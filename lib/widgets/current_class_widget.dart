@@ -59,7 +59,8 @@ class CurrentClassWidget extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                ],
+                ),
+              ],
             ),
             
             SizedBox(height: isCompact ? 12 : 16),

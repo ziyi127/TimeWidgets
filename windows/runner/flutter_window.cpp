@@ -97,8 +97,7 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
           if (wparam == IDM_EDIT_TIMETABLE) {
               // Send a message to Flutter to navigate to timetable edit screen
               if (flutter_controller_) {
-                  flutter_controller_->engine()->SendSystemMessage(
-                      "channel", "navigate_to_timetable_edit");
+                  flutter_controller_->engine()->ReloadSystemFonts();
               }
           }
           return 0;

@@ -21,33 +21,7 @@ void main() async {
     win.show();
   });
   
-  // 初始化系统托盘
-  await setupTrayManager();
-  
   runApp(const TimeWidgetsApp());
-}
-
-// 设置系统托盘
-Future<void> setupTrayManager() async {
-  try {
-    await trayManager.setIcon(
-      Platform.isWindows ? 'assets/icons/app_icon.ico' : 'assets/icons/app_icon.png'
-    );
-    
-    Menu menu = Menu(
-      items: [
-        MenuItem(label: '显示窗口', onClick: (_) => appWindow.show()),
-        MenuItem.separator(),
-        MenuItem(label: '退出', onClick: (_) => exit(0)),
-      ],
-    );
-    
-    await trayManager.setContextMenu(menu);
-    await trayManager.setToolTip('智慧课程表');
-  } catch (e) {
-    // 托盘初始化失败，静默处理避免影响应用启动
-    debugPrint('Tray initialization failed: $e');
-  }
 }
 
 class TimeWidgetsApp extends StatelessWidget {
@@ -84,6 +58,37 @@ class _DesktopWrapperState extends State<DesktopWrapper> with TrayListener {
         ),
       );
     });
+    
+    // Setup system tray menu
+    _setupTrayMenu();
+  }
+  
+  // 设置系统托盘菜单
+  Future<void> _setupTrayMenu() async {
+    try {
+      Menu menu = Menu(
+        items: [
+          MenuItem(label: '显示窗口', onClick: (_) => appWindow.show()),
+          MenuItem(label: '编辑课表', onClick: (_) {
+            // 导航到课表编辑页面
+            navigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (context) => const TimetableEditScreen(),
+              ),
+            );
+            appWindow.show();
+          }),
+          MenuItem.separator(),
+          MenuItem(label: '退出', onClick: (_) => exit(0)),
+        ],
+      );
+      
+      await trayManager.setContextMenu(menu);
+      await trayManager.setToolTip('智慧课程表');
+    } catch (e) {
+      // 托盘初始化失败，静默处理避免影响应用启动
+      debugPrint('Tray initialization failed: $e');
+    }
   }
 
   @override
@@ -132,7 +137,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with TrayListener {
         elevation: 0,
         scrolledUnderElevation: 1,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -165,7 +170,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with TrayListener {
         elevation: 0,
         scrolledUnderElevation: 1,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

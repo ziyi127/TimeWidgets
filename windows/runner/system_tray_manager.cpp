@@ -131,10 +131,10 @@ bool SystemTrayManager::RemoveTrayIcon() {
 void SystemTrayManager::CreateTrayMenu() {
     trayMenu_ = CreatePopupMenu();
     
-    AppendMenu(trayMenu_, MF_STRING, IDM_SHOW_WINDOW, L"Show Window");
-    AppendMenu(trayMenu_, MF_STRING, IDM_EDIT_TIMETABLE, L"Edit Timetable");
+    AppendMenu(trayMenu_, MF_STRING, IDM_SHOW_WINDOW, L"显示窗口");
+    AppendMenu(trayMenu_, MF_STRING, IDM_EDIT_TIMETABLE, L"编辑课表");
     AppendMenu(trayMenu_, MF_SEPARATOR, 0, NULL);
-    AppendMenu(trayMenu_, MF_STRING, IDM_EXIT, L"Exit");
+    AppendMenu(trayMenu_, MF_STRING, IDM_EXIT, L"退出");
 }
 
 void SystemTrayManager::LoadTrayIcon() {

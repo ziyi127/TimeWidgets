@@ -63,7 +63,7 @@ class CountdownWidget extends StatelessWidget {
     final countdown = countdownData;
     final description = countdown?.description ?? 'Final Exam';
     final remainingDays = countdown?.remainingDays ?? 45;
-    final eventType = countdown?.eventType ?? 'exam';
+    final eventType = countdown?.type ?? 'exam';
     final progress = countdown?.progress ?? 0.6;
     
     // 根据事件类型确定颜色
