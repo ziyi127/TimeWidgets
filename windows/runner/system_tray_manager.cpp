@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 SystemTrayManager::SystemTrayManager() 
-    : hwnd_(nullptr), hInstance_(nullptr), trayMenu_(nullptr), isInitialized_(false) {
+    : hwnd_(nullptr), hInstance_(nullptr), trayMenu_(nullptr), isInitialized_(false), WM_TRAYICON(0) {
     WM_TRAYICON = RegisterWindowMessage(L"TrayIconMessage");
 }
 
