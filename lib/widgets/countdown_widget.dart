@@ -3,194 +3,266 @@ import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/widgets/error_widget.dart';
 
 class CountdownWidget extends StatelessWidget {
-  final double? fontSize;
-  final double? padding;
   final CountdownData? countdownData;
   final String? error;
   final VoidCallback? onRetry;
+  final bool isCompact;
 
   const CountdownWidget({
     super.key,
-    this.fontSize,
-    this.padding,
     this.countdownData,
     this.error,
     this.onRetry,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final effectivePadding = padding ?? 24.0;
-    final effectiveBaseFontSize = fontSize ?? 14.0;
-    final titleFontSize = effectiveBaseFontSize;
-    final badgeFontSize = effectiveBaseFontSize * 0.7;
-    final eventFontSize = effectiveBaseFontSize * 2.3;
-    final numberFontSize = effectiveBaseFontSize * 3.4;
-    final unitFontSize = effectiveBaseFontSize * 1.7;
-    final progressFontSize = effectiveBaseFontSize * 0.85;
-    final hintFontSize = effectiveBaseFontSize;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     // 错误处理
     if (error != null) {
-      return CustomErrorWidget(
-        message: error!,
-        onRetry: onRetry,
-        fontSize: effectiveBaseFontSize,
+      return Card(
+        elevation: 0,
+        color: colorScheme.errorContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                color: colorScheme.onErrorContainer,
+                size: 24,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Countdown Error',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onErrorContainer,
+                ),
+              ),
+              if (onRetry != null) ...[
+                const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: onRetry,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ],
+          ),
+        ),
       );
     }
     
     // 使用真实倒计时数据或默认值
     final countdown = countdownData;
-    final title = countdown?.title ?? 'Important Event';
-    final description = countdown?.description ?? 'High School Exam';
-    final remainingDays = countdown?.remainingDays ?? 10;
-    final type = countdown?.type ?? 'exam';
-    final typeLabel = countdown?.typeLabel ?? 'Exam';
-    final typeColor = countdown?.typeColor ?? const Color(0xFFF44336);
-    final progress = countdown?.progress ?? 0.85;
-
-    return Container(
-      padding: EdgeInsets.all(effectivePadding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),  // 半透明背景
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: const Color(0xFF3D3D3D).withValues(alpha: 0.5),  // 半透明边框
-          width: 1.0,
+    final description = countdown?.description ?? 'Final Exam';
+    final remainingDays = countdown?.remainingDays ?? 45;
+    final eventType = countdown?.eventType ?? 'exam';
+    final progress = countdown?.progress ?? 0.6;
+    
+    // 根据事件类型确定颜色
+    final typeColor = _getEventTypeColor(colorScheme, eventType);
+    
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 标题区域
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: titleFontSize,
-                  color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.12),  // 使用真实类型颜色
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  typeLabel,
-                  style: TextStyle(
-                    fontSize: badgeFontSize,
-                    color: typeColor,  // 使用真实类型颜色
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: effectivePadding * 0.3),
-          
-          // 倒计时标题
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: eventFontSize,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFFFFFFFF),  // MD3 onSurface
-            ),
-          ),
-          SizedBox(height: effectivePadding * 0.15),
-          
-          // 倒计时数字
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
               children: [
+                Icon(
+                  _getEventTypeIcon(eventType),
+                  size: isCompact ? 16 : 18,
+                  color: typeColor,
+                ),
+                const SizedBox(width: 8),
                 Text(
-                  '$remainingDays',
-                  style: TextStyle(
-                    fontSize: numberFontSize,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFFFFFFFF),  // MD3 onSurface
+                  'Countdown',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(width: effectivePadding * 0.33),
-                Text(
-                  'days',
-                  style: TextStyle(
-                    fontSize: unitFontSize,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: typeColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    eventType.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: typeColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-          
-          SizedBox(height: effectivePadding * 0.3),
-          
-          // 进度条
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Study Progress',
-                    style: TextStyle(
-                      fontSize: progressFontSize,
-                      color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
+            
+            SizedBox(height: isCompact ? 12 : 16),
+            
+            // Event description
+            Text(
+              description,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
+                fontSize: isCompact ? 18 : 22,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            
+            SizedBox(height: isCompact ? 8 : 12),
+            
+            // Countdown display
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '$remainingDays',
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    color: typeColor,
+                    fontWeight: FontWeight.w300,
+                    fontSize: isCompact ? 36 : 48,
+                    height: 1.0,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    'days',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: isCompact ? 14 : 16,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
-                    '${(progress * 100).toInt()}%',
-                    style: TextStyle(
-                      fontSize: progressFontSize,
-                      color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+              ],
+            ),
+            
+            if (!isCompact) ...[
+              const SizedBox(height: 16),
+              
+              // Progress section
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Study Progress',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        '${(progress * 100).toInt()}%',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation<Color>(typeColor),
+                    minHeight: 6,
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ],
               ),
-              SizedBox(height: effectivePadding * 0.15),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: const Color(0xFF3D3D3D),  // MD3 surface variant
-                  valueColor: AlwaysStoppedAnimation<Color>(typeColor),  // 使用真实类型颜色
-                  minHeight: effectivePadding * 0.2,
+              
+              const SizedBox(height: 12),
+              
+              // Summary text
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 16,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '$remainingDays days until $description',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-          
-          SizedBox(height: effectivePadding * 0.2),
-          
-          // 提示文字
-          Text(
-            '$remainingDays days until $description',
-            style: TextStyle(
-              fontSize: hintFontSize,
-              color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  Color _getEventTypeColor(ColorScheme colorScheme, String eventType) {
+    switch (eventType.toLowerCase()) {
+      case 'exam':
+        return colorScheme.error;
+      case 'assignment':
+        return colorScheme.tertiary;
+      case 'project':
+        return colorScheme.secondary;
+      case 'holiday':
+        return colorScheme.primary;
+      default:
+        return colorScheme.primary;
+    }
+  }
+
+  IconData _getEventTypeIcon(String eventType) {
+    switch (eventType.toLowerCase()) {
+      case 'exam':
+        return Icons.quiz_rounded;
+      case 'assignment':
+        return Icons.assignment_rounded;
+      case 'project':
+        return Icons.work_rounded;
+      case 'holiday':
+        return Icons.celebration_rounded;
+      default:
+        return Icons.event_rounded;
+    }
   }
 }

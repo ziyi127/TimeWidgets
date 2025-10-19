@@ -3,40 +3,59 @@ import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/widgets/error_widget.dart';
 
 class WeatherWidget extends StatelessWidget {
-  final double? fontSize;
-  final double? padding;
   final WeatherData? weatherData;
   final String? error;
   final VoidCallback? onRetry;
+  final bool isCompact;
   
   const WeatherWidget({
     super.key,
-    this.fontSize,
-    this.padding,
     this.weatherData,
     this.error,
     this.onRetry,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final padding = this.padding ?? 24.0;
-    final baseFontSize = fontSize ?? 14.0;
-    final titleFontSize = baseFontSize;
-    final badgeFontSize = baseFontSize * 0.7;
-    final iconSize = baseFontSize * 3.4;
-    final tempFontSize = baseFontSize * 2.6;
-    final unitFontSize = baseFontSize * 1.4;
-    final weatherFontSize = baseFontSize * 1.1;
-    final detailFontSize = baseFontSize * 0.85;
-    final detailValueFontSize = baseFontSize * 0.85;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     // 错误处理
     if (error != null) {
-      return CustomErrorWidget(
-        message: error!,
-        onRetry: onRetry,
-        fontSize: baseFontSize,
+      return Card(
+        elevation: 0,
+        color: colorScheme.errorContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                color: colorScheme.onErrorContainer,
+                size: 24,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Weather Error',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onErrorContainer,
+                ),
+              ),
+              if (onRetry != null) ...[
+                const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: onRetry,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ],
+          ),
+        ),
       );
     }
     
@@ -48,203 +67,175 @@ class WeatherWidget extends StatelessWidget {
     final wind = weather?.wind ?? '微风';
     final pressure = weather?.pressure ?? 1016;
     
-    return Container(
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),  // Semi-transparent background
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: const Color(0xFF3D3D3D).withValues(alpha: 0.5),  // Semi-transparent border
-          width: 1.0,
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title area
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Weather Info',
-                style: TextStyle(
-                  fontSize: titleFontSize,
-                  color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                  fontWeight: FontWeight.w500,
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(
+                  _getWeatherIcon(description),
+                  size: isCompact ? 16 : 18,
+                  color: colorScheme.primary,
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: baseFontSize * 0.6, vertical: baseFontSize * 0.3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF9800).withValues(alpha: 0.12),  // MD3 primary with opacity
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Live Update',
-                  style: TextStyle(
-                    fontSize: badgeFontSize,
-                    color: const Color(0xFFFF9800),  // MD3 primary
-                    fontWeight: FontWeight.w600,
+                const SizedBox(width: 8),
+                Text(
+                  'Weather',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: baseFontSize * 0.8),
-          
-          // Main weather info
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Weather icon
-              Container(
-                width: iconSize,
-                height: iconSize,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF9800).withValues(alpha: 0.12),  // MD3 primary with opacity
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.wb_sunny,
-                  size: iconSize * 0.67,
-                  color: const Color(0xFFFF9800),  // MD3 primary
-                ),
-              ),
-              SizedBox(width: baseFontSize * 0.8),
-              
-              // Temperature display
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '$temperature',
-                            style: TextStyle(
-                              fontSize: tempFontSize,
-                              fontWeight: FontWeight.w300,
-                              color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                            ),
-                          ),
-                          Text(
-                            '°C',
-                            style: TextStyle(
-                              fontSize: unitFontSize,
-                              fontWeight: FontWeight.w300,
-                              color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                            ),
-                          ),
-                        ],
-                      ),
+                const Spacer(),
+                if (weatherData == null)
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.primary,
                     ),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: weatherFontSize,
-                        color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          
-          SizedBox(height: baseFontSize * 0.8),
-          
-          // Detail info card
-          Container(
-            padding: EdgeInsets.all(baseFontSize * 1.1),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),  // Semi-transparent inner card
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFF3D3D3D).withValues(alpha: 0.3),  // Semi-transparent border
-                width: 1,
-              ),
+                  ),
+              ],
             ),
-            child: Column(
+            
+            SizedBox(height: isCompact ? 12 : 16),
+            
+            // Temperature and description
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Feels Like',
-                      style: TextStyle(
-                        fontSize: detailFontSize,
-                        color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                      ),
-                    ),
-                    Text(
-                      '${pressure}hPa',
-                      style: TextStyle(
-                        fontSize: detailValueFontSize,
-                        color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                Text(
+                  '${temperature}°',
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w300,
+                    fontSize: isCompact ? 32 : 40,
+                    height: 1.0,
+                  ),
                 ),
-                SizedBox(height: baseFontSize * 0.6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Humidity',
-                      style: TextStyle(
-                        fontSize: detailFontSize,
-                        color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      description,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: isCompact ? 12 : 14,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      '$humidity%',
-                      style: TextStyle(
-                        fontSize: detailValueFontSize,
-                        color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: baseFontSize * 0.6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Wind',
-                      style: TextStyle(
-                        fontSize: detailFontSize,
-                        color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                      ),
-                    ),
-                    Text(
-                      wind,
-                      style: TextStyle(
-                        fontSize: detailValueFontSize,
-                        color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            
+            if (!isCompact) ...[
+              const SizedBox(height: 12),
+              
+              // Weather details
+              Row(
+                children: [
+                  _buildWeatherDetail(
+                    context,
+                    Icons.water_drop_outlined,
+                    '${humidity}%',
+                    'Humidity',
+                  ),
+                  const SizedBox(width: 16),
+                  _buildWeatherDetail(
+                    context,
+                    Icons.air_rounded,
+                    wind,
+                    'Wind',
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildWeatherDetail(
+    BuildContext context,
+    IconData icon,
+    String value,
+    String label,
+  ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getWeatherIcon(String description) {
+    switch (description.toLowerCase()) {
+      case 'sunny':
+      case 'clear':
+        return Icons.wb_sunny_rounded;
+      case 'cloudy':
+      case 'overcast':
+        return Icons.cloud_rounded;
+      case 'rainy':
+      case 'rain':
+        return Icons.umbrella_rounded;
+      case 'snowy':
+      case 'snow':
+        return Icons.ac_unit_rounded;
+      case 'thunderstorm':
+        return Icons.thunderstorm_rounded;
+      default:
+        return Icons.wb_cloudy_rounded;
+    }
   }
 }

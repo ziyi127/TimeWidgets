@@ -7,7 +7,8 @@
 
 // Menu item IDs
 #define IDM_SHOW_WINDOW 1
-#define IDM_EXIT        2
+#define IDM_EDIT_TIMETABLE 2
+#define IDM_EXIT        3
 
 class SystemTrayManager {
 public:
@@ -18,6 +19,7 @@ public:
     void Uninitialize();
     void ShowTrayMenu();
     void HandleTrayMessage(UINT message, WPARAM wparam, LPARAM lparam);
+    void HandleMenuCommand(WPARAM wparam);
     void ExitApplication();
 
 private:

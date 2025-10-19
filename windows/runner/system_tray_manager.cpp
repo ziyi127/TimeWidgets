@@ -66,6 +66,27 @@ void SystemTrayManager::HandleTrayMessage(UINT message, WPARAM wparam, LPARAM lp
     }
 }
 
+void SystemTrayManager::HandleMenuCommand(WPARAM wparam) {
+    switch (wparam) {
+        case IDM_SHOW_WINDOW:
+            ShowWindow(hwnd_, SW_SHOW);
+            SetForegroundWindow(hwnd_);
+            break;
+            
+        case IDM_EDIT_TIMETABLE:
+            // Show window and navigate to timetable edit screen
+            ShowWindow(hwnd_, SW_SHOW);
+            SetForegroundWindow(hwnd_);
+            // Send a custom message to the Flutter window to navigate to timetable edit
+            PostMessage(hwnd_, WM_USER + 1, IDM_EDIT_TIMETABLE, 0);
+            break;
+            
+        case IDM_EXIT:
+            ExitApplication();
+            break;
+    }
+}
+
 void SystemTrayManager::ExitApplication() {
     // Send WM_CLOSE message to the main window
     if (hwnd_) {
@@ -111,6 +132,7 @@ void SystemTrayManager::CreateTrayMenu() {
     trayMenu_ = CreatePopupMenu();
     
     AppendMenu(trayMenu_, MF_STRING, IDM_SHOW_WINDOW, L"Show Window");
+    AppendMenu(trayMenu_, MF_STRING, IDM_EDIT_TIMETABLE, L"Edit Timetable");
     AppendMenu(trayMenu_, MF_SEPARATOR, 0, NULL);
     AppendMenu(trayMenu_, MF_STRING, IDM_EXIT, L"Exit");
 }

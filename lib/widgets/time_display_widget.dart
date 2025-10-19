@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TimeDisplayWidget extends StatefulWidget {
-  final double? fontSize;
-  final double? padding;
+  final bool isCompact;
   
   const TimeDisplayWidget({
     super.key,
-    this.fontSize,
-    this.padding,
+    this.isCompact = false,
   });
 
   @override
@@ -46,92 +44,99 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final padding = widget.padding ?? 24.0;
-    final baseFontSize = widget.fontSize ?? 14.0;
-    final timeFontSize = baseFontSize * 3.4;
-    final secondsFontSize = baseFontSize * 1.7;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
-    return Container(
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),  // Semi-transparent background
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: const Color(0xFF3D3D3D).withValues(alpha: 0.5),  // Semi-transparent border
-          width: 1.0,
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title area
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Current Time',
-                style: TextStyle(
-                  fontSize: baseFontSize,
-                  color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: baseFontSize * 0.6, vertical: baseFontSize * 0.3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withValues(alpha: 0.12),  // MD3 primary with opacity
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Live',
-                  style: TextStyle(
-                    fontSize: baseFontSize * 0.7,
-                    color: const Color(0xFF4CAF50),  // MD3 primary
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: baseFontSize * 1.1),
-          
-          // Time display area
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+      child: Container(
+        padding: EdgeInsets.all(widget.isCompact ? 16.0 : 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
               children: [
-                Text(
-                  _currentTime,
-                  style: TextStyle(
-                    fontSize: timeFontSize,
-                    fontWeight: FontWeight.w300,
-                    color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                    fontFeatures: const [FontFeature.tabularFigures()], // Monospaced numbers
-                  ),
+                Icon(
+                  Icons.access_time_rounded,
+                  size: widget.isCompact ? 16 : 18,
+                  color: colorScheme.primary,
                 ),
-                SizedBox(width: baseFontSize * 0.6),
+                const SizedBox(width: 8),
                 Text(
-                  ':$_currentSeconds',
-                  style: TextStyle(
-                    fontSize: secondsFontSize,
-                    fontWeight: FontWeight.w300,
-                    color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                    fontFeatures: const [FontFeature.tabularFigures()],
+                  'Current Time',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            
+            SizedBox(height: widget.isCompact ? 12 : 16),
+            
+            // Time Display
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Main time
+                Text(
+                  _currentTime,
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w300,
+                    fontSize: widget.isCompact ? 36 : 48,
+                    height: 1.0,
+                  ),
+                ),
+                
+                const SizedBox(width: 8),
+                
+                // Seconds
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    _currentSeconds,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w400,
+                      fontSize: widget.isCompact ? 16 : 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            if (!widget.isCompact) ...[
+              const SizedBox(height: 8),
+              
+              // Additional info
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'Live',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

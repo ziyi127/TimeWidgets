@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/screens/home_screen.dart';
+import 'package:time_widgets/screens/timetable_edit_screen.dart';
+import 'package:time_widgets/services/system_tray_service.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'dart:io';
@@ -12,8 +14,8 @@ void main() async {
     final win = appWindow;
     const initialSize = Size(400, 800);
     win.size = initialSize;
-    win.minSize = const Size(400, 600);
-    win.maxSize = const Size(400, 1000);
+    win.minSize = const Size(350, 600);
+    win.maxSize = const Size(500, 1200);
     win.alignment = Alignment.topRight;
     win.title = "智慧课程表";
     win.show();
@@ -44,7 +46,7 @@ Future<void> setupTrayManager() async {
     await trayManager.setToolTip('智慧课程表');
   } catch (e) {
     // 托盘初始化失败，静默处理避免影响应用启动
-    // 在生产环境中可以考虑使用日志服务
+    debugPrint('Tray initialization failed: $e');
   }
 }
 
@@ -53,15 +55,7 @@ class TimeWidgetsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Smart Schedule',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const DesktopWrapper(),
-      debugShowCheckedModeBanner: false,
-    );
+    return const DesktopWrapper();
   }
 }
 
@@ -74,10 +68,22 @@ class DesktopWrapper extends StatefulWidget {
 }
 
 class _DesktopWrapperState extends State<DesktopWrapper> with TrayListener {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  
   @override
   void initState() {
     super.initState();
     trayManager.addListener(this);
+    
+    // Initialize system tray service
+    SystemTrayService().initialize(() {
+      // Navigate to timetable edit screen
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (context) => const TimetableEditScreen(),
+        ),
+      );
+    });
   }
 
   @override
@@ -98,14 +104,80 @@ class _DesktopWrapperState extends State<DesktopWrapper> with TrayListener {
 
   @override
   Widget build(BuildContext context) {
-    // 获取屏幕尺寸
-    final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-    
-    return HomeScreen(
-      screenWidth: screenWidth,
-      screenHeight: screenHeight,
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      title: 'Smart Schedule',
+      theme: _buildLightTheme(),
+      darkTheme: _buildDarkTheme(),
+      themeMode: ThemeMode.system,
+      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+
+  // Material Design 3 浅色主题
+  ThemeData _buildLightTheme() {
+    const seedColor = Color(0xFF6750A4); // MD3 Primary color
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.light,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+      ),
+      cardTheme: CardTheme(
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Material Design 3 深色主题
+  ThemeData _buildDarkTheme() {
+    const seedColor = Color(0xFF6750A4);
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.dark,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+      ),
+      cardTheme: CardTheme(
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
     );
   }
 }

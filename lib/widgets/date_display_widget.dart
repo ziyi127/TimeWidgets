@@ -2,173 +2,193 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateDisplayWidget extends StatelessWidget {
-  final double? fontSize;
-  final double? padding;
+  final bool isCompact;
   
   const DateDisplayWidget({
     super.key,
-    this.fontSize,
-    this.padding,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final effectivePadding = padding ?? 24.0;
-    final effectiveBaseFontSize = fontSize ?? 14.0;
-    final titleFontSize = effectiveBaseFontSize;
-    final dateFontSize = effectiveBaseFontSize * 1.7;
-    final lunarFontSize = effectiveBaseFontSize * 1.1;
-    final dayFontSize = effectiveBaseFontSize * 1.3;
-    final weekFontSize = effectiveBaseFontSize;
-    final timeFontSize = effectiveBaseFontSize * 0.9;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final now = DateTime.now();
     
-    return Container(
-      padding: EdgeInsets.all(effectivePadding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),  // Semi-transparent background
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: const Color(0xFF3D3D3D).withValues(alpha: 0.5),  // Semi-transparent border
-          width: 1.0,
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title area
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Date Information',
-                style: TextStyle(
-                  fontSize: titleFontSize,
-                  color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: effectiveBaseFontSize * 0.6, vertical: effectiveBaseFontSize * 0.3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3).withValues(alpha: 0.12),  // MD3 primary with opacity
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Today',
-                  style: TextStyle(
-                    fontSize: effectiveBaseFontSize * 0.7,
-                    color: const Color(0xFF2196F3),  // MD3 primary
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: effectiveBaseFontSize * 1.1),
-          
-          // Gregorian date
-          Text(
-            '${DateTime.now().year}-${DateFormat('MM.dd').format(DateTime.now())}',
-            style: TextStyle(
-              fontSize: dateFontSize,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFFFFFFFF),  // MD3 onSurface
-            ),
-          ),
-          SizedBox(height: effectiveBaseFontSize * 0.6),
-          
-          // Lunar date
-          Text(
-            _getLunarDate(DateTime.now()),
-            style: TextStyle(
-              fontSize: lunarFontSize,
-              color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          SizedBox(height: effectiveBaseFontSize * 0.9),
-          
-          // Day of week and week number
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
               children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  size: isCompact ? 16 : 18,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
                 Text(
-                  _getChineseDayOfWeek(DateTime.now().weekday),
-                  style: TextStyle(
-                    fontSize: dayFontSize,
+                  'Date',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFFFFFFFF),  // MD3 onSurface
                   ),
                 ),
-                SizedBox(width: effectiveBaseFontSize * 1.1),
-                Text(
-                  'Week 12',
-                  style: TextStyle(
-                    fontSize: weekFontSize,
-                    color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                    fontWeight: FontWeight.w400,
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Today',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-          
-          // Time of day
-          SizedBox(height: effectiveBaseFontSize * 0.6),
-          Text(
-            _getTimeOfDay(),
-            style: TextStyle(
-              fontSize: timeFontSize,
-              color: const Color(0xFF808080),  // MD3 onSurfaceVariant with less opacity
-              fontStyle: FontStyle.italic,
+            
+            SizedBox(height: isCompact ? 12 : 16),
+            
+            // Main date display
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Day number
+                Text(
+                  '${now.day}',
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w300,
+                    fontSize: isCompact ? 32 : 40,
+                    height: 1.0,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                
+                // Month and year
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          DateFormat('MMMM').format(now),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontSize: isCompact ? 14 : 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          '${now.year}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: isCompact ? 12 : 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            
+            if (!isCompact) ...[
+              const SizedBox(height: 12),
+              
+              // Additional info
+              Row(
+                children: [
+                  _buildDateDetail(
+                    context,
+                    Icons.event_rounded,
+                    DateFormat('EEEE').format(now),
+                    'Weekday',
+                  ),
+                  const SizedBox(width: 16),
+                  _buildDateDetail(
+                    context,
+                    Icons.schedule_rounded,
+                    'Week ${_getWeekOfYear(now)}',
+                    'Week of Year',
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  String _getChineseDayOfWeek(int weekday) {
-    switch (weekday) {
-      case 1:
-        return '周一';
-      case 2:
-        return '周二';
-      case 3:
-        return '周三';
-      case 4:
-        return '周四';
-      case 5:
-        return '周五';
-      case 6:
-        return '周六';
-      case 7:
-        return '周日';
-      default:
-        return '未知';
-    }
+  Widget _buildDateDetail(
+    BuildContext context,
+    IconData icon,
+    String value,
+    String label,
+  ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-  
-  String _getLunarDate(DateTime date) {
-    // 简化的农历显示，实际应用中需要农历转换库
-    return '农历三月初八';
-  }
-  
-  String _getTimeOfDay() {
-    final hour = DateTime.now().hour;
-    if (hour < 6) return '凌晨时分';
-    if (hour < 12) return '上午时光';
-    if (hour < 14) return '中午时分';
-    if (hour < 18) return '下午时光';
-    if (hour < 21) return '傍晚时分';
-    return '夜晚时分';
+
+  int _getWeekOfYear(DateTime date) {
+    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final daysSinceFirstDay = date.difference(firstDayOfYear).inDays;
+    return ((daysSinceFirstDay + firstDayOfYear.weekday - 1) / 7).ceil();
   }
 }

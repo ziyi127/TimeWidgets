@@ -88,15 +88,20 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
       
       // Handle menu commands
       if (message == WM_COMMAND) {
-          switch (LOWORD(wparam)) {
-              case IDM_SHOW_WINDOW: // Show window
-                  ShowWindow(hwnd, SW_SHOW);
-                  SetForegroundWindow(hwnd);
-                  break;
-              case IDM_EXIT: // Exit
-                  tray_manager_->ExitApplication();
-                  break;
+          tray_manager_->HandleMenuCommand(LOWORD(wparam));
+          return 0;
+      }
+      
+      // Handle custom messages from system tray
+      if (message == WM_USER + 1) {
+          if (wparam == IDM_EDIT_TIMETABLE) {
+              // Send a message to Flutter to navigate to timetable edit screen
+              if (flutter_controller_) {
+                  flutter_controller_->engine()->SendSystemMessage(
+                      "channel", "navigate_to_timetable_edit");
+              }
           }
+          return 0;
       }
   }
 

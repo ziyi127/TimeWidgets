@@ -1,199 +1,186 @@
 import 'package:flutter/material.dart';
 
 class CurrentClassWidget extends StatelessWidget {
-  final double? fontSize;
-  final double? padding;
+  final bool isCompact;
 
   const CurrentClassWidget({
     super.key,
-    this.fontSize,
-    this.padding,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final effectivePadding = padding ?? 24.0;
-    final effectiveBaseFontSize = fontSize ?? 14.0;
-    final titleFontSize = effectiveBaseFontSize;
-    final badgeFontSize = effectiveBaseFontSize * 0.7;
-    final courseFontSize = effectiveBaseFontSize * 1.4;
-    final timeFontSize = effectiveBaseFontSize;
-    final progressFontSize = effectiveBaseFontSize * 0.85;
-    final nextClassFontSize = effectiveBaseFontSize * 0.85;
-
-    return Container(
-      padding: EdgeInsets.all(effectivePadding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),  // 半透明背景
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: const Color(0xFF3D3D3D).withValues(alpha: 0.5),  // 半透明边框
-          width: 1.0,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 标题区域
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Current Class',
-                style: TextStyle(
-                  fontSize: titleFontSize,
-                  color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                  fontWeight: FontWeight.w500,
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(
+                  Icons.school_rounded,
+                  size: isCompact ? 16 : 18,
+                  color: colorScheme.primary,
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withValues(alpha: 0.12),  // MD3 primary with opacity
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'In Progress',
-                  style: TextStyle(
-                    fontSize: badgeFontSize,
-                    color: const Color(0xFF4CAF50),  // MD3 primary
-                    fontWeight: FontWeight.w600,
+                const SizedBox(width: 8),
+                Text(
+                  'Current Class',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: effectivePadding * 0.67),
-          
-          // 课程信息
-          Row(
-            children: [
-              // 课程图标
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3).withValues(alpha: 0.12),  // MD3 primary with opacity
-                  borderRadius: BorderRadius.circular(12),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: colorScheme.tertiaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'In Progress',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onTertiaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+            ),
+            
+            SizedBox(height: isCompact ? 12 : 16),
+            
+            // Course info
+            Row(
+              children: [
+                // Course icon
+                Container(
+                  width: isCompact ? 40 : 48,
+                  height: isCompact ? 40 : 48,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.class_rounded,
+                    size: isCompact ? 20 : 24,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.class_,
-                  size: 32,
-                  color: Color(0xFF2196F3),  // MD3 primary
-                ),
-              ),
-              const SizedBox(width: 16),
-              
-              // 课程详情
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
+                const SizedBox(width: 12),
+                
+                // Course details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         'Chinese A Teacher',
-                        style: TextStyle(
-                          fontSize: courseFontSize,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontSize: isCompact ? 14 : 16,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFFFFFFFF),  // MD3 onSurface
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '8:00 - 8:45',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: isCompact ? 12 : 14,
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            
+            if (!isCompact) ...[
+              const SizedBox(height: 16),
+              
+              // Progress section
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Class Progress',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        '30/45 min',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: 0.67, // 30/45 ≈ 0.67
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                    minHeight: 6,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Next class info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 16,
+                      color: colorScheme.onSurfaceVariant,
                     ),
-                    SizedBox(height: effectivePadding * 0.17),
-                    Text(
-                      '8:00 - 8:45',
-                      style: TextStyle(
-                        fontSize: timeFontSize,
-                        color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                        fontWeight: FontWeight.w400,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Next: Math B Teacher (8:50)',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
             ],
-          ),
-          
-          SizedBox(height: effectivePadding * 0.67),
-          
-          // 课程进度条
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Class Progress',
-                    style: TextStyle(
-                      fontSize: progressFontSize,
-                      color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                    ),
-                  ),
-                  Text(
-                    '30/45 min',
-                    style: TextStyle(
-                      fontSize: progressFontSize,
-                      color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: effectivePadding * 0.33),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: 0.67, // 30/45 ≈ 0.67
-                  backgroundColor: const Color(0xFF3D3D3D),  // MD3 surface variant
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),  // MD3 primary
-                  minHeight: effectivePadding * 0.25,
-                ),
-              ),
-            ],
-          ),
-          
-          SizedBox(height: effectivePadding * 0.67),
-          
-          // 下节课预告
-          Container(
-            padding: EdgeInsets.all(effectivePadding * 0.67),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A).withValues(alpha: 0.6),  // 半透明内卡片
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFF3D3D3D).withValues(alpha: 0.3),  // 半透明边框
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.schedule,
-                  size: 16,
-                  color: Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                ),
-                SizedBox(width: effectivePadding * 0.33),
-                Text(
-                  'Next: Math B Teacher (8:50)',
-                  style: TextStyle(
-                    fontSize: nextClassFontSize,
-                    color: const Color(0xFFFFFFFF),  // MD3 onSurface
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:time_widgets/models/course_model.dart';
+import 'package:time_widgets/models/weather_model.dart';
+import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/services/api_service.dart';
 
 class TimetableService {
@@ -73,7 +75,7 @@ class TimetableService {
   }
 
   // 获取天气信息
-  Future<Map<String, dynamic>> getWeather() async {
+  Future<WeatherData> getWeather() async {
     try {
       // 尝试从真实API获取数据
       return await _apiService.getWeather();
@@ -81,16 +83,25 @@ class TimetableService {
       // 如果API调用失败，回退到模拟数据
       print('Failed to fetch weather from API, using mock data: $e');
       // 模拟天气数据
-      return {
-        'condition': '晴',
-        'temperature': '20～25°C',
-        'icon': '☀️',
-      };
+      return WeatherData(
+        cityName: '北京',
+        description: '晴',
+        temperature: 25,
+        temperatureRange: '20℃~30℃',
+        aqiLevel: 50,
+        humidity: 40,
+        wind: '3-4级',
+        pressure: 1013,
+        sunrise: '06:00',
+        sunset: '18:30',
+        weatherType: 0,
+        weatherIcon: 'weather_0.png',
+      );
     }
   }
 
   // 获取倒计时信息
-  Future<Map<String, dynamic>> getCountdown() async {
+  Future<CountdownData> getCountdown() async {
     try {
       // 尝试从真实API获取数据
       return await _apiService.getCountdown();
@@ -98,10 +109,15 @@ class TimetableService {
       // 如果API调用失败，回退到模拟数据
       print('Failed to fetch countdown from API, using mock data: $e');
       // 模拟倒计时数据
-      return {
-        'event': '中考',
-        'daysRemaining': 10,
-      };
+      return CountdownData(
+        id: '1',
+        title: '中考',
+        description: '中考倒计时',
+        targetDate: DateTime.now().add(const Duration(days: 10)),
+        type: 'exam',
+        progress: 0.5,
+        category: 'Academic',
+      );
     }
   }
 }

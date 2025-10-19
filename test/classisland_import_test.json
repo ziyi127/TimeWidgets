@@ -1,0 +1,71 @@
+{
+  "Name": "测试课表",
+  "TimeLayouts": {
+    "layout1": {
+      "Name": "默认时间表",
+      "Layouts": [
+        {
+          "StartSecond": "2024-05-25T08:00:00",
+          "EndSecond": "2024-05-25T08:45:00",
+          "TimeType": 0,
+          "IsHideDefault": false,
+          "DefaultClassId": "",
+          "AttachedObjects": {}
+        },
+        {
+          "StartSecond": "2024-05-25T08:55:00",
+          "EndSecond": "2024-05-25T09:40:00",
+          "TimeType": 0,
+          "IsHideDefault": false,
+          "DefaultClassId": "",
+          "AttachedObjects": {}
+        }
+      ],
+      "AttachedObjects": {}
+    }
+  },
+  "ClassPlans": {
+    "plan1": {
+      "TimeLayoutId": "layout1",
+      "TimeRule": {
+        "WeekDay": 1,
+        "WeekCountDiv": 0,
+        "WeekCountDivTotal": 0,
+        "IsActive": true
+      },
+      "Classes": [
+        {
+          "SubjectId": "subject1",
+          "IsActive": true
+        },
+        {
+          "SubjectId": "subject2",
+          "IsActive": true
+        }
+      ],
+      "Name": "周一课表",
+      "IsOverlay": false,
+      "OverlaySourceId": null,
+      "IsEnabled": true
+    }
+  },
+  "Subjects": {
+    "subject1": {
+      "Name": "数学",
+      "Initial": "数",
+      "TeacherName": "张老师",
+      "IsOutDoor": false,
+      "AttachedObjects": {}
+    },
+    "subject2": {
+      "Name": "英语",
+      "Initial": "英",
+      "TeacherName": "李老师",
+      "IsOutDoor": false,
+      "AttachedObjects": {}
+    }
+  },
+  "ClassPlanGroups": {},
+  "IsOverlayClassPlanEnabled": false,
+  "OverlayClassPlanId": null
+}

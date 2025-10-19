@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
@@ -6,7 +7,7 @@ import 'package:time_widgets/models/countdown_model.dart';
 class IpcService {
   static const String _wsUrl = 'ws://localhost:8081'; // WebSocket服务器地址
   static final IpcService _instance = IpcService._internal();
-  dynamic _socket;
+  WebSocketChannel? _channel;
   
   factory IpcService() {
     return _instance;
@@ -17,8 +18,8 @@ class IpcService {
   // 连接到WebSocket服务器
   Future<void> connect() async {
     try {
-      // 在Web环境中使用WebSocket
-      _socket = await _connectWebSocket();
+      // 创建WebSocket连接
+      _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
       print('已连接到WebSocket服务器');
     } catch (e) {
       print('连接WebSocket失败: $e');
@@ -26,33 +27,18 @@ class IpcService {
     }
   }
   
-  // 连接WebSocket的通用方法
-  Future<dynamic> _connectWebSocket() async {
-    // 这里需要根据平台选择不同的WebSocket实现
-    // 由于我们在Web环境中，使用HTML WebSocket
-    return _createHtmlWebSocket();
-  }
-  
-  // 创建HTML WebSocket
-  dynamic _createHtmlWebSocket() {
-    // 在Web环境中，我们可以使用dart:html的WebSocket
-    // 但由于Flutter Web的限制，我们需要使用package:web_socket_channel
-    // 这里使用一个简化的实现
-    throw UnimplementedError('WebSocket implementation needed for Flutter Web');
-  }
-  
   // 断开连接
   void disconnect() {
-    if (_socket != null) {
-      // 关闭WebSocket连接
+    if (_channel != null) {
+      _channel!.sink.close();
       print('已断开WebSocket连接');
-      _socket = null;
+      _channel = null;
     }
   }
   
   // 发送请求并获取响应
   Future<Map<String, dynamic>> _sendRequest(String type, [Map<String, dynamic>? params]) async {
-    if (_socket == null) {
+    if (_channel == null) {
       await connect();
     }
     
@@ -63,9 +49,14 @@ class IpcService {
         if (params != null) 'params': params,
       };
       
-      // 发送请求并获取响应
-      // 这里需要根据具体的WebSocket实现来编写
-      throw UnimplementedError('WebSocket send/receive implementation needed');
+      // 发送请求
+      _channel!.sink.add(json.encode(request));
+      
+      // 等待响应
+      final response = await _channel!.stream.first;
+      final responseData = json.decode(response);
+      
+      return responseData;
     } catch (e) {
       print('IPC请求失败: $e');
       throw Exception('IPC request failed: $e');
