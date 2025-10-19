@@ -19,6 +19,7 @@ dependencies:
     sdk: flutter
   tray_manager: ^0.5.1
   bitsdojo_window: ^0.1.6
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   flutter_test:
