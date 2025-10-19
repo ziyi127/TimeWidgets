@@ -17,12 +17,36 @@ add_executable(${BINARY_NAME} WIN32
   "runner.exe.manifest"
 )
 
+# Test executable
+add_executable(test_system_tray
+  "test_system_tray.cpp"
+  "system_tray_manager.cpp"
+)
+
+# Apply the standard set of build settings to the test executable
+apply_standard_settings(test_system_tray)
+
+# Add UTF-8 encoding support to the test executable
+target_compile_options(test_system_tray PRIVATE /utf-8)
+target_compile_options(test_system_tray PRIVATE /source-charset:utf-8)
+target_compile_options(test_system_tray PRIVATE /execution-charset:utf-8)
+
+# Add preprocessor definitions for the test executable
+target_compile_definitions(test_system_tray PRIVATE "NOMINMAX")
+
+# Add dependency libraries and include directories for the test executable
+target_link_libraries(test_system_tray PRIVATE flutter flutter_wrapper_app)
+target_link_libraries(test_system_tray PRIVATE "dwmapi.lib")
+target_include_directories(test_system_tray PRIVATE "${CMAKE_SOURCE_DIR}")
+
 # Apply the standard set of build settings. This can be removed for applications
 # that need different build settings.
 apply_standard_settings(${BINARY_NAME})
 
 # Add UTF-8 encoding support
 target_compile_options(${BINARY_NAME} PRIVATE /utf-8)
+target_compile_options(${BINARY_NAME} PRIVATE /source-charset:utf-8)
+target_compile_options(${BINARY_NAME} PRIVATE /execution-charset:utf-8)
 
 # Add preprocessor definitions for the build version.
 target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION=\"${FLUTTER_VERSION}\"")
