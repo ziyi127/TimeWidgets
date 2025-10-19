@@ -1,213 +1,333 @@
 import 'package:flutter/material.dart';
 
 class TimetableWidget extends StatelessWidget {
-  final double? fontSize;
-  final double? padding;
+  final bool isCompact;
 
   const TimetableWidget({
     super.key,
-    this.fontSize,
-    this.padding,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final effectivePadding = padding ?? 24.0;
-    final effectiveBaseFontSize = fontSize ?? 14.0;
-    final titleFontSize = effectiveBaseFontSize * 1.4;
-    final badgeFontSize = effectiveBaseFontSize * 0.85;
-    // 移除未使用的变量
-    // final courseFontSize = effectiveBaseFontSize * 1.15;
-    // final teacherFontSize = effectiveBaseFontSize * 0.93;
-    // final timeFontSize = effectiveBaseFontSize;
-    // final statusFontSize = effectiveBaseFontSize * 0.7;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     final timetableData = [
-      {'subject': 'Chinese', 'teacher': 'Teacher A', 'time': '08:30-09:10', 'status': 'completed'},
-      {'subject': 'Math', 'teacher': 'Teacher B', 'time': '09:20-10:00', 'status': 'completed'},
-      {'subject': 'English', 'teacher': 'Teacher C', 'time': '10:10-11:50', 'status': 'current'},
-      {'subject': 'Physics', 'teacher': 'Teacher D', 'time': '14:00-14:40', 'status': 'upcoming'},
-      {'subject': 'Chemistry', 'teacher': 'Teacher E', 'time': '14:50-15:30', 'status': 'upcoming'},
+      {'subject': 'Chinese', 'teacher': 'Teacher A', 'time': '08:30-09:10', 'status': 'completed', 'room': 'A101'},
+      {'subject': 'Math', 'teacher': 'Teacher B', 'time': '09:20-10:00', 'status': 'completed', 'room': 'B205'},
+      {'subject': 'English', 'teacher': 'Teacher C', 'time': '10:10-11:50', 'status': 'current', 'room': 'C302'},
+      {'subject': 'Physics', 'teacher': 'Teacher D', 'time': '14:00-14:40', 'status': 'upcoming', 'room': 'D108'},
+      {'subject': 'Chemistry', 'teacher': 'Teacher E', 'time': '14:50-15:30', 'status': 'upcoming', 'room': 'E201'},
     ];
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(effectivePadding),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2a2a3e).withValues(alpha: 0.8),  // 保持半透明背景
+    final currentClassCount = timetableData.where((item) => item['status'] == 'current').length;
+    final upcomingClassCount = timetableData.where((item) => item['status'] == 'upcoming').length;
+    final completedClassCount = timetableData.where((item) => item['status'] == 'completed').length;
+
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF4a4a5e).withValues(alpha: 0.5),  // 半透明边框
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Today\'s Classes',
-                style: TextStyle(
-                  fontSize: titleFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+      child: Container(
+        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(
+                  Icons.schedule_rounded,
+                  size: isCompact ? 16 : 18,
+                  color: colorScheme.primary,
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  '5 Classes',
-                  style: TextStyle(
-                    fontSize: badgeFontSize,
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.8),
+                const SizedBox(width: 8),
+                Text(
+                  'Today\'s Classes',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                const Spacer(),
+                _buildStatusChip(
+                  context,
+                  '${timetableData.length} Classes',
+                  colorScheme.primary,
+                ),
+              ],
+            ),
+            
+            if (!isCompact) ...[
+              const SizedBox(height: 12),
+              
+              // Status summary
+              Row(
+                children: [
+                  if (completedClassCount > 0)
+                    _buildStatusIndicator(
+                      context,
+                      Icons.check_circle_outline_rounded,
+                      '$completedClassCount Completed',
+                      colorScheme.tertiary,
+                    ),
+                  if (currentClassCount > 0) ...[
+                    if (completedClassCount > 0) const SizedBox(width: 12),
+                    _buildStatusIndicator(
+                      context,
+                      Icons.play_circle_outline_rounded,
+                      '$currentClassCount Current',
+                      colorScheme.primary,
+                    ),
+                  ],
+                  if (upcomingClassCount > 0) ...[
+                    if (completedClassCount > 0 || currentClassCount > 0) const SizedBox(width: 12),
+                    _buildStatusIndicator(
+                      context,
+                      Icons.schedule_rounded,
+                      '$upcomingClassCount Upcoming',
+                      colorScheme.secondary,
+                    ),
+                  ],
+                ],
               ),
             ],
-          ),
-          SizedBox(height: effectivePadding * 0.83),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 280),
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              itemCount: timetableData.length,
-              separatorBuilder: (context, index) => SizedBox(height: effectivePadding * 0.33),
-              itemBuilder: (context, index) {
-                final item = timetableData[index];
-                return _buildCourseItem(item, index, effectiveBaseFontSize, effectivePadding);
-              },
+            
+            SizedBox(height: isCompact ? 12 : 16),
+            
+            // Classes list
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: isCompact ? 200 : 280),
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                itemCount: timetableData.length,
+                separatorBuilder: (context, index) => SizedBox(height: isCompact ? 8 : 12),
+                itemBuilder: (context, index) {
+                  final item = timetableData[index];
+                  return _buildCourseItem(context, item, index);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCourseItem(Map<String, String> item, int index, double effectiveBaseFontSize, double effectivePadding) {
-    // 字体大小变量
-    final courseFontSize = effectiveBaseFontSize * 1.15;
-    final teacherFontSize = effectiveBaseFontSize * 0.93;
-    final timeFontSize = effectiveBaseFontSize;
+  Widget _buildStatusChip(BuildContext context, String text, Color color) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusIndicator(BuildContext context, IconData icon, String text, Color color) {
+    final theme = Theme.of(context);
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: color,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCourseItem(BuildContext context, Map<String, String> item, int index) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     final status = item['status'] ?? 'upcoming';
     final isCurrent = status == 'current';
     final isCompleted = status == 'completed';
     
     final statusColor = isCurrent 
-        ? const Color(0xFF2196F3)
+        ? colorScheme.primary
         : isCompleted
-            ? const Color(0xFF757575)
-            : const Color(0xFF9E9E9E);
+            ? colorScheme.tertiary
+            : colorScheme.secondary;
     
     final backgroundColor = isCurrent
-        ? const Color(0xFF2196F3).withValues(alpha: 0.08)  // MD3 降低透明度
-        : const Color(0xFF3a3a4e);
+        ? colorScheme.primaryContainer.withOpacity(0.3)
+        : colorScheme.surfaceContainerHighest;
 
     return Container(
-      margin: EdgeInsets.only(bottom: effectivePadding * 0.5),
-      padding: EdgeInsets.symmetric(horizontal: effectivePadding * 0.67, vertical: effectivePadding * 0.5),
+      padding: EdgeInsets.all(isCompact ? 12.0 : 16.0),
       decoration: BoxDecoration(
-        color: backgroundColor.withValues(alpha: 0.6),  // 半透明内卡片
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isCurrent ? statusColor.withValues(alpha: 0.24) : const Color(0xFF4a4a5e).withValues(alpha: 0.3),  // 半透明边框
+          color: isCurrent 
+              ? statusColor.withOpacity(0.3) 
+              : colorScheme.outline.withOpacity(0.1),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          // 状态指示器
+          // Status indicator
           Container(
             width: 4,
-            height: 40,
+            height: isCompact ? 32 : 40,
             decoration: BoxDecoration(
               color: statusColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          SizedBox(width: effectivePadding * 0.67),
           
-          // 课程信息
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(width: isCompact ? 12 : 16),
+          
+          // Course info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
+                    Expanded(
                       child: Text(
                         item['subject']!,
-                        style: TextStyle(
-                          fontSize: courseFontSize,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFFFFFFFF),  // MD3 onSurface
+                          fontSize: isCompact ? 14 : 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isCurrent)
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'LIVE',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: effectivePadding * 0.17),
-                    Text(
-                      item['teacher']!,
-                      style: TextStyle(
-                        fontSize: teacherFontSize,
-                        color: const Color(0xFFB3B3B3),  // MD3 onSurfaceVariant
-                      ),
-                    ),
                   ],
                 ),
-              ),
+                
+                const SizedBox(height: 4),
+                
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline_rounded,
+                      size: 14,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        item['teacher']!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: isCompact ? 11 : 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (!isCompact && item['room'] != null) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 14,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        item['room']!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
           
-          // 时间信息
+          // Time info
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
                 item['time']!,
-                style: TextStyle(
-                  fontSize: timeFontSize,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFFFFFFFF),  // MD3 onSurface
+                  fontSize: isCompact ? 12 : 14,
                 ),
               ),
-              if (isCurrent)
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),  // MD3 降低透明度
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '进行中',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: statusColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              if (!isCompact) ...[
+                const SizedBox(height: 2),
+                Icon(
+                  _getStatusIcon(status),
+                  size: 16,
+                  color: statusColor,
                 ),
+              ],
             ],
           ),
         ],
       ),
     );
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status) {
+      case 'current':
+        return Icons.play_circle_filled_rounded;
+      case 'completed':
+        return Icons.check_circle_rounded;
+      case 'upcoming':
+        return Icons.schedule_rounded;
+      default:
+        return Icons.circle_outlined;
+    }
   }
 }
