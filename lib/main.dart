@@ -1,31 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:time_widgets/screens/home_screen.dart';
+import 'package:time_widgets/screens/desktop_widget_screen.dart';
 import 'package:time_widgets/screens/timetable_edit_screen.dart';
 import 'package:time_widgets/screens/settings_screen.dart';
-import 'package:time_widgets/services/system_tray_service.dart';
+import 'package:time_widgets/services/md3_tray_menu_service.dart';
 import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 初始化窗口
-  doWhenWindowReady(() {
-    final win = appWindow;
-    const initialSize = Size(400, 800);
-    win.size = initialSize;
-    win.minSize = const Size(350, 600);
-    win.maxSize = const Size(500, 1200);
-    win.alignment = Alignment.topRight;
-    win.title = "智慧课程表";
-    win.show();
-    
-    // 设置窗口关闭行为 - 隐藏到托盘而不是退出
-    // 注意：bitsdojo_window 可能不支持 onWindowClose，
-    // 这个功能将在系统托盘服务中处理
-  });
+  // 初始化窗口管理器
+  await windowManager.ensureInitialized();
   
   runApp(const TimeWidgetsApp());
 }
@@ -39,7 +26,7 @@ class TimeWidgetsApp extends StatelessWidget {
   }
 }
 
-// 桌面模式包装器
+/// 桌面模式包装器
 class DesktopWrapper extends StatefulWidget {
   const DesktopWrapper({super.key});
 
@@ -50,62 +37,87 @@ class DesktopWrapper extends StatefulWidget {
 class _DesktopWrapperState extends State<DesktopWrapper> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final ThemeService _themeService = ThemeService();
-  final SystemTrayService _systemTrayService = SystemTrayService();
   bool _isWindowVisible = true;
+  bool _isWindowInitialized = false;
   
   @override
   void initState() {
     super.initState();
     
-    // Initialize system tray service
-    _initializeSystemTray();
-    
-    // Load theme settings on startup
+    // 加载主题设置
     _themeService.loadSettings();
+    
+    // 初始化窗口
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeWindow();
+      _initializeSystemTray();
+    });
+  }
+
+  /// 初始化窗口配置
+  Future<void> _initializeWindow() async {
+    if (_isWindowInitialized) return;
+    
+    try {
+      // 获取屏幕尺寸
+      const windowWidth = 400.0;
+      const windowHeight = 900.0;
+      const windowX = 1520.0; // 屏幕右侧
+      
+      await windowManager.setSize(const Size(windowWidth, windowHeight));
+      await windowManager.setPosition(const Offset(windowX, 50));
+      await windowManager.setAsFrameless();
+      await windowManager.setBackgroundColor(Colors.transparent);
+      await windowManager.setHasShadow(false);
+      await windowManager.setAlwaysOnTop(false);
+      await windowManager.setAlwaysOnBottom(false);
+      await windowManager.show();
+      
+      doWhenWindowReady(() {
+        final win = appWindow;
+        win.title = "智慧课程表";
+        win.show();
+      });
+      
+      setState(() {
+        _isWindowInitialized = true;
+      });
+      
+      print('Window initialized successfully');
+    } catch (e) {
+      print('Window initialization failed: $e');
+      setState(() {
+        _isWindowInitialized = true;
+      });
+    }
   }
 
   /// 初始化系统托盘
   Future<void> _initializeSystemTray() async {
     try {
-      // 设置回调函数
-      _systemTrayService.onMenuItemSelected = _handleTrayMenuSelection;
-      _systemTrayService.onToggleWindow = _toggleMainWindow;
-      _systemTrayService.onExitApplication = _exitApplication;
+      final trayService = MD3TrayMenuService.instance;
       
-      // 暂时禁用系统托盘初始化，因为在开发环境中可能有权限问题
-      // await _systemTrayService.initializeSystemTray();
+      // 设置回调
+      trayService.onShowSettings = _navigateToSettings;
+      trayService.onShowTimetableEdit = _navigateToTimetableEdit;
+      trayService.onToggleWindow = _toggleMainWindow;
+      trayService.onExit = _exitApplication;
       
-      print('System tray service configured (initialization skipped in debug mode)');
+      // 初始化托盘
+      await trayService.initialize();
+      
+      print('System tray initialized');
     } catch (e) {
-      print('Failed to initialize system tray: $e');
-      // 系统托盘初始化失败不应该阻止应用启动
-    }
-  }
-
-  /// 处理托盘菜单选择
-  void _handleTrayMenuSelection(TrayMenuItem item) {
-    switch (item) {
-      case TrayMenuItem.settings:
-        _navigateToSettings();
-        break;
-      case TrayMenuItem.timetableEdit:
-        _navigateToTimetableEdit();
-        break;
-      case TrayMenuItem.toggleWindow:
-      case TrayMenuItem.exit:
-        // 这些由其他回调处理
-        break;
+      print('System tray initialization failed: $e');
     }
   }
 
   /// 导航到设置页面
   void _navigateToSettings() {
-    // 确保窗口可见
     if (!_isWindowVisible) {
       _showMainWindow();
     }
     
-    // 导航到设置页面
     navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (context) => const SettingsScreen(),
@@ -115,12 +127,10 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
 
   /// 导航到课表编辑页面
   void _navigateToTimetableEdit() {
-    // 确保窗口可见
     if (!_isWindowVisible) {
       _showMainWindow();
     }
     
-    // 导航到课表编辑页面
     navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (context) => const TimetableEditScreen(),
@@ -155,14 +165,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
 
   /// 退出应用程序
   void _exitApplication() {
-    _systemTrayService.destroy();
+    MD3TrayMenuService.instance.destroy();
     appWindow.close();
   }
 
   @override
   void dispose() {
     _themeService.dispose();
-    _systemTrayService.destroy();
+    MD3TrayMenuService.instance.destroy();
     super.dispose();
   }
 
@@ -179,11 +189,17 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
             
             return MaterialApp(
               navigatorKey: navigatorKey,
-              title: 'Smart Schedule',
-              theme: lightTheme,
-              darkTheme: darkTheme,
+              title: '智慧课程表',
+              theme: lightTheme?.copyWith(
+                scaffoldBackgroundColor: Colors.transparent,
+                canvasColor: Colors.transparent,
+              ),
+              darkTheme: darkTheme?.copyWith(
+                scaffoldBackgroundColor: Colors.transparent,
+                canvasColor: Colors.transparent,
+              ),
               themeMode: themeSettings.themeMode,
-              home: const HomeScreen(),
+              home: const DesktopWidgetScreen(),
               debugShowCheckedModeBanner: false,
             );
           },
@@ -191,6 +207,4 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
       },
     );
   }
-
-
 }

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/weather_model.dart';
-import 'package:time_widgets/utils/md3_card_styles.dart';
-import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/services/localization_service.dart';
 
-
+/// 天气组件 - 简化版
 class WeatherWidget extends StatelessWidget {
   final WeatherData? weatherData;
   final String? error;
   final VoidCallback? onRetry;
   final bool isCompact;
-  
+
   const WeatherWidget({
     super.key,
     this.weatherData,
@@ -23,12 +21,64 @@ class WeatherWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // 错误处理
     if (error != null) {
-      return MD3CardStyles.errorContainer(
-        context: context,
-        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+      return _buildErrorCard(context, colorScheme);
+    }
+
+    // 使用真实天气数据或默认值
+    final weather = weatherData;
+    final temperature = weather?.temperature ?? 20;
+    final description = weather?.description ?? LocalizationService.getString('weather_loading');
+    final humidity = weather?.humidity ?? 65;
+    final wind = weather?.wind ?? '微风';
+    final feelsLike = weather?.feelsLike ?? temperature;
+    final cityName = weather?.cityName ?? '北京';
+
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(isCompact ? 12.0 : 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 头部
+            _buildHeader(context, colorScheme, description, cityName, weatherData == null),
+            SizedBox(height: isCompact ? 8 : 12),
+
+            // 温度显示
+            _buildTemperature(context, colorScheme, temperature, description),
+
+            // 详细信息（非紧凑模式）
+            if (!isCompact) ...[
+              const SizedBox(height: 12),
+              _buildDetails(context, colorScheme, humidity, wind, feelsLike),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorCard(BuildContext context, ColorScheme colorScheme) {
+    return Card(
+      elevation: 0,
+      color: colorScheme.errorContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(isCompact ? 12.0 : 16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -40,7 +90,9 @@ class WeatherWidget extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               LocalizationService.getString('weather_error'),
-              style: MD3TypographyStyles.titleSmall(context, color: colorScheme.onErrorContainer),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onErrorContainer,
+                  ),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 8),
@@ -51,148 +103,130 @@ class WeatherWidget extends StatelessWidget {
             ],
           ],
         ),
-      );
-    }
-    
-    // 使用真实天气数据或默认值
-    final weather = weatherData;
-    final temperature = weather?.temperature ?? 20;
-    final description = weather?.description ?? LocalizationService.getString('weather_loading');
-    final humidity = weather?.humidity ?? 65;
-    final wind = weather?.wind ?? '微风';
-    final feelsLike = weather?.feelsLike ?? temperature;
-    final pressure = weather?.pressure ?? 1013.0;
-    final cityName = weather?.cityName ?? '北京';
-    
-    return MD3CardStyles.surfaceContainer(
-      context: context,
-      padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Row(
-              children: [
-                Icon(
-                  _getWeatherIcon(description),
-                  size: isCompact ? 16 : 18,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  LocalizationService.getString('weather_info'),
-                  style: MD3TypographyStyles.titleSmall(context, color: colorScheme.onSurfaceVariant),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  cityName,
-                  style: MD3TypographyStyles.labelSmall(context, color: colorScheme.onSurfaceVariant),
-                ),
-                const Spacer(),
-                if (weatherData == null)
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-              ],
-            ),
-            
-            SizedBox(height: isCompact ? 12 : 16),
-            
-            // Temperature and description
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '$temperature°',
-                  style: MD3TypographyStyles.displaySmall(context).copyWith(
-                    fontWeight: FontWeight.w300,
-                    fontSize: isCompact ? 32 : 40,
-                    height: 1.0,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      description,
-                      style: MD3TypographyStyles.bodyMedium(context, color: colorScheme.onSurfaceVariant).copyWith(
-                        fontSize: isCompact ? 12 : 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            
-            if (!isCompact) ...[
-              const SizedBox(height: 12),
-              
-              // Weather details - 第一行
-              Row(
-                children: [
-                  _buildWeatherDetail(
-                    context,
-                    Icons.water_drop_outlined,
-                    '$humidity${LocalizationService.getString('unit_percent')}',
-                    LocalizationService.getString('humidity'),
-                  ),
-                  const SizedBox(width: 12),
-                  _buildWeatherDetail(
-                    context,
-                    Icons.air_rounded,
-                    wind,
-                    LocalizationService.getString('wind_speed'),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 8),
-              
-              // Weather details - 第二行
-              Row(
-                children: [
-                  _buildWeatherDetail(
-                    context,
-                    Icons.thermostat_outlined,
-                    '$feelsLike${LocalizationService.getString('unit_celsius')}',
-                    '体感温度',
-                  ),
-                  const SizedBox(width: 12),
-                  _buildWeatherDetail(
-                    context,
-                    Icons.speed_outlined,
-                    '${pressure.toStringAsFixed(1)}mb',
-                    '气压',
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
+      ),
     );
   }
 
-  Widget _buildWeatherDetail(
+  Widget _buildHeader(
     BuildContext context,
+    ColorScheme colorScheme,
+    String description,
+    String cityName,
+    bool isLoading,
+  ) {
+    return Row(
+      children: [
+        Icon(
+          _getWeatherIcon(description),
+          size: isCompact ? 16 : 18,
+          color: colorScheme.primary,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            '${LocalizationService.getString('weather_info')} $cityName',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (isLoading)
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: colorScheme.primary,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildTemperature(
+    BuildContext context,
+    ColorScheme colorScheme,
+    int temperature,
+    String description,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          '$temperature°',
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w300,
+                fontSize: isCompact ? 32 : 40,
+                height: 1.0,
+              ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              description,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetails(
+    BuildContext context,
+    ColorScheme colorScheme,
+    int humidity,
+    String wind,
+    int feelsLike,
+  ) {
+    return Row(
+      children: [
+        _buildDetailItem(
+          context,
+          colorScheme,
+          Icons.water_drop_outlined,
+          '$humidity%',
+          LocalizationService.getString('humidity'),
+        ),
+        const SizedBox(width: 8),
+        _buildDetailItem(
+          context,
+          colorScheme,
+          Icons.air_rounded,
+          wind,
+          LocalizationService.getString('wind_speed'),
+        ),
+        const SizedBox(width: 8),
+        _buildDetailItem(
+          context,
+          colorScheme,
+          Icons.thermostat_outlined,
+          '$feelsLike°',
+          '体感',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(
+    BuildContext context,
+    ColorScheme colorScheme,
     IconData icon,
     String value,
     String label,
   ) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(8),
@@ -200,23 +234,24 @@ class WeatherWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 16,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
             const SizedBox(height: 2),
             Text(
               value,
-              style: MD3TypographyStyles.labelSmall(context).copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               label,
-              style: MD3TypographyStyles.labelSmall(context, color: colorScheme.onSurfaceVariant).copyWith(
-                fontSize: 10,
-              ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 10,
+                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -225,7 +260,6 @@ class WeatherWidget extends StatelessWidget {
   }
 
   IconData _getWeatherIcon(String description) {
-    // 中文天气描述映射
     switch (description) {
       case '晴':
       case '晴天':
@@ -252,29 +286,8 @@ class WeatherWidget extends StatelessWidget {
       case '雾':
       case '霾':
         return Icons.cloud_queue_rounded;
-      case '沙尘':
-      case '沙尘暴':
-        return Icons.blur_on_rounded;
       default:
-        // 英文描述兼容
-        switch (description.toLowerCase()) {
-          case 'sunny':
-          case 'clear':
-            return Icons.wb_sunny_rounded;
-          case 'cloudy':
-          case 'overcast':
-            return Icons.cloud_rounded;
-          case 'rainy':
-          case 'rain':
-            return Icons.umbrella_rounded;
-          case 'snowy':
-          case 'snow':
-            return Icons.ac_unit_rounded;
-          case 'thunderstorm':
-            return Icons.thunderstorm_rounded;
-          default:
-            return Icons.wb_cloudy_rounded;
-        }
+        return Icons.wb_cloudy_rounded;
     }
   }
 }

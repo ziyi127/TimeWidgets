@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/theme_service.dart';
+import 'package:time_widgets/screens/desktop_widget_config_screen.dart';
 import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
@@ -257,6 +258,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       DropdownMenuItem(value: 'en', child: Text('English')),
                     ],
                   ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 桌面小组件设置
+          MD3CardStyles.surfaceContainer(
+            context: context,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('桌面小组件', style: MD3TypographyStyles.titleMedium(context)),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.widgets_outlined),
+                  title: const Text('小组件配置'),
+                  subtitle: const Text('管理桌面小组件的显示和位置'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DesktopWidgetConfigScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
