@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 /// 主题设置模型
 /// 用于存储和管理应用的主题配置，包括种子颜色、主题模式等
 class ThemeSettings {
-  /// 种子颜色 - 用于生成 Material You 动态配色方案
+  /// 种子颜色 - 用于生成 Material You 动态配色方�?
   final Color seedColor;
 
   /// 主题模式 - light, dark, system
   final ThemeMode themeMode;
 
-  /// 是否启用动态颜色
+  /// 是否启用动态颜�?
   final bool useDynamicColor;
 
-  /// 是否使用系统强调色 (Android 12+)
+  /// 是否使用系统强调�?(Android 12+)
   final bool useSystemColor;
 
   const ThemeSettings({
@@ -23,7 +23,7 @@ class ThemeSettings {
   });
 
   /// 默认主题设置
-  /// 使用 Material 3 默认的紫色作为种子颜色
+  /// 使用 Material 3 默认的紫色作为种子颜�?
   factory ThemeSettings.defaultSettings() {
     return const ThemeSettings(
       seedColor: Color(0xFF6750A4), // Material 3 default purple
@@ -33,7 +33,7 @@ class ThemeSettings {
     );
   }
 
-  /// 从 JSON 反序列化
+  /// �?JSON 反序列化
   factory ThemeSettings.fromJson(Map<String, dynamic> json) {
     return ThemeSettings(
       seedColor: Color(json['seedColor'] as int),
@@ -56,7 +56,7 @@ class ThemeSettings {
     };
   }
 
-  /// 复制并修改部分字段
+  /// 复制并修改部分字�?
   ThemeSettings copyWith({
     Color? seedColor,
     ThemeMode? themeMode,

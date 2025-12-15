@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 import 'package:time_widgets/services/theme_service.dart';
-import 'package:time_widgets/models/theme_settings_model.dart';
 
 void main() {
   group('DynamicColorBuilder Tests', () {

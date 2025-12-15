@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_widgets/services/desktop_widget_service.dart';
 import 'dart:math' as math;
+import 'package:time_widgets/services/desktop_widget_service.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 增强的交互处理器
 /// 提供流畅的拖拽、点击和编辑模式交互
@@ -17,7 +18,7 @@ class EnhancedInteractionHandler {
       startTime: DateTime.now(),
     );
     
-    print('Drag started for $type at $startPosition');
+    Logger.d('Drag started for $type at $startPosition');
   }
 
   /// 处理拖拽更新

@@ -3,6 +3,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class IpcService {
   static const String _wsUrl = 'ws://localhost:8081'; // WebSocket服务器地址
@@ -15,14 +16,13 @@ class IpcService {
   
   IpcService._internal();
   
-  // 连接到WebSocket服务器
-  Future<void> connect() async {
+  // 连接到WebSocket服务�?  Future<void> connect() async {
     try {
       // 创建WebSocket连接
       _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
-      print('已连接到WebSocket服务器');
+      Logger.d('已连接到WebSocket服务�?);
     } catch (e) {
-      print('连接WebSocket失败: $e');
+      Logger.e('连接WebSocket失败: $e');
       throw Exception('Failed to connect to WebSocket server: $e');
     }
   }
@@ -31,7 +31,7 @@ class IpcService {
   void disconnect() {
     if (_channel != null) {
       _channel!.sink.close();
-      print('已断开WebSocket连接');
+      Logger.d('已断开WebSocket连接');
       _channel = null;
     }
   }
@@ -49,8 +49,7 @@ class IpcService {
         if (params != null) 'params': params,
       };
       
-      // 发送请求
-      _channel!.sink.add(json.encode(request));
+      // 发送请�?      _channel!.sink.add(json.encode(request));
       
       // 等待响应
       final response = await _channel!.stream.first;
@@ -58,13 +57,12 @@ class IpcService {
       
       return responseData;
     } catch (e) {
-      print('IPC请求失败: $e');
+      Logger.e('IPC请求失败: $e');
       throw Exception('IPC request failed: $e');
     }
   }
   
-  // 获取课程表数据
-  Future<Timetable> getTimetable(DateTime date) async {
+  // 获取课程表数�?  Future<Timetable> getTimetable(DateTime date) async {
     try {
       final response = await _sendRequest('timetable');
       
@@ -136,8 +134,7 @@ class IpcService {
     }
   }
   
-  // 获取倒计时信息
-  Future<CountdownData> getCountdown() async {
+  // 获取倒计时信�?  Future<CountdownData> getCountdown() async {
     try {
       final response = await _sendRequest('countdown');
       
@@ -147,8 +144,7 @@ class IpcService {
         throw Exception('Failed to load countdown: ${response['error']}');
       }
     } catch (e) {
-      // 如果IPC请求失败，返回模拟数据
-      return CountdownData(
+      // 如果IPC请求失败，返回模拟数�?      return CountdownData(
         id: '1',
         title: 'Final Exam',
         description: 'Computer Science Final Examination',

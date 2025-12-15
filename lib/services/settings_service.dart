@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/settings_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class SettingsService {
   static const String _settingsKey = 'app_settings';
@@ -29,7 +30,7 @@ class SettingsService {
       _settingsController.add(_currentSettings);
       return _currentSettings;
     } catch (e) {
-      print('Error loading settings: $e');
+      Logger.e('Error loading settings: $e');
       _currentSettings = AppSettings.defaultSettings();
       return _currentSettings;
     }
@@ -43,7 +44,7 @@ class SettingsService {
       _currentSettings = settings;
       _settingsController.add(_currentSettings);
     } catch (e) {
-      print('Error saving settings: $e');
+      Logger.e('Error saving settings: $e');
       throw Exception('Failed to save settings');
     }
   }
@@ -55,7 +56,7 @@ class SettingsService {
       _currentSettings = AppSettings.defaultSettings();
       _settingsController.add(_currentSettings);
     } catch (e) {
-      print('Error resetting settings: $e');
+      Logger.e('Error resetting settings: $e');
       throw Exception('Failed to reset settings');
     }
   }

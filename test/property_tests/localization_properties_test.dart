@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:glados/glados.dart';
 import 'package:time_widgets/services/localization_service.dart';
 

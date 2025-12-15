@@ -59,8 +59,8 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除倒计时'),
-        content: Text('确定要删除"${countdown.title}"吗？'),
+        title: const Text('删除倒计�?),
+        content: Text('确定要删�?${countdown.title}"吗？'),
         actions: [
           MD3ButtonStyles.text(
             onPressed: () => Navigator.pop(context, false),
@@ -91,7 +91,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('倒计时管理'),
+        title: const Text('倒计时管�?),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -107,7 +107,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        '暂无倒计时事件',
+                        '暂无倒计时事�?,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: colorScheme.outline,
                         ),
@@ -116,7 +116,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                       FilledButton.icon(
                         onPressed: _addCountdown,
                         icon: const Icon(Icons.add),
-                        label: const Text('添加倒计时'),
+                        label: const Text('添加倒计�?),
                       ),
                     ],
                   ),
@@ -133,7 +133,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
           ? MD3ButtonStyles.fab(
               onPressed: _addCountdown,
               child: const Icon(Icons.add),
-              tooltip: '添加倒计时',
+              tooltip: '添加倒计�?,
             )
           : null,
     );
@@ -177,7 +177,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                       ),
                     ),
                     Text(
-                      isExpired ? '天前' : '天',
+                      isExpired ? '天前' : '�?,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: countdown.typeColor,
                       ),
@@ -232,7 +232,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${countdown.targetDate.year}年${countdown.targetDate.month}月${countdown.targetDate.day}日',
+                      '${countdown.targetDate.year}�?{countdown.targetDate.month}�?{countdown.targetDate.day}�?,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: colorScheme.outline,
                       ),

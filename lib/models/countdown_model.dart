@@ -42,8 +42,7 @@ class CountdownData {
     return difference.inMinutes % 60;
   }
 
-  // 是否即将到期（7天内）
-  bool get isApproaching {
+  // 是否即将到期�?天内�?  bool get isApproaching {
     return remainingDays <= 7 && remainingDays >= 0;
   }
 

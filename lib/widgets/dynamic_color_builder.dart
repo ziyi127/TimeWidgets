@@ -28,9 +28,9 @@ class DynamicColorBuilder extends StatefulWidget {
 
 class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
   late ThemeService _themeService;
-  ThemeSettings? _currentThemeSettings;
   ThemeData? _lightTheme;
   ThemeData? _darkTheme;
+  ThemeSettings? _currentThemeSettings;
 
   @override
   void initState() {

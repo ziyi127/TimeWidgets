@@ -53,7 +53,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                   Expanded(
                     child: DropdownButtonFormField<WeekType>(
                       decoration: const InputDecoration(
-                        labelText: '选择周类型',
+                        labelText: '选择周类�?,
                         border: OutlineInputBorder(),
                       ),
                       value: _selectedWeekType,
@@ -124,7 +124,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
     
     if (courses.isEmpty) {
       return const Center(
-        child: Text('请先在课程表中添加课程'),
+        child: Text('请先在课程表中添加课�?),
       );
     }
     
@@ -222,11 +222,11 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
     return DropdownButton<String>(
       isExpanded: true,
       value: existingCourse.courseId.isEmpty ? null : existingCourse.courseId,
-      hint: const Text('无课程'),
+      hint: const Text('无课�?),
       items: [
         const DropdownMenuItem(
           value: '',
-          child: Text('无课程'),
+          child: Text('无课�?),
         ),
         ...courses.map((course) => DropdownMenuItem(
           value: course.id,
@@ -267,17 +267,17 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
       case DayOfWeek.monday:
         return '星期一';
       case DayOfWeek.tuesday:
-        return '星期二';
+        return '星期�?;
       case DayOfWeek.wednesday:
-        return '星期三';
+        return '星期�?;
       case DayOfWeek.thursday:
-        return '星期四';
+        return '星期�?;
       case DayOfWeek.friday:
-        return '星期五';
+        return '星期�?;
       case DayOfWeek.saturday:
-        return '星期六';
+        return '星期�?;
       case DayOfWeek.sunday:
-        return '星期日';
+        return '星期�?;
     }
   }
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// Material Design 3 Card 样式工具类
-/// 提供统一的 MD3 Card 样式和变体
+/// Material Design 3 Card 样式工具�?
+/// 提供统一�?MD3 Card 样式和变�?
 class MD3CardStyles {
   /// 标准 Surface Container Card
-  /// 用于大多数内容卡片
+  /// 用于大多数内容卡�?
   static Widget surfaceContainer({
     required BuildContext context,
     required Widget child,
@@ -34,7 +34,7 @@ class MD3CardStyles {
   }
 
   /// Surface Container Highest Card
-  /// 用于需要更高对比度的卡片
+  /// 用于需要更高对比度的卡�?
   static Widget surfaceContainerHighest({
     required BuildContext context,
     required Widget child,
@@ -189,7 +189,7 @@ class MD3CardStyles {
   }
 
   /// Compact Card
-  /// 紧凑型卡片，用于空间有限的场景
+  /// 紧凑型卡片，用于空间有限的场�?
   static Widget compact({
     required BuildContext context,
     required Widget child,
@@ -258,7 +258,6 @@ class MD3CardBuilder {
   Color? _backgroundColor;
   Color? _borderColor;
   double? _borderWidth;
-  bool _isCompact = false;
 
   MD3CardBuilder({
     required this.context,
@@ -296,10 +295,7 @@ class MD3CardBuilder {
     return this;
   }
 
-  MD3CardBuilder compact(bool isCompact) {
-    _isCompact = isCompact;
-    return this;
-  }
+  // Note: compact method removed as _isCompact field is not used in build()
 
   Widget build() {
     switch (_variant) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class CountdownStorageService {
   static const String _countdownListKey = 'countdown_list';
@@ -16,7 +17,7 @@ class CountdownStorageService {
       }
       return [];
     } catch (e) {
-      print('Error loading countdowns: $e');
+      Logger.e('Error loading countdowns: $e');
       return [];
     }
   }
@@ -34,7 +35,7 @@ class CountdownStorageService {
       
       await saveAllCountdowns(countdowns);
     } catch (e) {
-      print('Error saving countdown: $e');
+      Logger.e('Error saving countdown: $e');
       throw Exception('Failed to save countdown');
     }
   }
@@ -51,7 +52,7 @@ class CountdownStorageService {
         throw Exception('Countdown not found');
       }
     } catch (e) {
-      print('Error updating countdown: $e');
+      Logger.e('Error updating countdown: $e');
       throw Exception('Failed to update countdown');
     }
   }
@@ -62,7 +63,7 @@ class CountdownStorageService {
       countdowns.removeWhere((c) => c.id == id);
       await saveAllCountdowns(countdowns);
     } catch (e) {
-      print('Error deleting countdown: $e');
+      Logger.e('Error deleting countdown: $e');
       throw Exception('Failed to delete countdown');
     }
   }
@@ -73,7 +74,7 @@ class CountdownStorageService {
       final jsonList = countdowns.map((c) => c.toJson()).toList();
       await prefs.setString(_countdownListKey, jsonEncode(jsonList));
     } catch (e) {
-      print('Error saving countdowns: $e');
+      Logger.e('Error saving all countdowns: $e');
       throw Exception('Failed to save countdowns');
     }
   }
@@ -87,14 +88,14 @@ class CountdownStorageService {
     }
   }
 
-  /// 获取按目标日期排序的倒计时列表
+  /// 获取按目标日期排序的倒计时列�?
   Future<List<CountdownData>> getSortedCountdowns() async {
     final countdowns = await loadAllCountdowns();
     countdowns.sort((a, b) => a.targetDate.compareTo(b.targetDate));
     return countdowns;
   }
 
-  /// 获取最近的倒计时事件
+  /// 获取最近的倒计时事�?
   Future<CountdownData?> getNextCountdown() async {
     final countdowns = await getSortedCountdowns();
     final now = DateTime.now();

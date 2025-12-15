@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 /// 内容适配服务
-/// 提供智能内容裁剪、响应式布局和溢出处理
+/// 提供智能内容裁剪、响应式布局和溢出处�?
 class ContentAdaptationService {
-  /// 创建响应式文本
+  /// 创建响应式文�?
   static Widget createResponsiveText({
     required String text,
     required TextStyle baseStyle,
@@ -15,7 +15,7 @@ class ContentAdaptationService {
     double? minFontSize,
     double? maxFontSize,
   }) {
-    // 计算响应式字体大小
+    // 计算响应式字体大�?
     final responsiveFontSize = _calculateResponsiveFontSize(
       baseStyle.fontSize ?? 14.0,
       containerSize,
@@ -36,7 +36,7 @@ class ContentAdaptationService {
         
         textPainter.layout(maxWidth: constraints.maxWidth);
         
-        // 如果文本溢出，应用智能裁剪
+        // 如果文本溢出，应用智能裁�?
         if (textPainter.didExceedMaxLines || 
             textPainter.size.height > constraints.maxHeight) {
           return _createAdaptiveText(
@@ -60,7 +60,7 @@ class ContentAdaptationService {
     );
   }
 
-  /// 创建响应式容器
+  /// 创建响应式容�?
   static Widget createResponsiveContainer({
     required Widget child,
     required Size containerSize,
@@ -94,7 +94,7 @@ class ContentAdaptationService {
     );
   }
 
-  /// 创建响应式列表
+  /// 创建响应式列�?
   static Widget createResponsiveList({
     required List<Widget> children,
     required Size containerSize,
@@ -116,7 +116,7 @@ class ContentAdaptationService {
     );
   }
 
-  /// 创建响应式网格
+  /// 创建响应式网�?
   static Widget createResponsiveGrid({
     required List<Widget> children,
     required Size containerSize,
@@ -168,7 +168,7 @@ class ContentAdaptationService {
     );
   }
 
-  /// 处理长文本内容
+  /// 处理长文本内�?
   static Widget handleLongContent({
     required String content,
     required Size containerSize,
@@ -241,14 +241,14 @@ class ContentAdaptationService {
     }
   }
 
-  /// 计算响应式字体大小
+  /// 计算响应式字体大�?
   static double _calculateResponsiveFontSize(
     double baseFontSize,
     Size containerSize,
     double minSize,
     double maxSize,
   ) {
-    // 基于容器宽度的缩放因子
+    // 基于容器宽度的缩放因�?
     double scaleFactor = 1.0;
     
     if (containerSize.width < 250) {
@@ -261,7 +261,7 @@ class ContentAdaptationService {
       scaleFactor = 1.2;
     }
     
-    // 基于容器高度的额外调整
+    // 基于容器高度的额外调�?
     if (containerSize.height < 100) {
       scaleFactor *= 0.9;
     } else if (containerSize.height > 200) {
@@ -295,7 +295,7 @@ class ContentAdaptationService {
     );
   }
 
-  /// 计算响应式间距
+  /// 计算响应式间�?
   static double _calculateResponsiveSpacing(
     double baseSpacing,
     Size containerSize,
@@ -313,7 +313,7 @@ class ContentAdaptationService {
     return (baseSpacing * scaleFactor).clamp(2.0, 24.0);
   }
 
-  /// 计算响应式图标大小
+  /// 计算响应式图标大�?
   static double _calculateResponsiveIconSize(
     double baseSize,
     Size containerSize,
@@ -334,7 +334,7 @@ class ContentAdaptationService {
     return adjustedSize.clamp(minSize, maxSize);
   }
 
-  /// 计算响应式列数
+  /// 计算响应式列�?
   static int _calculateResponsiveColumns(
     int baseColumns,
     Size containerSize,
@@ -385,7 +385,7 @@ class ContentAdaptationService {
       fontSize -= step;
     }
     
-    // 如果无法适配，使用最小字体大小
+    // 如果无法适配，使用最小字体大�?
     return Text(
       text,
       style: style.copyWith(fontSize: minFontSize),
@@ -402,33 +402,12 @@ class ContentAdaptationService {
     required int maxLines,
     required BoxConstraints constraints,
   }) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        bool isExpanded = false;
-        
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              content,
-              style: style,
-              maxLines: isExpanded ? null : maxLines,
-              overflow: isExpanded ? null : TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            GestureDetector(
-              onTap: () => setState(() => isExpanded = !isExpanded),
-              child: Text(
-                isExpanded ? '收起' : '展开',
-                style: style.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: (style.fontSize ?? 14.0) * 0.9,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    // Simplified version without expand/collapse functionality
+    return Text(
+      content,
+      style: style,
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
@@ -491,7 +470,7 @@ class ContentAdaptationService {
            textPainter.size.height > containerSize.height;
   }
 
-  /// 计算文本所需的最小尺寸
+  /// 计算文本所需的最小尺�?
   static Size calculateTextSize({
     required String text,
     required TextStyle style,

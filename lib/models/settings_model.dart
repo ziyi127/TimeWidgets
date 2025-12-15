@@ -106,9 +106,9 @@ class AppSettings {
     );
   }
 
-  /// 便捷方法：获取主题模式
+  /// 便捷方法：获取主题模�?
   ThemeMode get themeMode => themeSettings.themeMode;
 
-  /// 便捷方法：获取种子颜色
+  /// 便捷方法：获取种子颜�?
   Color get seedColor => themeSettings.seedColor;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// 当前课程组件 - MD3紧凑�?
 class CurrentClassWidget extends StatelessWidget {
   final bool isCompact;
 
@@ -12,49 +13,44 @@ class CurrentClassWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       elevation: 0,
-      color: colorScheme.surfaceContainer,
+      color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: colorScheme.outline.withValues(alpha: 0.2),
-          width: 1,
-        ),
       ),
-      child: Container(
-        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
+            // 头部
             Row(
               children: [
                 Icon(
                   Icons.school_rounded,
-                  size: isCompact ? 16 : 18,
+                  size: 20,
                   color: colorScheme.primary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Text(
-                  'Current Class',
+                  '当前课程',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: colorScheme.tertiaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'In Progress',
-                    style: theme.textTheme.labelSmall?.copyWith(
+                    '进行�?,
+                    style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onTertiaryContainer,
                       fontWeight: FontWeight.w600,
                     ),
@@ -62,124 +58,82 @@ class CurrentClassWidget extends StatelessWidget {
                 ),
               ],
             ),
-            
-            SizedBox(height: isCompact ? 12 : 16),
-            
-            // Course info
+            const SizedBox(height: 12),
+            // 课程信息
             Row(
               children: [
-                // Course icon
+                // 课程图标
                 Container(
-                  width: isCompact ? 40 : 48,
-                  height: isCompact ? 40 : 48,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    Icons.class_rounded,
-                    size: isCompact ? 20 : 24,
+                    Icons.menu_book_rounded,
+                    size: 22,
                     color: colorScheme.onPrimaryContainer,
                   ),
                 ),
                 const SizedBox(width: 12),
-                
-                // Course details
+                // 课程详情
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Chinese A Teacher',
+                        '语文 · 张老师',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontSize: isCompact ? 14 : 16,
                           fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '8:00 - 8:45',
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        '08:00 - 08:45 · A101教室',
+                        style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: isCompact ? 12 : 14,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            
-            if (!isCompact) ...[
-              const SizedBox(height: 16),
-              
-              // Progress section
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Class Progress',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      Text(
-                        '30/45 min',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: 0.67, // 30/45 ≈ 0.67
-                    backgroundColor: colorScheme.surfaceContainerHighest,
-                    valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
-                    minHeight: 6,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Next class info
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
+                // 进度
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Icon(
-                      Icons.schedule_rounded,
-                      size: 16,
-                      color: colorScheme.onSurfaceVariant,
+                    Text(
+                      '30',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: colorScheme.primary,
+                        height: 1.0,
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Next: Math B Teacher (8:50)',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      '/45分钟',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // 进度�?
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: 0.67,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                minHeight: 6,
               ),
-            ],
+            ),
           ],
         ),
       ),

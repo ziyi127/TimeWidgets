@@ -3,40 +3,41 @@ import 'package:window_manager/window_manager.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 增强的窗口管理器
-/// 提供可靠的窗口初始化、定位和状态管理
+/// 提供可靠的窗口初始化、定位和状态管�?
 class EnhancedWindowManager {
   static bool _isInitialized = false;
   static Size? _lastScreenSize;
   static VoidCallback? _onScreenSizeChanged;
   
-  /// 初始化窗口
+  /// 初始化窗�?
   static Future<bool> initializeWindow({VoidCallback? onScreenSizeChanged}) async {
     if (_isInitialized) return true;
     
     _onScreenSizeChanged = onScreenSizeChanged;
     
     try {
-      // 确保窗口管理器已初始化
+      // 确保窗口管理器已初始�?
       await windowManager.ensureInitialized();
       
-      // 等待一帧以确保Flutter完全初始化
+      // 等待一帧以确保Flutter完全初始�?
       await Future.delayed(const Duration(milliseconds: 100));
       
       // 获取屏幕信息
       final screenInfo = await _getScreenInfo();
       if (screenInfo == null) {
-        print('Failed to get screen info, using default size');
+        Logger.w('Failed to get screen info, using default size');
         return await _initializeWithDefaultSize();
       }
       
       _lastScreenSize = screenInfo;
       
-      // 计算窗口尺寸和位置
+      // 计算窗口尺寸和位�?
       final windowBounds = _calculateWindowBounds(screenInfo);
       
-      // 设置窗口属性
+      // 设置窗口属�?
       await _configureWindow(windowBounds);
       
       // 初始化bitsdojo_window
@@ -46,11 +47,11 @@ class EnhancedWindowManager {
       _startScreenMonitoring();
       
       _isInitialized = true;
-      print('Window initialized successfully: ${windowBounds.size} at ${windowBounds.topLeft}');
+      Logger.i('Window initialized successfully: ${windowBounds.size} at ${windowBounds.topLeft}');
       return true;
       
     } catch (e) {
-      print('Window initialization failed: $e');
+      Logger.e('Window initialization failed: $e');
       return await _initializeWithDefaultSize();
     }
   }
@@ -68,17 +69,17 @@ class EnhancedWindowManager {
           return Size(1920, 1080); // 临时使用常见分辨率，后续可以改进
         }
       } catch (e) {
-        print('Failed to get bounds from window_manager: $e');
+        Logger.w('Failed to get bounds from window_manager: $e');
       }
       
-      // 方法2: 使用系统调用（Windows）
+      // 方法2: 使用系统调用（Windows�?
       if (Platform.isWindows) {
         return await _getWindowsScreenSize();
       }
       
       return null;
     } catch (e) {
-      print('Error getting screen info: $e');
+      Logger.e('Error getting screen info: $e');
       return null;
     }
   }
@@ -86,7 +87,7 @@ class EnhancedWindowManager {
   /// 获取Windows屏幕尺寸
   static Future<Size?> _getWindowsScreenSize() async {
     try {
-      // 使用PowerShell获取屏幕分辨率
+      // 使用PowerShell获取屏幕分辨�?
       final result = await Process.run('powershell', [
         '-Command',
         'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen.Bounds'
@@ -104,7 +105,7 @@ class EnhancedWindowManager {
         }
       }
     } catch (e) {
-      print('Failed to get Windows screen size: $e');
+      Logger.e('Failed to get Windows screen size: $e');
     }
     
     return null;
@@ -116,11 +117,11 @@ class EnhancedWindowManager {
     final windowWidth = screenSize.width / 4;
     final windowHeight = screenSize.height;
     
-    // 窗口位置在屏幕右侧
+    // 窗口位置在屏幕右�?
     final windowX = screenSize.width - windowWidth;
     final windowY = 0.0;
     
-    // 确保最小尺寸
+    // 确保最小尺�?
     final minWidth = 300.0;
     final minHeight = 600.0;
     
@@ -131,7 +132,7 @@ class EnhancedWindowManager {
     return Rect.fromLTWH(finalX, windowY, finalWidth, finalHeight);
   }
 
-  /// 配置窗口属性
+  /// 配置窗口属�?
   static Future<void> _configureWindow(Rect bounds) async {
     try {
       // 设置窗口尺寸
@@ -145,7 +146,7 @@ class EnhancedWindowManager {
       await windowManager.setBackgroundColor(Colors.transparent);
       await windowManager.setHasShadow(false);
       
-      // 设置窗口层级 - 不要设置为最底层，这会影响交互
+      // 设置窗口层级 - 不要设置为最底层，这会影响交�?
       await windowManager.setAlwaysOnTop(false);
       await windowManager.setAlwaysOnBottom(false);
       
@@ -156,7 +157,7 @@ class EnhancedWindowManager {
       await windowManager.show();
       
     } catch (e) {
-      print('Error configuring window: $e');
+      Logger.e('Error configuring window: $e');
       rethrow;
     }
   }
@@ -166,15 +167,15 @@ class EnhancedWindowManager {
     try {
       doWhenWindowReady(() {
         final win = appWindow;
-        win.title = "智慧课程表";
+        win.title = "智慧课程�?;
         win.show();
       });
     } catch (e) {
-      print('Error initializing bitsdojo_window: $e');
+      Logger.e('Error initializing bitsdojo_window: $e');
     }
   }
 
-  /// 使用默认尺寸初始化
+  /// 使用默认尺寸初始�?
   static Future<bool> _initializeWithDefaultSize() async {
     try {
       const defaultSize = Size(480, 1080);
@@ -192,17 +193,17 @@ class EnhancedWindowManager {
       _initializeBitsdojoWindow();
       _isInitialized = true;
       
-      print('Window initialized with default size: $defaultSize at $defaultPosition');
+      Logger.i('Window initialized with default size: $defaultSize at $defaultPosition');
       return true;
     } catch (e) {
-      print('Failed to initialize with default size: $e');
+      Logger.e('Failed to initialize with default size: $e');
       return false;
     }
   }
 
-  /// 开始屏幕监听
+  /// 开始屏幕监�?
   static void _startScreenMonitoring() {
-    // 定期检查屏幕尺寸变化
+    // 定期检查屏幕尺寸变�?
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       try {
         final currentSize = await _getScreenInfo();
@@ -210,7 +211,7 @@ class EnhancedWindowManager {
             _lastScreenSize != null && 
             currentSize != _lastScreenSize) {
           
-          print('Screen size changed from $_lastScreenSize to $currentSize');
+          Logger.i('Screen size changed from $_lastScreenSize to $currentSize');
           _lastScreenSize = currentSize;
           
           // 重新计算窗口位置
@@ -221,7 +222,7 @@ class EnhancedWindowManager {
           _onScreenSizeChanged?.call();
         }
       } catch (e) {
-        print('Error monitoring screen changes: $e');
+        Logger.e('Error monitoring screen changes: $e');
       }
     });
   }
@@ -232,7 +233,7 @@ class EnhancedWindowManager {
       final bounds = await windowManager.getBounds();
       return bounds;
     } catch (e) {
-      print('Error getting current bounds: $e');
+      Logger.e('Error getting current bounds: $e');
       return null;
     }
   }
@@ -242,7 +243,7 @@ class EnhancedWindowManager {
     try {
       await windowManager.setPosition(position);
     } catch (e) {
-      print('Error updating window position: $e');
+      Logger.e('Error updating window position: $e');
     }
   }
 
@@ -251,7 +252,7 @@ class EnhancedWindowManager {
     try {
       await windowManager.setSize(size);
     } catch (e) {
-      print('Error updating window size: $e');
+      Logger.e('Error updating window size: $e');
     }
   }
 
@@ -260,7 +261,7 @@ class EnhancedWindowManager {
     try {
       await windowManager.show();
     } catch (e) {
-      print('Error showing window: $e');
+      Logger.e('Error showing window: $e');
     }
   }
 
@@ -269,11 +270,11 @@ class EnhancedWindowManager {
     try {
       await windowManager.hide();
     } catch (e) {
-      print('Error hiding window: $e');
+      Logger.e('Error hiding window: $e');
     }
   }
 
-  /// 检查窗口是否已初始化
+  /// 检查窗口是否已初始�?
   static bool get isInitialized => _isInitialized;
 
   /// 获取最后记录的屏幕尺寸

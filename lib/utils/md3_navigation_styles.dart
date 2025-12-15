@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/gestures.dart';
 
-/// Material Design 3 Navigation 样式工具类
-/// 提供统一的 MD3 导航组件样式和变体
+/// Material Design 3 Navigation 样式工具�?
+/// 提供统一�?MD3 导航组件样式和变�?
 class MD3NavigationStyles {
   /// 创建 MD3 AppBar
   /// 支持不同的变体和自定义选项
@@ -73,7 +72,7 @@ class MD3NavigationStyles {
   }
 
   /// 创建 MD3 SliverAppBar
-  /// 支持可折叠的应用栏
+  /// 支持可折叠的应用�?
   static SliverAppBar sliverAppBar({
     required BuildContext context,
     Widget? title,
@@ -149,7 +148,7 @@ class MD3NavigationStyles {
   }
 
   /// 创建 MD3 NavigationBar
-  /// 底部导航栏
+  /// 底部导航�?
   static NavigationBar navigationBar({
     required BuildContext context,
     required List<NavigationDestination> destinations,
@@ -285,7 +284,7 @@ class MD3NavigationStyles {
   }
 
   /// 创建 MD3 NavigationDrawerDestination
-  /// 抽屉导航项
+  /// 抽屉导航�?
   static Widget navigationDrawerDestination({
     required BuildContext context,
     required Widget icon,
@@ -323,7 +322,7 @@ class MD3NavigationStyles {
   }
 
   /// 创建 MD3 TabBar
-  /// 标签栏
+  /// 标签�?
   static TabBar tabBar({
     required BuildContext context,
     required List<Widget> tabs,
@@ -374,7 +373,7 @@ class MD3NavigationStyles {
     );
   }
 
-  /// 创建标准的 MD3 导航目的地
+  /// 创建标准�?MD3 导航目的�?
   static NavigationDestination createDestination({
     required IconData icon,
     required String label,
@@ -389,7 +388,7 @@ class MD3NavigationStyles {
     );
   }
 
-  /// 创建标准的 MD3 导航栏目的地
+  /// 创建标准�?MD3 导航栏目的地
   static NavigationRailDestination createRailDestination({
     required IconData icon,
     required String label,
@@ -421,7 +420,7 @@ class MD3NavigationBuilder {
   final BuildContext context;
   final MD3NavigationVariant variant;
   
-  // 通用属性
+  // 通用属�?
   Widget? _title;
   List<Widget>? _actions;
   Widget? _leading;
@@ -430,12 +429,12 @@ class MD3NavigationBuilder {
   Color? _backgroundColor;
   Color? _foregroundColor;
   
-  // NavigationBar 特定属性
+  // NavigationBar 特定属�?
   List<NavigationDestination>? _destinations;
   int? _selectedIndex;
   ValueChanged<int>? _onDestinationSelected;
   
-  // TabBar 特定属性
+  // TabBar 特定属�?
   List<Widget>? _tabs;
   TabController? _controller;
   bool _isScrollable = false;

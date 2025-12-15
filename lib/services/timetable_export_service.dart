@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class ValidationResult {
   final bool isValid;
@@ -23,6 +24,57 @@ class ValidationResult {
   }
 }
 
+/// 导入结果
+class ImportResult {
+  final bool success;
+  final TimetableData? data;
+  final String? errorMessage;
+  final ImportStats? stats;
+
+  ImportResult({
+    required this.success,
+    this.data,
+    this.errorMessage,
+    this.stats,
+  });
+
+  factory ImportResult.success(TimetableData data, ImportStats stats) {
+    return ImportResult(success: true, data: data, stats: stats);
+  }
+
+  factory ImportResult.failure(String message) {
+    return ImportResult(success: false, errorMessage: message);
+  }
+}
+
+/// 导入统计
+class ImportStats {
+  final int coursesCount;
+  final int timeSlotsCount;
+  final int dailyCoursesCount;
+  final int timeLayoutsCount;
+  final int schedulesCount;
+
+  ImportStats({
+    required this.coursesCount,
+    required this.timeSlotsCount,
+    required this.dailyCoursesCount,
+    required this.timeLayoutsCount,
+    required this.schedulesCount,
+  });
+
+  @override
+  String toString() {
+    final parts = <String>[];
+    if (coursesCount > 0) parts.add('$coursesCount 个科目');
+    if (timeSlotsCount > 0) parts.add('$timeSlotsCount 个时间点');
+    if (dailyCoursesCount > 0) parts.add('$dailyCoursesCount 个课程安排');
+    if (timeLayoutsCount > 0) parts.add('$timeLayoutsCount 个时间表');
+    if (schedulesCount > 0) parts.add('$schedulesCount 个课表');
+    return parts.isEmpty ? '无数据' : parts.join('、');
+  }
+}
+
 class TimetableExportService {
   /// 将课表数据导出为 JSON 字符串
   String exportToJson(TimetableData data) {
@@ -36,8 +88,27 @@ class TimetableExportService {
       final jsonData = jsonDecode(jsonString);
       return TimetableData.fromJson(jsonData);
     } catch (e) {
-      print('Error importing JSON: $e');
+      Logger.e('Error importing JSON: $e');
       return null;
+    }
+  }
+
+  /// 从 JSON 字符串导入课表数据(带统计)
+  ImportResult importFromJsonWithStats(String jsonString) {
+    try {
+      final jsonData = jsonDecode(jsonString);
+      final data = TimetableData.fromJson(jsonData);
+      final stats = ImportStats(
+        coursesCount: data.courses.length,
+        timeSlotsCount: data.timeSlots.length,
+        dailyCoursesCount: data.dailyCourses.length,
+        timeLayoutsCount: data.timeLayouts.length,
+        schedulesCount: data.schedules.length,
+      );
+      return ImportResult.success(data, stats);
+    } catch (e) {
+      Logger.e('Error importing JSON: $e');
+      return ImportResult.failure('导入失败: ${e.toString()}');
     }
   }
 
@@ -126,6 +197,43 @@ class TimetableExportService {
       }
     }
 
+    // 验证 timeLayouts 字段 (可选)
+    if (jsonData.containsKey('timeLayouts')) {
+      if (jsonData['timeLayouts'] is! List) {
+        return ValidationResult.invalid('timeLayouts 必须是数组');
+      }
+      final timeLayouts = jsonData['timeLayouts'] as List;
+      for (var i = 0; i < timeLayouts.length; i++) {
+        final layout = timeLayouts[i];
+        if (layout is! Map<String, dynamic>) {
+          return ValidationResult.invalid('timeLayouts[$i] 必须是对象');
+        }
+        if (!layout.containsKey('id') || !layout.containsKey('name')) {
+          return ValidationResult.invalid('timeLayouts[$i] 缺少必需字段 (id, name)');
+        }
+      }
+    }
+
+    // 验证 schedules 字段 (可选)
+    if (jsonData.containsKey('schedules')) {
+      if (jsonData['schedules'] is! List) {
+        return ValidationResult.invalid('schedules 必须是数组');
+      }
+      final schedules = jsonData['schedules'] as List;
+      for (var i = 0; i < schedules.length; i++) {
+        final schedule = schedules[i];
+        if (schedule is! Map<String, dynamic>) {
+          return ValidationResult.invalid('schedules[$i] 必须是对象');
+        }
+        if (!schedule.containsKey('id') || !schedule.containsKey('name')) {
+          return ValidationResult.invalid('schedules[$i] 缺少必需字段 (id, name)');
+        }
+        if (!schedule.containsKey('triggerRule')) {
+          return ValidationResult.invalid('schedules[$i] 缺少必需字段 (triggerRule)');
+        }
+      }
+    }
+
     return ValidationResult.valid(warnings: warnings);
   }
 
@@ -147,7 +255,7 @@ class TimetableExportService {
       }
       return false;
     } catch (e) {
-      print('Error exporting to file: $e');
+      Logger.e('Error exporting to file: $e');
       return false;
     }
   }
@@ -176,8 +284,40 @@ class TimetableExportService {
       }
       return null;
     } catch (e) {
-      print('Error importing from file: $e');
+      Logger.e('Error importing from file: $e');
       rethrow;
+    }
+  }
+
+  /// 从文件导入(带统计)
+  Future<ImportResult> importFromFileWithStats() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        withData: true,
+      );
+
+      if (result == null || result.files.isEmpty) {
+        return ImportResult.failure('未选择文件');
+      }
+
+      final bytes = result.files.first.bytes;
+      if (bytes == null) {
+        return ImportResult.failure('无法读取文件内容');
+      }
+
+      final jsonString = utf8.decode(bytes);
+      final validation = validateJson(jsonString);
+      
+      if (!validation.isValid) {
+        return ImportResult.failure(validation.errorMessage ?? '验证失败');
+      }
+      
+      return importFromJsonWithStats(jsonString);
+    } catch (e) {
+      Logger.e('Error importing from file: $e');
+      return ImportResult.failure('导入失败: ${e.toString()}');
     }
   }
 }

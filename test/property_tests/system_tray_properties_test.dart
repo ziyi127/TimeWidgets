@@ -98,7 +98,7 @@ void main() {
       expect(callback, isNotNull);
       
       // 模拟调用回调
-      callback?.call();
+      callback.call();
       expect(callbackCalled, isTrue);
     });
 
@@ -116,7 +116,7 @@ void main() {
       expect(callback, isNotNull);
       
       // 模拟调用回调
-      callback?.call(TrayMenuItem.settings);
+      callback.call(TrayMenuItem.settings);
       expect(receivedItem, equals(TrayMenuItem.settings));
     });
 
@@ -134,7 +134,7 @@ void main() {
       expect(callback, isNotNull);
       
       // 模拟调用回调
-      callback?.call();
+      callback.call();
       expect(exitCalled, isTrue);
     });
   });

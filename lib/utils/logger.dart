@@ -1,47 +1,47 @@
-/// 日志工具类
+/// Simple logger utility class
 class Logger {
-  /// 日志级别
-  static const int debug = 0;
-  static const int info = 1;
-  static const int warning = 2;
-  static const int error = 3;
+  static const int levelDebug = 0;
+  static const int levelInfo = 1;
+  static const int levelWarning = 2;
+  static const int levelError = 3;
 
-  /// 当前日志级别
-  static int logLevel = debug;
+  /// Current log level
+  static int logLevel = levelDebug;
 
-  /// 调试日志
+  /// Debug log
   static void d(String message) {
-    if (logLevel <= debug) {
+    if (logLevel <= levelDebug) {
       _log('DEBUG', message);
     }
   }
 
-  /// 信息日志
+  /// Info log
   static void i(String message) {
-    if (logLevel <= info) {
+    if (logLevel <= levelInfo) {
       _log('INFO', message);
     }
   }
 
-  /// 警告日志
+  /// Warning log
   static void w(String message) {
-    if (logLevel <= warning) {
+    if (logLevel <= levelWarning) {
       _log('WARNING', message);
     }
   }
 
-  /// 错误日志
-  static void e(String message, [dynamic error]) {
-    if (logLevel <= error) {
+  /// Error log
+  static void e(String message, [dynamic err]) {
+    if (logLevel <= levelError) {
       _log('ERROR', message);
-      if (error != null) {
-        _log('ERROR', error.toString());
+      if (err != null) {
+        _log('ERROR', err.toString());
       }
     }
   }
 
-  /// 日志格式化
+  /// Internal log method
   static void _log(String level, String message) {
+    // ignore: avoid_print
     print('[$level] ${DateTime.now().toIso8601String()}: $message');
   }
 }

@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:time_widgets/utils/md3_card_styles.dart';
-import 'package:time_widgets/utils/md3_typography_styles.dart';
 
+/// 时间显示组件 - MD3紧凑�?
 class TimeDisplayWidget extends StatefulWidget {
   final bool isCompact;
-  
+
   const TimeDisplayWidget({
     super.key,
     this.isCompact = false,
@@ -48,82 +47,48 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return MD3CardStyles.surfaceContainer(
-      context: context,
-      padding: EdgeInsets.all(widget.isCompact ? 16.0 : 20.0),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+
+    // MD3: 使用 surfaceContainerLow 作为卡片背景
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
           children: [
-            // Header
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time_rounded,
-                  size: widget.isCompact ? 16 : 18,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Current Time',
-                  style: MD3TypographyStyles.titleSmall(context, color: colorScheme.onSurfaceVariant),
-                ),
-              ],
+            Icon(
+              Icons.schedule_rounded,
+              size: 20,
+              color: colorScheme.primary,
             ),
-            
-            SizedBox(height: widget.isCompact ? 12 : 16),
-            
-            // Time Display
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Main time
-                Text(
-                  _currentTime,
-                  style: MD3TypographyStyles.displayMedium(context).copyWith(
-                    fontWeight: FontWeight.w300,
-                    fontSize: widget.isCompact ? 36 : 48,
-                    height: 1.0,
-                  ),
-                ),
-                
-                const SizedBox(width: 8),
-                
-                // Seconds
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    _currentSeconds,
-                    style: MD3TypographyStyles.titleLarge(context, color: colorScheme.onSurfaceVariant).copyWith(
-                      fontWeight: FontWeight.w400,
-                      fontSize: widget.isCompact ? 16 : 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            
-            if (!widget.isCompact) ...[
-              const SizedBox(height: 8),
-              
-              // Additional info
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'Live',
-                  style: MD3TypographyStyles.labelSmall(context, color: colorScheme.onPrimaryContainer).copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+            const SizedBox(width: 12),
+            Text(
+              '当前时间',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
-            ],
+            ),
+            const Spacer(),
+            Text(
+              _currentTime,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              _currentSeconds,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
           ],
         ),
+      ),
     );
   }
 }

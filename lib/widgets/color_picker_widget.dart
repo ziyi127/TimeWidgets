@@ -3,10 +3,10 @@ import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 
-/// 颜色选择器组件
+/// 颜色选择器组�?
 /// 提供预设颜色和自定义颜色选择功能
 class ColorPickerWidget extends StatefulWidget {
-  /// 当前选中的颜色
+  /// 当前选中的颜�?
   final Color selectedColor;
   
   /// 颜色改变回调
@@ -27,26 +27,26 @@ class ColorPickerWidget extends StatefulWidget {
 }
 
 class _ColorPickerWidgetState extends State<ColorPickerWidget> {
-  // Material 3 推荐的种子颜色
+  // Material 3 推荐的种子颜�?
   static const List<Color> _presetColors = [
     Color(0xFF6750A4), // Material 3 默认紫色
     Color(0xFF1976D2), // 蓝色
     Color(0xFF388E3C), // 绿色
-    Color(0xFFFF5722), // 橙红色
+    Color(0xFFFF5722), // 橙红�?
     Color(0xFFE91E63), // 粉色
     Color(0xFF9C27B0), // 紫色
-    Color(0xFF673AB7), // 深紫色
-    Color(0xFF3F51B5), // 靛蓝色
-    Color(0xFF2196F3), // 浅蓝色
+    Color(0xFF673AB7), // 深紫�?
+    Color(0xFF3F51B5), // 靛蓝�?
+    Color(0xFF2196F3), // 浅蓝�?
     Color(0xFF03DAC6), // 青色
-    Color(0xFF4CAF50), // 浅绿色
-    Color(0xFF8BC34A), // 黄绿色
-    Color(0xFFCDDC39), // 柠檬色
+    Color(0xFF4CAF50), // 浅绿�?
+    Color(0xFF8BC34A), // 黄绿�?
+    Color(0xFFCDDC39), // 柠檬�?
     Color(0xFFFFEB3B), // 黄色
-    Color(0xFFFFC107), // 琥珀色
+    Color(0xFFFFC107), // 琥珀�?
     Color(0xFFFF9800), // 橙色
     Color(0xFF795548), // 棕色
-    Color(0xFF607D8B), // 蓝灰色
+    Color(0xFF607D8B), // 蓝灰�?
   ];
 
   @override
@@ -191,12 +191,12 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
   Color _getContrastColor(Color backgroundColor) {
     // 计算亮度
     final luminance = backgroundColor.computeLuminance();
-    // 如果背景较暗，使用白色；如果背景较亮，使用黑色
+    // 如果背景较暗，使用白色；如果背景较亮，使用黑�?
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 }
 
-/// 颜色选择对话框
+/// 颜色选择对话�?
 class ColorPickerDialog extends StatefulWidget {
   final Color initialColor;
   final String title;

@@ -5,6 +5,8 @@ import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/screens/desktop_widget_config_screen.dart';
 import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_card_styles.dart';
+import 'package:time_widgets/utils/md3_dialog_styles.dart';
+import 'package:time_widgets/utils/md3_form_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/widgets/color_picker_widget.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
@@ -45,28 +47,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('设置已保存')),
+        const SnackBar(content: Text('设置已保�?)),
       );
     }
   }
 
   Future<void> _resetSettings() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await MD3DialogStyles.showConfirmDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('重置设置'),
-        content: const Text('确定要将所有设置恢复为默认值吗？'),
-        actions: [
-          MD3ButtonStyles.text(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          MD3ButtonStyles.filled(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('确定'),
-          ),
-        ],
-      ),
+      title: '重置设置',
+      message: '确定要将所有设置恢复为默认值吗？此操作无法撤销�?,
+      confirmText: '重置',
+      cancelText: '取消',
+      isDestructive: true,
+      icon: const Icon(Icons.restore),
     );
 
     if (confirmed == true) {
@@ -74,7 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await _loadSettings();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('设置已重置')),
+          const SnackBar(content: Text('设置已重�?)),
         );
       }
     }
@@ -137,7 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           MD3ButtonStyles.icon(
             icon: const Icon(Icons.restore),
             onPressed: _resetSettings,
-            tooltip: '重置为默认',
+            tooltip: '重置为默�?,
           ),
         ],
       ),
@@ -154,12 +148,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 
                 // 主题模式选择
-                ListTile(
-                  leading: const Icon(Icons.brightness_6_outlined),
-                  title: const Text('主题模式'),
-                  subtitle: Text(_getThemeModeText(_settings.themeSettings.themeMode)),
-                  trailing: DropdownButton<ThemeMode>(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: MD3FormStyles.dropdown<ThemeMode>(
+                    context: context,
                     value: _settings.themeSettings.themeMode,
+                    label: '主题模式',
+                    prefixIcon: const Icon(Icons.brightness_6_outlined),
                     onChanged: (value) {
                       if (value != null) {
                         final newThemeSettings = _settings.themeSettings.copyWith(themeMode: value);
@@ -174,11 +169,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 
-                // 动态颜色开关
+                // 动态颜色开�?
                 SwitchListTile(
                   secondary: const Icon(Icons.auto_awesome_outlined),
-                  title: const Text('动态颜色'),
-                  subtitle: const Text('使用 Material You 动态取色'),
+                  title: const Text('动态颜�?),
+                  subtitle: const Text('使用 Material You 动态取�?),
                   value: _settings.themeSettings.useDynamicColor,
                   onChanged: (value) {
                     final newThemeSettings = _settings.themeSettings.copyWith(useDynamicColor: value);
@@ -190,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   leading: const Icon(Icons.palette_outlined),
                   title: const Text('种子颜色'),
-                  subtitle: const Text('自定义应用主题颜色'),
+                  subtitle: const Text('自定义应用主题颜�?),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -242,12 +237,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 
                 // 语言设置
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: const Text('语言'),
-                  subtitle: Text(_settings.language == 'zh' ? '中文' : 'English'),
-                  trailing: DropdownButton<String>(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: MD3FormStyles.dropdown<String>(
+                    context: context,
                     value: _settings.language,
+                    label: '语言',
+                    prefixIcon: const Icon(Icons.language),
                     onChanged: (value) {
                       if (value != null) {
                         _saveSettings(_settings.copyWith(language: value));
@@ -264,18 +260,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 桌面小组件设置
+          // 桌面小组件设�?
           MD3CardStyles.surfaceContainer(
             context: context,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('桌面小组件', style: MD3TypographyStyles.titleMedium(context)),
+                Text('桌面小组�?, style: MD3TypographyStyles.titleMedium(context)),
                 const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.widgets_outlined),
-                  title: const Text('小组件配置'),
-                  subtitle: const Text('管理桌面小组件的显示和位置'),
+                  title: const Text('小组件配�?),
+                  subtitle: const Text('管理桌面小组件的显示和位�?),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     Navigator.push(
@@ -301,11 +297,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.calendar_today),
-                  title: const Text('学期开始日期'),
+                  title: const Text('学期开始日�?),
                   subtitle: Text(
                     _settings.semesterStartDate != null
-                        ? '${_settings.semesterStartDate!.year}年${_settings.semesterStartDate!.month}月${_settings.semesterStartDate!.day}日'
-                        : '未设置',
+                        ? '${_settings.semesterStartDate!.year}�?{_settings.semesterStartDate!.month}�?{_settings.semesterStartDate!.day}�?
+                        : '未设�?,
                   ),
                   trailing: MD3ButtonStyles.filledTonal(
                     onPressed: _selectSemesterStartDate,
@@ -329,7 +325,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   secondary: const Icon(Icons.notifications_outlined),
                   title: const Text('启用通知'),
-                  subtitle: const Text('接收课程和倒计时提醒'),
+                  subtitle: const Text('接收课程和倒计时提�?),
                   value: _settings.enableNotifications,
                   onChanged: (value) {
                     _saveSettings(_settings.copyWith(enableNotifications: value));
@@ -348,12 +344,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text('数据刷新', style: MD3TypographyStyles.titleMedium(context)),
                 const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.cloud_outlined),
-                  title: const Text('天气刷新间隔'),
-                  subtitle: Text('${_settings.weatherRefreshInterval} 分钟'),
-                  trailing: DropdownButton<int>(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: MD3FormStyles.dropdown<int>(
+                    context: context,
                     value: _settings.weatherRefreshInterval,
+                    label: '天气刷新间隔',
+                    prefixIcon: const Icon(Icons.cloud_outlined),
                     onChanged: (value) {
                       if (value != null) {
                         _saveSettings(_settings.copyWith(weatherRefreshInterval: value));
@@ -366,20 +363,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.timer_outlined),
-                  title: const Text('倒计时刷新间隔'),
-                  subtitle: Text('${_settings.countdownRefreshInterval} 秒'),
-                  trailing: DropdownButton<int>(
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: MD3FormStyles.dropdown<int>(
+                    context: context,
                     value: _settings.countdownRefreshInterval,
+                    label: '倒计时刷新间�?,
+                    prefixIcon: const Icon(Icons.timer_outlined),
                     onChanged: (value) {
                       if (value != null) {
                         _saveSettings(_settings.copyWith(countdownRefreshInterval: value));
                       }
                     },
                     items: const [
-                      DropdownMenuItem(value: 30, child: Text('30秒')),
-                      DropdownMenuItem(value: 60, child: Text('60秒')),
+                      DropdownMenuItem(value: 30, child: Text('30�?)),
+                      DropdownMenuItem(value: 60, child: Text('60�?)),
                       DropdownMenuItem(value: 120, child: Text('2分钟')),
                     ],
                   ),

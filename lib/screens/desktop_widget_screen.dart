@@ -11,8 +11,7 @@ import 'package:time_widgets/services/cache_service.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 
-/// 桌面小组件屏幕 - 简化版
-/// 使用垂直列表布局，各组件自带卡片样式，不再外层包装
+/// 桌面小组件屏�?- 自适应紧凑�?
 class DesktopWidgetScreen extends StatefulWidget {
   const DesktopWidgetScreen({super.key});
 
@@ -96,60 +95,68 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 简单的垂直滚动列表，各组件自带样式
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 时间显示
-            const TimeDisplayWidget(isCompact: true),
-            const SizedBox(height: 8),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // 根据可用高度自适应
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(8),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 时间显示
+                  const TimeDisplayWidget(isCompact: true),
+                  const SizedBox(height: 6),
 
-            // 日期显示
-            const DateDisplayWidget(isCompact: true),
-            const SizedBox(height: 8),
+                  // 日期显示
+                  const DateDisplayWidget(isCompact: true),
+                  const SizedBox(height: 6),
 
-            // 周次显示
-            const WeekDisplayWidget(isCompact: true),
-            const SizedBox(height: 8),
+                  // 周次显示
+                  const WeekDisplayWidget(isCompact: true),
+                  const SizedBox(height: 6),
 
-            // 天气信息
-            GestureDetector(
-              onTap: _loadWeatherData,
-              child: WeatherWidget(
-                weatherData: _isLoadingWeather ? null : _weatherData,
-                error: _weatherError,
-                onRetry: _loadWeatherData,
-                isCompact: true,
+                  // 天气信息
+                  GestureDetector(
+                    onTap: _loadWeatherData,
+                    child: WeatherWidget(
+                      weatherData: _isLoadingWeather ? null : _weatherData,
+                      error: _weatherError,
+                      onRetry: _loadWeatherData,
+                      isCompact: true,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  // 当前课程
+                  const CurrentClassWidget(isCompact: true),
+                  const SizedBox(height: 6),
+
+                  // 倒计�?
+                  GestureDetector(
+                    onTap: _loadCountdownData,
+                    child: CountdownWidget(
+                      countdownData: _isLoadingCountdown ? null : _countdownData,
+                      error: _countdownError,
+                      onRetry: _loadCountdownData,
+                      isCompact: true,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  // 课程�?
+                  const TimetableWidget(isCompact: true),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-
-            // 当前课程
-            const CurrentClassWidget(isCompact: true),
-            const SizedBox(height: 8),
-
-            // 倒计时
-            GestureDetector(
-              onTap: _loadCountdownData,
-              child: CountdownWidget(
-                countdownData: _isLoadingCountdown ? null : _countdownData,
-                error: _countdownError,
-                onRetry: _loadCountdownData,
-                isCompact: true,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // 课程表
-            const TimetableWidget(isCompact: true),
-            const SizedBox(height: 12),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

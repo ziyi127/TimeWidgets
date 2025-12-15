@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/theme_settings_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 主题服务
 /// 管理应用的主题设置，包括种子颜色、主题模式等
-/// 支持 Material You 动态取色
+/// 支持 Material You 动态取�?
 class ThemeService {
   static const String _themeSettingsKey = 'theme_settings';
 
@@ -15,7 +16,7 @@ class ThemeService {
 
   ThemeSettings _currentSettings = ThemeSettings.defaultSettings();
 
-  /// 主题设置流
+  /// 主题设置�?
   Stream<ThemeSettings> get themeStream => _themeController.stream;
 
   /// 当前主题设置
@@ -49,7 +50,7 @@ class ThemeService {
       _themeController.add(_currentSettings);
       return _currentSettings;
     } catch (e) {
-      print('Error loading theme settings: $e');
+      Logger.e('Error loading theme settings: $e');
       _currentSettings = ThemeSettings.defaultSettings();
       return _currentSettings;
     }
@@ -64,13 +65,13 @@ class ThemeService {
       _currentSettings = settings;
       _themeController.add(_currentSettings);
     } catch (e) {
-      print('Error saving theme settings: $e');
+      Logger.e('Error saving theme settings: $e');
       throw Exception('Failed to save theme settings');
     }
   }
 
   /// 生成浅色主题
-  /// 使用 Material 3 的 ColorScheme.fromSeed 生成完整配色方案
+  /// 使用 Material 3 �?ColorScheme.fromSeed 生成完整配色方案
   ThemeData generateLightTheme(Color seedColor) {
     final colorScheme = generateColorScheme(seedColor, Brightness.light);
 
@@ -114,7 +115,7 @@ class ThemeService {
   }
 
   /// 生成深色主题
-  /// 使用 Material 3 的 ColorScheme.fromSeed 生成完整配色方案
+  /// 使用 Material 3 �?ColorScheme.fromSeed 生成完整配色方案
   ThemeData generateDarkTheme(Color seedColor) {
     final colorScheme = generateColorScheme(seedColor, Brightness.dark);
 

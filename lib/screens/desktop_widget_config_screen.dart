@@ -5,7 +5,7 @@ import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/utils/md3_button_styles.dart';
 
-/// 桌面小组件配置屏幕
+/// 桌面小组件配置屏�?
 /// 允许用户管理小组件的可见性和位置
 class DesktopWidgetConfigScreen extends StatefulWidget {
   const DesktopWidgetConfigScreen({super.key});
@@ -65,7 +65,7 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
       case WidgetType.countdown:
         return LocalizationService.getString('countdown_events');
       case WidgetType.timetable:
-        return '课程表';
+        return '课程�?;
       case WidgetType.settings:
         return LocalizationService.getString('settings');
     }
@@ -101,7 +101,7 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          '桌面小组件配置',
+          '桌面小组件配�?,
           style: MD3TypographyStyles.headlineSmall(context),
         ),
         backgroundColor: Colors.transparent,
@@ -152,9 +152,9 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '• 切换开关控制小组件的显示/隐藏\n'
-                  '• 在桌面小组件界面点击"编辑布局"可拖拽调整位置\n'
-                  '• 点击"重置位置"恢复默认布局',
+                  '�?切换开关控制小组件的显�?隐藏\n'
+                  '�?在桌面小组件界面点击"编辑布局"可拖拽调整位置\n'
+                  '�?点击"重置位置"恢复默认布局',
                   style: MD3TypographyStyles.bodyMedium(context, color: colorScheme.onSurfaceVariant),
                 ),
               ],
@@ -164,13 +164,13 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
           const SizedBox(height: 24),
           
           Text(
-            '小组件管理',
+            '小组件管�?,
             style: MD3TypographyStyles.titleLarge(context),
           ),
           
           const SizedBox(height: 16),
           
-          // 小组件列表
+          // 小组件列�?
           ...WidgetType.values.map((type) {
             final position = _widgetPositions[type];
             if (position == null) return const SizedBox.shrink();
@@ -230,7 +230,7 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '位置: (${position.x.toInt()}, ${position.y.toInt()}) • '
+                  '位置: (${position.x.toInt()}, ${position.y.toInt()}) �?'
                   '尺寸: ${position.width.toInt()}×${position.height.toInt()}',
                   style: MD3TypographyStyles.bodySmall(context, color: colorScheme.onSurfaceVariant),
                 ),
@@ -238,7 +238,7 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
             ),
           ),
           
-          // 开关
+          // 开�?
           Switch(
             value: position.isVisible,
             onChanged: (value) => _toggleWidgetVisibility(type),

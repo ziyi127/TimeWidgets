@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'dart:async';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 性能优化服务
 /// 提供布局计算优化、重绘减少和内存管理
@@ -37,12 +38,12 @@ class PerformanceOptimizationService {
     }
   }
 
-  /// 防抖动执行
+  /// 防抖动执�?
   static void debounce(String key, VoidCallback callback) {
     // 取消之前的定时器
     _debounceTimers[key]?.cancel();
     
-    // 设置新的定时器
+    // 设置新的定时�?
     _debounceTimers[key] = Timer(_debounceDelay, () {
       callback();
       _debounceTimers.remove(key);
@@ -64,7 +65,7 @@ class PerformanceOptimizationService {
     Future<T> Function() calculation, {
     Duration cacheTtl = const Duration(minutes: 5),
   }) async {
-    // 检查缓存
+    // 检查缓�?
     final cached = getCachedResult<T>(cacheKey);
     if (cached != null) {
       return cached;
@@ -127,7 +128,7 @@ class PerformanceOptimizationService {
     );
   }
 
-  /// 虚拟化列表
+  /// 虚拟化列�?
   static Widget virtualizedList({
     required int itemCount,
     required Widget Function(BuildContext, int) itemBuilder,
@@ -157,9 +158,9 @@ class PerformanceOptimizationService {
     for (final timing in timings) {
       final frameDuration = timing.totalSpan;
       
-      // 如果帧时间超过16.67ms（60fps），记录性能问题
+      // 如果帧时间超�?6.67ms�?0fps），记录性能问题
       if (frameDuration.inMicroseconds > 16670) {
-        print('Performance warning: Frame took ${frameDuration.inMilliseconds}ms');
+        Logger.w('Performance warning: Frame took ${frameDuration.inMilliseconds}ms');
       }
     }
   }
@@ -186,7 +187,7 @@ abstract class OptimizedState<T extends OptimizedStatefulWidget> extends State<T
   @override
   bool get wantKeepAlive => true;
 
-  /// 防抖动的setState（已弃用，使用RenderSyncMixin代替）
+  /// 防抖动的setState（已弃用，使用RenderSyncMixin代替�?
   @deprecated
   void debouncedSetState(VoidCallback fn, [String? key]) {
     final debounceKey = key ?? runtimeType.toString();
@@ -197,7 +198,7 @@ abstract class OptimizedState<T extends OptimizedStatefulWidget> extends State<T
     });
   }
 
-  /// 批量状态更新
+  /// 批量状态更�?
   void batchStateUpdate(List<VoidCallback> updates) {
     PerformanceOptimizationService.batchLayoutUpdate([
       () {
@@ -220,7 +221,7 @@ abstract class OptimizedState<T extends OptimizedStatefulWidget> extends State<T
   }
 }
 
-/// 性能优化的布局构建器
+/// 性能优化的布局构建�?
 class OptimizedLayoutBuilder extends StatelessWidget {
   final Widget Function(BuildContext, BoxConstraints) builder;
   final String? cacheKey;
@@ -237,7 +238,7 @@ class OptimizedLayoutBuilder extends StatelessWidget {
       builder: (context, constraints) {
         final key = cacheKey ?? '${constraints.maxWidth}x${constraints.maxHeight}';
         
-        // 尝试从缓存获取
+        // 尝试从缓存获�?
         final cached = PerformanceOptimizationService.getCachedResult<Widget>(key);
         if (cached != null) {
           return cached;

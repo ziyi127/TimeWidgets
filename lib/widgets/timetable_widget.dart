@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// 课程表组�?- MD3紧凑版，支持内部滚动
 class TimetableWidget extends StatelessWidget {
   final bool isCompact;
 
@@ -14,106 +15,61 @@ class TimetableWidget extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     final timetableData = [
-      {'subject': 'Chinese', 'teacher': 'Teacher A', 'time': '08:30-09:10', 'status': 'completed', 'room': 'A101'},
-      {'subject': 'Math', 'teacher': 'Teacher B', 'time': '09:20-10:00', 'status': 'completed', 'room': 'B205'},
-      {'subject': 'English', 'teacher': 'Teacher C', 'time': '10:10-11:50', 'status': 'current', 'room': 'C302'},
-      {'subject': 'Physics', 'teacher': 'Teacher D', 'time': '14:00-14:40', 'status': 'upcoming', 'room': 'D108'},
-      {'subject': 'Chemistry', 'teacher': 'Teacher E', 'time': '14:50-15:30', 'status': 'upcoming', 'room': 'E201'},
+      {'subject': '语文', 'teacher': '张老师', 'time': '08:00-08:45', 'status': 'completed'},
+      {'subject': '数学', 'teacher': '李老师', 'time': '08:55-09:40', 'status': 'completed'},
+      {'subject': '英语', 'teacher': '王老师', 'time': '10:00-10:45', 'status': 'current'},
+      {'subject': '物理', 'teacher': '赵老师', 'time': '14:00-14:45', 'status': 'upcoming'},
+      {'subject': '化学', 'teacher': '刘老师', 'time': '14:55-15:40', 'status': 'upcoming'},
     ];
 
-    final currentClassCount = timetableData.where((item) => item['status'] == 'current').length;
-    final upcomingClassCount = timetableData.where((item) => item['status'] == 'upcoming').length;
-    final completedClassCount = timetableData.where((item) => item['status'] == 'completed').length;
+    final completedCount = timetableData.where((item) => item['status'] == 'completed').length;
+    final currentCount = timetableData.where((item) => item['status'] == 'current').length;
+    final upcomingCount = timetableData.where((item) => item['status'] == 'upcoming').length;
 
     return Card(
       elevation: 0,
-      color: colorScheme.surfaceContainer,
+      color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: colorScheme.outline.withValues(alpha: 0.2),
-          width: 1,
-        ),
       ),
-      child: Container(
-        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
+            // 头部
             Row(
               children: [
-                Icon(
-                  Icons.schedule_rounded,
-                  size: isCompact ? 16 : 18,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
+                Icon(Icons.view_agenda_rounded, size: 20, color: colorScheme.primary),
+                const SizedBox(width: 12),
                 Text(
-                  'Today\'s Classes',
+                  '今日课程',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const Spacer(),
-                _buildStatusChip(
-                  context,
-                  '${timetableData.length} Classes',
-                  colorScheme.primary,
-                ),
+                // 状态统�?
+                _buildStatusBadge(context, '$completedCount', colorScheme.tertiary, '完成'),
+                const SizedBox(width: 8),
+                _buildStatusBadge(context, '$currentCount', colorScheme.primary, '进行'),
+                const SizedBox(width: 8),
+                _buildStatusBadge(context, '$upcomingCount', colorScheme.secondary, '待上'),
               ],
             ),
-            
-            if (!isCompact) ...[
-              const SizedBox(height: 12),
-              
-              // Status summary
-              Row(
-                children: [
-                  if (completedClassCount > 0)
-                    _buildStatusIndicator(
-                      context,
-                      Icons.check_circle_outline_rounded,
-                      '$completedClassCount Completed',
-                      colorScheme.tertiary,
-                    ),
-                  if (currentClassCount > 0) ...[
-                    if (completedClassCount > 0) const SizedBox(width: 12),
-                    _buildStatusIndicator(
-                      context,
-                      Icons.play_circle_outline_rounded,
-                      '$currentClassCount Current',
-                      colorScheme.primary,
-                    ),
-                  ],
-                  if (upcomingClassCount > 0) ...[
-                    if (completedClassCount > 0 || currentClassCount > 0) const SizedBox(width: 12),
-                    _buildStatusIndicator(
-                      context,
-                      Icons.schedule_rounded,
-                      '$upcomingClassCount Upcoming',
-                      colorScheme.secondary,
-                    ),
-                  ],
-                ],
-              ),
-            ],
-            
-            SizedBox(height: isCompact ? 12 : 16),
-            
-            // Classes list
+            const SizedBox(height: 12),
+            // 课程列表 - 限制高度并支持滚�?
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: isCompact ? 200 : 280),
+              constraints: const BoxConstraints(maxHeight: 180),
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const ClampingScrollPhysics(),
                 itemCount: timetableData.length,
-                separatorBuilder: (context, index) => SizedBox(height: isCompact ? 8 : 12),
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final item = timetableData[index];
-                  return _buildCourseItem(context, item, index);
+                  return _buildCourseItem(context, item);
                 },
               ),
             ),
@@ -123,40 +79,22 @@ class TimetableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(BuildContext context, String text, Color color) {
-    final theme = Theme.of(context);
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        text,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusIndicator(BuildContext context, IconData icon, String text, Color color) {
-    final theme = Theme.of(context);
-    
+  Widget _buildStatusBadge(BuildContext context, String count, Color color, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color,
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
         ),
         const SizedBox(width: 4),
         Text(
-          text,
-          style: theme.textTheme.labelSmall?.copyWith(
+          '$count$label',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: color,
             fontWeight: FontWeight.w500,
           ),
@@ -165,79 +103,71 @@ class TimetableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseItem(BuildContext context, Map<String, String> item, int index) {
+  Widget _buildCourseItem(BuildContext context, Map<String, String> item) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final status = item['status'] ?? 'upcoming';
     final isCurrent = status == 'current';
     final isCompleted = status == 'completed';
-    
-    final statusColor = isCurrent 
+
+    final statusColor = isCurrent
         ? colorScheme.primary
         : isCompleted
             ? colorScheme.tertiary
             : colorScheme.secondary;
-    
+
     final backgroundColor = isCurrent
-        ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-        : colorScheme.surfaceContainerHighest;
+        ? colorScheme.primaryContainer.withValues(alpha: 0.4)
+        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
 
     return Container(
-      padding: EdgeInsets.all(isCompact ? 12.0 : 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isCurrent 
-              ? statusColor.withValues(alpha: 0.3) 
-              : colorScheme.outline.withValues(alpha: 0.1),
+        border: isCurrent ? Border.all(
+          color: statusColor.withValues(alpha: 0.3),
           width: 1,
-        ),
+        ) : null,
       ),
       child: Row(
         children: [
-          // Status indicator
+          // 状态指示条
           Container(
             width: 4,
-            height: isCompact ? 32 : 40,
+            height: 32,
             decoration: BoxDecoration(
               color: statusColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
-          SizedBox(width: isCompact ? 12 : 16),
-          
-          // Course info
+          const SizedBox(width: 12),
+          // 课程信息
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
-                    Expanded(
-                      child: Text(
-                        item['subject']!,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
-                          fontSize: isCompact ? 14 : 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      item['subject']!,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
                       ),
                     ),
-                    if (isCurrent)
+                    if (isCurrent) ...[
+                      const SizedBox(width: 8),
                       Container(
-                        margin: const EdgeInsets.only(left: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8),
+                          color: statusColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'LIVE',
+                          '进行�?,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.w700,
@@ -245,89 +175,29 @@ class TimetableWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                  ],
-                ),
-                
-                const SizedBox(height: 4),
-                
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline_rounded,
-                      size: 14,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        item['teacher']!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: isCompact ? 11 : 12,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (!isCompact && item['room'] != null) ...[
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 14,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        item['room']!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: 12,
-                        ),
-                      ),
                     ],
                   ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  item['teacher']!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
           ),
-          
-          // Time info
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                item['time']!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                  fontSize: isCompact ? 12 : 14,
-                ),
-              ),
-              if (!isCompact) ...[
-                const SizedBox(height: 2),
-                Icon(
-                  _getStatusIcon(status),
-                  size: 16,
-                  color: statusColor,
-                ),
-              ],
-            ],
+          // 时间
+          Text(
+            item['time']!,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
     );
-  }
-
-  IconData _getStatusIcon(String status) {
-    switch (status) {
-      case 'current':
-        return Icons.play_circle_filled_rounded;
-      case 'completed':
-        return Icons.check_circle_rounded;
-      case 'upcoming':
-        return Icons.schedule_rounded;
-      default:
-        return Icons.circle_outlined;
-    }
   }
 }

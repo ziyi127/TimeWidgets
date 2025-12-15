@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class TimetableStorageService {
   static const String _prefsKey = 'timetable_data';
@@ -17,7 +18,7 @@ class TimetableStorageService {
         return _getDefaultTimetableData();
       }
     } catch (e) {
-      print('Error loading timetable data: $e');
+      Logger.e('Error loading timetable data: $e');
       return _getDefaultTimetableData();
     }
   }
@@ -28,7 +29,7 @@ class TimetableStorageService {
       final jsonData = data.toJson();
       await prefs.setString(_prefsKey, jsonEncode(jsonData));
     } catch (e) {
-      print('Error saving timetable data: $e');
+      Logger.e('Error saving timetable data: $e');
       throw Exception('Failed to save timetable data');
     }
   }

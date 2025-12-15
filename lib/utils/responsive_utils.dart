@@ -9,8 +9,7 @@ enum ScreenSize {
 
 /// 响应式设计工具类
 class ResponsiveUtils {
-  // 私有构造函数，防止实例化
-  ResponsiveUtils._();
+  // 私有构造函数，防止实例�?  ResponsiveUtils._();
 
   /// Material Design 3 断点定义
   static const double compactBreakpoint = 600;
@@ -68,8 +67,7 @@ class ResponsiveUtils {
     }
   }
 
-  /// 获取响应式卡片间距
-  static double getCardSpacing(double width) {
+  /// 获取响应式卡片间�?  static double getCardSpacing(double width) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
@@ -94,14 +92,12 @@ class ResponsiveUtils {
     }
   }
 
-  /// 获取响应式图标大小
-  static double getIconSize(double width, {double baseSize = 24.0}) {
+  /// 获取响应式图标大�?  static double getIconSize(double width, {double baseSize = 24.0}) {
     final multiplier = getFontSizeMultiplier(width);
     return baseSize * multiplier;
   }
 
-  /// 获取响应式边框圆角
-  static double getBorderRadius(double width, {double baseRadius = 16.0}) {
+  /// 获取响应式边框圆�?  static double getBorderRadius(double width, {double baseRadius = 16.0}) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
@@ -113,8 +109,7 @@ class ResponsiveUtils {
     }
   }
 
-  /// 获取响应式列数
-  static int getColumnCount(double width) {
+  /// 获取响应式列�?  static int getColumnCount(double width) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
@@ -139,8 +134,7 @@ class ResponsiveUtils {
     }
   }
 
-  /// 获取响应式最大宽度
-  static double getMaxWidth(double width) {
+  /// 获取响应式最大宽�?  static double getMaxWidth(double width) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
@@ -171,8 +165,7 @@ class ResponsiveUtils {
     }
   }
 
-  /// 构建响应式网格
-  static Widget buildResponsiveGrid({
+  /// 构建响应式网�?  static Widget buildResponsiveGrid({
     required double width,
     required List<Widget> children,
     int? compactColumns,
@@ -231,8 +224,7 @@ class ResponsiveUtils {
     }
   }
 
-  /// 构建响应式容器
-  static Widget buildResponsiveContainer({
+  /// 构建响应式容�?  static Widget buildResponsiveContainer({
     required double width,
     required Widget child,
     EdgeInsets? padding,

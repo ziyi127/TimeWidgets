@@ -5,7 +5,7 @@ class Course {
   final String classroom;
   final bool isCurrent;
 
-  Course({
+  const Course({
     required this.subject,
     required this.teacher,
     required this.time,
@@ -18,7 +18,7 @@ class Timetable {
   final List<Course> courses;
   final DateTime date;
 
-  Timetable({
+  const Timetable({
     required this.courses,
     required this.date,
   });

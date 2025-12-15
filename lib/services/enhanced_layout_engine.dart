@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/desktop_widget_service.dart';
 import 'dart:math' as math;
+import 'package:time_widgets/utils/logger.dart';
 
 /// 增强的布局引擎
 /// 提供智能位置计算、碰撞检测和自适应布局功能
 class EnhancedLayoutEngine {
-  static const double _minSpacing = 8.0;
-  static const double _defaultSpacing = 12.0;
   static const double _minWidgetSize = 50.0;
   static const double _maxWidgetSize = 500.0;
   
-  /// 位置计算器
+  /// 位置计算�?
   final PositionCalculator _positionCalculator = PositionCalculator();
   
   /// 碰撞检测器
   final CollisionDetector _collisionDetector = CollisionDetector();
   
-  /// 布局验证器
+  /// 布局验证�?
   final LayoutValidator _layoutValidator = LayoutValidator();
 
   /// 计算最优布局
@@ -25,13 +24,13 @@ class EnhancedLayoutEngine {
     Map<WidgetType, WidgetPosition>? currentLayout
   ) {
     try {
-      // 1. 计算容器尺寸（屏幕右侧1/4）
+      // 1. 计算容器尺寸（屏幕右�?/4�?
       final containerSize = Size(screenSize.width / 4, screenSize.height);
       
       // 2. 生成默认位置
       var layout = _positionCalculator.calculateDefaultPositions(containerSize);
       
-      // 3. 如果有现有布局，尝试保留有效位置
+      // 3. 如果有现有布局，尝试保留有效位�?
       if (currentLayout != null) {
         layout = _mergeWithExistingLayout(layout, currentLayout, containerSize);
       }
@@ -39,7 +38,7 @@ class EnhancedLayoutEngine {
       // 4. 解决碰撞问题
       layout = _collisionDetector.resolveCollisions(layout, containerSize);
       
-      // 5. 验证布局有效性
+      // 5. 验证布局有效�?
       if (!_layoutValidator.validateLayout(layout, containerSize)) {
         // 如果验证失败，使用安全的默认布局
         layout = _positionCalculator.calculateSafeDefaultLayout(containerSize);
@@ -47,7 +46,7 @@ class EnhancedLayoutEngine {
       
       return layout;
     } catch (e) {
-      print('Layout calculation failed: $e');
+      Logger.e('Layout calculation failed: $e');
       // 返回安全的默认布局
       return _positionCalculator.calculateSafeDefaultLayout(
         Size(screenSize.width / 4, screenSize.height)
@@ -98,7 +97,7 @@ class EnhancedLayoutEngine {
     return _collisionDetector.resolveCollisions(adjustedLayout, newContainerSize);
   }
 
-  /// 验证布局有效性
+  /// 验证布局有效�?
   bool validateLayout(Map<WidgetType, WidgetPosition> layout, Size containerSize) {
     return _layoutValidator.validateLayout(layout, containerSize);
   }
@@ -126,7 +125,7 @@ class EnhancedLayoutEngine {
   }
 }
 
-/// 位置计算器
+/// 位置计算�?
 class PositionCalculator {
   static const double _padding = 16.0;
   static const double _spacing = 12.0;
@@ -278,7 +277,7 @@ class CollisionDetector {
     return _applyFlowLayout(resolvedLayout, containerSize);
   }
 
-  /// 检查两个组件是否重叠
+  /// 检查两个组件是否重�?
   bool _isOverlapping(WidgetPosition a, WidgetPosition b) {
     return !(a.x + a.width <= b.x || 
              b.x + b.width <= a.x || 
@@ -327,7 +326,7 @@ class CollisionDetector {
       final adjustedHeight = math.min(position.height, containerSize.height - currentY - padding);
       
       if (adjustedHeight < 50) {
-        // 如果剩余空间不足，隐藏组件
+        // 如果剩余空间不足，隐藏组�?
         flowLayout[entry.key] = WidgetPosition(
           type: position.type,
           x: position.x,
@@ -355,11 +354,11 @@ class CollisionDetector {
   }
 }
 
-/// 布局验证器
+/// 布局验证�?
 class LayoutValidator {
-  /// 验证整个布局的有效性
+  /// 验证整个布局的有效�?
   bool validateLayout(Map<WidgetType, WidgetPosition> layout, Size containerSize) {
-    // 检查所有组件是否在边界内
+    // 检查所有组件是否在边界�?
     for (final position in layout.values) {
       if (!isPositionValid(position, containerSize)) {
         return false;
@@ -375,12 +374,12 @@ class LayoutValidator {
 
   /// 验证单个位置是否有效
   bool isPositionValid(WidgetPosition position, Size containerSize) {
-    // 检查边界
+    // 检查边�?
     if (position.x < 0 || position.y < 0) return false;
     if (position.x + position.width > containerSize.width) return false;
     if (position.y + position.height > containerSize.height) return false;
     
-    // 检查尺寸
+    // 检查尺�?
     if (position.width < 50 || position.height < 50) return false;
     if (position.width > containerSize.width || position.height > containerSize.height) return false;
     

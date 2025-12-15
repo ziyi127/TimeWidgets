@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/services/desktop_widget_service.dart';
-import 'package:time_widgets/services/render_sync_service.dart';
 
-/// 增强的小组件渲染器
+/// 增强的小组件渲染�?
 /// 提供统一的桌面小组件渲染和样式管理，支持同步渲染和性能优化
 class EnhancedWidgetRenderer {
-  // 静态缓存，避免重复创建相同的装饰
+  // 静态缓存，避免重复创建相同的装�?
   static final Map<String, BoxDecoration> _decorationCache = {};
   static final Map<String, Widget> _widgetCache = {};
-  /// 渲染桌面小组件容器（优化版本）
+  /// 渲染桌面小组件容器（优化版本�?
   static Widget renderDesktopWidget({
     required BuildContext context,
     required Widget child,
@@ -21,10 +19,10 @@ class EnhancedWidgetRenderer {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    // 生成缓存键
+    // 生成缓存�?
     final cacheKey = '${type.name}_${isEditMode}_${isCompact}_${colorScheme.hashCode}';
     
-    // 尝试从缓存获取装饰
+    // 尝试从缓存获取装�?
     final decoration = _getOrCreateDecoration(
       cacheKey,
       colorScheme,
@@ -53,7 +51,7 @@ class EnhancedWidgetRenderer {
     );
   }
 
-  /// 渲染响应式小组件（性能优化版本）
+  /// 渲染响应式小组件（性能优化版本�?
   static Widget renderResponsiveWidget({
     required BuildContext context,
     required Widget child,
@@ -68,7 +66,7 @@ class EnhancedWidgetRenderer {
     // 生成响应式缓存键
     final responsiveCacheKey = '${type.name}_responsive_${containerSize.width.toInt()}x${containerSize.height.toInt()}_${isEditMode}_${isCompact}';
     
-    // 检查缓存
+    // 检查缓�?
     if (_widgetCache.containsKey(responsiveCacheKey)) {
       final cachedWidget = _widgetCache[responsiveCacheKey];
       if (cachedWidget != null) {
@@ -102,7 +100,7 @@ class EnhancedWidgetRenderer {
     return widget;
   }
 
-  /// 渲染编辑模式指示器
+  /// 渲染编辑模式指示�?
   static Widget renderEditModeIndicator({
     required BuildContext context,
     required WidgetType type,
@@ -175,7 +173,7 @@ class EnhancedWidgetRenderer {
     );
   }
 
-  /// 渲染拖拽占位符
+  /// 渲染拖拽占位�?
   static Widget renderDragPlaceholder({
     required BuildContext context,
     required Size size,
@@ -243,7 +241,7 @@ class EnhancedWidgetRenderer {
     return decoration;
   }
 
-  /// 获取小组件背景颜色
+  /// 获取小组件背景颜�?
   static Color _getWidgetBackgroundColor(
     ColorScheme colorScheme, 
     WidgetType type, 
@@ -273,7 +271,7 @@ class EnhancedWidgetRenderer {
     }
   }
 
-  /// 获取小组件阴影
+  /// 获取小组件阴�?
   static List<BoxShadow> _getWidgetShadow(ColorScheme colorScheme, bool isEditMode) {
     if (isEditMode) {
       return [
@@ -299,7 +297,7 @@ class EnhancedWidgetRenderer {
     ];
   }
 
-  /// 包装内容以处理溢出
+  /// 包装内容以处理溢�?
   static Widget _wrapWithOverflowHandling(Widget child, BoxConstraints constraints) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
@@ -311,7 +309,7 @@ class EnhancedWidgetRenderer {
     );
   }
 
-  /// 创建响应式文本样式
+  /// 创建响应式文本样�?
   static TextStyle createResponsiveTextStyle({
     required BuildContext context,
     required TextStyle baseStyle,
@@ -339,7 +337,7 @@ class EnhancedWidgetRenderer {
     return baseStyle.copyWith(fontSize: clampedFontSize);
   }
 
-  /// 创建响应式图标尺寸
+  /// 创建响应式图标尺�?
   static double createResponsiveIconSize({
     required Size containerSize,
     double baseSize = 24.0,
@@ -358,7 +356,7 @@ class EnhancedWidgetRenderer {
     return adjustedSize.clamp(minSize, maxSize);
   }
 
-  /// 创建响应式间距
+  /// 创建响应式间�?
   static EdgeInsets createResponsivePadding({
     required Size containerSize,
     EdgeInsets basePadding = const EdgeInsets.all(16.0),
@@ -385,7 +383,7 @@ class EnhancedWidgetRenderer {
     _widgetCache.clear();
   }
 
-  /// 清理特定类型的缓存
+  /// 清理特定类型的缓�?
   static void clearCacheForType(WidgetType type) {
     final keysToRemove = <String>[];
     

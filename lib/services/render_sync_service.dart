@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'dart:async';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 渲染同步服务
 /// 确保所有渲染操作与屏幕刷新率同步，消除撕裂现象
@@ -19,21 +20,21 @@ class RenderSyncService {
   double _averageFrameTime = 16.67; // 60fps baseline
   int _droppedFrames = 0;
 
-  /// 初始化渲染同步服务
+  /// 初始化渲染同步服�?
   void initialize() {
     if (_isInitialized) return;
     
     // 开始帧时间监控
     SchedulerBinding.instance.addTimingsCallback(_onFrameTimings);
     
-    // 设置帧回调
+    // 设置帧回�?
     SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
     
     _isInitialized = true;
-    print('RenderSyncService initialized');
+    Logger.i('RenderSyncService initialized');
   }
 
-  /// 销毁服务
+  /// 销毁服�?
   void dispose() {
     if (!_isInitialized) return;
     
@@ -61,7 +62,7 @@ class RenderSyncService {
     // 添加到待处理队列
     _pendingUpdates.add(update);
     
-    // 如果性能良好，立即执行
+    // 如果性能良好，立即执�?
     if (_averageFrameTime < 14.0) { // 留有余量
       SchedulerBinding.instance.addPostFrameCallback((_) {
         _processPendingUpdates();
@@ -93,7 +94,7 @@ class RenderSyncService {
     });
   }
 
-  /// 智能延迟更新（根据性能自适应）
+  /// 智能延迟更新（根据性能自适应�?
   void smartDelayedUpdate(VoidCallback update, {String? key}) {
     if (!_isInitialized) {
       update();
@@ -117,13 +118,13 @@ class RenderSyncService {
     }
   }
 
-  /// 处理帧更新
+  /// 处理帧更�?
   void _processFrameUpdates(Duration timeStamp) {
     if (_pendingUpdates.isNotEmpty) {
       _processPendingUpdates();
     }
     
-    // 继续监听下一帧
+    // 继续监听下一�?
     SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
   }
 
@@ -134,7 +135,7 @@ class RenderSyncService {
     final updates = List<VoidCallback>.from(_pendingUpdates);
     _pendingUpdates.clear();
 
-    // 分批执行更新，避免单帧过载
+    // 分批执行更新，避免单帧过�?
     const maxUpdatesPerFrame = 5;
     final batches = <List<VoidCallback>>[];
     
@@ -143,11 +144,11 @@ class RenderSyncService {
       batches.add(updates.sublist(i, end));
     }
 
-    // 执行第一批
+    // 执行第一�?
     if (batches.isNotEmpty) {
       _executeBatch(batches.first);
       
-      // 如果有更多批次，在下一帧执行
+      // 如果有更多批次，在下一帧执�?
       if (batches.length > 1) {
         for (int i = 1; i < batches.length; i++) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -165,32 +166,32 @@ class RenderSyncService {
         update();
       }
     } catch (e) {
-      print('Error executing render update batch: $e');
+      Logger.e('Error executing render update batch: $e');
     }
   }
 
-  /// 帧时间回调
+  /// 帧时间回�?
   void _onFrameTimings(List<FrameTiming> timings) {
     for (final timing in timings) {
       final frameDuration = timing.totalSpan;
       _frameTimes.add(frameDuration);
       
-      // 保持最近100帧的数据
+      // 保持最�?00帧的数据
       if (_frameTimes.length > 100) {
         _frameTimes.removeAt(0);
       }
       
-      // 检测掉帧
+      // 检测掉�?
       if (frameDuration.inMicroseconds > 16670) { // 超过16.67ms
         _droppedFrames++;
       }
     }
     
-    // 更新平均帧时间
+    // 更新平均帧时�?
     _updateAverageFrameTime();
   }
 
-  /// 更新平均帧时间
+  /// 更新平均帧时�?
   void _updateAverageFrameTime() {
     if (_frameTimes.isEmpty) return;
     
@@ -198,10 +199,10 @@ class RenderSyncService {
         .map((duration) => duration.inMicroseconds)
         .reduce((a, b) => a + b);
     
-    _averageFrameTime = totalMicroseconds / _frameTimes.length / 1000.0; // 转换为毫秒
+    _averageFrameTime = totalMicroseconds / _frameTimes.length / 1000.0; // 转换为毫�?
   }
 
-  /// 计算最优延迟时间
+  /// 计算最优延迟时�?
   Duration _calculateOptimalDelay() {
     if (_averageFrameTime < 12.0) {
       return Duration.zero; // 性能很好，无需延迟
@@ -246,12 +247,12 @@ class RenderSyncService {
     return _averageFrameTime > 18.0 || _droppedFrames > 10;
   }
 
-  /// 获取建议的优化措施
+  /// 获取建议的优化措�?
   List<String> getOptimizationSuggestions() {
     final suggestions = <String>[];
     
     if (_averageFrameTime > 20.0) {
-      suggestions.add('减少同时更新的组件数量');
+      suggestions.add('减少同时更新的组件数�?);
     }
     
     if (_droppedFrames > 20) {

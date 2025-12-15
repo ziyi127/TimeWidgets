@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:system_tray/system_tray.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 系统托盘菜单项枚举
 enum TrayMenuItem {
@@ -48,9 +49,9 @@ class SystemTrayService {
       // 注册菜单点击事件
       _systemTray.registerSystemTrayEventHandler(_onTrayEvent);
 
-      print('System tray initialized successfully');
+      Logger.i('System tray initialized successfully');
     } catch (e) {
-      print('Failed to initialize system tray: $e');
+      Logger.e('Failed to initialize system tray: $e');
       throw Exception('系统托盘初始化失败: $e');
     }
   }
@@ -87,7 +88,7 @@ class SystemTrayService {
 
   /// 处理菜单点击事件
   void _handleMenuClick(TrayMenuItem item) {
-    print('Tray menu item clicked: $item');
+    Logger.d('Tray menu item clicked: $item');
     
     switch (item) {
       case TrayMenuItem.settings:
@@ -105,7 +106,7 @@ class SystemTrayService {
 
   /// 处理托盘事件
   void _onTrayEvent(String eventName) {
-    print('Tray event: $eventName');
+    Logger.d('Tray event: $eventName');
     
     switch (eventName) {
       case kSystemTrayEventClick:
@@ -123,7 +124,7 @@ class SystemTrayService {
     try {
       await _systemTray.setImage(iconPath);
     } catch (e) {
-      print('Failed to update tray icon: $e');
+      Logger.e('Failed to update tray icon: $e');
     }
   }
 
@@ -132,7 +133,7 @@ class SystemTrayService {
     try {
       await _systemTray.setToolTip(tooltip);
     } catch (e) {
-      print('Failed to set tray tooltip: $e');
+      Logger.e('Failed to set tray tooltip: $e');
     }
   }
 
@@ -141,7 +142,7 @@ class SystemTrayService {
     try {
       await _systemTray.popUpContextMenu();
     } catch (e) {
-      print('Failed to show tray menu: $e');
+      Logger.e('Failed to show tray menu: $e');
     }
   }
 
@@ -149,9 +150,9 @@ class SystemTrayService {
   Future<void> destroy() async {
     try {
       await _systemTray.destroy();
-      print('System tray destroyed');
+      Logger.i('System tray destroyed');
     } catch (e) {
-      print('Failed to destroy system tray: $e');
+      Logger.e('Failed to destroy system tray: $e');
     }
   }
 

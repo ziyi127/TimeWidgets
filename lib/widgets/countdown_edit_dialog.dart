@@ -93,7 +93,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
     final isEditing = widget.countdown != null;
 
     return AlertDialog(
-      title: Text(isEditing ? '编辑倒计时' : '添加倒计时'),
+      title: Text(isEditing ? '编辑倒计�? : '添加倒计�?),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -112,7 +112,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return '请输入标题';
+                      return '请输入标�?;
                     }
                     return null;
                   },
@@ -133,7 +133,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                   leading: const Icon(Icons.calendar_today),
                   title: const Text('目标日期'),
                   subtitle: Text(
-                    '${_targetDate.year}年${_targetDate.month}月${_targetDate.day}日',
+                    '${_targetDate.year}�?{_targetDate.month}�?{_targetDate.day}�?,
                   ),
                   trailing: FilledButton.tonal(
                     onPressed: _selectDate,

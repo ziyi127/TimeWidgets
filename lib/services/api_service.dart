@@ -7,6 +7,7 @@ import 'package:time_widgets/services/ipc_service.dart';
 import 'package:time_widgets/services/cache_service.dart';
 import 'package:time_widgets/utils/error_handler.dart';
 import 'package:time_widgets/services/localization_service.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class ApiService {
   static const bool _useIpc = true; // 设置为true使用IPC，false使用HTTP
@@ -32,8 +33,7 @@ class ApiService {
     '重庆': 'weathercn:101040100',
   };
   
-  // 获取课程表数据
-  Future<Timetable> getTimetable(DateTime date) async {
+  // 获取课程表数�?  Future<Timetable> getTimetable(DateTime date) async {
     if (_useIpc) {
       return _ipcService.getTimetable(date);
     }
@@ -109,14 +109,12 @@ class ApiService {
     }
   }
   
-  // 获取天气信息（带缓存回退）
-  Future<WeatherData> getWeather({String city = '北京'}) async {
+  // 获取天气信息（带缓存回退�?  Future<WeatherData> getWeather({String city = '北京'}) async {
     try {
       // 优先尝试小米天气API
       final weather = await _getXiaomiWeather(city);
       if (weather != null) {
-        // 成功获取后缓存数据
-        await CacheService.cacheWeatherData(weather);
+        // 成功获取后缓存数�?        await CacheService.cacheWeatherData(weather);
         return weather;
       }
       
@@ -140,8 +138,7 @@ class ApiService {
         throw Exception('Failed to load weather: ${response.statusCode}');
       }
     } catch (e) {
-      // 网络请求失败，尝试使用缓存数据
-      final appError = ErrorHandler.handleNetworkError(e);
+      // 网络请求失败，尝试使用缓存数�?      final appError = ErrorHandler.handleNetworkError(e);
       ErrorHandler.logError(appError);
       
       final cachedWeather = await CacheService.getCachedWeatherData();
@@ -170,7 +167,7 @@ class ApiService {
         'locale': 'zh_cn',
       });
       
-      print('Requesting Xiaomi Weather API: $uri');
+      Logger.d('Requesting Xiaomi Weather API: $uri');
       
       final response = await http.get(
         uri,
@@ -182,29 +179,27 @@ class ApiService {
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print('Xiaomi Weather API Response: ${response.body.substring(0, 500)}...');
+        Logger.d('Xiaomi Weather API Response: ${response.body.substring(0, 500)}...');
         
         if (data != null) {
           return WeatherData.fromXiaomiJson(data);
         }
       } else {
-        print('Xiaomi Weather API failed with status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        Logger.e('Xiaomi Weather API failed with status: ${response.statusCode}');
+        Logger.e('Response body: ${response.body}');
       }
     } catch (e) {
-      print('Error fetching Xiaomi weather: $e');
+      Logger.e('Error fetching Xiaomi weather: $e');
     }
     
     return null;
   }
   
-  // 获取倒计时信息（带缓存回退）
-  Future<CountdownData> getCountdown() async {
+  // 获取倒计时信息（带缓存回退�?  Future<CountdownData> getCountdown() async {
     try {
       if (_useIpc) {
         final countdown = await _ipcService.getCountdown();
-        // 成功获取后缓存数据
-        await CacheService.cacheCountdownData(countdown);
+        // 成功获取后缓存数�?        await CacheService.cacheCountdownData(countdown);
         return countdown;
       }
       
@@ -217,15 +212,13 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final countdown = CountdownData.fromJson(data['data']);
-        // 成功获取后缓存数据
-        await CacheService.cacheCountdownData(countdown);
+        // 成功获取后缓存数�?        await CacheService.cacheCountdownData(countdown);
         return countdown;
       } else {
         throw Exception('Failed to load countdown: ${response.statusCode}');
       }
     } catch (e) {
-      // 网络请求失败，尝试使用缓存数据
-      final appError = ErrorHandler.handleNetworkError(e);
+      // 网络请求失败，尝试使用缓存数�?      final appError = ErrorHandler.handleNetworkError(e);
       ErrorHandler.logError(appError);
       
       final cachedCountdown = await CacheService.getCachedCountdownData();
@@ -233,8 +226,7 @@ class ApiService {
         return cachedCountdown;
       }
       
-      // 如果没有缓存，返回默认数据
-      return CountdownData(
+      // 如果没有缓存，返回默认数�?      return CountdownData(
         id: '1',
         title: 'Final Exam',
         description: 'Computer Science Final Examination',

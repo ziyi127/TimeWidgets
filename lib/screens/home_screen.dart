@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadCountdownData() async {
     try {
-      // 首先尝试从缓存获取数据
+      // 首先尝试从缓存获取数�?
       final cachedCountdown = await CacheService.getCachedCountdownData();
       if (cachedCountdown != null && mounted) {
         setState(() {
@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
       
-      // 然后从API获取最新数据
+      // 然后从API获取最新数�?
       final countdownData = await _apiService.getCountdown();
       if (mounted) {
         setState(() {
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingCountdown = false;
           _countdownError = null;
         });
-        // 缓存新数据
+        // 缓存新数�?
         await CacheService.cacheCountdownData(countdownData);
       }
     } catch (e) {
@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _weatherError = null;
       });
       
-      // 首先尝试从缓存获取数据
+      // 首先尝试从缓存获取数�?
       final cachedWeather = await CacheService.getCachedWeatherData();
       if (cachedWeather != null && mounted) {
         setState(() {
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
       
-      // 然后从API获取最新数据
+      // 然后从API获取最新数�?
       final weatherData = await _apiService.getWeather();
       
       if (mounted) {
@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingWeather = false;
           _weatherError = null;
         });
-        // 缓存新数据
+        // 缓存新数�?
         await CacheService.cacheWeatherData(weatherData);
       }
     } catch (e) {
@@ -129,12 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    // 响应式断点
+    // 响应式断�?
     final isCompact = constraints.maxWidth < 600;
     final isMedium = constraints.maxWidth >= 600 && constraints.maxWidth < 840;
     final isExpanded = constraints.maxWidth >= 840;
     
-    // 计算间距和尺寸
+    // 计算间距和尺�?
     final horizontalPadding = isCompact ? 16.0 : (isMedium ? 24.0 : 32.0);
     final verticalPadding = isCompact ? 16.0 : 24.0;
     final cardSpacing = isCompact ? 12.0 : 16.0;
@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(height: spacing),
         
-        // 倒计时
+        // 倒计�?
         CountdownWidget(
           countdownData: _isLoadingCountdown ? null : _countdownData,
           error: _countdownError,
@@ -274,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(height: spacing),
         
-        // 课程表
+        // 课程�?
         TimetableWidget(
           isCompact: false,
         ),
@@ -285,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildExpandedLayout(double spacing) {
     return SliverList(
       delegate: SliverChildListDelegate([
-        // 第一行：时间、日期、天气
+        // 第一行：时间、日期、天�?
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(height: spacing),
         
-        // 第二行：当前课程和倒计时
+        // 第二行：当前课程和倒计�?
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -337,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         SizedBox(height: spacing),
         
-        // 第三行：课程表
+        // 第三行：课程�?
         TimetableWidget(
           isCompact: false,
         ),

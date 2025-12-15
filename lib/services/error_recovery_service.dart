@@ -3,6 +3,7 @@ import 'package:time_widgets/services/desktop_widget_service.dart';
 import 'package:time_widgets/services/enhanced_layout_engine.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:time_widgets/utils/logger.dart';
 
 /// 错误恢复服务
 /// 提供布局数据验证、自动修复和多级回退策略
@@ -38,7 +39,7 @@ class ErrorRecoveryService {
       final validationResult = _validateLayout(currentLayout, containerSize);
       
       if (validationResult.isValid) {
-        // 布局有效，创建备份
+        // 布局有效，创建备�?
         await _createBackup(currentLayout);
         return LayoutRecoveryResult(
           layout: currentLayout,
@@ -48,7 +49,7 @@ class ErrorRecoveryService {
         );
       }
 
-      // 布局无效，尝试修复
+      // 布局无效，尝试修�?
       final repairResult = await _repairLayout(
         currentLayout, 
         containerSize, 
@@ -60,7 +61,7 @@ class ErrorRecoveryService {
         return LayoutRecoveryResult(
           layout: repairResult.layout!,
           recoveryLevel: RecoveryLevel.repaired,
-          message: '布局已自动修复: ${repairResult.message}',
+          message: '布局已自动修�? ${repairResult.message}',
           wasRecovered: true,
           issues: validationResult.issues,
         );
@@ -125,7 +126,7 @@ class ErrorRecoveryService {
         backups = decoded.cast<Map<String, dynamic>>();
       }
 
-      // 添加新备份
+      // 添加新备�?
       final newBackup = {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
         'layout': layout.map((key, value) => MapEntry(key.name, value.toJson())),
@@ -133,7 +134,7 @@ class ErrorRecoveryService {
       
       backups.insert(0, newBackup);
       
-      // 保持最大备份数量
+      // 保持最大备份数�?
       if (backups.length > _maxBackups) {
         backups = backups.take(_maxBackups).toList();
       }
@@ -142,11 +143,11 @@ class ErrorRecoveryService {
       await prefs.setString(_backupKey, json.encode(backups));
       
     } catch (e) {
-      print('Failed to create backup: $e');
+      Logger.e('Failed to create backup: $e');
     }
   }
 
-  /// 从备份恢复
+  /// 从备份恢�?
   static Future<RecoveryAttemptResult> _restoreFromBackup(Size containerSize) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -155,13 +156,13 @@ class ErrorRecoveryService {
       if (backupsJson == null) {
         return RecoveryAttemptResult(
           isSuccess: false,
-          message: '没有可用的备份',
+          message: '没有可用的备�?,
         );
       }
 
       final backups = json.decode(backupsJson) as List;
       
-      // 尝试每个备份，从最新的开始
+      // 尝试每个备份，从最新的开�?
       for (final backup in backups) {
         try {
           final layoutData = backup['layout'] as Map<String, dynamic>;
@@ -181,11 +182,11 @@ class ErrorRecoveryService {
             return RecoveryAttemptResult(
               isSuccess: true,
               layout: layout,
-              message: '从备份恢复成功',
+              message: '从备份恢复成�?,
             );
           }
         } catch (e) {
-          continue; // 尝试下一个备份
+          continue; // 尝试下一个备�?
         }
       }
       
@@ -244,7 +245,7 @@ class ErrorRecoveryService {
         );
       }
 
-      // 如果布局引擎修复失败，尝试手动修复
+      // 如果布局引擎修复失败，尝试手动修�?
       final manuallyRepaired = _manualRepair(layout, containerSize, issues);
       final manualValidation = _validateLayout(manuallyRepaired, containerSize);
       
@@ -264,7 +265,7 @@ class ErrorRecoveryService {
     } catch (e) {
       return RecoveryAttemptResult(
         isSuccess: false,
-        message: '修复过程中发生错误: $e',
+        message: '修复过程中发生错�? $e',
       );
     }
   }
@@ -277,7 +278,7 @@ class ErrorRecoveryService {
   ) {
     final repairedLayout = Map<WidgetType, WidgetPosition>.from(layout);
     
-    // 修复超出边界的组件
+    // 修复超出边界的组�?
     for (final entry in repairedLayout.entries) {
       final position = entry.value;
       
@@ -353,19 +354,19 @@ class ErrorRecoveryService {
   ) {
     final issues = <String>[];
     
-    // 检查是否包含所有必需的组件
+    // 检查是否包含所有必需的组�?
     for (final type in WidgetType.values) {
       if (!layout.containsKey(type)) {
         issues.add('缺少组件: ${type.name}');
       }
     }
     
-    // 检查边界
+    // 检查边�?
     for (final entry in layout.entries) {
       final position = entry.value;
       
       if (position.x < 0 || position.y < 0) {
-        issues.add('${entry.key.name}位置为负数');
+        issues.add('${entry.key.name}位置为负�?);
       }
       
       if (position.x + position.width > containerSize.width ||
@@ -378,12 +379,12 @@ class ErrorRecoveryService {
       }
     }
     
-    // 检查重叠
+    // 检查重�?
     final positions = layout.values.where((p) => p.isVisible).toList();
     for (int i = 0; i < positions.length; i++) {
       for (int j = i + 1; j < positions.length; j++) {
         if (_isOverlapping(positions[i], positions[j])) {
-          issues.add('${positions[i].type.name}与${positions[j].type.name}重叠');
+          issues.add('${positions[i].type.name}�?{positions[j].type.name}重叠');
         }
       }
     }
@@ -394,7 +395,7 @@ class ErrorRecoveryService {
     );
   }
 
-  /// 检查两个组件是否重叠
+  /// 检查两个组件是否重�?
   static bool _isOverlapping(WidgetPosition a, WidgetPosition b) {
     return !(a.x + a.width <= b.x || 
              b.x + b.width <= a.x || 
@@ -422,7 +423,7 @@ class ErrorRecoveryService {
         errorLog = decoded.cast<Map<String, dynamic>>();
       }
 
-      // 添加新错误
+      // 添加新错�?
       final newError = {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
         'message': message,
@@ -431,7 +432,7 @@ class ErrorRecoveryService {
       
       errorLog.insert(0, newError);
       
-      // 保持最大日志数量
+      // 保持最大日志数�?
       if (errorLog.length > _maxErrorLogs) {
         errorLog = errorLog.take(_maxErrorLogs).toList();
       }
@@ -440,13 +441,13 @@ class ErrorRecoveryService {
       await prefs.setString(_errorLogKey, json.encode(errorLog));
       
       // 同时输出到控制台
-      print('ErrorRecoveryService: $message');
+      Logger.e('ErrorRecoveryService: $message');
       if (details != null) {
-        print('Details: $details');
+        Logger.e('Details: $details');
       }
       
     } catch (e) {
-      print('Failed to log error: $e');
+      Logger.e('Failed to log error: $e');
     }
   }
 
@@ -467,7 +468,7 @@ class ErrorRecoveryService {
       )).toList();
       
     } catch (e) {
-      print('Failed to get error log: $e');
+      Logger.e('Failed to get error log: $e');
       return [];
     }
   }
@@ -478,17 +479,17 @@ class ErrorRecoveryService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_errorLogKey);
     } catch (e) {
-      print('Failed to clear error log: $e');
+      Logger.e('Failed to clear error log: $e');
     }
   }
 
-  /// 清除所有备份
+  /// 清除所有备�?
   static Future<void> clearBackups() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_backupKey);
     } catch (e) {
-      print('Failed to clear backups: $e');
+      Logger.e('Failed to clear backups: $e');
     }
   }
 }
@@ -526,11 +527,11 @@ class RecoveryAttemptResult {
 /// 恢复级别
 enum RecoveryLevel {
   valid,              // 布局有效
-  loadedFromStorage,  // 从存储加载
+  loadedFromStorage,  // 从存储加�?
   repaired,           // 自动修复
-  restoredFromBackup, // 从备份恢复
+  restoredFromBackup, // 从备份恢�?
   defaultLayout,      // 使用默认布局
-  emergency,          // 紧急模式
+  emergency,          // 紧急模�?
 }
 
 /// 验证结果

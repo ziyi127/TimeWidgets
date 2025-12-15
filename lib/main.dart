@@ -7,6 +7,7 @@ import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +27,7 @@ class TimeWidgetsApp extends StatelessWidget {
   }
 }
 
-/// 桌面模式包装器
-class DesktopWrapper extends StatefulWidget {
+/// 桌面模式包装�?class DesktopWrapper extends StatefulWidget {
   const DesktopWrapper({super.key});
 
   @override
@@ -39,6 +39,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
   final ThemeService _themeService = ThemeService();
   bool _isWindowVisible = true;
   bool _isWindowInitialized = false;
+  bool _showTrayMenu = false;
   
   @override
   void initState() {
@@ -47,22 +48,19 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
     // 加载主题设置
     _themeService.loadSettings();
     
-    // 初始化窗口
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // 初始化窗�?    WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWindow();
       _initializeSystemTray();
     });
   }
 
-  /// 初始化窗口配置
-  Future<void> _initializeWindow() async {
+  /// 初始化窗口配�?  Future<void> _initializeWindow() async {
     if (_isWindowInitialized) return;
     
     try {
-      // 获取屏幕尺寸
       const windowWidth = 400.0;
       const windowHeight = 900.0;
-      const windowX = 1520.0; // 屏幕右侧
+      const windowX = 1520.0;
       
       await windowManager.setSize(const Size(windowWidth, windowHeight));
       await windowManager.setPosition(const Offset(windowX, 50));
@@ -75,7 +73,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
       
       doWhenWindowReady(() {
         final win = appWindow;
-        win.title = "智慧课程表";
+        win.title = "智慧课程�?;
         win.show();
       });
       
@@ -83,17 +81,16 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
         _isWindowInitialized = true;
       });
       
-      print('Window initialized successfully');
+      Logger.i('窗口初始化成�?);
     } catch (e) {
-      print('Window initialization failed: $e');
+      Logger.e('窗口初始化失�? $e');
       setState(() {
         _isWindowInitialized = true;
       });
     }
   }
 
-  /// 初始化系统托盘
-  Future<void> _initializeSystemTray() async {
+  /// 初始化系统托�?  Future<void> _initializeSystemTray() async {
     try {
       final trayService = MD3TrayMenuService.instance;
       
@@ -103,17 +100,38 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
       trayService.onToggleWindow = _toggleMainWindow;
       trayService.onExit = _exitApplication;
       
-      // 初始化托盘
-      await trayService.initialize();
+      // 设置MD3菜单显示回调
+      trayService.onShowMD3Menu = _showMD3TrayMenu;
       
-      print('System tray initialized');
+      // 初始化托�?      await trayService.initialize();
+      
+      Logger.i('系统托盘初始化成�?);
     } catch (e) {
-      print('System tray initialization failed: $e');
+      Logger.e('系统托盘初始化失�? $e');
     }
   }
 
-  /// 导航到设置页面
-  void _navigateToSettings() {
+  /// 显示MD3风格的托盘菜�?  void _showMD3TrayMenu() {
+    // 确保窗口可见
+    if (!_isWindowVisible) {
+      _showMainWindow();
+    }
+    
+    setState(() {
+      _showTrayMenu = true;
+    });
+  }
+
+  /// 隐藏MD3托盘菜单
+  void _hideMD3TrayMenu() {
+    setState(() {
+      _showTrayMenu = false;
+    });
+  }
+
+  /// 导航到设置页�?  void _navigateToSettings() {
+    _hideMD3TrayMenu();
+    
     if (!_isWindowVisible) {
       _showMainWindow();
     }
@@ -125,8 +143,9 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
     );
   }
 
-  /// 导航到课表编辑页面
-  void _navigateToTimetableEdit() {
+  /// 导航到课表编辑页�?  void _navigateToTimetableEdit() {
+    _hideMD3TrayMenu();
+    
     if (!_isWindowVisible) {
       _showMainWindow();
     }
@@ -138,8 +157,9 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
     );
   }
 
-  /// 切换主窗口可见性
-  void _toggleMainWindow() {
+  /// 切换主窗口可见�?  void _toggleMainWindow() {
+    _hideMD3TrayMenu();
+    
     if (_isWindowVisible) {
       _hideMainWindow();
     } else {
@@ -147,24 +167,21 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
     }
   }
 
-  /// 显示主窗口
-  void _showMainWindow() {
+  /// 显示主窗�?  void _showMainWindow() {
     appWindow.show();
     setState(() {
       _isWindowVisible = true;
     });
   }
 
-  /// 隐藏主窗口
-  void _hideMainWindow() {
+  /// 隐藏主窗�?  void _hideMainWindow() {
     appWindow.hide();
     setState(() {
       _isWindowVisible = false;
     });
   }
 
-  /// 退出应用程序
-  void _exitApplication() {
+  /// 退出应用程�?  void _exitApplication() {
     MD3TrayMenuService.instance.destroy();
     appWindow.close();
   }
@@ -189,17 +206,30 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
             
             return MaterialApp(
               navigatorKey: navigatorKey,
-              title: '智慧课程表',
-              theme: lightTheme?.copyWith(
+              title: '智慧课程�?,
+              theme: lightTheme.copyWith(
                 scaffoldBackgroundColor: Colors.transparent,
                 canvasColor: Colors.transparent,
               ),
-              darkTheme: darkTheme?.copyWith(
+              darkTheme: darkTheme.copyWith(
                 scaffoldBackgroundColor: Colors.transparent,
                 canvasColor: Colors.transparent,
               ),
               themeMode: themeSettings.themeMode,
-              home: const DesktopWidgetScreen(),
+              home: Stack(
+                children: [
+                  // 主界�?                  const DesktopWidgetScreen(),
+                  
+                  // MD3托盘菜单覆盖�?                  if (_showTrayMenu)
+                    MD3TrayPopupMenu(
+                      onShowSettings: _navigateToSettings,
+                      onShowTimetableEdit: _navigateToTimetableEdit,
+                      onToggleWindow: _toggleMainWindow,
+                      onExit: _exitApplication,
+                      onDismiss: _hideMD3TrayMenu,
+                    ),
+                ],
+              ),
               debugShowCheckedModeBanner: false,
             );
           },

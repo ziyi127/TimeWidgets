@@ -2,18 +2,17 @@ import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/services/api_service.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class TimetableService {
   final ApiService _apiService = ApiService();
   
-  // 获取课程表数据
-  Future<Timetable> getTimetable(DateTime date) async {
+  // 获取课程表数�?  Future<Timetable> getTimetable(DateTime date) async {
     try {
       // 尝试从真实API获取数据
       return await _apiService.getTimetable(date);
     } catch (e) {
-      // 如果API调用失败，回退到模拟数据
-      print('Failed to fetch timetable from API, using mock data: $e');
+      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch timetable from API, using mock data: $e');
       await Future.delayed(const Duration(milliseconds: 500));
       
       return Timetable(
@@ -61,8 +60,7 @@ class TimetableService {
       // 尝试从真实API获取数据
       return await _apiService.getCurrentCourse();
     } catch (e) {
-      // 如果API调用失败，回退到模拟数据
-      print('Failed to fetch current course from API, using mock data: $e');
+      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch current course from API, using mock data: $e');
       // 模拟当前课程
       return Course(
         subject: '语文',
@@ -80,39 +78,39 @@ class TimetableService {
       // 尝试从真实API获取数据
       return await _apiService.getWeather();
     } catch (e) {
-      // 如果API调用失败，回退到模拟数据
-      print('Failed to fetch weather from API, using mock data: $e');
+      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch weather from API, using mock data: $e');
       // 模拟天气数据
       return WeatherData(
         cityName: '北京',
-        description: '晴',
+        description: '�?,
         temperature: 25,
-        temperatureRange: '20℃~30℃',
+        temperatureRange: '20℃~30�?,
         aqiLevel: 50,
         humidity: 40,
-        wind: '3-4级',
+        wind: '3-4�?,
         pressure: 1013,
         sunrise: '06:00',
         sunset: '18:30',
         weatherType: 0,
         weatherIcon: 'weather_0.png',
+        feelsLike: 26,
+        visibility: '10km',
+        uvIndex: '5',
+        pubTime: DateTime.now().toIso8601String(),
       );
     }
   }
 
-  // 获取倒计时信息
-  Future<CountdownData> getCountdown() async {
+  // 获取倒计时信�?  Future<CountdownData> getCountdown() async {
     try {
       // 尝试从真实API获取数据
       return await _apiService.getCountdown();
     } catch (e) {
-      // 如果API调用失败，回退到模拟数据
-      print('Failed to fetch countdown from API, using mock data: $e');
-      // 模拟倒计时数据
-      return CountdownData(
+      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch countdown from API, using mock data: $e');
+      // 模拟倒计时数�?      return CountdownData(
         id: '1',
-        title: '中考',
-        description: '中考倒计时',
+        title: '中�?,
+        description: '中考倒计�?,
         targetDate: DateTime.now().add(const Duration(days: 10)),
         type: 'exam',
         progress: 0.5,

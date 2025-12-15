@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// Material Design 3 Button 样式工具类
-/// 提供统一的 MD3 Button 样式和变体
+/// Material Design 3 Button 样式工具�?
+/// 提供统一�?MD3 Button 样式和变�?
 class MD3ButtonStyles {
   /// Filled Button (主要按钮)
-  /// 用于最重要的操作
+  /// 用于最重要的操�?
   static Widget filled({
     required VoidCallback? onPressed,
     required Widget child,
@@ -19,7 +19,7 @@ class MD3ButtonStyles {
   }
 
   /// Filled Tonal Button (次要强调按钮)
-  /// 用于重要但不是最主要的操作
+  /// 用于重要但不是最主要的操�?
   static Widget filledTonal({
     required VoidCallback? onPressed,
     required Widget child,
@@ -49,7 +49,7 @@ class MD3ButtonStyles {
   }
 
   /// Text Button (文本按钮)
-  /// 用于最低优先级的操作
+  /// 用于最低优先级的操�?
   static Widget text({
     required VoidCallback? onPressed,
     required Widget child,
@@ -64,7 +64,7 @@ class MD3ButtonStyles {
   }
 
   /// Icon Button (图标按钮)
-  /// 用于工具栏和操作栏
+  /// 用于工具栏和操作�?
   static Widget icon({
     required VoidCallback? onPressed,
     required Widget icon,
@@ -132,7 +132,7 @@ class MD3ButtonStyles {
   }
 
   /// Floating Action Button (浮动操作按钮)
-  /// 用于主要的浮动操作
+  /// 用于主要的浮动操�?
   static Widget fab({
     required VoidCallback? onPressed,
     required Widget child,
@@ -161,7 +161,7 @@ class MD3ButtonStyles {
     }
   }
 
-  // 私有方法：获取各种按钮样式
+  // 私有方法：获取各种按钮样�?
 
   static ButtonStyle _getFilledButtonStyle(bool isCompact) {
     return FilledButton.styleFrom(
