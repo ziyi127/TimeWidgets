@@ -31,7 +31,7 @@ class TimetableWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -129,7 +129,7 @@ class TimetableWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -180,7 +180,7 @@ class TimetableWidget extends StatelessWidget {
             : colorScheme.secondary;
     
     final backgroundColor = isCurrent
-        ? colorScheme.primaryContainer.withOpacity(0.3)
+        ? colorScheme.primaryContainer.withValues(alpha: 0.3)
         : colorScheme.surfaceContainerHighest;
 
     return Container(
@@ -190,8 +190,8 @@ class TimetableWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isCurrent 
-              ? statusColor.withOpacity(0.3) 
-              : colorScheme.outline.withOpacity(0.1),
+              ? statusColor.withValues(alpha: 0.3) 
+              : colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -233,7 +233,7 @@ class TimetableWidget extends StatelessWidget {
                         margin: const EdgeInsets.only(left: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.12),
+                          color: statusColor.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(

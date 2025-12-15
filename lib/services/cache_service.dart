@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class CacheService {
   static const String _weatherKey = 'cached_weather_data';
@@ -20,7 +21,7 @@ class CacheService {
       await prefs.setString(_weatherKey, weatherJson);
       await prefs.setInt(_weatherTimestampKey, DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
-      print('缓存天气数据失败: $e');
+      Logger.e('缓存天气数据失败: $e');
     }
   }
 
@@ -44,7 +45,7 @@ class CacheService {
       final weatherMap = jsonDecode(weatherJson);
       return WeatherData.fromJson(weatherMap);
     } catch (e) {
-      print('获取缓存天气数据失败: $e');
+      Logger.e('获取缓存天气数据失败: $e');
       return null;
     }
   }
@@ -57,7 +58,7 @@ class CacheService {
       await prefs.setString(_countdownKey, countdownJson);
       await prefs.setInt(_countdownTimestampKey, DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
-      print('缓存倒计时数据失败: $e');
+      Logger.e('缓存倒计时数据失败: $e');
     }
   }
 
@@ -81,7 +82,7 @@ class CacheService {
       final countdownMap = jsonDecode(countdownJson);
       return CountdownData.fromJson(countdownMap);
     } catch (e) {
-      print('获取缓存倒计时数据失败: $e');
+      Logger.e('获取缓存倒计时数据失败: $e');
       return null;
     }
   }
@@ -95,7 +96,7 @@ class CacheService {
       await prefs.remove(_countdownKey);
       await prefs.remove(_countdownTimestampKey);
     } catch (e) {
-      print('清除缓存失败: $e');
+      Logger.e('清除所有缓存失败: $e');
     }
   }
 
@@ -106,7 +107,7 @@ class CacheService {
       await prefs.remove(_weatherKey);
       await prefs.remove(_weatherTimestampKey);
     } catch (e) {
-      print('清除天气缓存失败: $e');
+      Logger.e('清除天气缓存失败: $e');
     }
   }
 
@@ -117,7 +118,7 @@ class CacheService {
       await prefs.remove(_countdownKey);
       await prefs.remove(_countdownTimestampKey);
     } catch (e) {
-      print('清除倒计时缓存失败: $e');
+      Logger.e('清除倒计时缓存失败: $e');
     }
   }
 }

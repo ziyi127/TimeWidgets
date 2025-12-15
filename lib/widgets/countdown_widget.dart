@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/countdown_model.dart';
-import 'package:time_widgets/widgets/error_widget.dart';
+import 'package:time_widgets/screens/countdown_list_screen.dart';
+import 'package:time_widgets/utils/md3_card_styles.dart';
 
 class CountdownWidget extends StatelessWidget {
   final CountdownData? countdownData;
+  final List<CountdownData>? allCountdowns;
   final String? error;
   final VoidCallback? onRetry;
+  final VoidCallback? onViewAll;
   final bool isCompact;
 
   const CountdownWidget({
     super.key,
     this.countdownData,
+    this.allCountdowns,
     this.error,
     this.onRetry,
+    this.onViewAll,
     this.isCompact = false,
   });
 
@@ -23,38 +28,32 @@ class CountdownWidget extends StatelessWidget {
     
     // 错误处理
     if (error != null) {
-      return Card(
-        elevation: 0,
-        color: colorScheme.errorContainer,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.error_outline_rounded,
+      return MD3CardStyles.errorContainer(
+        context: context,
+        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              color: colorScheme.onErrorContainer,
+              size: 24,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Countdown Error',
+              style: theme.textTheme.titleSmall?.copyWith(
                 color: colorScheme.onErrorContainer,
-                size: 24,
               ),
+            ),
+            if (onRetry != null) ...[
               const SizedBox(height: 8),
-              Text(
-                'Countdown Error',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colorScheme.onErrorContainer,
-                ),
+              FilledButton.tonal(
+                onPressed: onRetry,
+                child: const Text('Retry'),
               ),
-              if (onRetry != null) ...[
-                const SizedBox(height: 8),
-                FilledButton.tonal(
-                  onPressed: onRetry,
-                  child: const Text('Retry'),
-                ),
-              ],
             ],
-          ),
+          ],
         ),
       );
     }
@@ -69,19 +68,10 @@ class CountdownWidget extends StatelessWidget {
     // 根据事件类型确定颜色
     final typeColor = _getEventTypeColor(colorScheme, eventType);
     
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: colorScheme.outline.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Container(
-        padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
-        child: Column(
+    return MD3CardStyles.surfaceContainer(
+      context: context,
+      padding: EdgeInsets.all(isCompact ? 16.0 : 20.0),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -105,7 +95,7 @@ class CountdownWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: typeColor.withOpacity(0.12),
+                    color: typeColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -201,38 +191,55 @@ class CountdownWidget extends StatelessWidget {
               
               const SizedBox(height: 12),
               
-              // Summary text
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: 16,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '$remainingDays days until $description',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+              // Summary text and view all button
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: 16,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '$remainingDays days until $description',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurface,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.tonal(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CountdownListScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('查看全部'),
+                  ),
+                ],
               ),
             ],
           ],
         ),
-      ),
     );
   }
 

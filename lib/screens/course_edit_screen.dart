@@ -4,7 +4,7 @@ import '../models/timetable_edit_model.dart';
 import '../services/timetable_edit_service.dart';
 
 class CourseEditScreen extends StatefulWidget {
-  const CourseEditScreen({Key? key}) : super(key: key);
+  const CourseEditScreen({super.key});
 
   @override
   State<CourseEditScreen> createState() => _CourseEditScreenState();

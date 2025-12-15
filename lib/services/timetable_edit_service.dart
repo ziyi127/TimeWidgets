@@ -168,6 +168,15 @@ class TimetableEditService extends ChangeNotifier {
     }
   }
 
+  // Get current timetable data
+  TimetableData getTimetableData() {
+    return TimetableData(
+      courses: List.from(_courses),
+      timeSlots: List.from(_timeSlots),
+      dailyCourses: List.from(_dailyCourses),
+    );
+  }
+
   // Refresh data from storage
   Future<void> refreshData() async {
     _timetableData = await _storageService.loadTimetableData();

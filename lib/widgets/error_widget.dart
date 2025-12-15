@@ -1,16 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/utils/error_handler.dart';
 
 class CustomErrorWidget extends StatelessWidget {
   final String message;
+  final String? resolution;
   final VoidCallback? onRetry;
   final double? fontSize;
+  final AppError? appError;
 
   const CustomErrorWidget({
     super.key,
     required this.message,
+    this.resolution,
     this.onRetry,
     this.fontSize,
+    this.appError,
   });
+
+  factory CustomErrorWidget.fromAppError({
+    Key? key,
+    required AppError error,
+    VoidCallback? onRetry,
+    double? fontSize,
+  }) {
+    return CustomErrorWidget(
+      key: key,
+      message: error.userMessage ?? error.message,
+      resolution: error.resolution,
+      onRetry: onRetry,
+      fontSize: fontSize,
+      appError: error,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +74,37 @@ class CustomErrorWidget extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
+          if (resolution != null) ...[
+            SizedBox(height: effectiveFontSize * 0.5),
+            Container(
+              padding: EdgeInsets.all(effectiveFontSize * 0.5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2A2A2A),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    color: const Color(0xFFFFB74D),
+                    size: effectiveFontSize,
+                  ),
+                  SizedBox(width: effectiveFontSize * 0.3),
+                  Flexible(
+                    child: Text(
+                      resolution!,
+                      style: TextStyle(
+                        fontSize: effectiveFontSize * 0.8,
+                        color: const Color(0xFFFFB74D),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           if (onRetry != null) ...[
             SizedBox(height: effectiveFontSize * 0.8),
             ElevatedButton(

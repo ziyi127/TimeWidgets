@@ -5,7 +5,7 @@ import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/services/timetable_storage_service.dart';
 
 class JsonDataViewerScreen extends StatefulWidget {
-  const JsonDataViewerScreen({Key? key}) : super(key: key);
+  const JsonDataViewerScreen({super.key});
 
   @override
   State<JsonDataViewerScreen> createState() => _JsonDataViewerScreenState();
@@ -47,10 +47,12 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
       
       await Clipboard.setData(ClipboardData(text: jsonString));
       
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('JSON数据已复制到剪贴板')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('导出失败: $e')),
       );
@@ -61,6 +63,7 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
     try {
       final clipboardData = await Clipboard.getData('text/plain');
       if (clipboardData?.text == null || clipboardData!.text!.isEmpty) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('剪贴板中没有JSON数据')),
         );
@@ -74,10 +77,12 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
       await _storageService.saveTimetableData(timetableData);
       await _loadTimetableData();
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('JSON数据导入成功')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('导入失败: $e')),
       );

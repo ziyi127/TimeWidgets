@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+/// 屏幕尺寸类型枚举
+enum ScreenSize {
+  compact,    // < 600dp
+  medium,     // 600dp - 839dp
+  expanded,   // >= 840dp
+}
+
 /// 响应式设计工具类
 class ResponsiveUtils {
   // 私有构造函数，防止实例化
@@ -9,13 +16,6 @@ class ResponsiveUtils {
   static const double compactBreakpoint = 600;
   static const double mediumBreakpoint = 840;
   static const double expandedBreakpoint = 1200;
-
-  /// 屏幕尺寸类型
-  enum ScreenSize {
-    compact,    // < 600dp
-    medium,     // 600dp - 839dp
-    expanded,   // >= 840dp
-  }
 
   /// 获取当前屏幕尺寸类型
   static ScreenSize getScreenSize(double width) {

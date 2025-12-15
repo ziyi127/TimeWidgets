@@ -32,7 +32,11 @@ const weatherData = {
   condition: "晴",
   humidity: 45,
   windSpeed: 10,
-  icon: "sunny"
+  icon: "sunny",
+  feelsLike: 27,
+  pressure: 1013.2,
+  visibility: "10",
+  uvIndex: "3"
 };
 
 const countdownData = {

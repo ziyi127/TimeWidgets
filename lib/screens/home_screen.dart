@@ -5,10 +5,15 @@ import 'package:time_widgets/widgets/weather_widget.dart';
 import 'package:time_widgets/widgets/countdown_widget.dart';
 import 'package:time_widgets/widgets/current_class_widget.dart';
 import 'package:time_widgets/widgets/timetable_widget.dart';
+import 'package:time_widgets/widgets/week_display_widget.dart';
 import 'package:time_widgets/services/api_service.dart';
+import 'package:time_widgets/screens/settings_screen.dart';
 import 'package:time_widgets/services/cache_service.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/utils/md3_button_styles.dart';
+import 'package:time_widgets/utils/md3_typography_styles.dart';
+import 'package:time_widgets/utils/md3_navigation_styles.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -148,7 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: CustomScrollView(
         slivers: [
           // App Bar
-          SliverAppBar(
+          MD3NavigationStyles.sliverAppBar(
+            context: context,
             floating: true,
             snap: true,
             backgroundColor: Colors.transparent,
@@ -156,33 +162,48 @@ class _HomeScreenState extends State<HomeScreen> {
             flexibleSpace: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    colorScheme.primaryContainer.withOpacity(0.1),
-                    colorScheme.secondaryContainer.withOpacity(0.1),
-                  ],
-                ),
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primaryContainer.withValues(alpha: 0.1),
+                  colorScheme.secondaryContainer.withValues(alpha: 0.1),
+                ],
+              ),
               ),
             ),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Smart Schedule',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Smart Schedule',
+                      style: MD3TypographyStyles.headlineSmall(context).copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const WeekDisplayWidget(isCompact: true),
+                  ],
                 ),
                 Text(
                   'Your Intelligent Time Manager',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  style: MD3TypographyStyles.bodySmall(context),
                 ),
               ],
             ),
+            actions: [
+              MD3ButtonStyles.icon(
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                  );
+                },
+                tooltip: '设置',
+              ),
+            ],
             toolbarHeight: 80,
           ),
           

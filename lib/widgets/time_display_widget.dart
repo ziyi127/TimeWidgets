@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:time_widgets/utils/md3_card_styles.dart';
+import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class TimeDisplayWidget extends StatefulWidget {
   final bool isCompact;
@@ -47,19 +49,10 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: colorScheme.outline.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Container(
-        padding: EdgeInsets.all(widget.isCompact ? 16.0 : 20.0),
-        child: Column(
+    return MD3CardStyles.surfaceContainer(
+      context: context,
+      padding: EdgeInsets.all(widget.isCompact ? 16.0 : 20.0),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -74,10 +67,7 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
                 const SizedBox(width: 8),
                 Text(
                   'Current Time',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: MD3TypographyStyles.titleSmall(context, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -91,8 +81,7 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
                 // Main time
                 Text(
                   _currentTime,
-                  style: theme.textTheme.displayMedium?.copyWith(
-                    color: colorScheme.onSurface,
+                  style: MD3TypographyStyles.displayMedium(context).copyWith(
                     fontWeight: FontWeight.w300,
                     fontSize: widget.isCompact ? 36 : 48,
                     height: 1.0,
@@ -106,8 +95,7 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
                     _currentSeconds,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    style: MD3TypographyStyles.titleLarge(context, color: colorScheme.onSurfaceVariant).copyWith(
                       fontWeight: FontWeight.w400,
                       fontSize: widget.isCompact ? 16 : 20,
                     ),
@@ -123,13 +111,12 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.3),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   'Live',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
+                  style: MD3TypographyStyles.labelSmall(context, color: colorScheme.onPrimaryContainer).copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -137,7 +124,6 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
             ],
           ],
         ),
-      ),
     );
   }
 }

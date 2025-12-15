@@ -1,5 +1,45 @@
 import 'package:flutter/material.dart';
 
+/// 课程状态枚举
+enum CourseStatus {
+  upcoming,   // 即将开始
+  current,    // 正在进行
+  completed,  // 已结束
+}
+
+/// 事件类型枚举
+enum EventType {
+  exam,       // 考试
+  assignment, // 作业
+  meeting,    // 会议
+  other,      // 其他
+}
+
+/// 天气状态枚举
+enum WeatherCondition {
+  sunny,      // 晴天
+  cloudy,     // 多云
+  rainy,      // 雨天
+  snowy,      // 雪天
+  foggy,      // 雾天
+  stormy,     // 暴风雨
+  unknown,    // 未知
+}
+
+/// 主题模式枚举
+enum AppThemeMode {
+  system,     // 跟随系统
+  light,      // 浅色主题
+  dark,       // 深色主题
+}
+
+/// 语言设置枚举
+enum AppLanguage {
+  system,     // 跟随系统
+  chinese,    // 中文
+  english,    // 英文
+}
+
 /// 应用常量定义
 class AppConstants {
   // 私有构造函数，防止实例化
@@ -65,46 +105,6 @@ class AppConstants {
   /// 默认值
   static const String defaultCity = '北京';
   static const String defaultWeatherApiKey = 'your_api_key_here';
-
-  /// 课程状态
-  enum CourseStatus {
-    upcoming,   // 即将开始
-    current,    // 正在进行
-    completed,  // 已结束
-  }
-
-  /// 事件类型
-  enum EventType {
-    exam,       // 考试
-    assignment, // 作业
-    meeting,    // 会议
-    other,      // 其他
-  }
-
-  /// 天气状态
-  enum WeatherCondition {
-    sunny,      // 晴天
-    cloudy,     // 多云
-    rainy,      // 雨天
-    snowy,      // 雪天
-    foggy,      // 雾天
-    stormy,     // 暴风雨
-    unknown,    // 未知
-  }
-
-  /// 主题模式
-  enum ThemeMode {
-    system,     // 跟随系统
-    light,      // 浅色主题
-    dark,       // 深色主题
-  }
-
-  /// 语言设置
-  enum Language {
-    system,     // 跟随系统
-    chinese,    // 中文
-    english,    // 英文
-  }
 
   /// 课程状态颜色映射
   static const Map<CourseStatus, Color> courseStatusColors = {

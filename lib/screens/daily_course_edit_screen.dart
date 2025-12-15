@@ -4,7 +4,7 @@ import '../models/timetable_edit_model.dart';
 import '../services/timetable_edit_service.dart';
 
 class DailyCourseEditScreen extends StatefulWidget {
-  const DailyCourseEditScreen({Key? key}) : super(key: key);
+  const DailyCourseEditScreen({super.key});
 
   @override
   State<DailyCourseEditScreen> createState() => _DailyCourseEditScreenState();
@@ -133,7 +133,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
         // Header row with time slot names
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Theme.of(context).primaryColor.withOpacity(0.1),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
           child: Row(
             children: [
               const SizedBox(width: 80), // Space for course selector

@@ -110,7 +110,7 @@ class CountdownData {
       'type': type,
       'progress': progress,
       'category': category,
-      'color': color?.value,
+      'color': color?.toARGB32,
     };
   }
 
