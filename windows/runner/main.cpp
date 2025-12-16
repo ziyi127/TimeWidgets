@@ -53,17 +53,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
   window.SetQuitOnClose(true);
 
-  // Initialize system tray
-  SystemTrayManager trayManager;
-  trayManager.Initialize(window.GetHandle(), instance);
-
   ::MSG msg;
   while (::GetMessage(&msg, nullptr, 0, 0)) {
-    // Handle system tray messages
-    if (msg.message == RegisterWindowMessage(L"TrayIconMessage")) {
-      // Handle tray icon messages here if needed
-    }
-    
     ::TranslateMessage(&msg);
     ::DispatchMessage(&msg);
   }

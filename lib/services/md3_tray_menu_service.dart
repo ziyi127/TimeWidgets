@@ -340,59 +340,40 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
     final hoverColor = isDestructive ? colorScheme.errorContainer.withOpacity(0.2) : colorScheme.surfaceContainerHighest;
     final focusColor = colorScheme.onSurface.withOpacity(0.1);
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        bool isHovered = false;
-        
-        return MouseRegion(
-          onEnter: (_) {
-            setState(() {
-              isHovered = true;
-            });
-          },
-          onExit: (_) {
-            setState(() {
-              isHovered = false;
-            });
-          },
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(8),
-            hoverColor: hoverColor,
-            focusColor: focusColor,
-            highlightColor: colorScheme.onSurface.withOpacity(0.1),
-            splashColor: colorScheme.onSurface.withOpacity(0.15),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: isHovered ? hoverColor : Colors.transparent,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      hoverColor: hoverColor,
+      focusColor: focusColor,
+      highlightColor: colorScheme.onSurface.withOpacity(0.1),
+      splashColor: colorScheme.onSurface.withOpacity(0.15),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                icon, 
+                color: color,
+                size: 22,
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      icon, 
-                      color: color,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        label,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: color,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
