@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 import 'package:time_widgets/services/theme_service.dart';
+import 'package:time_widgets/models/theme_settings_model.dart';
 
 void main() {
+  // Initialize binding for tests
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   group('DynamicColorBuilder Tests', () {
     testWidgets('DynamicColorBuilder builds with default themes', (tester) async {
       bool builderCalled = false;
@@ -110,8 +114,9 @@ void main() {
       final themeService = ThemeService();
       const seedColor = Color(0xFF6750A4);
 
-      final lightTheme = themeService.generateLightTheme(seedColor);
-      final darkTheme = themeService.generateDarkTheme(seedColor);
+      final defaultSettings = ThemeSettings.defaultSettings();
+    final lightTheme = themeService.generateLightTheme(seedColor, defaultSettings);
+    final darkTheme = themeService.generateDarkTheme(seedColor, defaultSettings);
 
       expect(lightTheme.useMaterial3, isTrue);
       expect(darkTheme.useMaterial3, isTrue);

@@ -21,7 +21,7 @@ class CourseInfo {
   final String color;
   final bool isOutdoor;  // 是否户外课
 
-  CourseInfo({
+  const CourseInfo({
     required this.id,
     required this.name,
     this.abbreviation = '',
@@ -90,7 +90,7 @@ class TimeSlot {
   final String? defaultSubjectId;  // 默认科目ID
   final bool isHiddenByDefault;  // 默认隐藏
 
-  TimeSlot({
+  const TimeSlot({
     required this.id,
     required this.startTime,
     required this.endTime,
@@ -163,13 +163,15 @@ class DailyCourse {
   final String timeSlotId;
   final String courseId;
   final WeekType weekType;
+  final bool isChangedClass;  // 是否为换课课程
 
-  DailyCourse({
+  const DailyCourse({
     required this.id,
     required this.dayOfWeek,
     required this.timeSlotId,
     required this.courseId,
     this.weekType = WeekType.both,
+    this.isChangedClass = false,
   });
 
   DailyCourse copyWith({
@@ -178,6 +180,7 @@ class DailyCourse {
     String? timeSlotId,
     String? courseId,
     WeekType? weekType,
+    bool? isChangedClass,
   }) {
     return DailyCourse(
       id: id ?? this.id,
@@ -185,6 +188,7 @@ class DailyCourse {
       timeSlotId: timeSlotId ?? this.timeSlotId,
       courseId: courseId ?? this.courseId,
       weekType: weekType ?? this.weekType,
+      isChangedClass: isChangedClass ?? this.isChangedClass,
     );
   }
 
@@ -195,6 +199,7 @@ class DailyCourse {
       'timeSlotId': timeSlotId,
       'courseId': courseId,
       'weekType': weekType.index,
+      'isChangedClass': isChangedClass,
     };
   }
 
@@ -205,6 +210,7 @@ class DailyCourse {
       timeSlotId: json['timeSlotId'],
       courseId: json['courseId'],
       weekType: WeekType.values[json['weekType'] ?? 2],
+      isChangedClass: json['isChangedClass'] ?? false,
     );
   }
 }
@@ -232,13 +238,29 @@ class ScheduleTriggerRule {
     
     // 检查周类型
     if (weekType == WeekType.both) return true;
-    if (currentWeekNumber == null) return true;
     
-    final isOddWeek = currentWeekNumber % 2 == 1;
+    // 计算周数 (如果未提供)
+    final weekNum = currentWeekNumber ?? _calculateWeekNumber(date);
+    
+    final isOddWeek = weekNum % 2 == 1;
     if (weekType == WeekType.single && isOddWeek) return true;
     if (weekType == WeekType.double && !isOddWeek) return true;
     
     return false;
+  }
+  
+  /// 计算周数 (1-based)
+  int _calculateWeekNumber(DateTime date) {
+    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final firstMonday = firstDayOfYear.weekday > DateTime.monday 
+        ? firstDayOfYear.add(Duration(days: 8 - firstDayOfYear.weekday))
+        : firstDayOfYear;
+    
+    if (date.isBefore(firstMonday)) {
+      return _calculateWeekNumber(date.subtract(Duration(days: 7)));
+    }
+    
+    return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
   }
 
   ScheduleTriggerRule copyWith({
@@ -279,8 +301,10 @@ class Schedule {
   final List<DailyCourse> courses;
   final bool isAutoEnabled;
   final int priority;  // 优先级 (数字越小优先级越高)
+  final bool isOverlay;  // 是否为临时层课表
+  final String? overlaySourceId;  // 临时层来源课表ID
 
-  Schedule({
+  const Schedule({
     required this.id,
     required this.name,
     this.timeLayoutId,
@@ -288,6 +312,8 @@ class Schedule {
     this.courses = const [],
     this.isAutoEnabled = true,
     this.priority = 0,
+    this.isOverlay = false,
+    this.overlaySourceId,
   });
 
   Schedule copyWith({
@@ -298,6 +324,8 @@ class Schedule {
     List<DailyCourse>? courses,
     bool? isAutoEnabled,
     int? priority,
+    bool? isOverlay,
+    String? overlaySourceId,
   }) {
     return Schedule(
       id: id ?? this.id,
@@ -307,6 +335,8 @@ class Schedule {
       courses: courses ?? this.courses,
       isAutoEnabled: isAutoEnabled ?? this.isAutoEnabled,
       priority: priority ?? this.priority,
+      isOverlay: isOverlay ?? this.isOverlay,
+      overlaySourceId: overlaySourceId ?? this.overlaySourceId,
     );
   }
 
@@ -319,6 +349,8 @@ class Schedule {
       'courses': courses.map((c) => c.toJson()).toList(),
       'isAutoEnabled': isAutoEnabled,
       'priority': priority,
+      'isOverlay': isOverlay,
+      'overlaySourceId': overlaySourceId,
     };
   }
 
@@ -333,6 +365,8 @@ class Schedule {
           .toList() ?? [],
       isAutoEnabled: json['isAutoEnabled'] ?? true,
       priority: json['priority'] ?? 0,
+      isOverlay: json['isOverlay'] ?? false,
+      overlaySourceId: json['overlaySourceId'],
     );
   }
 }
@@ -344,7 +378,7 @@ class TimeLayout {
   final String name;
   final List<TimeSlot> timeSlots;
 
-  TimeLayout({
+  const TimeLayout({
     required this.id,
     required this.name,
     this.timeSlots = const [],
@@ -389,7 +423,7 @@ class TimetableData {
   final List<TimeLayout> timeLayouts;  // 时间表列表
   final List<Schedule> schedules;  // 课表列表
 
-  TimetableData({
+  const TimetableData({
     required this.courses,
     required this.timeSlots,
     required this.dailyCourses,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'md3_typography_styles.dart';
 
-/// Material Design 3 Form 样式工具�?
-/// 提供统一�?MD3 表单组件样式
+/// Material Design 3 Form 样式工具�?
+/// 提供统一�?MD3 表单组件样式
 class MD3FormStyles {
   /// MD3 Outlined TextField
   static Widget outlinedTextField({
@@ -133,7 +133,7 @@ class MD3FormStyles {
     final colorScheme = Theme.of(context).colorScheme;
     
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       items: items,
       onChanged: enabled ? onChanged : null,
       validator: validator,
@@ -241,7 +241,7 @@ class MD3FormStyles {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final dateText = date != null
-        ? '${date.year}�?{date.month}�?{date.day}�?
+        ? '${date.year}年${date.month}月${date.day}日'
         : '选择日期';
     
     return InkWell(
@@ -423,25 +423,24 @@ class MD3FormStyles {
     
     // 预定义的 MD3 颜色
     final colors = [
-      Colors.red,
-      Colors.pink,
-      Colors.purple,
-      Colors.deepPurple,
-      Colors.indigo,
-      Colors.blue,
-      Colors.lightBlue,
-      Colors.cyan,
-      Colors.teal,
-      Colors.green,
-      Colors.lightGreen,
-      Colors.lime,
-      Colors.yellow,
-      Colors.amber,
-      Colors.orange,
-      Colors.deepOrange,
-      Colors.brown,
-      Colors.grey,
-      Colors.blueGrey,
+      Color(0xFFEF4444), // Red
+      Color(0xFFEC4899), // Pink
+      Color(0xFF8B5CF6), // Purple
+      Color(0xFF6366F1), // Indigo
+      Color(0xFF3B82F6), // Blue
+      Color(0xFF0EA5E9), // Light Blue
+      Color(0xFF06B6D4), // Cyan
+      Color(0xFF10B981), // Teal
+      Color(0xFF22C55E), // Green
+      Color(0xFF84CC16), // Light Green
+      Color(0xFFEAB308), // Yellow
+      Color(0xFFF59E0B), // Amber
+      Color(0xFFF97316), // Orange
+      Color(0xFFEF4444), // Deep Red
+      Color(0xFF7C3AED), // Violet
+      Color(0xFFF43F5E), // Rose
+      Color(0xFF14B8A6), // Emerald
+      Color(0xFFFBBF24), // Gold
     ];
     
     return showDialog<Color>(

@@ -87,9 +87,10 @@ void main() {
 
     test('should generate consistent themes for same seed color', () {
       const seedColor = Color(0xFF9C27B0); // Purple
+      final defaultSettings = ThemeSettings.defaultSettings();
 
-      final theme1 = themeService.generateLightTheme(seedColor);
-      final theme2 = themeService.generateLightTheme(seedColor);
+      final theme1 = themeService.generateLightTheme(seedColor, defaultSettings);
+      final theme2 = themeService.generateLightTheme(seedColor, defaultSettings);
 
       expect(theme1.colorScheme.primary, equals(theme2.colorScheme.primary));
       expect(theme1.colorScheme.secondary, equals(theme2.colorScheme.secondary));
@@ -100,9 +101,10 @@ void main() {
     test('should generate different themes for different seed colors', () {
       const seedColor1 = Color(0xFF9C27B0); // Purple
       const seedColor2 = Color(0xFFFF9800); // Orange
+      final defaultSettings = ThemeSettings.defaultSettings();
 
-      final theme1 = themeService.generateLightTheme(seedColor1);
-      final theme2 = themeService.generateLightTheme(seedColor2);
+      final theme1 = themeService.generateLightTheme(seedColor1, defaultSettings);
+      final theme2 = themeService.generateLightTheme(seedColor2, defaultSettings);
 
       expect(theme1.colorScheme.primary, isNot(equals(theme2.colorScheme.primary)));
     });

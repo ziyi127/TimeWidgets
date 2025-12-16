@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/screens/countdown_list_screen.dart';
 
-/// 倒计时组�?- MD3紧凑�?
+/// 倒计时组件- MD3紧凑版
 class CountdownWidget extends StatelessWidget {
   final CountdownData? countdownData;
   final List<CountdownData>? allCountdowns;
@@ -59,7 +59,7 @@ class CountdownWidget extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.15),
+                  color: typeColor.withAlpha(38),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -78,7 +78,7 @@ class CountdownWidget extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '倒计�?,
+                          '倒计时',
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -87,7 +87,7 @@ class CountdownWidget extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: typeColor.withValues(alpha: 0.15),
+                            color: typeColor.withAlpha(38),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -126,7 +126,7 @@ class CountdownWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '�?,
+                    '天',
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -161,7 +161,7 @@ class CountdownWidget extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '倒计时加载失�?,
+                '倒计时加载失败',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onErrorContainer,
                 ),

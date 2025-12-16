@@ -87,6 +87,23 @@ class TimetableEditService extends ChangeNotifier {
   
   // Daily course management methods
   void addDailyCourse(DailyCourse dailyCourse) {
+    // Conflict resolution:
+    // If adding 'both', remove any 'single' or 'double' for this slot
+    if (dailyCourse.weekType == WeekType.both) {
+        _dailyCourses.removeWhere((d) => 
+            d.dayOfWeek == dailyCourse.dayOfWeek && 
+            d.timeSlotId == dailyCourse.timeSlotId &&
+            d.weekType != WeekType.both);
+    }
+    
+    // If adding 'single' or 'double', remove 'both' for this slot
+    if (dailyCourse.weekType != WeekType.both) {
+        _dailyCourses.removeWhere((d) => 
+            d.dayOfWeek == dailyCourse.dayOfWeek && 
+            d.timeSlotId == dailyCourse.timeSlotId &&
+            d.weekType == WeekType.both);
+    }
+
     // Check if a course already exists for this time slot and week type
     final existingIndex = _dailyCourses.indexWhere((d) => 
         d.dayOfWeek == dailyCourse.dayOfWeek && 
@@ -120,6 +137,17 @@ class TimetableEditService extends ChangeNotifier {
   }
   
   // Load timetable data
+  Future<void> loadData() async {
+    try {
+      final data = await _storageService.loadTimetableData();
+      if (data != null) {
+        loadTimetableData(data);
+      }
+    } catch (e) {
+      Logger.e('Failed to load timetable data: $e');
+    }
+  }
+
   void loadTimetableData(TimetableData data) {
     _timetableData = data;
     _courses.clear();
@@ -156,7 +184,7 @@ class TimetableEditService extends ChangeNotifier {
     }
   }
 
-  // TimeLayout management methods
+  // TimeLayout management methods with schedule sync
   void addTimeLayout(TimeLayout timeLayout) {
     _timeLayouts.add(timeLayout);
     _autoSave();
@@ -173,6 +201,12 @@ class TimetableEditService extends ChangeNotifier {
   }
 
   void deleteTimeLayout(String timeLayoutId) {
+    // Remove reference from all schedules
+    for (final schedule in _schedules) {
+      if (schedule.timeLayoutId == timeLayoutId) {
+        updateSchedule(schedule.copyWith(timeLayoutId: null));
+      }
+    }
     _timeLayouts.removeWhere((t) => t.id == timeLayoutId);
     _autoSave();
     notifyListeners();
@@ -241,6 +275,14 @@ class TimetableEditService extends ChangeNotifier {
     // Sort by priority (lower number = higher priority)
     matchingSchedules.sort((a, b) => a.priority.compareTo(b.priority));
     return matchingSchedules;
+  }
+
+  /// Refresh schedules when time layout changes
+  void refreshSchedulesForTimeLayout(String timeLayoutId) {
+    // This method would be called when a time layout is updated
+    // For now, we'll just trigger a save and notification
+    _autoSave();
+    notifyListeners();
   }
 
   /// Check if a course/subject can be deleted (not in use)

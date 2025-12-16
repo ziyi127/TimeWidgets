@@ -7,16 +7,23 @@ import 'package:time_widgets/utils/logger.dart';
 
 /// 主题服务
 /// 管理应用的主题设置，包括种子颜色、主题模式等
-/// 支持 Material You 动态取�?
+/// 支持 Material You 动态取色
 class ThemeService {
   static const String _themeSettingsKey = 'theme_settings';
 
-  final StreamController<ThemeSettings> _themeController =
+  // 单例模式实现
+  static final ThemeService _instance = ThemeService._internal();
+  factory ThemeService() => _instance;
+  
+  ThemeService._internal();
+
+  final StreamController<ThemeSettings> _themeController = 
       StreamController<ThemeSettings>.broadcast();
 
   ThemeSettings _currentSettings = ThemeSettings.defaultSettings();
+  bool _isInitialized = false;
 
-  /// 主题设置�?
+  /// 主题设置流
   Stream<ThemeSettings> get themeStream => _themeController.stream;
 
   /// 当前主题设置
@@ -36,6 +43,10 @@ class ThemeService {
 
   /// 加载主题设置
   Future<ThemeSettings> loadSettings() async {
+    if (_isInitialized) {
+      return _currentSettings;
+    }
+    
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_themeSettingsKey);
@@ -47,11 +58,13 @@ class ThemeService {
         _currentSettings = ThemeSettings.defaultSettings();
       }
 
+      _isInitialized = true;
       _themeController.add(_currentSettings);
       return _currentSettings;
     } catch (e) {
       Logger.e('Error loading theme settings: $e');
       _currentSettings = ThemeSettings.defaultSettings();
+      _isInitialized = true;
       return _currentSettings;
     }
   }
@@ -71,104 +84,211 @@ class ThemeService {
   }
 
   /// 生成浅色主题
-  /// 使用 Material 3 �?ColorScheme.fromSeed 生成完整配色方案
-  ThemeData generateLightTheme(Color seedColor) {
+  /// 使用 Material 3 完整生成符合 MD3 规范的主题
+  ThemeData generateLightTheme(Color seedColor, ThemeSettings settings) {
     final colorScheme = generateColorScheme(seedColor, Brightness.light);
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      textTheme: generateTextTheme(colorScheme, settings.fontSizeScale),
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surface.withOpacity(settings.componentOpacity),
         foregroundColor: colorScheme.onSurface,
+        surfaceTintColor: colorScheme.primary,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 3 * settings.shadowStrength,
       ),
       cardTheme: CardThemeData(
-        elevation: 1,
+        elevation: 0,
+        surfaceTintColor: colorScheme.primary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12 * settings.borderRadiusScale),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
+      dialogTheme: DialogThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28 * settings.borderRadiusScale),
+        ),
+        surfaceTintColor: colorScheme.primary,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
+          ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
           ),
         ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        elevation: 6 * settings.shadowStrength,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        elevation: 8 * settings.shadowStrength,
       ),
     );
   }
 
   /// 生成深色主题
-  /// 使用 Material 3 �?ColorScheme.fromSeed 生成完整配色方案
-  ThemeData generateDarkTheme(Color seedColor) {
+  /// 使用 Material 3 完整生成符合 MD3 规范的主题
+  ThemeData generateDarkTheme(Color seedColor, ThemeSettings settings) {
     final colorScheme = generateColorScheme(seedColor, Brightness.dark);
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      textTheme: generateTextTheme(colorScheme, settings.fontSizeScale),
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surface.withOpacity(settings.componentOpacity),
         foregroundColor: colorScheme.onSurface,
+        surfaceTintColor: colorScheme.primary,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 3 * settings.shadowStrength,
       ),
       cardTheme: CardThemeData(
-        elevation: 1,
+        elevation: 0,
+        surfaceTintColor: colorScheme.primary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12 * settings.borderRadiusScale),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
+      dialogTheme: DialogThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28 * settings.borderRadiusScale),
+        ),
+        surfaceTintColor: colorScheme.primary,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
+          ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8 * settings.borderRadiusScale),
           ),
         ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        elevation: 6 * settings.shadowStrength,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        elevation: 8 * settings.shadowStrength,
+      ),
+    );
+  }
+
+  /// 生成文本主题
+  /// 根据字体大小缩放比例调整所有文本样式
+  TextTheme generateTextTheme(ColorScheme colorScheme, double fontSizeScale) {
+    final baseTextTheme = Typography.material2021(colorScheme: colorScheme).black;
+    
+    return baseTextTheme.copyWith(
+      displayLarge: baseTextTheme.displayLarge?.copyWith(
+        fontSize: (32 * fontSizeScale),
+      ),
+      displayMedium: baseTextTheme.displayMedium?.copyWith(
+        fontSize: (28 * fontSizeScale),
+      ),
+      displaySmall: baseTextTheme.displaySmall?.copyWith(
+        fontSize: (24 * fontSizeScale),
+      ),
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+        fontSize: (20 * fontSizeScale),
+      ),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        fontSize: (18 * fontSizeScale),
+      ),
+      headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+        fontSize: (16 * fontSizeScale),
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        fontSize: (16 * fontSizeScale),
+      ),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        fontSize: (14 * fontSizeScale),
+      ),
+      titleSmall: baseTextTheme.titleSmall?.copyWith(
+        fontSize: (12 * fontSizeScale),
+      ),
+      bodyLarge: baseTextTheme.bodyLarge?.copyWith(
+        fontSize: (14 * fontSizeScale),
+      ),
+      bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+        fontSize: (12 * fontSizeScale),
+      ),
+      bodySmall: baseTextTheme.bodySmall?.copyWith(
+        fontSize: (10 * fontSizeScale),
+      ),
+      labelLarge: baseTextTheme.labelLarge?.copyWith(
+        fontSize: (12 * fontSizeScale),
+      ),
+      labelMedium: baseTextTheme.labelMedium?.copyWith(
+        fontSize: (11 * fontSizeScale),
+      ),
+      labelSmall: baseTextTheme.labelSmall?.copyWith(
+        fontSize: (10 * fontSizeScale),
       ),
     );
   }
 
   /// 生成配色方案
-  /// 使用 Material You 算法从种子颜色生成完整的配色方案
+  /// 使用 Material You 算法从种子颜色生成完整的 MD3 配色方案
   ColorScheme generateColorScheme(Color seedColor, Brightness brightness) {
     return ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: brightness,
+      surfaceTint: seedColor,
+      // 为 MD3 完整配置所有颜色角色
+      // Flutter 3.16+ 会自动处理 MD3 颜色角色映射
     );
   }
 
   /// 释放资源
+  /// 用于测试环境，重置单例状态
   void dispose() {
-    _themeController.close();
+    // 测试环境下重置状态
+    _isInitialized = false;
+    _currentSettings = ThemeSettings.defaultSettings();
+    // 不关闭流控制器，因为单例可能被其他地方使用
   }
 }

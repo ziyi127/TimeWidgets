@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'md3_button_styles.dart';
-import 'md3_typography_styles.dart';
 
-/// Material Design 3 Dialog 样式工具�?
-/// 提供统一�?MD3 Dialog 样式和变�?
+/// Material Design 3 Dialog 样式工具类
+/// 提供统一的 MD3 Dialog 样式和变量
 class MD3DialogStyles {
   /// MD3 标准圆角半径
   static const double _cornerRadius = 28.0;
   
-  /// MD3 标准内边�?
+  /// MD3 标准内边距
   static const EdgeInsets _contentPadding = EdgeInsets.fromLTRB(24, 16, 24, 0);
   static const EdgeInsets _actionsPadding = EdgeInsets.fromLTRB(24, 16, 24, 24);
   
-  /// 标准 MD3 对话�?
+  /// 标准 MD3 对话框
   static Widget dialog({
     required BuildContext context,
     required String title,
@@ -32,7 +30,7 @@ class MD3DialogStyles {
       icon: icon,
       title: Text(
         title,
-        style: MD3TypographyStyles.headlineSmall(context),
+        style: _headlineSmall(context),
       ),
       content: scrollable
           ? SingleChildScrollView(child: content)
@@ -44,7 +42,7 @@ class MD3DialogStyles {
     );
   }
 
-  /// 确认对话�?
+  /// 确认对话框
   static Future<bool?> showConfirmDialog({
     required BuildContext context,
     required String title,
@@ -67,17 +65,17 @@ class MD3DialogStyles {
         icon: icon,
         title: Text(
           title,
-          style: MD3TypographyStyles.headlineSmall(context),
+          style: _headlineSmall(context),
         ),
         content: Text(
           message,
-          style: MD3TypographyStyles.bodyMedium(context),
+          style: _bodyMedium(context),
         ),
         contentPadding: _contentPadding,
         actionsPadding: _actionsPadding,
         actionsAlignment: MainAxisAlignment.end,
         actions: [
-          MD3ButtonStyles.text(
+          TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(cancelText),
           ),
@@ -91,7 +89,7 @@ class MD3DialogStyles {
                   ),
                   child: Text(confirmText),
                 )
-              : MD3ButtonStyles.filled(
+              : FilledButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: Text(confirmText),
                 ),
@@ -100,7 +98,7 @@ class MD3DialogStyles {
     );
   }
 
-  /// 删除确认对话�?
+  /// 删除确认对话框
   static Future<bool?> showDeleteConfirmDialog({
     required BuildContext context,
     required String itemName,
@@ -109,7 +107,7 @@ class MD3DialogStyles {
     return showConfirmDialog(
       context: context,
       title: '确认删除',
-      message: additionalMessage ?? '确定要删�?$itemName"吗？此操作无法撤销�?,
+      message: additionalMessage ?? '确定要删除"$itemName"吗？此操作无法撤销。',
       confirmText: '删除',
       cancelText: '取消',
       isDestructive: true,
@@ -120,7 +118,7 @@ class MD3DialogStyles {
     );
   }
 
-  /// 全屏对话�?(用于复杂编辑)
+  /// 全屏对话框(用于复杂编辑)
   static Future<T?> showFullScreenDialog<T>({
     required BuildContext context,
     required String title,
@@ -141,7 +139,7 @@ class MD3DialogStyles {
     );
   }
 
-  /// 输入对话�?
+  /// 输入对话框
   static Future<String?> showInputDialog({
     required BuildContext context,
     required String title,
@@ -169,7 +167,7 @@ class MD3DialogStyles {
           surfaceTintColor: colorScheme.surfaceTint,
           title: Text(
             title,
-            style: MD3TypographyStyles.headlineSmall(context),
+            style: _headlineSmall(context),
           ),
           content: Form(
             key: formKey,
@@ -189,12 +187,12 @@ class MD3DialogStyles {
           actionsPadding: _actionsPadding,
           actionsAlignment: MainAxisAlignment.end,
           actions: [
-            MD3ButtonStyles.text(
+            TextButton(
               onPressed: () => Navigator.of(context).pop(null),
               child: Text(cancelText),
             ),
             const SizedBox(width: 8),
-            MD3ButtonStyles.filled(
+            FilledButton(
               onPressed: () {
                 if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(controller.text);
@@ -208,7 +206,7 @@ class MD3DialogStyles {
     );
   }
 
-  /// 选择对话�?
+  /// 选择对话框
   static Future<T?> showSelectionDialog<T>({
     required BuildContext context,
     required String title,
@@ -228,7 +226,7 @@ class MD3DialogStyles {
           surfaceTintColor: colorScheme.surfaceTint,
           title: Text(
             title,
-            style: MD3TypographyStyles.headlineSmall(context),
+            style: _headlineSmall(context),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
           content: SizedBox(
@@ -272,9 +270,37 @@ class MD3DialogStyles {
     }
     return result;
   }
+
+  // 内部文本样式辅助方法
+  static TextStyle _headlineSmall(BuildContext context) {
+    return Theme.of(context).textTheme.headlineSmall ?? TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0,
+      height: 1.33,
+    );
+  }
+
+  static TextStyle _bodyMedium(BuildContext context) {
+    return Theme.of(context).textTheme.bodyMedium ?? TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0.25,
+      height: 1.43,
+    );
+  }
+
+  static TextStyle _titleLarge(BuildContext context) {
+    return Theme.of(context).textTheme.titleLarge ?? TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0,
+      height: 1.27,
+    );
+  }
 }
 
-/// 全屏对话框组�?
+/// 全屏对话框组件
 class _FullScreenDialog extends StatelessWidget {
   final String title;
   final Widget content;
@@ -306,13 +332,13 @@ class _FullScreenDialog extends StatelessWidget {
           ),
           title: Text(
             title,
-            style: MD3TypographyStyles.titleLarge(context),
+            style: MD3DialogStyles._titleLarge(context),
           ),
           actions: showSaveButton
               ? [
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: MD3ButtonStyles.filledTonal(
+                    child: FilledButton.tonal(
                       onPressed: onSave ?? () => Navigator.of(context).pop(),
                       child: Text(saveText),
                     ),

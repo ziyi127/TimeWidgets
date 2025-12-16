@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/services/countdown_storage_service.dart';
 import 'package:time_widgets/widgets/countdown_edit_dialog.dart';
-import 'package:time_widgets/utils/md3_button_styles.dart';
 
 class CountdownListScreen extends StatefulWidget {
   const CountdownListScreen({super.key});
@@ -32,41 +31,41 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
   }
 
   Future<void> _addCountdown() async {
-    final result = await showDialog<CountdownData>(
+    final newCountdown = await showDialog<CountdownData>(
       context: context,
       builder: (context) => const CountdownEditDialog(),
     );
 
-    if (result != null) {
-      await _storageService.saveCountdown(result);
+    if (newCountdown != null) {
+      await _storageService.saveCountdown(newCountdown);
       await _loadCountdowns();
     }
   }
 
   Future<void> _editCountdown(CountdownData countdown) async {
-    final result = await showDialog<CountdownData>(
+    final updatedCountdown = await showDialog<CountdownData>(
       context: context,
       builder: (context) => CountdownEditDialog(countdown: countdown),
     );
 
-    if (result != null) {
-      await _storageService.updateCountdown(result);
+    if (updatedCountdown != null) {
+      await _storageService.saveCountdown(updatedCountdown);
       await _loadCountdowns();
     }
   }
 
   Future<void> _deleteCountdown(CountdownData countdown) async {
-    final confirmed = await showDialog<bool>(
+    final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除倒计�?),
-        content: Text('确定要删�?${countdown.title}"吗？'),
+        title: const Text('确认删除'),
+        content: Text('确定要删除"${countdown.title}"吗？'),
         actions: [
-          MD3ButtonStyles.text(
+          TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('取消'),
           ),
-          MD3ButtonStyles.filled(
+          FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
@@ -75,180 +74,134 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
           ),
         ],
       ),
-    );
+    ) ?? false;
 
-    if (confirmed == true) {
+    if (shouldDelete) {
       await _storageService.deleteCountdown(countdown.id);
       await _loadCountdowns();
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('倒计时')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('倒计时管�?),
+        title: const Text('倒计时'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadCountdowns,
+            tooltip: '刷新',
+          ),
+        ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _countdowns.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.event_note_outlined,
-                        size: 64,
-                        color: colorScheme.outline,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '暂无倒计时事�?,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: colorScheme.outline,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      FilledButton.icon(
-                        onPressed: _addCountdown,
-                        icon: const Icon(Icons.add),
-                        label: const Text('添加倒计�?),
-                      ),
-                    ],
+      body: _countdowns.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.timer_outlined,
+                    size: 64,
+                    color: Colors.grey,
                   ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _countdowns.length,
-                  itemBuilder: (context, index) {
-                    final countdown = _countdowns[index];
-                    return _buildCountdownCard(countdown);
-                  },
-                ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    '暂无倒计时',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    '点击下方按钮添加第一个倒计时',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: _countdowns.length,
+              itemBuilder: (context, index) {
+                final countdown = _countdowns[index];
+                final timeLeft = '${countdown.remainingDays}天 ${countdown.remainingHours}小时 ${countdown.remainingMinutes}分钟';
+
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: InkWell(
+                    onTap: () => _editCountdown(countdown),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  countdown.title,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                onPressed: () => _deleteCountdown(countdown),
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            countdown.description,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                countdown.targetDate.toString(),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              Text(
+                                timeLeft,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: _countdowns.isNotEmpty
-          ? MD3ButtonStyles.fab(
+          ? FloatingActionButton(
               onPressed: _addCountdown,
               child: const Icon(Icons.add),
-              tooltip: '添加倒计�?,
             )
           : null,
-    );
-  }
-
-  Widget _buildCountdownCard(CountdownData countdown) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isExpired = countdown.isExpired;
-    final isApproaching = countdown.isApproaching;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      color: isExpired
-          ? colorScheme.errorContainer.withValues(alpha: 0.3)
-          : isApproaching
-              ? colorScheme.tertiaryContainer.withValues(alpha: 0.3)
-              : null,
-      child: InkWell(
-        onTap: () => _editCountdown(countdown),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: countdown.typeColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${countdown.remainingDays.abs()}',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: countdown.typeColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      isExpired ? '天前' : '�?,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: countdown.typeColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            countdown.title,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                  color: countdown.typeColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                          child: Text(
-                            countdown.typeLabel,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: countdown.typeColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      countdown.description,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${countdown.targetDate.year}�?{countdown.targetDate.month}�?{countdown.targetDate.day}�?,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.outline,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              MD3ButtonStyles.icon(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () => _deleteCountdown(countdown),
-                tooltip: '删除',
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

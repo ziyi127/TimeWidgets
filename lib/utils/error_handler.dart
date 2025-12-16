@@ -1,7 +1,8 @@
 import 'dart:io';
 import '../utils/logger.dart';
 
-/// 应用错误�?class AppError {
+/// 应用错误类
+class AppError {
   final String code;
   final String message;
   final String? userMessage;
@@ -20,7 +21,8 @@ import '../utils/logger.dart';
   String toString() => 'AppError($code): $message';
 }
 
-/// 错误处理工具�?class ErrorHandler {
+/// 错误处理工具类
+class ErrorHandler {
   /// 处理网络错误
   static AppError handleNetworkError(dynamic error) {
     String code = 'NETWORK_ERROR';
@@ -30,8 +32,8 @@ import '../utils/logger.dart';
 
     if (error is SocketException) {
       code = 'NO_INTERNET';
-      userMessage = '无法连接到网�?;
-      resolution = '请检查网络设�?;
+      userMessage = '无法连接到网络';
+      resolution = '请检查网络设置';
     } else if (error.toString().contains('timeout')) {
       code = 'TIMEOUT';
       userMessage = '网络连接超时';
@@ -42,12 +44,12 @@ import '../utils/logger.dart';
       resolution = '请检查请求地址是否正确';
     } else if (error.toString().contains('500')) {
       code = 'SERVER_ERROR';
-      userMessage = '服务器内部错�?;
-      resolution = '请稍后重�?;
+      userMessage = '服务器内部错误';
+      resolution = '请稍后重试';
     } else if (error.toString().contains('503')) {
       code = 'SERVICE_UNAVAILABLE';
-      userMessage = '服务暂时不可�?;
-      resolution = '请稍后重�?;
+      userMessage = '服务暂时不可用';
+      resolution = '请稍后重试';
     }
 
     return AppError(
@@ -64,20 +66,20 @@ import '../utils/logger.dart';
     String code = 'STORAGE_ERROR';
     String message = error.toString();
     String userMessage = '数据存储失败';
-    String resolution = '请重�?;
+    String resolution = '请重试';
 
     if (error.toString().contains('permission')) {
       code = 'PERMISSION_DENIED';
       userMessage = '没有文件访问权限';
-      resolution = '请授予应用文件访问权�?;
+      resolution = '请授予应用文件访问权限';
     } else if (error.toString().contains('space') || error.toString().contains('full')) {
       code = 'STORAGE_FULL';
       userMessage = '存储空间不足';
       resolution = '请清理存储空间后重试';
     } else if (error.toString().contains('not found') || error.toString().contains('exist')) {
       code = 'FILE_NOT_FOUND';
-      userMessage = '文件不存�?;
-      resolution = '请检查文件路径是否正�?;
+      userMessage = '文件不存在';
+      resolution = '请检查文件路径是否正确';
     }
 
     return AppError(
@@ -95,7 +97,7 @@ import '../utils/logger.dart';
       code: 'VALIDATION_ERROR',
       message: message,
       userMessage: message,
-      resolution: '请检查输入数据格�?,
+      resolution: '请检查输入数据格式',
     );
   }
 
@@ -105,7 +107,7 @@ import '../utils/logger.dart';
       code: 'JSON_ERROR',
       message: error.toString(),
       userMessage: '文件格式无效',
-      resolution: '请确保文件是有效�?JSON 格式',
+      resolution: '请确保文件是有效的 JSON 格式',
       originalError: error,
     );
   }
@@ -126,12 +128,13 @@ import '../utils/logger.dart';
     Logger.e('${error.code}: ${error.message}', error.originalError);
   }
 
-  /// 获取用户友好的错误信�?  static String getUserMessage(AppError error) {
+  /// 获取用户友好的错误信息
+  static String getUserMessage(AppError error) {
     return error.userMessage ?? error.message;
   }
 
   /// 获取错误解决建议
   static String getResolution(AppError error) {
-    return error.resolution ?? '请重�?;
+    return error.resolution ?? '请重试';
   }
 }

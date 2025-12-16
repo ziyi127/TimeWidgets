@@ -49,7 +49,7 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
       
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('JSON数据已复制到剪贴�?)),
+        const SnackBar(content: Text('JSON数据已复制到剪贴板')),
       );
     } catch (e) {
       if (!mounted) return;
@@ -93,7 +93,7 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JSON数据查看�?),
+        title: const Text('JSON数据查看器'),
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),
@@ -173,9 +173,9 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
           children: [
             Text('课程数量: ${_timetableData!.courses.length}'),
             const SizedBox(height: 8),
-            Text('时间段数�? ${_timetableData!.timeSlots.length}'),
+            Text('时间段数量: ${_timetableData!.timeSlots.length}'),
             const SizedBox(height: 8),
-            Text('日课表数�? ${_timetableData!.dailyCourses.length}'),
+            Text('日课表数量: ${_timetableData!.dailyCourses.length}'),
           ],
         ),
       ),

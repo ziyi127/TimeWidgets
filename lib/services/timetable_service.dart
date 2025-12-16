@@ -1,120 +1,228 @@
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/models/weather_model.dart';
-import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/services/api_service.dart';
+import 'package:time_widgets/services/timetable_storage_service.dart';
+import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class TimetableService {
   final ApiService _apiService = ApiService();
+  final TimetableStorageService _storageService = TimetableStorageService();
   
-  // 获取课程表数�?  Future<Timetable> getTimetable(DateTime date) async {
+  // Calculate week number (1-based) from a given date
+  // Assuming week 1 starts from the first Monday of the year
+  int _calculateWeekNumber(DateTime date) {
+    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final firstMonday = firstDayOfYear.weekday > DateTime.monday 
+        ? firstDayOfYear.add(Duration(days: 8 - firstDayOfYear.weekday))
+        : firstDayOfYear;
+    
+    if (date.isBefore(firstMonday)) {
+      return _calculateWeekNumber(date.subtract(Duration(days: 7)));
+    }
+    
+    return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
+  }
+  
+  // 获取当前适用的课表
+  Schedule? _getActiveSchedule(TimetableData timetableData, DateTime date) {
+    final currentWeekNumber = _calculateWeekNumber(date);
+    final weekday = date.weekday; // DateTime.weekday 1=Mon...7=Sun
+    
+    // 获取所有自动启用的课表
+    final matchingSchedules = timetableData.schedules.where((schedule) {
+      if (!schedule.isAutoEnabled) return false;
+      return schedule.triggerRule.matches(date, currentWeekNumber: currentWeekNumber);
+    }).toList();
+    
+    if (matchingSchedules.isEmpty) {
+      return null;
+    }
+    
+    // 按优先级排序（数字越小优先级越高）
+    matchingSchedules.sort((a, b) => a.priority.compareTo(b.priority));
+    return matchingSchedules.first;
+  }
+  
+  // 获取课程表数据
+  Future<Timetable> getTimetable(DateTime date) async {
     try {
-      // 尝试从真实API获取数据
-      return await _apiService.getTimetable(date);
-    } catch (e) {
-      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch timetable from API, using mock data: $e');
-      await Future.delayed(const Duration(milliseconds: 500));
+      // 优先从本地存储获取
+      final timetableData = await _storageService.loadTimetableData();
+      
+      // 1. 确定星期几 (0-6, 0=Monday in our model, DateTime.weekday 1=Mon...7=Sun)
+      final weekday = date.weekday - 1;
+      final dayOfWeek = DayOfWeek.values[weekday];
+      
+      // 2. 确定周数
+      final currentWeekNumber = _calculateWeekNumber(date);
+      
+      // 3. 获取当前适用的课表
+      final activeSchedule = _getActiveSchedule(timetableData, date);
+      
+      List<DailyCourse> dailyCourses = [];
+      List<TimeSlot> timeSlots = [];
+      
+      if (activeSchedule != null) {
+        // 使用课表中的课程
+        dailyCourses = activeSchedule.courses;
+        
+        // 查找关联的时间表
+        if (activeSchedule.timeLayoutId != null) {
+          final timeLayout = timetableData.timeLayouts.firstWhere(
+            (tl) => tl.id == activeSchedule.timeLayoutId,
+            orElse: () => const TimeLayout(id: '', name: '', timeSlots: []),
+          );
+          timeSlots = timeLayout.timeSlots;
+        }
+      }
+      
+      // 如果没有找到适用的课表或时间表，使用默认的旧格式数据
+      if (dailyCourses.isEmpty) {
+        dailyCourses = timetableData.dailyCourses;
+        timeSlots = timetableData.timeSlots;
+      }
+      
+      // 筛选当天的课程并检查周类型
+      final filteredDailyCourses = dailyCourses.where((d) => 
+        d.dayOfWeek == dayOfWeek
+      ).toList();
+      
+      final List<Course> courses = [];
+      
+      for (final daily in filteredDailyCourses) {
+        // Check if course matches current week type
+        bool matchesWeekType = false;
+        switch (daily.weekType) {
+          case WeekType.both:
+            matchesWeekType = true;
+            break;
+          case WeekType.single:
+            matchesWeekType = currentWeekNumber % 2 == 1;
+            break;
+          case WeekType.double:
+            matchesWeekType = currentWeekNumber % 2 == 0;
+            break;
+        }
+        
+        if (!matchesWeekType) continue;
+        
+        final slot = timeSlots.firstWhere(
+          (t) => t.id == daily.timeSlotId,
+          orElse: () => const TimeSlot(id: '', startTime: '', endTime: '', name: ''),
+        );
+        
+        if (slot.id.isEmpty) continue;
+        
+        final info = timetableData.courses.firstWhere(
+          (c) => c.id == daily.courseId,
+          orElse: () => const CourseInfo(id: '', name: 'Unknown', teacher: ''),
+        );
+        
+        bool isCurrent = false;
+        try {
+          final ntpService = NtpService();
+          final now = ntpService.now;
+          final startParts = slot.startTime.split(':');
+          final endParts = slot.endTime.split(':');
+          if (startParts.length == 2 && endParts.length == 2) {
+            final start = DateTime(now.year, now.month, now.day, 
+                int.parse(startParts[0]), int.parse(startParts[1]));
+            final end = DateTime(now.year, now.month, now.day, 
+                int.parse(endParts[0]), int.parse(endParts[1]));
+            if (now.isAfter(start) && now.isBefore(end)) {
+              isCurrent = true;
+            }
+          }
+        } catch (e) {
+          // Ignore parsing errors
+        }
+
+        courses.add(Course(
+          subject: info.displayName,
+          teacher: info.teacher,
+          time: '${slot.startTime}~${slot.endTime}',
+          classroom: info.classroom,
+          isCurrent: isCurrent,
+        ));
+      }
+      
+      // 按开始时间排序
+      courses.sort((a, b) {
+        final aStartTime = a.time.split('~')[0];
+        final bStartTime = b.time.split('~')[0];
+        return aStartTime.compareTo(bStartTime);
+      });
       
       return Timetable(
         date: date,
-        courses: [
-          Course(
-            subject: '语文',
-            teacher: 'A老师',
-            time: '8:30~9:10',
-            classroom: '101教室',
-            isCurrent: true,
-          ),
-          Course(
-            subject: '数学',
-            teacher: 'B老师',
-            time: '9:20~10:00',
-            classroom: '102教室',
-          ),
-          Course(
-            subject: '英语',
-            teacher: 'C老师',
-            time: '10:10~11:50',
-            classroom: '103教室',
-          ),
-          Course(
-            subject: '物理',
-            teacher: 'D老师',
-            time: '14:00~14:40',
-            classroom: '104教室',
-          ),
-          Course(
-            subject: '化学',
-            teacher: 'E老师',
-            time: '14:50~15:30',
-            classroom: '105教室',
-          ),
-        ],
+        courses: courses,
       );
+      
+    } catch (e) {
+      Logger.e('Failed to fetch timetable: $e');
+      return Timetable(date: date, courses: []);
     }
   }
-
+  
   // 获取当前课程
   Future<Course?> getCurrentCourse() async {
     try {
-      // 尝试从真实API获取数据
-      return await _apiService.getCurrentCourse();
+      final ntpService = NtpService();
+      final now = ntpService.now;
+      final timetable = await getTimetable(now);
+      
+      // 简单判断当前时间是否在课程时间内
+      final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      
+      for (final course in timetable.courses) {
+        final parts = course.time.split('~');
+        if (parts.length == 2) {
+          final start = parts[0];
+          final end = parts[1];
+          if (currentTime.compareTo(start) >= 0 && currentTime.compareTo(end) <= 0) {
+            return Course(
+              subject: course.subject,
+              teacher: course.teacher,
+              time: course.time,
+              classroom: course.classroom,
+              isCurrent: true,
+            );
+          }
+        }
+      }
+      
+      return null;
     } catch (e) {
-      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch current course from API, using mock data: $e');
-      // 模拟当前课程
-      return Course(
-        subject: '语文',
-        teacher: 'A老师',
-        time: '8:30~9:10',
-        classroom: '101教室',
-        isCurrent: true,
-      );
+      Logger.e('Failed to get current course: $e');
+      return null;
     }
   }
-
+  
   // 获取天气信息
   Future<WeatherData> getWeather() async {
     try {
-      // 尝试从真实API获取数据
       return await _apiService.getWeather();
     } catch (e) {
-      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch weather from API, using mock data: $e');
-      // 模拟天气数据
+      Logger.e('Failed to fetch weather from API, using mock data: $e');
       return WeatherData(
-        cityName: '北京',
-        description: '�?,
+        cityName: 'Beijing',
+        description: 'sunny',
         temperature: 25,
-        temperatureRange: '20℃~30�?,
+        temperatureRange: '20C~30C',
         aqiLevel: 50,
         humidity: 40,
-        wind: '3-4�?,
+        wind: '3-4 level',
         pressure: 1013,
         sunrise: '06:00',
         sunset: '18:30',
         weatherType: 0,
         weatherIcon: 'weather_0.png',
         feelsLike: 26,
-        visibility: '10km',
+        visibility: '10000',
         uvIndex: '5',
         pubTime: DateTime.now().toIso8601String(),
-      );
-    }
-  }
-
-  // 获取倒计时信�?  Future<CountdownData> getCountdown() async {
-    try {
-      // 尝试从真实API获取数据
-      return await _apiService.getCountdown();
-    } catch (e) {
-      // 如果API调用失败，回退到模拟数�?      Logger.e('Failed to fetch countdown from API, using mock data: $e');
-      // 模拟倒计时数�?      return CountdownData(
-        id: '1',
-        title: '中�?,
-        description: '中考倒计�?,
-        targetDate: DateTime.now().add(const Duration(days: 10)),
-        type: 'exam',
-        progress: 0.5,
-        category: 'Academic',
       );
     }
   }

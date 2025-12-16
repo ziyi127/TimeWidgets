@@ -11,7 +11,7 @@ class CacheService {
   static const String _countdownTimestampKey = 'countdown_cache_timestamp';
   
   static const Duration _weatherCacheDuration = Duration(minutes: 30); // 天气数据缓存30分钟
-  static const Duration _countdownCacheDuration = Duration(hours: 1); // 倒计时数据缓�?小时
+  static const Duration _countdownCacheDuration = Duration(hours: 1); // 倒计时数据缓存1小时
 
   // 缓存天气数据
   static Future<void> cacheWeatherData(WeatherData weatherData) async {
@@ -25,7 +25,8 @@ class CacheService {
     }
   }
 
-  // 获取缓存的天气数�?  static Future<WeatherData?> getCachedWeatherData() async {
+  // 获取缓存的天气数据
+  static Future<WeatherData?> getCachedWeatherData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final weatherJson = prefs.getString(_weatherKey);
@@ -35,7 +36,8 @@ class CacheService {
         return null;
       }
       
-      // 检查缓存是否过�?      final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      // 检查缓存是否过期
+      final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
       if (DateTime.now().difference(cacheTime) > _weatherCacheDuration) {
         return null;
       }
@@ -48,18 +50,20 @@ class CacheService {
     }
   }
 
-  // 缓存倒计时数�?  static Future<void> cacheCountdownData(CountdownData countdownData) async {
+  // 缓存倒计时数据
+  static Future<void> cacheCountdownData(CountdownData countdownData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final countdownJson = jsonEncode(countdownData.toJson());
       await prefs.setString(_countdownKey, countdownJson);
       await prefs.setInt(_countdownTimestampKey, DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
-      Logger.e('缓存倒计时数据失�? $e');
+      Logger.e('缓存倒计时数据失败: $e');
     }
   }
 
-  // 获取缓存的倒计时数�?  static Future<CountdownData?> getCachedCountdownData() async {
+  // 获取缓存的倒计时数据
+  static Future<CountdownData?> getCachedCountdownData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final countdownJson = prefs.getString(_countdownKey);
@@ -69,7 +73,8 @@ class CacheService {
         return null;
       }
       
-      // 检查缓存是否过�?      final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      // 检查缓存是否过期
+      final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
       if (DateTime.now().difference(cacheTime) > _countdownCacheDuration) {
         return null;
       }
@@ -77,12 +82,13 @@ class CacheService {
       final countdownMap = jsonDecode(countdownJson);
       return CountdownData.fromJson(countdownMap);
     } catch (e) {
-      Logger.e('获取缓存倒计时数据失�? $e');
+      Logger.e('获取缓存倒计时数据失败: $e');
       return null;
     }
   }
 
-  // 清除所有缓�?  static Future<void> clearAllCache() async {
+  // 清除所有缓存
+  static Future<void> clearAllCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_weatherKey);
@@ -90,7 +96,7 @@ class CacheService {
       await prefs.remove(_countdownKey);
       await prefs.remove(_countdownTimestampKey);
     } catch (e) {
-      Logger.e('清除所有缓存失�? $e');
+      Logger.e('清除所有缓存失败: $e');
     }
   }
 
@@ -105,13 +111,14 @@ class CacheService {
     }
   }
 
-  // 清除倒计时缓�?  static Future<void> clearCountdownCache() async {
+  // 清除倒计时缓存
+  static Future<void> clearCountdownCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_countdownKey);
       await prefs.remove(_countdownTimestampKey);
     } catch (e) {
-      Logger.e('清除倒计时缓存失�? $e');
+      Logger.e('清除倒计时缓存失败: $e');
     }
   }
 }

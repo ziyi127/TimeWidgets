@@ -9,7 +9,7 @@ import '../utils/md3_form_styles.dart';
 import '../utils/md3_typography_styles.dart';
 import '../utils/color_utils.dart';
 
-/// 课表编辑标签�?- 网格视图
+/// 课表编辑标签�?- 网格视图
 class ScheduleEditTab extends StatefulWidget {
   const ScheduleEditTab({super.key});
 
@@ -35,7 +35,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               child: _buildScheduleList(context, schedules, service),
             ),
             const VerticalDivider(width: 1),
-            // 右侧: 课程网格编辑�?
+            // 右侧: 课程网格编辑�?
             Expanded(
               child: _buildScheduleGrid(context, service),
             ),
@@ -199,7 +199,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              '请先�?时间�?中添加时间点',
+              '请先�?时间�?中添加时间点',
               style: MD3TypographyStyles.bodyLarge(context).copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -218,7 +218,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             children: [
               Text('课程安排', style: MD3TypographyStyles.titleMedium(context)),
               const Spacer(),
-              // 周类型筛�?
+              // 周类型筛�?
               MD3FormStyles.segmentedButton<WeekType>(
                 context: context,
                 segments: const [
@@ -355,7 +355,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               MD3FormStyles.dropdown<WeekType>(
                 context: context,
                 value: weekType,
-                label: '周类�?,
+                label: '周类�?,
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
@@ -419,7 +419,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
       items: [
         const SelectionDialogItem(
           value: null,
-          title: '无课�?,
+          title: '无课�?,
           icon: Icon(Icons.remove_circle_outline),
         ),
         ...courses.map((course) {
@@ -482,7 +482,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 }
 
-/// 课程单元�?
+/// 课程单元�?
 class _CourseCell extends StatelessWidget {
   final CourseInfo? course;
   final DailyCourse? dailyCourse;
@@ -557,7 +557,7 @@ class _CourseCell extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  dailyCourse!.weekType == WeekType.single ? '�? : '�?,
+                  dailyCourse!.weekType == WeekType.single ? '�? : '�?,
                   style: TextStyle(
                     color: ColorUtils.getContrastTextColor(color),
                     fontSize: 10,
@@ -571,7 +571,7 @@ class _CourseCell extends StatelessWidget {
   }
 }
 
-/// 课表网格编辑�?
+/// 课表网格编辑�?
 class _ScheduleGridEditor extends StatelessWidget {
   final Schedule schedule;
   final TimetableEditService service;
@@ -590,6 +590,11 @@ class _ScheduleGridEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final timeSlots = widget.schedule.timeLayoutId != null
+        ? widget.service.getTimeLayoutById(widget.schedule.timeLayoutId!)
+            ?.timeSlots ?? widget.service.timeSlots
+        : widget.service.timeSlots;
+    final courses = widget.service.courses;
     
     return Column(
       children: [
@@ -598,7 +603,7 @@ class _ScheduleGridEditor extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text(schedule.name, style: MD3TypographyStyles.titleMedium(context)),
+              Text(widget.schedule.name, style: MD3TypographyStyles.titleMedium(context)),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -607,11 +612,24 @@ class _ScheduleGridEditor extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  _getTriggerRuleText(schedule.triggerRule),
+                  _getTriggerRuleText(widget.schedule.triggerRule),
                   style: MD3TypographyStyles.labelSmall(context),
                 ),
               ),
               const Spacer(),
+              // 周类型筛选
+              MD3FormStyles.segmentedButton<WeekType>(
+                context: context,
+                segments: const [
+                  ButtonSegment(value: WeekType.both, label: Text('每周')),
+                  ButtonSegment(value: WeekType.single, label: Text('单周')),
+                  ButtonSegment(value: WeekType.double, label: Text('双周')),
+                ],
+                selected: {widget.filterWeekType},
+                onSelectionChanged: widget.onFilterChanged,
+                buttonStyle: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8))),
+              ),
+              const SizedBox(width: 8),
               MD3ButtonStyles.iconOutlined(
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () => _deleteSchedule(context),
@@ -621,18 +639,213 @@ class _ScheduleGridEditor extends StatelessWidget {
           ),
         ),
         const Divider(height: 1),
-        // 课程列表
+        // 课程网格
         Expanded(
-          child: Center(
-            child: Text(
-              '课表编辑功能开发中...',
-              style: MD3TypographyStyles.bodyLarge(context).copyWith(
-                color: colorScheme.outline,
-              ),
-            ),
-          ),
+          child: timeSlots.isEmpty
+              ? _buildEmptyState(context)
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SingleChildScrollView(
+                    child: _buildScheduleGrid(context, timeSlots, courses),
+                  ),
+                ),
         ),
       ],
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.schedule_outlined,
+            size: 64,
+            color: colorScheme.outline,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '暂无时间点',
+            style: MD3TypographyStyles.bodyLarge(context).copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '请在时间表中添加时间点',
+            style: MD3TypographyStyles.bodyMedium(context).copyWith(
+              color: colorScheme.outline,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScheduleGrid(
+    BuildContext context,
+    List<TimeSlot> timeSlots,
+    List<CourseInfo> courses,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    
+    return DataTable(
+      headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest),
+      columns: [
+        const DataColumn(label: Text('时间')),
+        ...days.map((day) => DataColumn(label: Text(day))),
+      ],
+      rows: timeSlots.map((slot) {
+        return DataRow(
+          cells: [
+            DataCell(
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(slot.name, style: MD3TypographyStyles.labelMedium(context)),
+                  Text(
+                    '${slot.startTime}-${slot.endTime}',
+                    style: MD3TypographyStyles.bodySmall(context).copyWith(
+                      color: colorScheme.outline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ...DayOfWeek.values.map((day) {
+              final dailyCourse = widget.schedule.courses.where((dc) =>
+                dc.dayOfWeek == day &&
+                dc.timeSlotId == slot.id &&
+                (widget.filterWeekType == WeekType.both || dc.weekType == widget.filterWeekType || dc.weekType == WeekType.both)
+              ).firstOrNull;
+              
+              final course = dailyCourse != null 
+                  ? widget.service.getCourseById(dailyCourse.courseId)
+                  : null;
+              
+              return DataCell(
+                _CourseCell(
+                  course: course,
+                  dailyCourse: dailyCourse,
+                  onTap: () => _showCoursePickerDialog(context, slot, day),
+                ),
+              );
+            }),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Future<void> _showCoursePickerDialog(
+    BuildContext context,
+    TimeSlot slot,
+    DayOfWeek day,
+  ) async {
+    final courses = widget.service.courses;
+    
+    final selectedCourse = await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
+      context: context,
+      title: '选择课程',
+      selectedValue: null,
+      items: [
+        const SelectionDialogItem(
+          value: null,
+          title: '无课程',
+          icon: Icon(Icons.remove_circle_outline),
+        ),
+        ...courses.map((course) {
+          final color = ColorUtils.parseHexColor(course.color) ?? 
+              ColorUtils.generateColorFromName(course.name);
+          return SelectionDialogItem(
+            value: course,
+            title: course.name,
+            subtitle: course.teacher.isNotEmpty ? course.teacher : null,
+            icon: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+    
+    // 更新课程
+    final updatedCourses = List<DailyCourse>.from(widget.schedule.courses);
+    
+    // 查找现有课程
+    final existingIndex = updatedCourses.indexWhere((dc) =>
+      dc.dayOfWeek == day &&
+      dc.timeSlotId == slot.id &&
+      dc.weekType == widget.filterWeekType
+    );
+    
+    if (selectedCourse == null) {
+      // 删除现有课程
+      if (existingIndex != -1) {
+        updatedCourses.removeAt(existingIndex);
+      }
+    } else {
+      // 添加或更新课程
+      final newDailyCourse = DailyCourse(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        dayOfWeek: day,
+        timeSlotId: slot.id,
+        courseId: selectedCourse.id,
+        weekType: widget.filterWeekType,
+      );
+      
+      if (existingIndex != -1) {
+        updatedCourses[existingIndex] = newDailyCourse;
+      } else {
+        updatedCourses.add(newDailyCourse);
+      }
+    }
+    
+    // 更新课表
+    final updatedSchedule = widget.schedule.copyWith(
+      courses: updatedCourses,
+    );
+    widget.service.updateSchedule(updatedSchedule);
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.schedule_outlined,
+            size: 64,
+            color: colorScheme.outline,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '暂无时间点',
+            style: MD3TypographyStyles.bodyLarge(context).copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '请在时间表中添加时间点',
+            style: MD3TypographyStyles.bodyMedium(context).copyWith(
+              color: colorScheme.outline,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

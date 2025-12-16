@@ -4,7 +4,7 @@ import 'package:time_widgets/services/enhanced_layout_engine.dart';
 import 'dart:convert';
 import 'package:time_widgets/utils/logger.dart';
 
-/// 小组件类型枚�?
+/// 小组件类型枚�?
 enum WidgetType {
   time,
   date,
@@ -16,7 +16,7 @@ enum WidgetType {
   settings,
 }
 
-/// 小组件位置信�?
+/// 小组件位置信�?
 class WidgetPosition {
   final WidgetType type;
   final double x;
@@ -33,6 +33,24 @@ class WidgetPosition {
     required this.height,
     this.isVisible = true,
   });
+
+  WidgetPosition copyWith({
+    WidgetType? type,
+    double? x,
+    double? y,
+    double? width,
+    double? height,
+    bool? isVisible,
+  }) {
+    return WidgetPosition(
+      type: type ?? this.type,
+      x: x ?? this.x,
+      y: y ?? this.y,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      isVisible: isVisible ?? this.isVisible,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -70,7 +88,7 @@ class WidgetPosition {
   }
 }
 
-/// 桌面小组件服�?
+/// 桌面小组件服�?
 /// 管理桌面小组件的位置、可见性和配置
 class DesktopWidgetService {
   static const String _positionsKey = 'desktop_widget_positions';
@@ -78,7 +96,7 @@ class DesktopWidgetService {
   // 使用增强的布局引擎
   static final EnhancedLayoutEngine _layoutEngine = EnhancedLayoutEngine();
 
-  /// 默认小组件位置配置（使用增强布局引擎�?
+  /// 默认小组件位置配置（使用增强布局引擎�?
   static Map<WidgetType, WidgetPosition> getDefaultPositions([Size? screenSize]) {
     final containerSize = screenSize != null 
         ? Size(screenSize.width / 4, screenSize.height)
@@ -87,7 +105,7 @@ class DesktopWidgetService {
     return _layoutEngine.calculateOptimalLayout(containerSize, null);
   }
 
-  /// 保存小组件位�?
+  /// 保存小组件位�?
   static Future<void> saveWidgetPositions(Map<WidgetType, WidgetPosition> positions) async {
     final prefs = await SharedPreferences.getInstance();
     final positionsJson = positions.map(
@@ -96,7 +114,7 @@ class DesktopWidgetService {
     await prefs.setString(_positionsKey, json.encode(positionsJson));
   }
 
-  /// 加载小组件位置（使用增强布局引擎�?
+  /// 加载小组件位置（使用增强布局引擎�?
   static Future<Map<WidgetType, WidgetPosition>> loadWidgetPositions([Size? screenSize]) async {
     final prefs = await SharedPreferences.getInstance();
     final positionsString = prefs.getString(_positionsKey);
@@ -124,7 +142,7 @@ class DesktopWidgetService {
       // 使用布局引擎计算最优布局，考虑已保存的位置
       final optimizedLayout = _layoutEngine.calculateOptimalLayout(containerSize, savedPositions);
       
-      // 验证布局有效�?
+      // 验证布局有效�?
       if (_layoutEngine.validateLayout(optimizedLayout, containerSize)) {
         return optimizedLayout;
       } else {
@@ -137,7 +155,7 @@ class DesktopWidgetService {
     }
   }
 
-  /// 更新单个小组件位�?
+  /// 更新单个小组件位�?
   static Future<void> updateWidgetPosition(
     WidgetType type,
     double x,
@@ -160,7 +178,7 @@ class DesktopWidgetService {
     await saveWidgetPositions(positions);
   }
 
-  /// 切换小组件可见�?
+  /// 切换小组件可见�?
   static Future<void> toggleWidgetVisibility(WidgetType type) async {
     final positions = await loadWidgetPositions();
     final currentPosition = positions[type]!;
@@ -189,7 +207,7 @@ class DesktopWidgetService {
     return Size(position.width, position.height);
   }
 
-  /// 检查位置是否在屏幕边界�?
+  /// 检查位置是否在屏幕边界�?
   static bool isPositionValid(double x, double y, double width, double height, Size screenSize) {
     return x >= 0 && 
            y >= 0 && 
@@ -197,7 +215,7 @@ class DesktopWidgetService {
            y + height <= screenSize.height;
   }
 
-  /// 调整位置到屏幕边界内（使用增强布局引擎�?
+  /// 调整位置到屏幕边界内（使用增强布局引擎�?
   static Offset adjustPositionToScreen(double x, double y, double width, double height, Size screenSize) {
     final containerSize = Size(screenSize.width / 4, screenSize.height);
     final positionCalculator = PositionCalculator();
@@ -209,7 +227,7 @@ class DesktopWidgetService {
     return _layoutEngine.detectCollisions(layout);
   }
   
-  /// 调整布局以适应新屏幕尺�?
+  /// 调整布局以适应新屏幕尺�?
   static Map<WidgetType, WidgetPosition> adjustLayoutForScreenSize(
     Map<WidgetType, WidgetPosition> currentLayout,
     Size oldSize,

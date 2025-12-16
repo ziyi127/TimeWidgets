@@ -35,7 +35,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                         labelText: '选择星期',
                         border: OutlineInputBorder(),
                       ),
-                      value: _selectedDay,
+                      initialValue: _selectedDay,
                       items: DayOfWeek.values.map((day) {
                         return DropdownMenuItem(
                           value: day,
@@ -53,10 +53,10 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                   Expanded(
                     child: DropdownButtonFormField<WeekType>(
                       decoration: const InputDecoration(
-                        labelText: '选择周类�?,
+                        labelText: '选择周类型',
                         border: OutlineInputBorder(),
                       ),
-                      value: _selectedWeekType,
+                      initialValue: _selectedWeekType,
                       items: WeekType.values.map((weekType) {
                         return DropdownMenuItem(
                           value: weekType,
@@ -124,7 +124,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
     
     if (courses.isEmpty) {
       return const Center(
-        child: Text('请先在课程表中添加课�?),
+        child: Text('请先在课程表中添加课程'),
       );
     }
     
@@ -222,11 +222,11 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
     return DropdownButton<String>(
       isExpanded: true,
       value: existingCourse.courseId.isEmpty ? null : existingCourse.courseId,
-      hint: const Text('无课�?),
+      hint: const Text('无课程'),
       items: [
         const DropdownMenuItem(
           value: '',
-          child: Text('无课�?),
+          child: Text('无课程'),
         ),
         ...courses.map((course) => DropdownMenuItem(
           value: course.id,
@@ -267,17 +267,17 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
       case DayOfWeek.monday:
         return '星期一';
       case DayOfWeek.tuesday:
-        return '星期�?;
+        return '星期二';
       case DayOfWeek.wednesday:
-        return '星期�?;
+        return '星期三';
       case DayOfWeek.thursday:
-        return '星期�?;
+        return '星期四';
       case DayOfWeek.friday:
-        return '星期�?;
+        return '星期五';
       case DayOfWeek.saturday:
-        return '星期�?;
+        return '星期六';
       case DayOfWeek.sunday:
-        return '星期�?;
+        return '星期日';
     }
   }
 

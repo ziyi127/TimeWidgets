@@ -123,7 +123,7 @@ void main() {
         final formatted = LocalizationService.formatDate(testDate, format: 'long');
         
         // 验证包含年份
-        expect(formatted.contains('${year}年'), isTrue);
+        expect(formatted.contains('$year年'), isTrue);
         // 验证包含月份
         expect(formatted.contains('6月'), isTrue);
         // 验证包含日期
@@ -159,7 +159,7 @@ void main() {
     test('week formatting is correct', () {
       for (int week = 1; week <= 20; week++) {
         final formatted = LocalizationService.formatWeek(week);
-        expect(formatted, equals('第${week}周'));
+        expect(formatted, equals('第$week周'));
       }
     });
 

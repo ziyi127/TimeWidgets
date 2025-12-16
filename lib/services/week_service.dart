@@ -1,4 +1,5 @@
 import 'package:time_widgets/models/timetable_edit_model.dart';
+import 'package:time_widgets/services/ntp_service.dart';
 
 class WeekService {
   /// 计算当前是第几周
@@ -65,7 +66,7 @@ class WeekService {
 
   /// 获取今天是星期几
   DayOfWeek getTodayDayOfWeek() {
-    final weekday = DateTime.now().weekday;
+    final weekday = NtpService().now.weekday;
     // DateTime.weekday: 1=Monday, 7=Sunday
     // DayOfWeek: 0=Monday, 6=Sunday
     return DayOfWeek.values[weekday - 1];

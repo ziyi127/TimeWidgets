@@ -29,12 +29,15 @@ class Logger {
     }
   }
 
-  /// Error log
-  static void e(String message, [dynamic err]) {
+  /// Error log with stack trace support
+  static void e(String message, [dynamic err, StackTrace? stackTrace]) {
     if (logLevel <= levelError) {
       _log('ERROR', message);
       if (err != null) {
         _log('ERROR', err.toString());
+      }
+      if (stackTrace != null) {
+        _log('ERROR', 'Stack trace: $stackTrace');
       }
     }
   }

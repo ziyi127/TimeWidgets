@@ -65,7 +65,7 @@ void main() {
           final name = 'Subject_$seed';
           final color = ColorUtils.generateColorFromName(name);
           
-          expect(color.alpha, equals(255),
+          expect((color.a * 255.0).round() & 0xff, equals(255),
             reason: 'Generated color should be fully opaque');
         },
       );

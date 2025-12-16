@@ -6,7 +6,15 @@ import 'package:time_widgets/services/timetable_edit_service.dart';
 /// **Feature: md3-settings-timetable-enhancement**
 /// **Property 4: Subject deletion prevention when in use**
 /// **Validates: Requirements 12.4**
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
+  // Initialize Flutter binding for tests that use Flutter services
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Set up mock SharedPreferences for all tests
+  SharedPreferences.setMockInitialValues({});
+  
   group('Subject Deletion Properties', () {
     group('Property 4: Subject deletion prevention when in use', () {
       test('subject used in daily course should not be deletable', () {

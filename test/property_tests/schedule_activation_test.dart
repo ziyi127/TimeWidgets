@@ -7,7 +7,15 @@ import 'package:time_widgets/services/timetable_edit_service.dart';
 /// **Property 2: Schedule auto-activation based on trigger rules**
 /// **Property 3: Schedule priority ordering**
 /// **Validates: Requirements 11.3, 11.4**
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
+  // Initialize Flutter binding for tests that use Flutter services
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Set up mock SharedPreferences for all tests
+  SharedPreferences.setMockInitialValues({});
+  
   group('Schedule Activation Properties', () {
     group('Property 2: Schedule auto-activation based on trigger rules', () {
       test('schedule with matching weekday should be activated', () {

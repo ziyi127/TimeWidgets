@@ -6,23 +6,23 @@ import 'dart:async';
 import 'package:time_widgets/utils/logger.dart';
 
 /// 增强的窗口管理器
-/// 提供可靠的窗口初始化、定位和状态管�?
+/// 提供可靠的窗口初始化、定位和状态管�?
 class EnhancedWindowManager {
   static bool _isInitialized = false;
   static Size? _lastScreenSize;
   static VoidCallback? _onScreenSizeChanged;
   
-  /// 初始化窗�?
+  /// 初始化窗�?
   static Future<bool> initializeWindow({VoidCallback? onScreenSizeChanged}) async {
     if (_isInitialized) return true;
     
     _onScreenSizeChanged = onScreenSizeChanged;
     
     try {
-      // 确保窗口管理器已初始�?
+      // 确保窗口管理器已初始�?
       await windowManager.ensureInitialized();
       
-      // 等待一帧以确保Flutter完全初始�?
+      // 等待一帧以确保Flutter完全初始�?
       await Future.delayed(const Duration(milliseconds: 100));
       
       // 获取屏幕信息
@@ -34,10 +34,10 @@ class EnhancedWindowManager {
       
       _lastScreenSize = screenInfo;
       
-      // 计算窗口尺寸和位�?
+      // 计算窗口尺寸和位�?
       final windowBounds = _calculateWindowBounds(screenInfo);
       
-      // 设置窗口属�?
+      // 设置窗口属�?
       await _configureWindow(windowBounds);
       
       // 初始化bitsdojo_window
@@ -59,24 +59,12 @@ class EnhancedWindowManager {
   /// 获取屏幕信息
   static Future<Size?> _getScreenInfo() async {
     try {
-      // 尝试多种方法获取屏幕尺寸
-      
-      // 方法1: 使用window_manager
-      try {
-        final bounds = await windowManager.getBounds();
-        if (bounds.size.width > 0 && bounds.size.height > 0) {
-          // 获取主屏幕尺寸（假设窗口在主屏幕上）
-          return Size(1920, 1080); // 临时使用常见分辨率，后续可以改进
-        }
-      } catch (e) {
-        Logger.w('Failed to get bounds from window_manager: $e');
-      }
-      
-      // 方法2: 使用系统调用（Windows�?
+      // 优先使用系统调用获取准确的屏幕尺寸（Windows）
       if (Platform.isWindows) {
         return await _getWindowsScreenSize();
       }
       
+      // 其他平台暂时返回null，触发默认尺寸回退
       return null;
     } catch (e) {
       Logger.e('Error getting screen info: $e');
@@ -87,7 +75,7 @@ class EnhancedWindowManager {
   /// 获取Windows屏幕尺寸
   static Future<Size?> _getWindowsScreenSize() async {
     try {
-      // 使用PowerShell获取屏幕分辨�?
+      // 使用PowerShell获取屏幕分辨�?
       final result = await Process.run('powershell', [
         '-Command',
         'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen.Bounds'
@@ -117,11 +105,10 @@ class EnhancedWindowManager {
     final windowWidth = screenSize.width / 4;
     final windowHeight = screenSize.height;
     
-    // 窗口位置在屏幕右�?
-    final windowX = screenSize.width - windowWidth;
+    // 窗口位置在屏幕右
     final windowY = 0.0;
     
-    // 确保最小尺�?
+    // 确保最小尺�?
     final minWidth = 300.0;
     final minHeight = 600.0;
     
@@ -132,7 +119,7 @@ class EnhancedWindowManager {
     return Rect.fromLTWH(finalX, windowY, finalWidth, finalHeight);
   }
 
-  /// 配置窗口属�?
+  /// 配置窗口属�?
   static Future<void> _configureWindow(Rect bounds) async {
     try {
       // 设置窗口尺寸
@@ -146,7 +133,7 @@ class EnhancedWindowManager {
       await windowManager.setBackgroundColor(Colors.transparent);
       await windowManager.setHasShadow(false);
       
-      // 设置窗口层级 - 不要设置为最底层，这会影响交�?
+      // 设置窗口层级 - 不要设置为最底层，这会影响交�?
       await windowManager.setAlwaysOnTop(false);
       await windowManager.setAlwaysOnBottom(false);
       
@@ -167,7 +154,7 @@ class EnhancedWindowManager {
     try {
       doWhenWindowReady(() {
         final win = appWindow;
-        win.title = "智慧课程�?;
+        win.title = "智慧课程表";
         win.show();
       });
     } catch (e) {
@@ -175,7 +162,7 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 使用默认尺寸初始�?
+  /// 使用默认尺寸初始�?
   static Future<bool> _initializeWithDefaultSize() async {
     try {
       const defaultSize = Size(480, 1080);
@@ -201,9 +188,9 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 开始屏幕监�?
+  /// 开始屏幕监�?
   static void _startScreenMonitoring() {
-    // 定期检查屏幕尺寸变�?
+    // 定期检查屏幕尺寸变�?
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       try {
         final currentSize = await _getScreenInfo();
@@ -274,7 +261,7 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 检查窗口是否已初始�?
+  /// 检查窗口是否已初始�?
   static bool get isInitialized => _isInitialized;
 
   /// 获取最后记录的屏幕尺寸

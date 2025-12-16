@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/week_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
+import 'package:time_widgets/services/ntp_service.dart';
 
-/// 周次显示组件 - MD3紧凑�?
+/// 周次显示组件 - MD3紧凑版
 class WeekDisplayWidget extends StatefulWidget {
   final bool isCompact;
 
@@ -34,7 +35,7 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
       if (settings.semesterStartDate != null) {
         final weekNumber = _weekService.calculateWeekNumber(
           settings.semesterStartDate!,
-          DateTime.now(),
+          NtpService().now,
         );
         if (mounted) {
           setState(() {
@@ -100,7 +101,7 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
               )
             else ...[
               Text(
-                '�?_weekNumber�?,
+                '第$_weekNumber周',
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: onContainerColor,
                   fontWeight: FontWeight.w600,
@@ -110,7 +111,7 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: onContainerColor.withValues(alpha: 0.15),
+                  color: onContainerColor.withAlpha(38),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

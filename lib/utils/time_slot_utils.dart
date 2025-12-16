@@ -1,9 +1,9 @@
 import 'package:time_widgets/models/timetable_edit_model.dart';
 
 class TimeSlotUtils {
-  /// 判断给定时间是否在时间段�?
-  /// [timeSlot] 时间�?
-  /// [currentTime] 当前时间 (格式: "HH:MM" �?DateTime)
+  /// 判断给定时间是否在时间段内
+  /// [timeSlot] 时间段
+  /// [currentTime] 当前时间 (格式: "HH:MM" 或 DateTime)
   static bool isCurrentTimeSlot(TimeSlot timeSlot, DateTime currentTime) {
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
     final startMinutes = _parseTimeToMinutes(timeSlot.startTime);
@@ -12,7 +12,7 @@ class TimeSlotUtils {
     return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
   }
 
-  /// 查找当前时间�?
+  /// 查找当前时间�?
   /// [timeSlots] 所有时间段
   /// [currentTime] 当前时间
   /// 返回当前时间段的索引，如果没有则返回 -1
@@ -25,10 +25,10 @@ class TimeSlotUtils {
     return -1;
   }
 
-  /// 获取当前时间�?
+  /// 获取当前时间段
   /// [timeSlots] 所有时间段
   /// [currentTime] 当前时间
-  /// 返回当前时间段，如果没有则返�?null
+  /// 返回当前时间段，如果没有则返回 null
   static TimeSlot? getCurrentTimeSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
     final index = findCurrentTimeSlotIndex(timeSlots, currentTime);
     return index >= 0 ? timeSlots[index] : null;
@@ -60,7 +60,7 @@ class TimeSlotUtils {
     return nextStartMinutes - currentMinutes;
   }
 
-  /// 计算当前时间段的剩余分钟�?
+  /// 计算当前时间段的剩余分钟�?
   static int? getRemainingMinutesInCurrentSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
     final currentSlot = getCurrentTimeSlot(timeSlots, currentTime);
     if (currentSlot == null) return null;
@@ -88,7 +88,7 @@ class TimeSlotUtils {
     return '${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}';
   }
 
-  /// 判断时间段是否已�?
+  /// 判断时间段是否已�?
   static bool isTimeSlotPassed(TimeSlot timeSlot, DateTime currentTime) {
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
     final endMinutes = _parseTimeToMinutes(timeSlot.endTime);

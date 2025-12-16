@@ -42,11 +42,11 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: '课程名称',
-                  hintText: '请输入课程名�?,
+                  hintText: '请输入课程名称',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '请输入课程名�?;
+                    return '请输入课程名称';
                   }
                   return null;
                 },
@@ -56,7 +56,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 controller: _teacherController,
                 decoration: const InputDecoration(
                   labelText: '授课教师',
-                  hintText: '请输入教师姓�?,
+                  hintText: '请输入教师姓名',
                 ),
               ),
               const SizedBox(height: 16),
@@ -64,7 +64,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 controller: _classroomController,
                 decoration: const InputDecoration(
                   labelText: '教室',
-                  hintText: '请输入教室位�?,
+                  hintText: '请输入教室位置',
                 ),
               ),
             ],
@@ -116,11 +116,11 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: '课程名称',
-                  hintText: '请输入课程名�?,
+                  hintText: '请输入课程名称',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '请输入课程名�?;
+                    return '请输入课程名称';
                   }
                   return null;
                 },
@@ -130,7 +130,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 controller: _teacherController,
                 decoration: const InputDecoration(
                   labelText: '授课教师',
-                  hintText: '请输入教师姓�?,
+                  hintText: '请输入教师姓名',
                 ),
               ),
               const SizedBox(height: 16),
@@ -138,7 +138,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 controller: _classroomController,
                 decoration: const InputDecoration(
                   labelText: '教室',
-                  hintText: '请输入教室位�?,
+                  hintText: '请输入教室位置',
                 ),
               ),
             ],
@@ -237,7 +237,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                       builder: (context) => AlertDialog(
                                         title: const Text('确认删除'),
                                         content: Text(
-                                            '确定要删除课�?${course.name}"吗？'),
+                                            '确定要删除课程"${course.name}"吗？'),
                                         actions: [
                                           TextButton(
                                             onPressed: () =>

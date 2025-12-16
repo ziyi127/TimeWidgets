@@ -1,18 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/models/course_model.dart';
 
-/// 当前课程组件 - MD3紧凑�?
+/// 当前课程组件 - MD3紧凑版
 class CurrentClassWidget extends StatelessWidget {
   final bool isCompact;
+  final Course? course;
+  final bool isLoading;
 
   const CurrentClassWidget({
     super.key,
     this.isCompact = false,
+    this.course,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    if (isLoading) {
+      return Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (course == null) {
+      return Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.free_breakfast_outlined, color: colorScheme.secondary, size: 32),
+              const SizedBox(height: 8),
+              Text(
+                '当前无课',
+                style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.secondary),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Card(
       elevation: 0,
@@ -49,7 +84,7 @@ class CurrentClassWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '进行�?,
+                    '进行中',
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onTertiaryContainer,
                       fontWeight: FontWeight.w600,
@@ -83,7 +118,7 @@ class CurrentClassWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '语文 · 张老师',
+                        '${course!.subject} · ${course!.teacher}',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
@@ -93,7 +128,7 @@ class CurrentClassWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '08:00 - 08:45 · A101教室',
+                        '${course!.time} · ${course!.classroom}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -101,38 +136,7 @@ class CurrentClassWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                // 进度
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '30',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: colorScheme.primary,
-                        height: 1.0,
-                      ),
-                    ),
-                    Text(
-                      '/45分钟',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
               ],
-            ),
-            const SizedBox(height: 12),
-            // 进度�?
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: 0.67,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
-                minHeight: 6,
-              ),
             ),
           ],
         ),

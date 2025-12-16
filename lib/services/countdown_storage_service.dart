@@ -88,14 +88,14 @@ class CountdownStorageService {
     }
   }
 
-  /// 获取按目标日期排序的倒计时列�?
+  /// 获取按目标日期排序的倒计时列�?
   Future<List<CountdownData>> getSortedCountdowns() async {
     final countdowns = await loadAllCountdowns();
     countdowns.sort((a, b) => a.targetDate.compareTo(b.targetDate));
     return countdowns;
   }
 
-  /// 获取最近的倒计时事�?
+  /// 获取最近的倒计时事�?
   Future<CountdownData?> getNextCountdown() async {
     final countdowns = await getSortedCountdowns();
     final now = DateTime.now();

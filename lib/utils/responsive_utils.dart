@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 
 /// 屏幕尺寸类型枚举
 enum ScreenSize {
@@ -9,7 +9,24 @@ enum ScreenSize {
 
 /// 响应式设计工具类
 class ResponsiveUtils {
-  // 私有构造函数，防止实例�?  ResponsiveUtils._();
+  // 私有构造函数，防止实例化
+  ResponsiveUtils._();
+
+  /// UI缩放比例
+  static double _scaleFactor = 1.0;
+  
+  /// 设置缩放比例
+  static void setScaleFactor(double factor) {
+    _scaleFactor = factor;
+  }
+  
+  /// 获取当前缩放比例
+  static double get scaleFactor => _scaleFactor;
+  
+  /// 缩放数值
+  static double value(double val) {
+    return val * _scaleFactor;
+  }
 
   /// Material Design 3 断点定义
   static const double compactBreakpoint = 600;
@@ -47,11 +64,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 16.0;
+        return 16.0 * _scaleFactor;
       case ScreenSize.medium:
-        return 24.0;
+        return 24.0 * _scaleFactor;
       case ScreenSize.expanded:
-        return 32.0;
+        return 32.0 * _scaleFactor;
     }
   }
 
@@ -60,56 +77,69 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 16.0;
+        return 16.0 * _scaleFactor;
       case ScreenSize.medium:
       case ScreenSize.expanded:
-        return 24.0;
+        return 24.0 * _scaleFactor;
     }
   }
 
-  /// 获取响应式卡片间�?  static double getCardSpacing(double width) {
+  /// 获取响应式卡片间距
+  static double getCardSpacing(double width) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 12.0;
+        return 12.0 * _scaleFactor;
       case ScreenSize.medium:
-        return 16.0;
+        return 16.0 * _scaleFactor;
       case ScreenSize.expanded:
-        return 20.0;
+        return 20.0 * _scaleFactor;
     }
   }
 
   /// 获取响应式字体大小倍数
   static double getFontSizeMultiplier(double width) {
     final screenSize = getScreenSize(width);
+    double baseMultiplier;
     switch (screenSize) {
       case ScreenSize.compact:
-        return 0.9;
+        baseMultiplier = 0.9;
+        break;
       case ScreenSize.medium:
-        return 1.0;
+        baseMultiplier = 1.0;
+        break;
       case ScreenSize.expanded:
-        return 1.1;
+        baseMultiplier = 1.1;
+        break;
     }
+    return baseMultiplier * _scaleFactor;
   }
 
-  /// 获取响应式图标大�?  static double getIconSize(double width, {double baseSize = 24.0}) {
-    final multiplier = getFontSizeMultiplier(width);
-    return baseSize * multiplier;
+  /// 获取响应式图标大小
+  static double getIconSize(double width, {double baseSize = 24.0}) {
+    return baseSize * _scaleFactor;
   }
 
-  /// 获取响应式边框圆�?  static double getBorderRadius(double width, {double baseRadius = 16.0}) {
+  /// 获取响应式边框圆角
+  static double getBorderRadius(double width, {double baseRadius = 16.0}) {
     final screenSize = getScreenSize(width);
+    double multiplier;
     switch (screenSize) {
       case ScreenSize.compact:
-        return baseRadius * 0.75;
+        multiplier = 0.75;
+        break;
       case ScreenSize.medium:
-        return baseRadius;
+        multiplier = 1.0;
+        break;
       case ScreenSize.expanded:
-        return baseRadius * 1.25;
+        multiplier = 1.25;
+        break;
     }
+    return baseRadius * multiplier * _scaleFactor;
   }
 
-  /// 获取响应式列�?  static int getColumnCount(double width) {
+  /// 获取响应式列数
+  static int getColumnCount(double width) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
@@ -126,121 +156,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return compactCount ?? 1;
+        return compactCount ?? 2;
       case ScreenSize.medium:
-        return mediumCount ?? 2;
+        return mediumCount ?? 3;
       case ScreenSize.expanded:
-        return expandedCount ?? 3;
+        return expandedCount ?? 4;
     }
-  }
-
-  /// 获取响应式最大宽�?  static double getMaxWidth(double width) {
-    final screenSize = getScreenSize(width);
-    switch (screenSize) {
-      case ScreenSize.compact:
-        return width;
-      case ScreenSize.medium:
-        return 800.0;
-      case ScreenSize.expanded:
-        return 1200.0;
-    }
-  }
-
-  /// 构建响应式布局
-  static Widget buildResponsiveLayout({
-    required double width,
-    required Widget compactLayout,
-    Widget? mediumLayout,
-    Widget? expandedLayout,
-  }) {
-    final screenSize = getScreenSize(width);
-    
-    switch (screenSize) {
-      case ScreenSize.compact:
-        return compactLayout;
-      case ScreenSize.medium:
-        return mediumLayout ?? compactLayout;
-      case ScreenSize.expanded:
-        return expandedLayout ?? mediumLayout ?? compactLayout;
-    }
-  }
-
-  /// 构建响应式网�?  static Widget buildResponsiveGrid({
-    required double width,
-    required List<Widget> children,
-    int? compactColumns,
-    int? mediumColumns,
-    int? expandedColumns,
-    double? spacing,
-  }) {
-    final columnCount = getCrossAxisCount(
-      width,
-      compactCount: compactColumns ?? 1,
-      mediumCount: mediumColumns ?? 2,
-      expandedCount: expandedColumns ?? 3,
-    );
-    
-    final effectiveSpacing = spacing ?? getCardSpacing(width);
-    
-    return GridView.count(
-      crossAxisCount: columnCount,
-      crossAxisSpacing: effectiveSpacing,
-      mainAxisSpacing: effectiveSpacing,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: children,
-    );
-  }
-
-  /// 构建响应式行布局
-  static Widget buildResponsiveRow({
-    required double width,
-    required List<Widget> children,
-    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
-    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
-    bool forceColumn = false,
-  }) {
-    final spacing = getCardSpacing(width);
-    final isCompactScreen = isCompact(width);
-    
-    if (forceColumn || isCompactScreen) {
-      return Column(
-        mainAxisAlignment: mainAxisAlignment,
-        crossAxisAlignment: crossAxisAlignment,
-        children: children
-            .expand((child) => [child, SizedBox(height: spacing)])
-            .take(children.length * 2 - 1)
-            .toList(),
-      );
-    } else {
-      return Row(
-        mainAxisAlignment: mainAxisAlignment,
-        crossAxisAlignment: crossAxisAlignment,
-        children: children
-            .expand((child) => [Expanded(child: child), SizedBox(width: spacing)])
-            .take(children.length * 2 - 1)
-            .toList(),
-      );
-    }
-  }
-
-  /// 构建响应式容�?  static Widget buildResponsiveContainer({
-    required double width,
-    required Widget child,
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    double? borderRadius,
-  }) {
-    return Container(
-      width: getMaxWidth(width),
-      padding: padding ?? EdgeInsets.all(getHorizontalPadding(width)),
-      margin: margin,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? getBorderRadius(width),
-        ),
-      ),
-      child: child,
-    );
   }
 }

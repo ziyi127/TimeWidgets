@@ -48,7 +48,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('添加时间�?),
+        title: const Text('添加时间段'),
         content: StatefulBuilder(
           builder: (context, setState) {
             return Form(
@@ -59,7 +59,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: '时间段名�?,
+                      labelText: '时间段名称',
                       hintText: '例如：第1节课',
                     ),
                     validator: (value) {
@@ -77,13 +77,13 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                           onTap: () => _selectTime(isStart: true),
                           child: InputDecorator(
                             decoration: const InputDecoration(
-                              labelText: '开始时�?,
+                              labelText: '开始时间',
                               border: OutlineInputBorder(),
                             ),
                             child: Text(
                               _startTime != null 
                                   ? '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}'
-                                  : '选择开始时�?,
+                                  : '选择开始时间',
                             ),
                           ),
                         ),
@@ -130,7 +130,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                 if (_endTime!.hour < _startTime!.hour || 
                     (_endTime!.hour == _startTime!.hour && _endTime!.minute <= _startTime!.minute)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('结束时间必须晚于开始时�?)),
+                    const SnackBar(content: Text('结束时间必须晚于开始时间')),
                   );
                   return;
                 }
@@ -178,7 +178,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('编辑时间�?),
+        title: const Text('编辑时间段'),
         content: StatefulBuilder(
           builder: (context, setState) {
             return Form(
@@ -189,7 +189,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: '时间段名�?,
+                      labelText: '时间段名称',
                       hintText: '例如：第1节课',
                     ),
                     validator: (value) {
@@ -218,13 +218,13 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                           },
                           child: InputDecorator(
                             decoration: const InputDecoration(
-                              labelText: '开始时�?,
+                              labelText: '开始时间',
                               border: OutlineInputBorder(),
                             ),
                             child: Text(
                               _startTime != null 
                                   ? '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}'
-                                  : '选择开始时�?,
+                                  : '选择开始时间',
                             ),
                           ),
                         ),
@@ -282,7 +282,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                 if (_endTime!.hour < _startTime!.hour || 
                     (_endTime!.hour == _startTime!.hour && _endTime!.minute <= _startTime!.minute)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('结束时间必须晚于开始时�?)),
+                    const SnackBar(content: Text('结束时间必须晚于开始时间')),
                   );
                   return;
                 }
@@ -348,13 +348,13 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '时间段列�?(${timeSlots.length})',
+                    '时间段列表 (${timeSlots.length})',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   ElevatedButton.icon(
                     onPressed: _showAddTimeSlotDialog,
                     icon: const Icon(Icons.add),
-                    label: const Text('添加时间�?),
+                    label: const Text('添加时间段'),
                   ),
                 ],
               ),

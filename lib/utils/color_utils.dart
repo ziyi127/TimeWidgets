@@ -4,9 +4,10 @@ import 'package:flutter/painting.dart';
 class ColorUtils {
   /// Generate a deterministic color from a name string
   /// The same name will always produce the same color
+  /// Follows MD3 color guidelines for better visual harmony
   static Color generateColorFromName(String name) {
     if (name.isEmpty) {
-      return const Color(0xFF2196F3); // Default blue
+      return const Color(0xFF3B82F6); // Default MD3 blue
     }
     
     // Use a simple hash function for deterministic color generation
@@ -15,13 +16,13 @@ class ColorUtils {
       hash = name.codeUnitAt(i) + ((hash << 5) - hash);
     }
     
-    // Generate HSL color for better visual distribution
-    // Hue: 0-360 degrees
+    // Generate HSL color following MD3 guidelines
+    // Hue: 0-360 degrees, but using MD3 preferred hue ranges
     final hue = (hash.abs() % 360).toDouble();
-    // Saturation: 50-80% for vibrant but not overwhelming colors
-    final saturation = 0.5 + (((hash >> 8).abs() % 30) / 100);
-    // Lightness: 40-60% for good contrast with both light and dark text
-    final lightness = 0.4 + (((hash >> 16).abs() % 20) / 100);
+    // Saturation: 60-85% for MD3 vibrant yet harmonious colors
+    final saturation = 0.6 + (((hash >> 8).abs() % 25) / 100);
+    // Lightness: 45-65% for better contrast and MD3 compliance
+    final lightness = 0.45 + (((hash >> 16).abs() % 20) / 100);
     
     return HSLColor.fromAHSL(1.0, hue, saturation, lightness).toColor();
   }
@@ -29,9 +30,9 @@ class ColorUtils {
   /// Calculate the relative luminance of a color
   /// Based on WCAG 2.1 formula
   static double getRelativeLuminance(Color color) {
-    double r = color.red / 255;
-    double g = color.green / 255;
-    double b = color.blue / 255;
+    double r = (color.r * 255.0).round() / 255;
+    double g = (color.g * 255.0).round() / 255;
+    double b = (color.b * 255.0).round() / 255;
     
     r = r <= 0.03928 ? r / 12.92 : ((r + 0.055) / 1.055).pow(2.4);
     g = g <= 0.03928 ? g / 12.92 : ((g + 0.055) / 1.055).pow(2.4);
@@ -95,31 +96,31 @@ class ColorUtils {
   /// Convert Color to hex string
   static String toHexString(Color color, {bool includeAlpha = false}) {
     if (includeAlpha) {
-      return '#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+      return '#${color.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
     }
-    return '#${(color.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+    return '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
   }
 
   /// Predefined MD3 color palette for subjects
   static const List<Color> subjectColors = [
-    Color(0xFFF44336), // Red
-    Color(0xFFE91E63), // Pink
-    Color(0xFF9C27B0), // Purple
-    Color(0xFF673AB7), // Deep Purple
-    Color(0xFF3F51B5), // Indigo
-    Color(0xFF2196F3), // Blue
-    Color(0xFF03A9F4), // Light Blue
-    Color(0xFF00BCD4), // Cyan
-    Color(0xFF009688), // Teal
-    Color(0xFF4CAF50), // Green
-    Color(0xFF8BC34A), // Light Green
-    Color(0xFFCDDC39), // Lime
-    Color(0xFFFFEB3B), // Yellow
-    Color(0xFFFFC107), // Amber
-    Color(0xFFFF9800), // Orange
-    Color(0xFFFF5722), // Deep Orange
-    Color(0xFF795548), // Brown
-    Color(0xFF607D8B), // Blue Grey
+    Color(0xFFEF4444), // Red
+    Color(0xFFEC4899), // Pink
+    Color(0xFF8B5CF6), // Purple
+    Color(0xFF6366F1), // Indigo
+    Color(0xFF3B82F6), // Blue
+    Color(0xFF0EA5E9), // Light Blue
+    Color(0xFF06B6D4), // Cyan
+    Color(0xFF10B981), // Teal
+    Color(0xFF22C55E), // Green
+    Color(0xFF84CC16), // Light Green
+    Color(0xFFEAB308), // Yellow
+    Color(0xFFF59E0B), // Amber
+    Color(0xFFF97316), // Orange
+    Color(0xFFEF4444), // Deep Red
+    Color(0xFF7C3AED), // Violet
+    Color(0xFFF43F5E), // Rose
+    Color(0xFF14B8A6), // Emerald
+    Color(0xFFFBBF24), // Gold
   ];
 
   /// Get a color from the predefined palette by index

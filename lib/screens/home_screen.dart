@@ -14,6 +14,8 @@ import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/utils/md3_navigation_styles.dart';
+import 'package:time_widgets/services/settings_service.dart';
+import 'package:time_widgets/models/settings_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,23 +26,43 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService _apiService = ApiService();
+  final SettingsService _settingsService = SettingsService();
   WeatherData? _weatherData;
   bool _isLoadingWeather = true;
   String? _weatherError;
   CountdownData? _countdownData;
   bool _isLoadingCountdown = true;
   String? _countdownError;
+  late AppSettings _settings;
+  bool _isLoadingSettings = true;
 
   @override
   void initState() {
     super.initState();
+    _loadSettings();
     _loadWeatherData();
     _loadCountdownData();
   }
 
+  Future<void> _loadSettings() async {
+    try {
+      final settings = await _settingsService.loadSettings();
+      setState(() {
+        _settings = settings;
+        _isLoadingSettings = false;
+      });
+    } catch (e) {
+      // 如果加载失败，使用默认设置
+      setState(() {
+        _settings = AppSettings.defaultSettings();
+        _isLoadingSettings = false;
+      });
+    }
+  }
+
   Future<void> _loadCountdownData() async {
     try {
-      // 首先尝试从缓存获取数�?
+      // 首先尝试从缓存获取数�?
       final cachedCountdown = await CacheService.getCachedCountdownData();
       if (cachedCountdown != null && mounted) {
         setState(() {
@@ -49,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
       
-      // 然后从API获取最新数�?
+      // 然后从API获取最新数�?
       final countdownData = await _apiService.getCountdown();
       if (mounted) {
         setState(() {
@@ -57,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingCountdown = false;
           _countdownError = null;
         });
-        // 缓存新数�?
+        // 缓存新数�?
         await CacheService.cacheCountdownData(countdownData);
       }
     } catch (e) {
@@ -77,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _weatherError = null;
       });
       
-      // 首先尝试从缓存获取数�?
+      // 首先尝试从缓存获取数�?
       final cachedWeather = await CacheService.getCachedWeatherData();
       if (cachedWeather != null && mounted) {
         setState(() {
@@ -86,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
       
-      // 然后从API获取最新数�?
+      // 然后从API获取最新数�?
       final weatherData = await _apiService.getWeather();
       
       if (mounted) {
@@ -95,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingWeather = false;
           _weatherError = null;
         });
-        // 缓存新数�?
+        // 缓存新数�?
         await CacheService.cacheWeatherData(weatherData);
       }
     } catch (e) {
@@ -113,6 +135,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
+    if (_isLoadingSettings) {
+      return Scaffold(
+        backgroundColor: colorScheme.surface,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: SafeArea(
@@ -129,12 +158,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    // 响应式断�?
+    // 响应式断�?
     final isCompact = constraints.maxWidth < 600;
     final isMedium = constraints.maxWidth >= 600 && constraints.maxWidth < 840;
     final isExpanded = constraints.maxWidth >= 840;
     
-    // 计算间距和尺�?
+    // 计算间距和尺�?
     final horizontalPadding = isCompact ? 16.0 : (isMedium ? 24.0 : 32.0);
     final verticalPadding = isCompact ? 16.0 : 24.0;
     final cardSpacing = isCompact ? 12.0 : 16.0;
@@ -194,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: [
               MD3ButtonStyles.icon(
+                context: context,
                 icon: const Icon(Icons.settings_outlined),
                 onPressed: () {
                   Navigator.push(
@@ -223,125 +253,181 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCompactLayout(double spacing) {
-    return SliverList(
-      delegate: SliverChildListDelegate([
-        // 时间和日期行
-        Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: TimeDisplayWidget(
-                isCompact: true,
-              ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: DateDisplayWidget(
-                isCompact: true,
-              ),
-            ),
-          ],
+    final List<Widget> children = [];
+
+    // 时间和日期行
+    final timeDateWidgets = <Widget>[];
+    if (_settings.showTimeDisplayWidget) {
+      timeDateWidgets.add(
+        Expanded(
+          flex: 2,
+          child: TimeDisplayWidget(
+            isCompact: true,
+          ),
         ),
-        SizedBox(height: spacing),
-        
-        // 天气和当前课程行
-        Row(
-          children: [
-            Expanded(
-              child: WeatherWidget(
-                weatherData: _isLoadingWeather ? null : _weatherData,
-                error: _weatherError,
-                onRetry: _loadWeatherData,
-                isCompact: true,
-              ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: CurrentClassWidget(
-                isCompact: true,
-              ),
-            ),
-          ],
+      );
+    }
+    if (_settings.showDateDisplayWidget) {
+      if (timeDateWidgets.isNotEmpty) {
+        timeDateWidgets.add(SizedBox(width: spacing));
+      }
+      timeDateWidgets.add(
+        Expanded(
+          child: DateDisplayWidget(
+            isCompact: true,
+          ),
         ),
-        SizedBox(height: spacing),
-        
-        // 倒计�?
+      );
+    }
+    if (timeDateWidgets.isNotEmpty) {
+      children.add(Row(children: timeDateWidgets));
+      children.add(SizedBox(height: spacing));
+    }
+
+    // 天气和当前课程行
+    final weatherClassWidgets = <Widget>[];
+    if (_settings.showWeatherWidget) {
+      weatherClassWidgets.add(
+        Expanded(
+          child: WeatherWidget(
+            weatherData: _isLoadingWeather ? null : _weatherData,
+            error: _weatherError,
+            onRetry: _loadWeatherData,
+            isCompact: true,
+          ),
+        ),
+      );
+    }
+    if (_settings.showCurrentClassWidget) {
+      if (weatherClassWidgets.isNotEmpty) {
+        weatherClassWidgets.add(SizedBox(width: spacing));
+      }
+      weatherClassWidgets.add(
+        Expanded(
+          child: CurrentClassWidget(
+            isCompact: true,
+          ),
+        ),
+      );
+    }
+    if (weatherClassWidgets.isNotEmpty) {
+      children.add(Row(children: weatherClassWidgets));
+      children.add(SizedBox(height: spacing));
+    }
+
+    // 倒计时
+    if (_settings.showCountdownWidget) {
+      children.add(
         CountdownWidget(
           countdownData: _isLoadingCountdown ? null : _countdownData,
           error: _countdownError,
           onRetry: _loadCountdownData,
           isCompact: false,
         ),
-        SizedBox(height: spacing),
-        
-        // 课程�?
-        TimetableWidget(
-          isCompact: false,
-        ),
-      ]),
+      );
+      children.add(SizedBox(height: spacing));
+    }
+
+    // 课程表
+    children.add(
+      TimetableWidget(
+        isCompact: false,
+      ),
+    );
+
+    return SliverList(
+      delegate: SliverChildListDelegate(children),
     );
   }
 
   Widget _buildExpandedLayout(double spacing) {
+    final List<Widget> children = [];
+
+    // 第一行：时间、日期、天气
+    final firstRowWidgets = <Widget>[];
+    if (_settings.showTimeDisplayWidget) {
+      firstRowWidgets.add(
+        Expanded(
+          flex: 2,
+          child: TimeDisplayWidget(
+            isCompact: false,
+          ),
+        ),
+      );
+    }
+    if (_settings.showDateDisplayWidget) {
+      if (firstRowWidgets.isNotEmpty) {
+        firstRowWidgets.add(SizedBox(width: spacing));
+      }
+      firstRowWidgets.add(
+        Expanded(
+          child: DateDisplayWidget(
+            isCompact: false,
+          ),
+        ),
+      );
+    }
+    if (_settings.showWeatherWidget) {
+      if (firstRowWidgets.isNotEmpty) {
+        firstRowWidgets.add(SizedBox(width: spacing));
+      }
+      firstRowWidgets.add(
+        Expanded(
+          child: WeatherWidget(
+            weatherData: _isLoadingWeather ? null : _weatherData,
+            error: _weatherError,
+            onRetry: _loadWeatherData,
+            isCompact: false,
+          ),
+        ),
+      );
+    }
+    if (firstRowWidgets.isNotEmpty) {
+      children.add(Row(children: firstRowWidgets));
+      children.add(SizedBox(height: spacing));
+    }
+
+    // 第二行：当前课程和倒计时
+    final secondRowWidgets = <Widget>[];
+    if (_settings.showCurrentClassWidget) {
+      secondRowWidgets.add(
+        Expanded(
+          child: CurrentClassWidget(
+            isCompact: false,
+          ),
+        ),
+      );
+    }
+    if (_settings.showCountdownWidget) {
+      if (secondRowWidgets.isNotEmpty) {
+        secondRowWidgets.add(SizedBox(width: spacing));
+      }
+      secondRowWidgets.add(
+        Expanded(
+          flex: 2,
+          child: CountdownWidget(
+            countdownData: _isLoadingCountdown ? null : _countdownData,
+            error: _countdownError,
+            onRetry: _loadCountdownData,
+            isCompact: false,
+          ),
+        ),
+      );
+    }
+    if (secondRowWidgets.isNotEmpty) {
+      children.add(Row(children: secondRowWidgets));
+      children.add(SizedBox(height: spacing));
+    }
+
+    // 第三行：课程表
+    children.add(
+      TimetableWidget(
+        isCompact: false,
+      ),
+    );
+
     return SliverList(
-      delegate: SliverChildListDelegate([
-        // 第一行：时间、日期、天�?
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: TimeDisplayWidget(
-                isCompact: false,
-              ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: DateDisplayWidget(
-                isCompact: false,
-              ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: WeatherWidget(
-                weatherData: _isLoadingWeather ? null : _weatherData,
-                error: _weatherError,
-                onRetry: _loadWeatherData,
-                isCompact: false,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: spacing),
-        
-        // 第二行：当前课程和倒计�?
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: CurrentClassWidget(
-                isCompact: false,
-              ),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              flex: 2,
-              child: CountdownWidget(
-                countdownData: _isLoadingCountdown ? null : _countdownData,
-                error: _countdownError,
-                onRetry: _loadCountdownData,
-                isCompact: false,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: spacing),
-        
-        // 第三行：课程�?
-        TimetableWidget(
-          isCompact: false,
-        ),
-      ]),
+      delegate: SliverChildListDelegate(children),
     );
   }
 }

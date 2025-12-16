@@ -30,8 +30,9 @@ void main() {
       const seedColor = Color(0xFF6750A4);
       
       // 生成浅色和深色主题
-      final lightTheme = themeService.generateLightTheme(seedColor);
-      final darkTheme = themeService.generateDarkTheme(seedColor);
+      final defaultSettings = ThemeSettings.defaultSettings();
+      final lightTheme = themeService.generateLightTheme(seedColor, defaultSettings);
+      final darkTheme = themeService.generateDarkTheme(seedColor, defaultSettings);
 
       // 验证主题的基本结构完整性
       expect(lightTheme.colorScheme.brightness, equals(Brightness.light));
@@ -101,11 +102,12 @@ void main() {
         (WidgetTester tester) async {
       const seedColor = Color(0xFF4CAF50);
       
-      // 多次生成相同种子颜色的主题，应该得到相同结果
-      final theme1 = themeService.generateLightTheme(seedColor);
-      final theme2 = themeService.generateLightTheme(seedColor);
-      final theme3 = themeService.generateDarkTheme(seedColor);
-      final theme4 = themeService.generateDarkTheme(seedColor);
+      // 验证生成的主题是否一致
+      final defaultSettings = ThemeSettings.defaultSettings();
+      final theme1 = themeService.generateLightTheme(seedColor, defaultSettings);
+      final theme2 = themeService.generateLightTheme(seedColor, defaultSettings);
+      final theme3 = themeService.generateDarkTheme(seedColor, defaultSettings);
+      final theme4 = themeService.generateDarkTheme(seedColor, defaultSettings);
 
       // 验证相同参数生成的主题完全一致
       expect(theme1.colorScheme.primary.toARGB32(), equals(theme2.colorScheme.primary.toARGB32()));
@@ -126,8 +128,9 @@ void main() {
         (WidgetTester tester) async {
       const seedColor = Color(0xFFFF5722);
       
-      final lightTheme = themeService.generateLightTheme(seedColor);
-      final darkTheme = themeService.generateDarkTheme(seedColor);
+      final defaultSettings = ThemeSettings.defaultSettings();
+      final lightTheme = themeService.generateLightTheme(seedColor, defaultSettings);
+      final darkTheme = themeService.generateDarkTheme(seedColor, defaultSettings);
 
       // 验证 Material 3 特性
       expect(lightTheme.useMaterial3, isTrue);
@@ -189,20 +192,3 @@ void _validateContrastRelationships(ColorScheme colorScheme) {
   expect(colorScheme.onSurface.toARGB32(), isNot(equals(colorScheme.surface.toARGB32())));
 }
 
-/// 验证主题的完整性
-void _validateThemeIntegrity(ThemeData theme) {
-  // 验证主题的基本属性
-  expect(theme.colorScheme, isNotNull);
-  expect(theme.textTheme, isNotNull);
-  expect(theme.useMaterial3, isTrue);
-  
-  // 验证关键组件主题
-  expect(theme.appBarTheme, isNotNull);
-  expect(theme.cardTheme, isNotNull);
-  expect(theme.filledButtonTheme, isNotNull);
-  expect(theme.outlinedButtonTheme, isNotNull);
-  expect(theme.textButtonTheme, isNotNull);
-  
-  // 验证颜色方案完整性
-  _validateColorSchemeCompleteness(theme.colorScheme);
-}

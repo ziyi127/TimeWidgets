@@ -212,8 +212,9 @@ void main() {
     test('generated themes use correct color scheme', () {
       final seedColor = const Color(0xFF6750A4);
 
-      final lightTheme = themeService.generateLightTheme(seedColor);
-      final darkTheme = themeService.generateDarkTheme(seedColor);
+      final defaultSettings = ThemeSettings.defaultSettings();
+      final lightTheme = themeService.generateLightTheme(seedColor, defaultSettings);
+      final darkTheme = themeService.generateDarkTheme(seedColor, defaultSettings);
 
       expect(lightTheme.colorScheme.brightness, equals(Brightness.light));
       expect(darkTheme.colorScheme.brightness, equals(Brightness.dark));
@@ -223,10 +224,11 @@ void main() {
 
     test('generated themes have proper MD3 styling', () {
       final seedColor = const Color(0xFF6750A4);
-      final theme = themeService.generateLightTheme(seedColor);
+      final defaultSettings = ThemeSettings.defaultSettings();
+      final theme = themeService.generateLightTheme(seedColor, defaultSettings);
 
       // Check card theme
-      expect(theme.cardTheme.elevation, equals(1));
+      expect(theme.cardTheme.elevation, equals(0.0));
       expect(theme.cardTheme.shape, isA<RoundedRectangleBorder>());
 
       // Check button themes
@@ -235,8 +237,8 @@ void main() {
       expect(theme.textButtonTheme.style, isNotNull);
 
       // Check app bar theme
-      expect(theme.appBarTheme.elevation, equals(0));
-      expect(theme.appBarTheme.scrolledUnderElevation, equals(1));
+      expect(theme.appBarTheme.elevation, equals(0.0));
+      expect(theme.appBarTheme.scrolledUnderElevation, equals(3.0));
     });
   });
 }

@@ -16,7 +16,7 @@ class WeatherData {
   final String uvIndex;
   final String pubTime;
 
-  WeatherData({
+  const WeatherData({
     required this.cityName,
     required this.description,
     required this.temperature,
@@ -39,7 +39,6 @@ class WeatherData {
   factory WeatherData.fromXiaomiJson(Map<String, dynamic> json) {
     final current = json['current'] ?? {};
     final aqi = json['aqi'] ?? {};
-    final yesterday = json['yesterday'] ?? {};
     final forecastDaily = json['forecastDaily'] ?? {};
     
     // 解析当前温度
@@ -54,8 +53,8 @@ class WeatherData {
     // 解析气压
     final pressure = double.tryParse(current['pressure']?['value']?.toString() ?? '0') ?? 0.0;
     
-    // 解析风信�?    final windSpeed = current['wind']?['speed']?['value']?.toString() ?? '0';
-    final windDirection = current['wind']?['direction']?['value']?.toString() ?? '0';
+    // 解析风向
+    final windSpeed = current['wind']?['speed']?['value']?.toString() ?? '0';
     final wind = '${windSpeed}km/h';
     
     // 解析天气类型
@@ -69,10 +68,11 @@ class WeatherData {
     final sunrise = _formatTimeFromISO(sunRiseSet['from']?.toString() ?? '');
     final sunset = _formatTimeFromISO(sunRiseSet['to']?.toString() ?? '');
     
-    // 解析温度范围（从今日预报获取�?    final todayTemp = forecastDaily['temperature']?['value']?[0] ?? {};
+    // 解析温度范围（从今日预报获取）
+    final todayTemp = forecastDaily['temperature']?['value']?[0] ?? {};
     final tempMax = todayTemp['from']?.toString() ?? '0';
     final tempMin = todayTemp['to']?.toString() ?? '0';
-    final temperatureRange = '${tempMin}℃~${tempMax}�?;
+    final temperatureRange = '$tempMin℃~$tempMax℃';
     
     // 其他信息
     final visibility = current['visibility']?['value']?.toString() ?? '';
@@ -80,7 +80,8 @@ class WeatherData {
     final pubTime = current['pubTime']?.toString() ?? '';
     
     return WeatherData(
-      cityName: '北京', // 可以根据locationKey解析城市�?      description: _getWeatherDescription(weatherType),
+      cityName: '北京', // 可以根据locationKey解析城市名
+      description: _getWeatherDescription(weatherType),
       temperature: temperature,
       temperatureRange: temperatureRange,
       aqiLevel: aqiLevel,
@@ -105,11 +106,12 @@ class WeatherData {
       return WeatherData.fromXiaomiJson(json);
     }
     
-    // 兼容旧格�?    return WeatherData(
+    // 兼容旧格式
+    return WeatherData(
       cityName: json['city_name'] ?? 'Unknown',
       description: json['description'] ?? 'Unknown',
-      temperature: int.tryParse(json['temperature'].toString().replaceAll('�?, '')) ?? 0,
-      temperatureRange: json['temperature_range'] ?? '0℃~0�?,
+      temperature: int.tryParse(json['temperature'].toString().replaceAll('℃', '')) ?? 0,
+      temperatureRange: json['temperature_range'] ?? '0℃~0℃',
       aqiLevel: json['aqilevel'] ?? 0,
       humidity: json['humidity'] ?? 0,
       wind: json['wind'] ?? 'Unknown',
@@ -145,9 +147,9 @@ class WeatherData {
   /// 根据天气代码获取天气描述
   static String _getWeatherDescription(int weatherType) {
     switch (weatherType) {
-      case 0: return '�?;
+      case 0: return '晴';
       case 1: return '多云';
-      case 2: return '�?;
+      case 2: return '阴';
       case 3: return '小雨';
       case 4: return '中雨';
       case 5: return '大雨';
@@ -156,39 +158,45 @@ class WeatherData {
       case 8: return '中雪';
       case 9: return '大雪';
       case 10: return '暴雪';
-      case 11: return '沙尘�?;
-      case 12: return '�?;
-      case 13: return '�?;
-      case 14: return '�?;
-      case 15: return '雨夹�?;
-      case 16: return '雷阵�?;
+      case 11: return '沙尘暴';
+      case 12: return '雾';
+      case 13: return '霾';
+      case 14: return '霜冻';
+      case 15: return '雨夹雪';
+      case 16: return '雷阵雨';
       case 17: return '雷阵雨伴冰雹';
       case 18: return '沙尘';
       case 19: return '浮尘';
       case 20: return '扬沙';
       case 21: return '强沙尘暴';
-      case 22: return '雷阵�?;
-      case 23: return '�?;
+      case 22: return '雷阵雨';
+      case 23: return '雾';
       case 24: return '冰雹';
-      default: return '�?;
+      default: return '晴';
     }
   }
 
   static String _getWeatherIcon(int weatherType) {
-    // 根据天气类型返回对应的图标路�?    switch (weatherType) {
-      case 0: // �?        return 'assets/icons/weather_0.png';
+    // 根据天气类型返回对应的图标路径
+    switch (weatherType) {
+      case 0: // 晴
+        return 'assets/icons/weather_0.png';
       case 1: // 多云
         return 'assets/icons/weather_1.png';
-      case 2: // �?        return 'assets/icons/weather_2.png';
+      case 2: // 阴
+        return 'assets/icons/weather_2.png';
       case 3: // 小雨
         return 'assets/icons/weather_3.png';
       case 4: // 中雨
         return 'assets/icons/weather_4.png';
-      case 12: // �?        return 'assets/icons/weather_12.png';
-      case 13: // �?        return 'assets/icons/weather_13.png';
+      case 12: // 雾
+        return 'assets/icons/weather_12.png';
+      case 13: // 霾
+        return 'assets/icons/weather_13.png';
       case 18: // 沙尘
         return 'assets/icons/weather_18.png';
-      case 22: // 雷阵�?        return 'assets/icons/weather_22.png';
+      case 22: // 雷阵雨
+        return 'assets/icons/weather_22.png';
       case 24: // 冰雹
         return 'assets/icons/weather_24.png';
       default:

@@ -18,9 +18,12 @@ void main() {
             theme: ThemeData(useMaterial3: true),
             home: Scaffold(
               body: Center(
-                child: MD3ButtonStyles.icon(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {},
+                child: Builder(
+                  builder: (context) => MD3ButtonStyles.icon(
+                    context: context,
+                    icon: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
                 ),
               ),
             ),
@@ -49,9 +52,12 @@ void main() {
             theme: ThemeData(useMaterial3: true),
             home: Scaffold(
               body: Center(
-                child: MD3ButtonStyles.iconFilled(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {},
+                child: Builder(
+                  builder: (context) => MD3ButtonStyles.iconFilled(
+                    context: context,
+                    icon: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
                 ),
               ),
             ),
@@ -74,9 +80,12 @@ void main() {
             theme: ThemeData(useMaterial3: true),
             home: Scaffold(
               body: Center(
-                child: MD3ButtonStyles.iconFilledTonal(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {},
+                child: Builder(
+                  builder: (context) => MD3ButtonStyles.iconFilledTonal(
+                    context: context,
+                    icon: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
                 ),
               ),
             ),
@@ -99,9 +108,12 @@ void main() {
             theme: ThemeData(useMaterial3: true),
             home: Scaffold(
               body: Center(
-                child: MD3ButtonStyles.iconOutlined(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {},
+                child: Builder(
+                  builder: (context) => MD3ButtonStyles.iconOutlined(
+                    context: context,
+                    icon: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
                 ),
               ),
             ),
@@ -138,10 +150,12 @@ void main() {
             theme: ThemeData(useMaterial3: true),
             home: Scaffold(
               body: Center(
-                child: MD3ButtonStyles.icon(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {},
-                  isCompact: true,
+                child: Builder(
+                  builder: (context) => MD3ButtonStyles.icon(
+                    context: context,
+                    icon: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
                 ),
               ),
             ),

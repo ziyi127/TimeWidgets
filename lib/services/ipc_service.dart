@@ -16,11 +16,12 @@ class IpcService {
   
   IpcService._internal();
   
-  // 连接到WebSocket服务�?  Future<void> connect() async {
+  // 连接到WebSocket服务器
+  Future<void> connect() async {
     try {
       // 创建WebSocket连接
       _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
-      Logger.d('已连接到WebSocket服务�?);
+      Logger.d('已连接到WebSocket服务器');
     } catch (e) {
       Logger.e('连接WebSocket失败: $e');
       throw Exception('Failed to connect to WebSocket server: $e');
@@ -49,7 +50,8 @@ class IpcService {
         if (params != null) 'params': params,
       };
       
-      // 发送请�?      _channel!.sink.add(json.encode(request));
+      // 发送请求
+      _channel!.sink.add(json.encode(request));
       
       // 等待响应
       final response = await _channel!.stream.first;
@@ -62,7 +64,8 @@ class IpcService {
     }
   }
   
-  // 获取课程表数�?  Future<Timetable> getTimetable(DateTime date) async {
+  // 获取课程表数据
+  Future<Timetable> getTimetable(DateTime date) async {
     try {
       final response = await _sendRequest('timetable');
       
@@ -134,7 +137,8 @@ class IpcService {
     }
   }
   
-  // 获取倒计时信�?  Future<CountdownData> getCountdown() async {
+  // 获取倒计时信息
+  Future<CountdownData> getCountdown() async {
     try {
       final response = await _sendRequest('countdown');
       
@@ -144,7 +148,8 @@ class IpcService {
         throw Exception('Failed to load countdown: ${response['error']}');
       }
     } catch (e) {
-      // 如果IPC请求失败，返回模拟数�?      return CountdownData(
+      // 如果IPC请求失败，返回模拟数据
+      return CountdownData(
         id: '1',
         title: 'Final Exam',
         description: 'Computer Science Final Examination',

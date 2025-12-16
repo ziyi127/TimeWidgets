@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/models/course_model.dart';
+import 'package:time_widgets/services/ntp_service.dart';
 
-/// 课程表组�?- MD3紧凑版，支持内部滚动
+/// 课程表组件- MD3紧凑版，支持内部滚动
 class TimetableWidget extends StatelessWidget {
+  final List<Course>? courses;
   final bool isCompact;
 
   const TimetableWidget({
     super.key,
+    this.courses,
     this.isCompact = false,
   });
 
@@ -13,18 +17,40 @@ class TimetableWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final displayCourses = courses ?? [];
 
-    final timetableData = [
-      {'subject': '语文', 'teacher': '张老师', 'time': '08:00-08:45', 'status': 'completed'},
-      {'subject': '数学', 'teacher': '李老师', 'time': '08:55-09:40', 'status': 'completed'},
-      {'subject': '英语', 'teacher': '王老师', 'time': '10:00-10:45', 'status': 'current'},
-      {'subject': '物理', 'teacher': '赵老师', 'time': '14:00-14:45', 'status': 'upcoming'},
-      {'subject': '化学', 'teacher': '刘老师', 'time': '14:55-15:40', 'status': 'upcoming'},
-    ];
+    int completedCount = 0;
+    int currentCount = 0;
+    int upcomingCount = 0;
 
-    final completedCount = timetableData.where((item) => item['status'] == 'completed').length;
-    final currentCount = timetableData.where((item) => item['status'] == 'current').length;
-    final upcomingCount = timetableData.where((item) => item['status'] == 'upcoming').length;
+    // Calculate status for each course
+    final courseStatuses = displayCourses.map((course) {
+      if (course.isCurrent) {
+        currentCount++;
+        return 'current';
+      }
+      
+      // Parse time to check if completed
+      // Format: "HH:MM~HH:MM"
+      final parts = course.time.split('~');
+      if (parts.length == 2) {
+        final endParts = parts[1].split(':');
+        if (endParts.length == 2) {
+          final now = NtpService().now;
+          final endHour = int.tryParse(endParts[0]) ?? 0;
+          final endMinute = int.tryParse(endParts[1]) ?? 0;
+          final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
+          
+          if (now.isAfter(endTime)) {
+            completedCount++;
+            return 'completed';
+          }
+        }
+      }
+      
+      upcomingCount++;
+      return 'upcoming';
+    }).toList();
 
     return Card(
       elevation: 0,
@@ -50,7 +76,7 @@ class TimetableWidget extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                // 状态统�?
+                // 状态统计
                 _buildStatusBadge(context, '$completedCount', colorScheme.tertiary, '完成'),
                 const SizedBox(width: 8),
                 _buildStatusBadge(context, '$currentCount', colorScheme.primary, '进行'),
@@ -59,19 +85,29 @@ class TimetableWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            // 课程列表 - 限制高度并支持滚�?
+            // 课程列表 - 限制高度并支持滚动
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 180),
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(),
-                itemCount: timetableData.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final item = timetableData[index];
-                  return _buildCourseItem(context, item);
-                },
-              ),
+              child: displayCourses.isEmpty
+                  ? Center(
+                      child: Text(
+                        '今天没有课',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: displayCourses.length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final course = displayCourses[index];
+                        final status = courseStatuses[index];
+                        return _buildCourseItem(context, course, status);
+                      },
+                    ),
             ),
           ],
         ),
@@ -103,11 +139,10 @@ class TimetableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseItem(BuildContext context, Map<String, String> item) {
+  Widget _buildCourseItem(BuildContext context, Course course, String status) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final status = item['status'] ?? 'upcoming';
     final isCurrent = status == 'current';
     final isCompleted = status == 'completed';
 
@@ -118,8 +153,8 @@ class TimetableWidget extends StatelessWidget {
             : colorScheme.secondary;
 
     final backgroundColor = isCurrent
-        ? colorScheme.primaryContainer.withValues(alpha: 0.4)
-        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
+        ? colorScheme.primaryContainer.withAlpha(102)
+        : colorScheme.surfaceContainerHighest.withAlpha(128);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -127,7 +162,7 @@ class TimetableWidget extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: isCurrent ? Border.all(
-          color: statusColor.withValues(alpha: 0.3),
+          color: statusColor.withAlpha(77),
           width: 1,
         ) : null,
       ),
@@ -152,7 +187,7 @@ class TimetableWidget extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      item['subject']!,
+                      course.subject,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
@@ -163,11 +198,11 @@ class TimetableWidget extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.15),
+                          color: statusColor.withAlpha(38),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '进行�?,
+                          '进行中',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.w700,
@@ -180,18 +215,33 @@ class TimetableWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  item['teacher']!,
+                  course.teacher,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined, size: 12, color: colorScheme.onSurfaceVariant),
+                    const SizedBox(width: 4),
+                    Text(
+                      course.classroom,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           // 时间
           Text(
-            item['time']!,
-            style: theme.textTheme.labelMedium?.copyWith(
+            course.time,
+            style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),

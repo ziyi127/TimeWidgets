@@ -8,14 +8,15 @@ import 'package:time_widgets/utils/logger.dart';
 class EnhancedLayoutEngine {
   static const double _minWidgetSize = 50.0;
   static const double _maxWidgetSize = 500.0;
+  static const double _padding = 16.0;
   
-  /// 位置计算�?
+  /// 位置计算器
   final PositionCalculator _positionCalculator = PositionCalculator();
   
   /// 碰撞检测器
   final CollisionDetector _collisionDetector = CollisionDetector();
   
-  /// 布局验证�?
+  /// 布局验证器
   final LayoutValidator _layoutValidator = LayoutValidator();
 
   /// 计算最优布局
@@ -24,13 +25,13 @@ class EnhancedLayoutEngine {
     Map<WidgetType, WidgetPosition>? currentLayout
   ) {
     try {
-      // 1. 计算容器尺寸（屏幕右�?/4�?
-      final containerSize = Size(screenSize.width / 4, screenSize.height);
+      // 1. 计算自适应容器大小，根据屏幕尺寸动态调整
+      final containerSize = _calculateAdaptiveContainerSize(screenSize);
       
       // 2. 生成默认位置
       var layout = _positionCalculator.calculateDefaultPositions(containerSize);
       
-      // 3. 如果有现有布局，尝试保留有效位�?
+      // 3. 如果有现有布局，尝试保留有效位置
       if (currentLayout != null) {
         layout = _mergeWithExistingLayout(layout, currentLayout, containerSize);
       }
@@ -38,7 +39,53 @@ class EnhancedLayoutEngine {
       // 4. 解决碰撞问题
       layout = _collisionDetector.resolveCollisions(layout, containerSize);
       
-      // 5. 验证布局有效�?
+      // 5. 特殊处理settings按钮，确保不会与其他组件重叠
+      final settingsPosition = layout[WidgetType.settings];
+      if (settingsPosition != null) {
+        final settingsRect = Rect.fromLTWH(
+          settingsPosition.x,
+          settingsPosition.y,
+          settingsPosition.width,
+          settingsPosition.height,
+        );
+        
+        bool hasOverlap = false;
+        
+        // 检查是否与其他组件重叠
+        for (final entry in layout.entries) {
+          if (entry.key == WidgetType.settings) continue;
+          
+          final position = entry.value;
+          final rect = Rect.fromLTWH(
+            position.x,
+            position.y,
+            position.width,
+            position.height,
+          );
+          
+          if (settingsRect.overlaps(rect)) {
+            hasOverlap = true;
+            break;
+          }
+        }
+        
+        // 如果有重叠，将settings按钮重新放置在右下角
+        if (hasOverlap) {
+          layout[WidgetType.settings] = WidgetPosition(
+            type: WidgetType.settings,
+            x: containerSize.width - _padding - settingsPosition.width,
+            y: containerSize.height - _padding - settingsPosition.height,
+            width: settingsPosition.width,
+            height: settingsPosition.height,
+            isVisible: settingsPosition.isVisible,
+          );
+        }
+      }
+      
+      // 6. 再次检查并解决碰撞问题
+      layout = _collisionDetector.resolveCollisions(layout, containerSize);
+      
+      // 7. 验证布局有效性
       if (!_layoutValidator.validateLayout(layout, containerSize)) {
         // 如果验证失败，使用安全的默认布局
         layout = _positionCalculator.calculateSafeDefaultLayout(containerSize);
@@ -49,9 +96,24 @@ class EnhancedLayoutEngine {
       Logger.e('Layout calculation failed: $e');
       // 返回安全的默认布局
       return _positionCalculator.calculateSafeDefaultLayout(
-        Size(screenSize.width / 4, screenSize.height)
+        _calculateAdaptiveContainerSize(screenSize)
       );
     }
+  }
+
+  /// 计算自适应容器大小
+  Size _calculateAdaptiveContainerSize(Size screenSize) {
+    // 根据屏幕尺寸动态调整容器大小
+    // 大屏幕使用更宽的容器，小屏幕使用相对宽度
+    double containerWidth;
+    if (screenSize.width > 1920) {
+      containerWidth = screenSize.width / 3;
+    } else if (screenSize.width > 1440) {
+      containerWidth = screenSize.width / 3.5;
+    } else {
+      containerWidth = screenSize.width / 4;
+    }
+    return Size(containerWidth, screenSize.height);
   }
 
   /// 检测布局中的碰撞
@@ -65,8 +127,8 @@ class EnhancedLayoutEngine {
     Size oldSize,
     Size newSize
   ) {
-    final newContainerSize = Size(newSize.width / 4, newSize.height);
-    final oldContainerSize = Size(oldSize.width / 4, oldSize.height);
+    final newContainerSize = _calculateAdaptiveContainerSize(newSize);
+    final oldContainerSize = _calculateAdaptiveContainerSize(oldSize);
     
     // 计算缩放比例
     final scaleX = newContainerSize.width / oldContainerSize.width;
@@ -78,17 +140,22 @@ class EnhancedLayoutEngine {
       final position = entry.value;
       
       // 按比例调整位置和尺寸
-      final newX = (position.x * scaleX).clamp(0.0, (newContainerSize.width - position.width).toDouble());
-      final newY = (position.y * scaleY).clamp(0.0, (newContainerSize.height - position.height).toDouble());
-      final newWidth = (position.width * scaleX).clamp(_minWidgetSize, _maxWidgetSize);
-      final newHeight = (position.height * scaleY).clamp(_minWidgetSize, _maxWidgetSize);
+      final scaledWidth = (position.width * scaleX).clamp(_minWidgetSize, _maxWidgetSize);
+      final scaledHeight = (position.height * scaleY).clamp(_minWidgetSize, _maxWidgetSize);
+      
+      // 确保组件不会超出容器边界
+      final maxX = newContainerSize.width - scaledWidth;
+      final maxY = newContainerSize.height - scaledHeight;
+      
+      final newX = (position.x * scaleX).clamp(0.0, maxX);
+      final newY = (position.y * scaleY).clamp(0.0, maxY);
       
       adjustedLayout[entry.key] = WidgetPosition(
         type: position.type,
         x: newX,
         y: newY,
-        width: newWidth,
-        height: newHeight,
+        width: scaledWidth,
+        height: scaledHeight,
         isVisible: position.isVisible,
       );
     }
@@ -97,7 +164,7 @@ class EnhancedLayoutEngine {
     return _collisionDetector.resolveCollisions(adjustedLayout, newContainerSize);
   }
 
-  /// 验证布局有效�?
+  /// 验证布局有效性
   bool validateLayout(Map<WidgetType, WidgetPosition> layout, Size containerSize) {
     return _layoutValidator.validateLayout(layout, containerSize);
   }
@@ -125,22 +192,27 @@ class EnhancedLayoutEngine {
   }
 }
 
-/// 位置计算�?
+/// 位置计算器
 class PositionCalculator {
   static const double _padding = 16.0;
   static const double _spacing = 12.0;
 
-  /// 计算默认位置
+  /// 计算默认位置 - 支持多行多列布局
   Map<WidgetType, WidgetPosition> calculateDefaultPositions(Size containerSize) {
     final positions = <WidgetType, WidgetPosition>{};
-    final cardWidth = (containerSize.width - 2 * _padding).clamp(240.0, 400.0);
     
+    // 根据容器宽度决定列数
+    final columns = containerSize.width > 600 ? 2 : 1;
+    final cardWidth = (containerSize.width - 2 * _padding - (columns - 1) * _spacing) / columns;
+    
+    double currentX = _padding;
     double currentY = _padding;
+    double rowHeight = 0;
     
-    // 按优先级排列组件
+    // 按优先级排列组件 - 先不包括settings
     final orderedTypes = [
       WidgetType.time,
-      WidgetType.date, 
+      WidgetType.date,
       WidgetType.week,
       WidgetType.weather,
       WidgetType.currentClass,
@@ -148,28 +220,44 @@ class PositionCalculator {
       WidgetType.timetable,
     ];
     
-    for (final type in orderedTypes) {
+    for (int i = 0; i < orderedTypes.length; i++) {
+      final type = orderedTypes[i];
       final height = _getDefaultHeight(type);
+      
+      // 如果当前行空间不足，换行
+      if (i % columns == 0 && i > 0) {
+        currentX = _padding;
+        currentY += rowHeight + _spacing;
+        rowHeight = 0;
+      }
       
       positions[type] = WidgetPosition(
         type: type,
-        x: _padding,
+        x: currentX,
         y: currentY,
         width: cardWidth,
         height: height,
         isVisible: true,
       );
       
-      currentY += height + _spacing;
+      // 更新行高和X坐标
+      rowHeight = math.max(rowHeight, height);
+      currentX += cardWidth + _spacing;
     }
     
-    // 设置按钮单独处理
+    // 设置按钮单独处理 - 放置在右下角，确保不会与其他组件重叠
+    // 计算右下角位置，避免与其他组件重叠
+    final settingsWidth = 48.0;
+    final settingsHeight = 48.0;
+    final settingsX = containerSize.width - _padding - settingsWidth;
+    final settingsY = containerSize.height - _padding - settingsHeight;
+    
     positions[WidgetType.settings] = WidgetPosition(
       type: WidgetType.settings,
-      x: containerSize.width - _padding - 48,
-      y: _padding,
-      width: 48,
-      height: 48,
+      x: settingsX,
+      y: settingsY,
+      width: settingsWidth,
+      height: settingsHeight,
       isVisible: true,
     );
     
@@ -277,7 +365,7 @@ class CollisionDetector {
     return _applyFlowLayout(resolvedLayout, containerSize);
   }
 
-  /// 检查两个组件是否重�?
+  /// 检查两个组件是否重叠
   bool _isOverlapping(WidgetPosition a, WidgetPosition b) {
     return !(a.x + a.width <= b.x || 
              b.x + b.width <= a.x || 
@@ -285,7 +373,7 @@ class CollisionDetector {
              b.y + b.height <= a.y);
   }
 
-  /// 应用流式布局解决重叠
+  /// 应用流式布局解决重叠 - 支持多行多列
   Map<WidgetType, WidgetPosition> _applyFlowLayout(
     Map<WidgetType, WidgetPosition> layout,
     Size containerSize
@@ -294,11 +382,22 @@ class CollisionDetector {
     const padding = 16.0;
     const spacing = 12.0;
     
+    // 根据容器宽度决定列数
+    final columns = containerSize.width > 600 ? 2 : 1;
+    final cardWidth = (containerSize.width - 2 * padding - (columns - 1) * spacing) / columns;
+    
     // 按Y坐标排序
     final sortedEntries = layout.entries.toList()
       ..sort((a, b) => a.value.y.compareTo(b.value.y));
     
+    double currentX = padding;
     double currentY = padding;
+    double rowHeight = 0;
+    int currentColumn = 0;
+    
+    // 保存settings按钮，最后处理
+    WidgetType? settingsKey;
+    WidgetPosition? settingsPosition;
     
     for (final entry in sortedEntries) {
       if (!entry.value.isVisible) {
@@ -306,27 +405,20 @@ class CollisionDetector {
         continue;
       }
       
-      final position = entry.value;
-      
-      // 特殊处理设置按钮
+      // 保存settings按钮，最后处理
       if (entry.key == WidgetType.settings) {
-        flowLayout[entry.key] = WidgetPosition(
-          type: position.type,
-          x: containerSize.width - padding - position.width,
-          y: padding,
-          width: position.width,
-          height: position.height,
-          isVisible: position.isVisible,
-        );
+        settingsKey = entry.key;
+        settingsPosition = entry.value;
         continue;
       }
       
+      final position = entry.value;
+      
       // 确保组件在容器内
-      final adjustedWidth = math.min(position.width, containerSize.width - 2 * padding);
       final adjustedHeight = math.min(position.height, containerSize.height - currentY - padding);
       
       if (adjustedHeight < 50) {
-        // 如果剩余空间不足，隐藏组�?
+        // 如果剩余空间不足，隐藏组件
         flowLayout[entry.key] = WidgetPosition(
           type: position.type,
           x: position.x,
@@ -340,25 +432,50 @@ class CollisionDetector {
       
       flowLayout[entry.key] = WidgetPosition(
         type: position.type,
-        x: padding,
+        x: currentX,
         y: currentY,
-        width: adjustedWidth,
+        width: cardWidth,
         height: adjustedHeight,
         isVisible: true,
       );
       
-      currentY += adjustedHeight + spacing;
+      // 更新行高和位置
+      rowHeight = math.max(rowHeight, adjustedHeight);
+      currentColumn++;
+      
+      // 如果当前行已满，换行
+      if (currentColumn >= columns) {
+        currentColumn = 0;
+        currentX = padding;
+        currentY += rowHeight + spacing;
+        rowHeight = 0;
+      } else {
+        currentX += cardWidth + spacing;
+      }
+    }
+    
+    // 最后处理settings按钮，确保不会与其他组件重叠
+    if (settingsKey != null && settingsPosition != null) {
+      // 将settings按钮放置在右下角
+      flowLayout[settingsKey] = WidgetPosition(
+        type: settingsPosition.type,
+        x: containerSize.width - padding - settingsPosition.width,
+        y: containerSize.height - padding - settingsPosition.height,
+        width: settingsPosition.width,
+        height: settingsPosition.height,
+        isVisible: settingsPosition.isVisible,
+      );
     }
     
     return flowLayout;
   }
 }
 
-/// 布局验证�?
+/// 布局验证器
 class LayoutValidator {
-  /// 验证整个布局的有效�?
+  /// 验证整个布局的有效性
   bool validateLayout(Map<WidgetType, WidgetPosition> layout, Size containerSize) {
-    // 检查所有组件是否在边界�?
+    // 检查所有组件是否在边界内
     for (final position in layout.values) {
       if (!isPositionValid(position, containerSize)) {
         return false;
@@ -374,12 +491,12 @@ class LayoutValidator {
 
   /// 验证单个位置是否有效
   bool isPositionValid(WidgetPosition position, Size containerSize) {
-    // 检查边�?
+    // 检查边界
     if (position.x < 0 || position.y < 0) return false;
     if (position.x + position.width > containerSize.width) return false;
     if (position.y + position.height > containerSize.height) return false;
     
-    // 检查尺�?
+    // 检查尺寸
     if (position.width < 50 || position.height < 50) return false;
     if (position.width > containerSize.width || position.height > containerSize.height) return false;
     

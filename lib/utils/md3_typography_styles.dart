@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Material Design 3 Typography 样式工具�?
-/// 提供统一�?MD3 文本样式和变�?
+/// Material Design 3 Typography 样式工具�?
+/// 提供统一�?MD3 文本样式和变�?
 /// 遵循 Material 3 Type Scale 规范
 class MD3TypographyStyles {
   /// Display Large - 用于最大的标题文本
@@ -20,7 +20,7 @@ class MD3TypographyStyles {
   }
 
   /// Display Medium - 用于大型标题文本
-  /// 通常用于页面主标�?
+  /// 通常用于页面主标�?
   static TextStyle displayMedium(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.displayMedium?.copyWith(
@@ -34,8 +34,8 @@ class MD3TypographyStyles {
     );
   }
 
-  /// Display Small - 用于中等大小的标题文�?
-  /// 通常用于卡片标题或重要信�?
+  /// Display Small - 用于中等大小的标题文�?
+  /// 通常用于卡片标题或重要信�?
   static TextStyle displaySmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.displaySmall?.copyWith(
@@ -50,7 +50,7 @@ class MD3TypographyStyles {
   }
 
   /// Headline Large - 用于大型标题
-  /// 通常用于页面或章节标�?
+  /// 通常用于页面或章节标�?
   static TextStyle headlineLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.headlineLarge?.copyWith(
@@ -140,7 +140,7 @@ class MD3TypographyStyles {
   }
 
   /// Body Large - 用于大型正文文本
-  /// 通常用于重要的正文内�?
+  /// 通常用于重要的正文内�?
   static TextStyle bodyLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.bodyLarge?.copyWith(
@@ -170,7 +170,7 @@ class MD3TypographyStyles {
   }
 
   /// Body Small - 用于小型正文文本
-  /// 通常用于辅助信息或说明文�?
+  /// 通常用于辅助信息或说明文�?
   static TextStyle bodySmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.bodySmall?.copyWith(
@@ -185,7 +185,7 @@ class MD3TypographyStyles {
   }
 
   /// Label Large - 用于大型标签文本
-  /// 通常用于按钮文本或重要标�?
+  /// 通常用于按钮文本或重要标�?
   static TextStyle labelLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.labelLarge?.copyWith(
