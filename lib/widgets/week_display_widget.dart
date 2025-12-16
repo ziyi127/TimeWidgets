@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/services/week_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/ntp_service.dart';
+import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 周次显示组件 - MD3紧凑版
 class WeekDisplayWidget extends StatefulWidget {
@@ -64,6 +65,8 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     // MD3: 使用 primaryContainer/secondaryContainer 作为强调背景
     final containerColor = _isOddWeek 
@@ -77,25 +80,30 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
       elevation: 0,
       color: containerColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: ResponsiveUtils.value(16),
+          vertical: ResponsiveUtils.value(10),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.view_week_rounded,
-              size: 20,
+              size: ResponsiveUtils.getIconSize(width, baseSize: 20),
               color: onContainerColor,
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: ResponsiveUtils.value(12)),
             if (_isLoading)
               SizedBox(
-                width: 16,
-                height: 16,
+                width: ResponsiveUtils.value(16),
+                height: ResponsiveUtils.value(16),
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: ResponsiveUtils.value(2),
                   color: onContainerColor,
                 ),
               )
@@ -105,20 +113,25 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: onContainerColor,
                   fontWeight: FontWeight.w600,
+                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: ResponsiveUtils.value(8)),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: ResponsiveUtils.value(8),
+                  vertical: ResponsiveUtils.value(4),
+                ),
                 decoration: BoxDecoration(
                   color: onContainerColor.withAlpha(38),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
                 ),
                 child: Text(
                   _isOddWeek ? '单周' : '双周',
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: onContainerColor,
                     fontWeight: FontWeight.w600,
+                    fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) * fontMultiplier,
                   ),
                 ),
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/utils/responsive_utils.dart';
 
 class CountdownEditDialog extends StatefulWidget {
   final CountdownData? countdown;
@@ -86,9 +87,17 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.countdown != null;
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
+    final theme = Theme.of(context);
 
     return AlertDialog(
-      title: Text(isEditing ? '编辑倒计时' : '添加倒计时'),
+      title: Text(
+        isEditing ? '编辑倒计时' : '添加倒计时',
+        style: TextStyle(
+          fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
+        ),
+      ),
       content: SizedBox(
         width: double.maxFinite,
         child: Form(
@@ -99,10 +108,14 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
               children: [
                 TextFormField(
                   controller: _titleController,
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 16 * fontMultiplier),
+                  decoration: InputDecoration(
                     labelText: '标题',
+                    labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                     hintText: '请输入倒计时标题',
-                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(fontSize: 14 * fontMultiplier),
+                    border: const OutlineInputBorder(),
+                    contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -111,35 +124,50 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveUtils.value(16)),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
+                  style: TextStyle(fontSize: 16 * fontMultiplier),
+                  decoration: InputDecoration(
                     labelText: '描述',
+                    labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                     hintText: '（可选）请输入倒计时描述',
-                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(fontSize: 14 * fontMultiplier),
+                    border: const OutlineInputBorder(),
                     alignLabelWithHint: true,
+                    contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
                   ),
                   maxLines: 3,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveUtils.value(16)),
                 Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('目标日期'),
-                          const SizedBox(height: 8),
+                          Text(
+                            '目标日期',
+                            style: TextStyle(fontSize: 14 * fontMultiplier),
+                          ),
+                          SizedBox(height: ResponsiveUtils.value(8)),
                           ElevatedButton.icon(
                             onPressed: () => _selectDate(context),
-                            icon: const Icon(Icons.calendar_today),
+                            icon: Icon(
+                              Icons.calendar_today,
+                              size: ResponsiveUtils.getIconSize(width, baseSize: 18),
+                            ),
                             label: Text(
                               '${_targetDate.year}-${_targetDate.month.toString().padLeft(2, '0')}-${_targetDate.day.toString().padLeft(2, '0')} ${_targetDate.hour.toString().padLeft(2, '0')}:${_targetDate.minute.toString().padLeft(2, '0')}',
+                              style: TextStyle(fontSize: 14 * fontMultiplier),
                               overflow: TextOverflow.ellipsis,
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ResponsiveUtils.value(16),
+                                vertical: ResponsiveUtils.value(12),
+                              ),
                             ),
                           ),
                         ],
@@ -147,15 +175,21 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveUtils.value(16)),
                 Row(
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _type,
-                        decoration: const InputDecoration(
+                        style: TextStyle(
+                          fontSize: 16 * fontMultiplier,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        decoration: InputDecoration(
                           labelText: '类型',
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
+                          border: const OutlineInputBorder(),
+                          contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
                         ),
                         items: _types.map((type) => DropdownMenuItem(
                           value: type,
@@ -170,13 +204,19 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: ResponsiveUtils.value(16)),
                     Expanded(
                       child: DropdownButtonFormField<String?>(
                         initialValue: _category,
-                        decoration: const InputDecoration(
+                        style: TextStyle(
+                          fontSize: 16 * fontMultiplier,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        decoration: InputDecoration(
                           labelText: '分类',
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
+                          border: const OutlineInputBorder(),
+                          contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
                         ),
                         items: [
                           const DropdownMenuItem(value: null, child: Text('无分类')),
@@ -202,11 +242,17 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(
+            '取消',
+            style: TextStyle(fontSize: 14 * fontMultiplier),
+          ),
         ),
         FilledButton(
           onPressed: _save,
-          child: Text(isEditing ? '保存' : '添加'),
+          child: Text(
+            isEditing ? '保存' : '添加',
+            style: TextStyle(fontSize: 14 * fontMultiplier),
+          ),
         ),
       ],
     );

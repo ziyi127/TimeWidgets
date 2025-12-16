@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:time_widgets/services/timetable_service.dart';
-import 'package:time_widgets/models/course_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   group('TimetableService Tests', () {
     late TimetableService service;
 

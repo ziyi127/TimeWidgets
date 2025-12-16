@@ -51,6 +51,7 @@ class WeatherWidget extends StatelessWidget {
           children: [
             // 头部
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   _getWeatherIcon(description),
@@ -58,11 +59,15 @@ class WeatherWidget extends StatelessWidget {
                   color: colorScheme.primary,
                 ),
                 SizedBox(width: ResponsiveUtils.value(12)),
-                Text(
-                  '天气 · $cityName',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                // 限制文本宽度，避免溢出
+                Flexible(
+                  child: Text(
+                    '天气 · $cityName',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const Spacer(),

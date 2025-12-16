@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/weather_service.dart';
+import 'package:time_widgets/utils/responsive_utils.dart';
 
 class CitySearchDialog extends StatefulWidget {
   const CitySearchDialog({super.key});
@@ -33,31 +34,51 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
+    final theme = Theme.of(context);
+
     return AlertDialog(
-      title: const Text('搜索城市'),
+      title: Text(
+        '搜索城市',
+        style: TextStyle(
+          fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
+        ),
+      ),
       content: SizedBox(
-        width: 300,
-        height: 400,
+        width: ResponsiveUtils.value(300),
+        height: ResponsiveUtils.value(400),
         child: Column(
           children: [
             TextField(
               controller: _controller,
+              style: TextStyle(fontSize: 16 * fontMultiplier),
               decoration: InputDecoration(
                 labelText: '城市名称 (支持中文/拼音)',
+                labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: Icon(
+                    Icons.search,
+                    size: ResponsiveUtils.getIconSize(width, baseSize: 24),
+                  ),
                   onPressed: _search,
                 ),
                 border: const OutlineInputBorder(),
+                contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
               ),
               onSubmitted: (_) => _search(),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: ResponsiveUtils.value(16)),
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _results.isEmpty && _controller.text.isNotEmpty
-                      ? const Center(child: Text('未找到城市'))
+                      ? Center(
+                          child: Text(
+                            '未找到城市',
+                            style: TextStyle(fontSize: 14 * fontMultiplier),
+                          ),
+                        )
                       : ListView.builder(
                           itemCount: _results.length,
                           itemBuilder: (context, index) {
@@ -67,8 +88,14 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                             final country = city['country'] ?? '';
                             
                             return ListTile(
-                              title: Text(name),
-                              subtitle: Text([admin1, country].where((e) => e.toString().isNotEmpty).join(', ')),
+                              title: Text(
+                                name,
+                                style: TextStyle(fontSize: 16 * fontMultiplier),
+                              ),
+                              subtitle: Text(
+                                [admin1, country].where((e) => e.toString().isNotEmpty).join(', '),
+                                style: TextStyle(fontSize: 14 * fontMultiplier),
+                              ),
                               onTap: () {
                                 Navigator.pop(context, city);
                               },
@@ -82,7 +109,10 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(
+            '取消',
+            style: TextStyle(fontSize: 14 * fontMultiplier),
+          ),
         ),
       ],
     );

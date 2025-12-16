@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/services/ntp_service.dart';
+import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 课程表组件- MD3紧凑版，支持内部滚动
 class TimetableWidget extends StatelessWidget {
@@ -18,6 +19,8 @@ class TimetableWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final displayCourses = courses ?? [];
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     int completedCount = 0;
     int currentCount = 0;
@@ -56,10 +59,12 @@ class TimetableWidget extends StatelessWidget {
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(ResponsiveUtils.value(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -67,33 +72,41 @@ class TimetableWidget extends StatelessWidget {
             // 头部
             Row(
               children: [
-                Icon(Icons.view_agenda_rounded, size: 20, color: colorScheme.primary),
-                const SizedBox(width: 12),
+                Icon(
+                  Icons.view_agenda_rounded,
+                  size: ResponsiveUtils.getIconSize(width, baseSize: 20),
+                  color: colorScheme.primary,
+                ),
+                SizedBox(width: ResponsiveUtils.value(12)),
                 Text(
                   '今日课程',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
+                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                   ),
                 ),
                 const Spacer(),
                 // 状态统计
-                _buildStatusBadge(context, '$completedCount', colorScheme.tertiary, '完成'),
-                const SizedBox(width: 8),
-                _buildStatusBadge(context, '$currentCount', colorScheme.primary, '进行'),
-                const SizedBox(width: 8),
-                _buildStatusBadge(context, '$upcomingCount', colorScheme.secondary, '待上'),
+                _buildStatusBadge(context, '$completedCount', colorScheme.tertiary, '完成', width),
+                SizedBox(width: ResponsiveUtils.value(8)),
+                _buildStatusBadge(context, '$currentCount', colorScheme.primary, '进行', width),
+                SizedBox(width: ResponsiveUtils.value(8)),
+                _buildStatusBadge(context, '$upcomingCount', colorScheme.secondary, '待上', width),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: ResponsiveUtils.value(12)),
             // 课程列表 - 限制高度并支持滚动
             ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 180),
+              constraints: BoxConstraints(
+                maxHeight: ResponsiveUtils.value(180),
+              ),
               child: displayCourses.isEmpty
                   ? Center(
                       child: Text(
                         '今天没有课',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
+                          fontSize: (theme.textTheme.bodyMedium?.fontSize ?? 14) * fontMultiplier,
                         ),
                       ),
                     )
@@ -101,11 +114,11 @@ class TimetableWidget extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
                       itemCount: displayCourses.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(8)),
                       itemBuilder: (context, index) {
                         final course = displayCourses[index];
                         final status = courseStatuses[index];
-                        return _buildCourseItem(context, course, status);
+                        return _buildCourseItem(context, course, status, width);
                       },
                     ),
             ),
@@ -115,33 +128,37 @@ class TimetableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(BuildContext context, String count, Color color, String label) {
+  Widget _buildStatusBadge(BuildContext context, String count, Color color, String label, double width) {
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
+    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 6,
-          height: 6,
+          width: ResponsiveUtils.value(6),
+          height: ResponsiveUtils.value(6),
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: ResponsiveUtils.value(4)),
         Text(
           '$count$label',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: color,
             fontWeight: FontWeight.w500,
+            fontSize: (Theme.of(context).textTheme.labelSmall?.fontSize ?? 11) * fontMultiplier,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildCourseItem(BuildContext context, Course course, String status) {
+  Widget _buildCourseItem(BuildContext context, Course course, String status, double width) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     final isCurrent = status == 'current';
     final isCompleted = status == 'completed';
@@ -157,27 +174,30 @@ class TimetableWidget extends StatelessWidget {
         : colorScheme.surfaceContainerHighest.withAlpha(128);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveUtils.value(12),
+        vertical: ResponsiveUtils.value(10),
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ResponsiveUtils.value(12)),
         border: isCurrent ? Border.all(
           color: statusColor.withAlpha(77),
-          width: 1,
+          width: ResponsiveUtils.value(1),
         ) : null,
       ),
       child: Row(
         children: [
           // 状态指示条
           Container(
-            width: 4,
-            height: 32,
+            width: ResponsiveUtils.value(4),
+            height: ResponsiveUtils.value(32),
             decoration: BoxDecoration(
               color: statusColor,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(ResponsiveUtils.value(2)),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: ResponsiveUtils.value(12)),
           // 课程信息
           Expanded(
             child: Column(
@@ -191,47 +211,59 @@ class TimetableWidget extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
+                        fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                       ),
                     ),
                     if (isCurrent) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: ResponsiveUtils.value(8)),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ResponsiveUtils.value(6),
+                          vertical: ResponsiveUtils.value(2),
+                        ),
                         decoration: BoxDecoration(
                           color: statusColor.withAlpha(38),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(ResponsiveUtils.value(6)),
                         ),
                         child: Text(
                           '进行中',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 10,
+                            fontSize: 10.0 * fontMultiplier,
                           ),
                         ),
                       ),
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: ResponsiveUtils.value(2)),
                 Text(
                   course.teacher,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
+                    fontSize: (theme.textTheme.bodySmall?.fontSize ?? 12) * fontMultiplier,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: ResponsiveUtils.value(2)),
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined, size: 12, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(width: 4),
-                    Text(
-                      course.classroom,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: ResponsiveUtils.getIconSize(width, baseSize: 12),
+                      color: colorScheme.onSurfaceVariant
+                    ),
+                    SizedBox(width: ResponsiveUtils.value(4)),
+                    Expanded(
+                      child: Text(
+                        course.classroom,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: (theme.textTheme.bodySmall?.fontSize ?? 12) * fontMultiplier,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -244,6 +276,7 @@ class TimetableWidget extends StatelessWidget {
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
+              fontSize: (theme.textTheme.labelSmall?.fontSize ?? 11) * fontMultiplier,
             ),
           ),
         ],

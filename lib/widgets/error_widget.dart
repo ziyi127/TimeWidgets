@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/utils/error_handler.dart';
+import 'package:time_widgets/utils/responsive_utils.dart';
 
 class CustomErrorWidget extends StatelessWidget {
   final String message;
@@ -43,7 +44,9 @@ class CustomErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveFontSize = fontSize ?? 14.0;
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
+    final effectiveFontSize = (fontSize ?? 14.0) * fontMultiplier;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
@@ -51,16 +54,16 @@ class CustomErrorWidget extends StatelessWidget {
       padding: EdgeInsets.all(effectiveFontSize * 1.5),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer.withAlpha(229),
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(ResponsiveUtils.getBorderRadius(width, baseRadius: 16.0)),
         border: Border.all(
           color: colorScheme.error.withAlpha(128),
-          width: 1.0,
+          width: ResponsiveUtils.value(1.0),
         ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withAlpha(25),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: ResponsiveUtils.value(8),
+            offset: Offset(0, ResponsiveUtils.value(2)),
           ),
         ],
       ),
@@ -101,7 +104,7 @@ class CustomErrorWidget extends StatelessWidget {
               padding: EdgeInsets.all(effectiveFontSize * 0.5),
               decoration: BoxDecoration(
                 color: colorScheme.onErrorContainer.withAlpha(25),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -143,7 +146,7 @@ class CustomErrorWidget extends StatelessWidget {
                       vertical: effectiveFontSize * 0.5,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
                     ),
                   ),
                   child: Row(
@@ -171,7 +174,7 @@ class CustomErrorWidget extends StatelessWidget {
                       vertical: effectiveFontSize * 0.5,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
                     ),
                   ),
                   child: Row(
@@ -211,21 +214,26 @@ class ErrorToast extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveUtils.value(16),
+        vertical: ResponsiveUtils.value(12),
+      ),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ResponsiveUtils.getBorderRadius(width, baseRadius: 12)),
         border: Border.all(
           color: colorScheme.error.withAlpha(128),
-          width: 1.0,
+          width: ResponsiveUtils.value(1.0),
         ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withAlpha(38),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: ResponsiveUtils.value(12),
+            offset: Offset(0, ResponsiveUtils.value(4)),
           ),
         ],
       ),
@@ -235,14 +243,14 @@ class ErrorToast extends StatelessWidget {
           Icon(
             Icons.error_outline,
             color: colorScheme.error,
-            size: 20,
+            size: ResponsiveUtils.getIconSize(width, baseSize: 20),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: ResponsiveUtils.value(8)),
           Flexible(
             child: Text(
               message,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 14 * fontMultiplier,
                 color: colorScheme.onErrorContainer,
               ),
               maxLines: 2,
@@ -250,16 +258,22 @@ class ErrorToast extends StatelessWidget {
             ),
           ),
           if (onRetry != null) ...[
-            const SizedBox(width: 12),
+            SizedBox(width: ResponsiveUtils.value(12)),
             TextButton(
               onPressed: onRetry,
               style: TextButton.styleFrom(
                 foregroundColor: colorScheme.onError,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: ResponsiveUtils.value(12),
+                  vertical: ResponsiveUtils.value(4),
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text('重试'),
+              child: Text(
+                '重试',
+                style: TextStyle(fontSize: 14 * fontMultiplier),
+              ),
             ),
           ],
         ],
@@ -285,13 +299,15 @@ class ErrorDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final width = MediaQuery.sizeOf(context).width;
+    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
     
     return AlertDialog(
       title: Row(
         children: [
-          Icon(Icons.error_outline, color: colorScheme.error),
-          const SizedBox(width: 12),
-          Text(title ?? '错误详情'),
+          Icon(Icons.error_outline, color: colorScheme.error, size: ResponsiveUtils.getIconSize(width, baseSize: 24)),
+          SizedBox(width: ResponsiveUtils.value(12)),
+          Text(title ?? '错误详情', style: TextStyle(fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier)),
         ],
       ),
       content: SingleChildScrollView(
@@ -299,46 +315,51 @@ class ErrorDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (description != null) ...[
-              Text(description!),
-              const SizedBox(height: 16),
+              Text(description!, style: TextStyle(fontSize: 16 * fontMultiplier)),
+              SizedBox(height: ResponsiveUtils.value(16)),
             ],
             if (error != null) ...[
               Text('错误消息:', style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
               )),
-              const SizedBox(height: 4),
-              Text(error!.message),
-              const SizedBox(height: 16),
+              SizedBox(height: ResponsiveUtils.value(4)),
+              Text(error!.message, style: TextStyle(fontSize: 14 * fontMultiplier)),
+              SizedBox(height: ResponsiveUtils.value(16)),
               if (error!.userMessage != null && error!.userMessage != error!.message) ...[
                 Text('用户提示:', style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                 )),
-                const SizedBox(height: 4),
-                Text(error!.userMessage!),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveUtils.value(4)),
+                Text(error!.userMessage!, style: TextStyle(fontSize: 14 * fontMultiplier)),
+                SizedBox(height: ResponsiveUtils.value(16)),
               ],
               if (error!.resolution != null) ...[
                 Text('解决建议:', style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                 )),
-                const SizedBox(height: 4),
-                Text(error!.resolution!),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveUtils.value(4)),
+                Text(error!.resolution!, style: TextStyle(fontSize: 14 * fontMultiplier)),
+                SizedBox(height: ResponsiveUtils.value(16)),
               ],
               if (error!.code.isNotEmpty) ...[
                 Text('错误代码:', style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                 )),
-                const SizedBox(height: 4),
-                Text(error!.code),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveUtils.value(4)),
+                Text(error!.code, style: TextStyle(fontSize: 14 * fontMultiplier)),
+                SizedBox(height: ResponsiveUtils.value(16)),
               ],
             ],
             Text('错误类型:', style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
+              fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
             )),
-            const SizedBox(height: 4),
-            Text(error?.code ?? '未知'),
+            SizedBox(height: ResponsiveUtils.value(4)),
+            Text(error?.code ?? '未知', style: TextStyle(fontSize: 14 * fontMultiplier)),
           ],
         ),
       ),
@@ -347,14 +368,14 @@ class ErrorDetailsDialog extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('关闭'),
+          child: Text('关闭', style: TextStyle(fontSize: 14 * fontMultiplier)),
         ),
         ElevatedButton(
           onPressed: () {
             // 可以添加复制日志或分享错误信息的功能
             Navigator.of(context).pop();
           },
-          child: const Text('复制日志'),
+          child: Text('复制日志', style: TextStyle(fontSize: 14 * fontMultiplier)),
         ),
       ],
     );

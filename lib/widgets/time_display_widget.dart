@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:time_widgets/services/ntp_service.dart';
-import 'package:time_widgets/utils/responsive_utils.dart';
 
-/// 时间显示组件 - MD3紧凑?
+/// 时间显示组件 - MD3紧凑版
 class TimeDisplayWidget extends StatefulWidget {
   final bool isCompact;
 
@@ -38,7 +36,7 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
   }
 
   void _updateTime() {
-    final now = NtpService().now;
+    final now = DateTime.now();
     setState(() {
       _currentTime = DateFormat('HH:mm').format(now);
       _currentSeconds = DateFormat('ss').format(now);
@@ -49,53 +47,52 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final width = MediaQuery.sizeOf(context).width;
-    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     // MD3: 使用 surfaceContainerLow 作为卡片背景
     return Card(
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
-        ),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: ResponsiveUtils.getHorizontalPadding(width),
-          vertical: ResponsiveUtils.value(12),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.schedule_rounded,
-              size: ResponsiveUtils.getIconSize(width, baseSize: 20),
+              size: 20,
               color: colorScheme.primary,
             ),
-            SizedBox(width: ResponsiveUtils.value(12)),
-            Text(
-              '当前时间',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+            const SizedBox(width: 12),
+            // 限制文本宽度，避免溢出
+            Flexible(
+              child: Text(
+                '当前时间',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const Spacer(),
-            Text(
-              _currentTime,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-                fontSize: (theme.textTheme.headlineSmall?.fontSize ?? 24) * fontMultiplier,
+            // 限制时间文本宽度
+            Flexible(
+              child: Text(
+                _currentTime,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurface,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: ResponsiveUtils.value(4)),
+            const SizedBox(width: 4),
             Text(
               _currentSeconds,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
-                fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
               ),
             ),
           ],

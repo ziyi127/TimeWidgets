@@ -35,7 +35,7 @@ class MD3TrayMenuService {
       // 初始化托盘图标
       await _systemTray!.initSystemTray(
         title: '智慧课程表',
-        iconPath: Platform.isWindows ? 'assets/icons/app_icon.ico' : 'assets/icons/app_icon.png',
+        iconPath: Platform.isWindows ? 'assets/icons/tray_icon.ico' : 'assets/icons/app_icon.png',
         toolTip: '智慧课程表\n左键: 显示/隐藏窗口\n右键: 打开菜单',
       );
 

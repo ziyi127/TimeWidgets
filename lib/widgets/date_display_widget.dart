@@ -33,6 +33,7 @@ class DateDisplayWidget extends StatelessWidget {
           vertical: ResponsiveUtils.value(12),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.calendar_today_rounded,
@@ -40,20 +41,28 @@ class DateDisplayWidget extends StatelessWidget {
               color: colorScheme.primary,
             ),
             SizedBox(width: ResponsiveUtils.value(12)),
-            Text(
-              '日期',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+            // 限制文本宽度，避免溢出
+            Flexible(
+              child: Text(
+                '日期',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const Spacer(),
-            Text(
-              '${now.month}月${now.day}日',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-                fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
+            // 限制日期文本宽度
+            Flexible(
+              child: Text(
+                '${now.month}月${now.day}日',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurface,
+                  fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             SizedBox(width: ResponsiveUtils.value(8)),
