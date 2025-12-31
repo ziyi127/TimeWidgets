@@ -86,8 +86,8 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
           seedColor = lightDynamic.primary;
         }
 
-        final lightTheme = _themeService.generateLightTheme(seedColor, themeSettings);
-        final darkTheme = _themeService.generateDarkTheme(seedColor, themeSettings);
+        final lightTheme = _themeService.generateLightTheme(seedColor);
+        final darkTheme = _themeService.generateDarkTheme(seedColor);
 
         return widget.builder(lightTheme, darkTheme);
       },
@@ -154,8 +154,8 @@ class ThemePreview extends StatelessWidget {
     final themeService = ThemeService();
     final themeSettings = ThemeSettings.defaultSettings();
     final theme = isDark
-        ? themeService.generateDarkTheme(seedColor, themeSettings)
-        : themeService.generateLightTheme(seedColor, themeSettings);
+        ? themeService.generateDarkTheme(seedColor)
+        : themeService.generateLightTheme(seedColor);
 
     return Theme(
       data: theme,
