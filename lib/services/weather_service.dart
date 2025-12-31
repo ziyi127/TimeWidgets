@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/utils/logger.dart';
@@ -32,13 +33,21 @@ class WeatherService {
   Future<List<Map<String, dynamic>>> searchCity(String query) async {
     try {
       final url = Uri.parse('$_geocodingUrl/search?name=$query&count=5&language=zh&format=json');
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          Logger.e('City search request timed out');
+          throw const SocketException('Request timed out');
+        },
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['results'] != null) {
           return List<Map<String, dynamic>>.from(data['results']);
         }
+      } else {
+        Logger.e('Failed to search city: ${response.statusCode}');
       }
       return [];
     } catch (e) {

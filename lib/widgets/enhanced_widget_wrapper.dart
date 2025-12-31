@@ -66,7 +66,7 @@ class EnhancedWidgetWrapper extends StatelessWidget {
     if (isInteractive && onTap != null) {
       content = InkWell(
         onTap: onTap,
-        borderRadius: effectiveBorderRadius as BorderRadius?,
+        borderRadius: effectiveBorderRadius,
         child: content,
       );
     }

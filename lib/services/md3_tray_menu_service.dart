@@ -32,22 +32,92 @@ class MD3TrayMenuService {
     try {
       _systemTray = SystemTray();
 
-      // 初始化托盘图标
+      // 系统托盘初始化 - 使用system_tray 2.0.3版本兼容的API
+      String iconPath = Platform.isWindows ? 'assets/icons/tray_icon.ico' : 'assets/icons/app_icon.png';
+      Logger.d('使用图标路径: $iconPath');
+      
       await _systemTray!.initSystemTray(
         title: '智慧课程表',
-        iconPath: Platform.isWindows ? 'assets/icons/tray_icon.ico' : 'assets/icons/app_icon.png',
-        toolTip: '智慧课程表\n左键: 显示/隐藏窗口\n右键: 打开菜单',
+        iconPath: iconPath,
       );
 
-      // 不设置原生菜单，右键时显示Flutter MD3菜单
+      // 设置工具提示
+      await _systemTray!.setToolTip('智慧课程表');
+
+      // 创建菜单（使用system_tray 2.0.3版本兼容的API）
+      final Menu menu = Menu();
+      
+      Logger.d('开始构建菜单');
+      
+      // 先创建菜单项
+      final showHideItem = MenuItemLabel(
+        label: '显示/隐藏窗口',
+        onClicked: (menuItem) {
+          Logger.d('菜单点击: 显示/隐藏窗口');
+          onToggleWindow?.call();
+        },
+      );
+      
+      final editTimetableItem = MenuItemLabel(
+        label: '编辑课表',
+        onClicked: (menuItem) {
+          Logger.d('菜单点击: 编辑课表');
+          onShowTimetableEdit?.call();
+        },
+      );
+      
+      final editLayoutItem = MenuItemLabel(
+        label: '编辑布局',
+        onClicked: (menuItem) {
+          Logger.d('菜单点击: 编辑布局');
+          onToggleEditMode?.call();
+        },
+      );
+      
+      final settingsItem = MenuItemLabel(
+        label: '设置',
+        onClicked: (menuItem) {
+          Logger.d('菜单点击: 设置');
+          onShowSettings?.call();
+        },
+      );
+      
+      final exitItem = MenuItemLabel(
+        label: '退出程序',
+        onClicked: (menuItem) {
+          Logger.d('菜单点击: 退出程序');
+          onExit?.call();
+        },
+      );
+      
+      // 构建菜单
+      await menu.buildFrom([
+        showHideItem,
+        editTimetableItem,
+        editLayoutItem,
+        settingsItem,
+        MenuSeparator(),
+        exitItem,
+      ]);
+      
+      Logger.d('菜单构建完成');
+
+      // 设置菜单
+      await _systemTray!.setContextMenu(menu);
+      Logger.d('上下文菜单设置完成');
+
       // 设置点击事件
       _systemTray!.registerSystemTrayEventHandler((eventName) {
+        Logger.d('MD3 Tray Event: $eventName');
         if (eventName == kSystemTrayEventClick) {
           // 左键点击显示/隐藏窗口
+          Logger.d('MD3 Tray: Left click - toggle window');
           onToggleWindow?.call();
         } else if (eventName == kSystemTrayEventRightClick) {
-          // 右键点击显示MD3 Flutter菜单
-          onShowMD3Menu?.call();
+          // 右键点击显示原生菜单（由系统托盘库处理）
+          Logger.d('MD3 Tray: Right click - show native menu');
+          // 手动弹出菜单，确保右键菜单显示
+          _systemTray!.popUpContextMenu();
         }
       });
 
@@ -181,10 +251,10 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
           color: Colors.transparent,
           child: Stack(
             children: [
-              // 菜单定位在右下角，根据屏幕尺寸动态调整
+              // 菜单定位在右下角，根据托盘位置调整
               Positioned(
-                right: MediaQuery.of(context).size.width * 0.02, // 屏幕宽度的2%
-                bottom: MediaQuery.of(context).size.height * 0.03, // 屏幕高度的3%
+                right: 16, // 距离右侧边界16px
+                bottom: 16, // 距离底部边界16px
                 child: GestureDetector(
                   onTap: () {}, // 阻止点击穿透
                   child: FadeTransition(

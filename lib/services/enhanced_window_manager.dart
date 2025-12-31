@@ -260,6 +260,15 @@ class EnhancedWindowManager {
       Logger.e('Error hiding window: $e');
     }
   }
+  
+  /// 设置窗口是否忽略鼠标事件（指针穿透）
+  static Future<void> setIgnoreMouseEvents(bool ignore) async {
+    try {
+      await windowManager.setIgnoreMouseEvents(ignore);
+    } catch (e) {
+      Logger.e('Error setting ignore mouse events: $e');
+    }
+  }
 
   /// 检查窗口是否已初始�?
   static bool get isInitialized => _isInitialized;

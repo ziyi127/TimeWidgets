@@ -77,6 +77,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
     // 初始化窗口
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWindow();
+      // 只初始化一个托盘服务，避免冲突
       _initializeSystemTray();
     });
   }
@@ -165,9 +166,13 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
       _showMainWindow();
     }
     
+    // 打开设置页面时，禁用指针穿透，确保可以交互
+    EnhancedWindowManager.setIgnoreMouseEvents(false);
+    
     navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (context) => const SettingsScreen(),
+        fullscreenDialog: false,
       ),
     );
   }
@@ -180,9 +185,13 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
       _showMainWindow();
     }
     
+    // 打开课表编辑页面时，禁用指针穿透，确保可以交互
+    EnhancedWindowManager.setIgnoreMouseEvents(false);
+    
     navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (context) => const TimetableEditScreen(),
+        fullscreenDialog: false,
       ),
     );
   }

@@ -14,12 +14,15 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
   final WeatherService _weatherService = WeatherService();
   List<Map<String, dynamic>> _results = [];
   bool _isLoading = false;
+  bool _hasError = false;
 
   Future<void> _search() async {
     if (_controller.text.isEmpty) return;
 
     setState(() {
       _isLoading = true;
+      _hasError = false;
+      _results = [];
     });
 
     final results = await _weatherService.searchCity(_controller.text);
@@ -28,6 +31,7 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
       setState(() {
         _results = results;
         _isLoading = false;
+        _hasError = results.isEmpty && _controller.text.isNotEmpty;
       });
     }
   }
@@ -72,36 +76,70 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _results.isEmpty && _controller.text.isNotEmpty
+                  : _hasError
                       ? Center(
-                          child: Text(
-                            '未找到城市',
-                            style: TextStyle(fontSize: 14 * fontMultiplier),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: _results.length,
-                          itemBuilder: (context, index) {
-                            final city = _results[index];
-                            final name = city['name'] ?? 'Unknown';
-                            final admin1 = city['admin1'] ?? '';
-                            final country = city['country'] ?? '';
-                            
-                            return ListTile(
-                              title: Text(
-                                name,
-                                style: TextStyle(fontSize: 16 * fontMultiplier),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.cloud_off_outlined,
+                                size: ResponsiveUtils.getIconSize(width, baseSize: 48),
+                                color: theme.colorScheme.error,
                               ),
-                              subtitle: Text(
-                                [admin1, country].where((e) => e.toString().isNotEmpty).join(', '),
+                              SizedBox(height: ResponsiveUtils.value(16)),
+                              Text(
+                                '搜索失败',
+                                style: TextStyle(
+                                  fontSize: 16 * fontMultiplier,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                              SizedBox(height: ResponsiveUtils.value(8)),
+                              Text(
+                                '网络连接超时，请重试',
                                 style: TextStyle(fontSize: 14 * fontMultiplier),
                               ),
-                              onTap: () {
-                                Navigator.pop(context, city);
+                              SizedBox(height: ResponsiveUtils.value(16)),
+                              ElevatedButton(
+                                onPressed: _search,
+                                child: const Text('重试'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : _results.isEmpty
+                          ? Center(
+                              child: Text(
+                                _controller.text.isEmpty
+                                    ? '请输入城市名称'
+                                    : '未找到城市',
+                                style: TextStyle(fontSize: 14 * fontMultiplier),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: _results.length,
+                              itemBuilder: (context, index) {
+                                final city = _results[index];
+                                final name = city['name'] ?? 'Unknown';
+                                final admin1 = city['admin1'] ?? '';
+                                final country = city['country'] ?? '';
+                                
+                                return ListTile(
+                                  title: Text(
+                                    name,
+                                    style: TextStyle(fontSize: 16 * fontMultiplier),
+                                  ),
+                                  subtitle: Text(
+                                    [admin1, country].where((e) => e.toString().isNotEmpty).join(', '),
+                                    style: TextStyle(fontSize: 14 * fontMultiplier),
+                                  ),
+                                  onTap: () {
+                                    Navigator.pop(context, city);
+                                  },
+                                );
                               },
-                            );
-                          },
-                        ),
+                            ),
             ),
           ],
         ),

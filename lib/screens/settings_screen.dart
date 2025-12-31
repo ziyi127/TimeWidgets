@@ -6,6 +6,7 @@ import 'package:time_widgets/screens/desktop_widget_config_screen.dart';
 import 'package:time_widgets/screens/about_screen.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/services/ntp_service.dart';
+import 'package:time_widgets/widgets/city_search_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -508,6 +509,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (value) {
                     _saveSettings(_settings.copyWith(showWeatherWidget: value));
                   },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.location_on_outlined),
+                  title: const Text('天气地区'),
+                  subtitle: Text(_settings.cityName ?? '未设置'),
+                  trailing: ElevatedButton(
+                    onPressed: () async {
+                      final city = await showDialog<Map<String, dynamic>>(
+                        context: context,
+                        builder: (context) => const CitySearchDialog(),
+                      );
+                      if (city != null) {
+                        await _saveSettings(_settings.copyWith(
+                          latitude: city['latitude'],
+                          longitude: city['longitude'],
+                          cityName: city['name'],
+                        ));
+                      }
+                    },
+                    child: const Text('更改'),
+                  ),
                 ),
                 SwitchListTile(
                   secondary: const Icon(Icons.timer_outlined),

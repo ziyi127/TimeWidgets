@@ -459,15 +459,15 @@ class TimetableData {
 
   factory TimetableData.fromJson(Map<String, dynamic> json) {
     return TimetableData(
-      courses: (json['courses'] as List)
-          .map((c) => CourseInfo.fromJson(c))
-          .toList(),
-      timeSlots: (json['timeSlots'] as List)
-          .map((t) => TimeSlot.fromJson(t))
-          .toList(),
-      dailyCourses: (json['dailyCourses'] as List)
-          .map((d) => DailyCourse.fromJson(d))
-          .toList(),
+      courses: (json['courses'] as List?)
+          ?.map((c) => CourseInfo.fromJson(c))
+          .toList() ?? [],
+      timeSlots: (json['timeSlots'] as List?)
+          ?.map((t) => TimeSlot.fromJson(t))
+          .toList() ?? [],
+      dailyCourses: (json['dailyCourses'] as List?)
+          ?.map((d) => DailyCourse.fromJson(d))
+          .toList() ?? [],
       timeLayouts: (json['timeLayouts'] as List?)
           ?.map((t) => TimeLayout.fromJson(t))
           .toList() ?? [],

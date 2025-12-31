@@ -98,7 +98,7 @@ class TimetableWidget extends StatelessWidget {
             // 课程列表 - 限制高度并支持滚动
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight: ResponsiveUtils.value(180),
+                maxHeight: ResponsiveUtils.value(120),
               ),
               child: displayCourses.isEmpty
                   ? Center(
@@ -112,9 +112,9 @@ class TimetableWidget extends StatelessWidget {
                     )
                   : ListView.separated(
                       shrinkWrap: true,
-                      physics: const ClampingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       itemCount: displayCourses.length,
-                      separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(8)),
+                      separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(6)),
                       itemBuilder: (context, index) {
                         final course = displayCourses[index];
                         final status = courseStatuses[index];

@@ -43,8 +43,10 @@ class _CourseListTabState extends State<CourseListTab> {
 
   // Filter and sort courses
   List<CourseInfo> get _filteredCourses {
-    // Filter first
-    List<CourseInfo> filtered = widget.service.courses;
+    // Create a modifiable copy of the courses list first
+    List<CourseInfo> filtered = List.from(widget.service.courses);
+    
+    // Filter if needed
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       filtered = filtered.where((course) {
@@ -55,7 +57,7 @@ class _CourseListTabState extends State<CourseListTab> {
       }).toList();
     }
     
-    // Then sort
+    // Then sort the modifiable list
     filtered.sort((a, b) {
       int comparison;
       

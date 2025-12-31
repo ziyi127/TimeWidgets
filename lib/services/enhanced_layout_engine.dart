@@ -110,9 +110,16 @@ class EnhancedLayoutEngine {
       containerWidth = screenSize.width / 3;
     } else if (screenSize.width > 1440) {
       containerWidth = screenSize.width / 3.5;
-    } else {
+    } else if (screenSize.width > 1024) {
       containerWidth = screenSize.width / 4;
+    } else if (screenSize.width > 768) {
+      containerWidth = screenSize.width / 3;
+    } else {
+      containerWidth = screenSize.width / 2;
     }
+    
+    // 确保容器宽度不小于最小安全宽度
+    containerWidth = math.max(containerWidth, 280.0);
     return Size(containerWidth, screenSize.height);
   }
 
@@ -373,6 +380,27 @@ class CollisionDetector {
              b.y + b.height <= a.y);
   }
 
+  /// 获取组件默认高度
+  double _getDefaultHeight(WidgetType type) {
+    switch (type) {
+      case WidgetType.time:
+        return 100.0;
+      case WidgetType.date:
+        return 80.0;
+      case WidgetType.week:
+        return 60.0;
+      case WidgetType.weather:
+        return 140.0;
+      case WidgetType.currentClass:
+      case WidgetType.countdown:
+        return 120.0;
+      case WidgetType.timetable:
+        return 200.0;
+      case WidgetType.settings:
+        return 48.0;
+    }
+  }
+  
   /// 应用流式布局解决重叠 - 支持多行多列
   Map<WidgetType, WidgetPosition> _applyFlowLayout(
     Map<WidgetType, WidgetPosition> layout,
@@ -382,9 +410,16 @@ class CollisionDetector {
     const padding = 16.0;
     const spacing = 12.0;
     
-    // 根据容器宽度决定列数
-    final columns = containerSize.width > 600 ? 2 : 1;
-    final cardWidth = (containerSize.width - 2 * padding - (columns - 1) * spacing) / columns;
+    // 根据容器宽度决定列数，确保每列宽度足够
+    final maxColumns = containerSize.width > 1200 ? 3 : containerSize.width > 800 ? 2 : 1;
+    // 确保每列宽度不小于最小安全宽度
+    final minColumnWidth = 280.0;
+    final availableWidth = containerSize.width - 2 * padding;
+    final maxPossibleColumns = (availableWidth + spacing) ~/ (minColumnWidth + spacing);
+    final columns = math.min(maxColumns, maxPossibleColumns);
+    
+    // 计算每列宽度，确保总和不超过容器宽度
+    final cardWidth = columns > 0 ? (availableWidth - (columns - 1) * spacing) / columns : availableWidth;
     
     // 按Y坐标排序
     final sortedEntries = layout.entries.toList()
@@ -414,8 +449,10 @@ class CollisionDetector {
       
       final position = entry.value;
       
-      // 确保组件在容器内
-      final adjustedHeight = math.min(position.height, containerSize.height - currentY - padding);
+      // 确保组件高度合理
+      final preferredHeight = _getDefaultHeight(position.type);
+      final remainingHeight = containerSize.height - currentY - padding;
+      final adjustedHeight = math.min(preferredHeight, remainingHeight);
       
       if (adjustedHeight < 50) {
         // 如果剩余空间不足，隐藏组件
@@ -456,11 +493,14 @@ class CollisionDetector {
     
     // 最后处理settings按钮，确保不会与其他组件重叠
     if (settingsKey != null && settingsPosition != null) {
-      // 将settings按钮放置在右下角
+      // 将settings按钮放置在右下角，确保不会溢出
+      final settingsX = math.max(0.0, containerSize.width - padding - settingsPosition.width);
+      final settingsY = math.max(0.0, containerSize.height - padding - settingsPosition.height);
+      
       flowLayout[settingsKey] = WidgetPosition(
         type: settingsPosition.type,
-        x: containerSize.width - padding - settingsPosition.width,
-        y: containerSize.height - padding - settingsPosition.height,
+        x: settingsX,
+        y: settingsY,
         width: settingsPosition.width,
         height: settingsPosition.height,
         isVisible: settingsPosition.isVisible,
