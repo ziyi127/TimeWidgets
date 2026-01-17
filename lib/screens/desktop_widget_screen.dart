@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:time_widgets/widgets/time_display_widget.dart';
 import 'package:time_widgets/widgets/date_display_widget.dart';
 import 'package:time_widgets/widgets/weather_widget.dart';
@@ -53,12 +54,19 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   bool _isLayoutLoaded = false;
   Size? _lastConstraints;
   double? _lastScaleFactor;
+  
+  // 添加防抖相关变量
+  bool _isLayoutCalculating = false;
+  Timer? _layoutTimer;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
-    _loadLayout();
+    // 延迟到下一帧执行，避免在构建过程中调用 setState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+      _loadLayout();
+    });
   }
 
   void _loadData() {
@@ -200,9 +208,10 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
       case WidgetType.currentClass:
         // Find current course
         Course? currentCourse;
-        if (_timetable != null && _timetable!.courses.isNotEmpty) {
+        final timetable = _timetable;
+        if (timetable != null && timetable.courses.isNotEmpty) {
            try {
-             currentCourse = _timetable!.courses.firstWhere((c) => c.isCurrent);
+             currentCourse = timetable.courses.firstWhere((c) => c.isCurrent);
            } catch (e) {
              // No current course
            }
@@ -243,7 +252,16 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
       case WidgetType.settings:
         // 设置按钮通常由托盘管理，但在布局中预留位置
         return const SizedBox.shrink(); 
+      default:
+        // 默认返回空容器，防止返回null导致错误
+        return const SizedBox.shrink();
     }
+  }
+
+  @override
+  void dispose() {
+    _layoutTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -252,85 +270,72 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
       backgroundColor: Colors.transparent,
       body: LayoutBuilder(
         builder: (context, constraints) {
+          // 保存当前约束，用于拖动结束时重新计算布局
+          _lastConstraints = Size(constraints.maxWidth, constraints.maxHeight);
+          
           if (!_isLayoutLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final containerSize = Size(constraints.maxWidth, constraints.maxHeight);
-          final currentScale = ResponsiveUtils.scaleFactor;
-          
-          // 如果布局为空或尺寸发生显著变化，或缩放比例发生变化，重新计算布局
-          if (_layout == null || 
-              (_lastConstraints != null && _lastConstraints != containerSize) ||
-              _lastScaleFactor != currentScale) {
-            
-            _layout = _layoutEngine.calculateOptimalLayout(containerSize, _layout);
-            _lastConstraints = containerSize;
-            _lastScaleFactor = currentScale;
-            
-            // 异步保存新布局，不阻塞渲染
-            DesktopWidgetService.saveWidgetPositions(_layout!);
-          }
-
-          // 如果还是没有布局（不应该发生），使用默认布局
+          // 如果布局为空，使用默认布局
           if (_layout == null) {
              return const Center(child: Text('无法加载布局'));
           }
 
+          final layout = _layout!;
           return Stack(
-            children: _layout!.entries.map((entry) {
+            children: layout.entries.map((entry) {
               if (!entry.value.isVisible) return const SizedBox.shrink();
               
               return Positioned(
                 left: entry.value.x,
                 top: entry.value.y,
-                width: entry.value.width,
-                height: entry.value.height,
-                child: widget.isEditMode 
-                  ? GestureDetector(
-                      onPanUpdate: (details) {
-                        setState(() {
-                          final currentPos = _layout![entry.key]!;
-                          _layout![entry.key] = currentPos.copyWith(
-                            x: currentPos.x + details.delta.dx,
-                            y: currentPos.y + details.delta.dy,
-                          );
-                        });
-                      },
-                      onPanEnd: (details) {
-                        // Resolve collisions and save
-                        if (_layout != null && _lastConstraints != null) {
-                          // Recalculate layout to ensure no overlaps and valid bounds
-                          final resolvedLayout = _layoutEngine.calculateOptimalLayout(
-                            _lastConstraints!, 
-                            _layout
-                          );
-                          
-                          setState(() {
-                            _layout = resolvedLayout;
-                          });
-                          
-                          DesktopWidgetService.saveWidgetPositions(resolvedLayout);
-                        }
-                      },
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.move,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: ResponsiveUtils.value(2),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: entry.value.width,
+                    // 移除 maxHeight 限制，让组件根据内容自适应高度
+                  ),
+                  child: widget.isEditMode 
+                    ? GestureDetector(
+                        onPanUpdate: (details) {
+                            setState(() {
+                              final currentPos = layout[entry.key];
+                              if (currentPos != null) {
+                                layout[entry.key] = currentPos.copyWith(
+                                  x: currentPos.x + details.delta.dx,
+                                  y: currentPos.y + details.delta.dy,
+                                );
+                              }
+                            });
+                          },
+                        onPanEnd: (details) {
+                          // 直接保存当前布局
+                          final currentLayout = _layout;
+                          if (currentLayout != null) {
+                            // 保存位置
+                            DesktopWidgetService.saveWidgetPositions(currentLayout);
+                            Logger.i('Widget positions saved after drag');
+                          }
+                        },
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.move,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: ResponsiveUtils.value(2),
+                              ),
+                              borderRadius: BorderRadius.circular(ResponsiveUtils.value(16)),
+                              color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
                             ),
-                            borderRadius: BorderRadius.circular(ResponsiveUtils.value(16)),
-                            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-                          ),
-                          child: IgnorePointer(
-                            child: _buildWidget(entry.key),
+                            child: IgnorePointer(
+                              child: _buildWidget(entry.key),
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  : _buildWidget(entry.key),
+                      )
+                    : _buildWidget(entry.key),
+                ),
               );
             }).toList(),
           );

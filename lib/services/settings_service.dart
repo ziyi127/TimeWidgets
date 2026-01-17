@@ -80,6 +80,7 @@ class SettingsService {
     // 测试环境下重置状态
     _isInitialized = false;
     _currentSettings = AppSettings.defaultSettings();
-    // 不关闭流控制器，因为单例可能被其他地方使用
+    _settingsController.close();
+    Logger.i('SettingsService disposed');
   }
 }

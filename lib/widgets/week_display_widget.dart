@@ -33,9 +33,10 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
   Future<void> _loadWeekInfo() async {
     try {
       final settings = await _settingsService.loadSettings();
-      if (settings.semesterStartDate != null) {
+      final semesterStartDate = settings.semesterStartDate;
+      if (semesterStartDate != null) {
         final weekNumber = _weekService.calculateWeekNumber(
-          settings.semesterStartDate!,
+          semesterStartDate,
           NtpService().now,
         );
         if (mounted) {
@@ -65,8 +66,6 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final width = MediaQuery.sizeOf(context).width;
-    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     // MD3: 使用 primaryContainer/secondaryContainer 作为强调背景
     final containerColor = _isOddWeek 
@@ -80,58 +79,53 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
       elevation: 0,
       color: containerColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: ResponsiveUtils.value(16),
-          vertical: ResponsiveUtils.value(10),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.view_week_rounded,
-              size: ResponsiveUtils.getIconSize(width, baseSize: 20),
+              size: 16,
               color: onContainerColor,
             ),
-            SizedBox(width: ResponsiveUtils.value(12)),
+            const SizedBox(width: 8),
             if (_isLoading)
               SizedBox(
-                width: ResponsiveUtils.value(16),
-                height: ResponsiveUtils.value(16),
+                width: 14,
+                height: 14,
                 child: CircularProgressIndicator(
-                  strokeWidth: ResponsiveUtils.value(2),
+                  strokeWidth: 2,
                   color: onContainerColor,
                 ),
               )
             else ...[
               Text(
                 '第$_weekNumber周',
-                style: theme.textTheme.titleSmall?.copyWith(
+                style: theme.textTheme.labelLarge?.copyWith(
                   color: onContainerColor,
                   fontWeight: FontWeight.w600,
-                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                  fontSize: 12,
                 ),
               ),
-              SizedBox(width: ResponsiveUtils.value(8)),
+              const SizedBox(width: 6),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ResponsiveUtils.value(8),
-                  vertical: ResponsiveUtils.value(4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
                 ),
                 decoration: BoxDecoration(
                   color: onContainerColor.withAlpha(38),
-                  borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   _isOddWeek ? '单周' : '双周',
-                  style: theme.textTheme.labelMedium?.copyWith(
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: onContainerColor,
                     fontWeight: FontWeight.w600,
-                    fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) * fontMultiplier,
+                    fontSize: 11,
                   ),
                 ),
               ),

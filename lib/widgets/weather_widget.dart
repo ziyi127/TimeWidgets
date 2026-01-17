@@ -44,44 +44,51 @@ class WeatherWidget extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(ResponsiveUtils.value(16)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 头部
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _getWeatherIcon(description),
-                  size: ResponsiveUtils.getIconSize(width, baseSize: 20),
-                  color: colorScheme.primary,
-                ),
-                SizedBox(width: ResponsiveUtils.value(12)),
-                // 限制文本宽度，避免溢出
-                Flexible(
-                  child: Text(
-                    '天气 · $cityName',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const Spacer(),
-                if (weatherData == null)
-                  SizedBox(
-                    width: ResponsiveUtils.value(16),
-                    height: ResponsiveUtils.value(16),
-                    child: CircularProgressIndicator(
-                      strokeWidth: ResponsiveUtils.value(2),
-                      color: colorScheme.primary,
+          padding: EdgeInsets.all(ResponsiveUtils.value(16)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 头部
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getWeatherIcon(description),
+                          size: ResponsiveUtils.getIconSize(width, baseSize: 20),
+                          color: colorScheme.primary,
+                        ),
+                        SizedBox(width: ResponsiveUtils.value(12)),
+                        // 限制文本宽度，避免溢出
+                        Flexible(
+                          child: Text(
+                            '天气 · $cityName',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-              ],
-            ),
+                  if (weatherData == null)
+                    SizedBox(
+                      width: ResponsiveUtils.value(16),
+                      height: ResponsiveUtils.value(16),
+                      child: CircularProgressIndicator(
+                        strokeWidth: ResponsiveUtils.value(2),
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                ],
+              ),
             SizedBox(height: ResponsiveUtils.value(12)),
             // 温度和详情
             Row(

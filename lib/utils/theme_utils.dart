@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Material Design 3 主题工具�?class ThemeUtils {
-  // 私有构造函数，防止实例�?  ThemeUtils._();
+/// Material Design 3 主题工具�?class ThemeUtils {
+  // 私有构造函数，防止实例�?  ThemeUtils._();
 
   /// MD3 种子颜色
   static const Color _seedColor = Color(0xFF6750A4);
@@ -32,7 +32,7 @@ import 'package:flutter/material.dart';
       useMaterial3: true,
       colorScheme: colorScheme,
       
-      // 应用栏主�?      appBarTheme: AppBarTheme(
+      // 应用栏主�?      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -51,7 +51,7 @@ import 'package:flutter/material.dart';
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.2),
+            color: colorScheme.outline.withAlpha((255 * 0.2).round()),
             width: 1,
           ),
         ),
@@ -77,19 +77,19 @@ import 'package:flutter/material.dart';
         ),
       ),
 
-      // 输入框主�?      inputDecorationTheme: InputDecorationTheme(
+      // 输入框主�?      inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.5),
+            color: colorScheme.outline.withAlpha((255 * 0.5).round()),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.5),
+            color: colorScheme.outline.withAlpha((255 * 0.5).round()),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -102,13 +102,13 @@ import 'package:flutter/material.dart';
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
 
-      // 进度指示器主�?      progressIndicatorTheme: ProgressIndicatorThemeData(
+      // 进度指示器主�?      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colorScheme.primary,
         linearTrackColor: colorScheme.surfaceContainerHighest,
       ),
 
-      // 分割线主�?      dividerTheme: DividerThemeData(
-        color: colorScheme.outline.withValues(alpha: 0.2),
+      // 分割线主�?      dividerTheme: DividerThemeData(
+        color: colorScheme.outline.withAlpha((255 * 0.2).round()),
         thickness: 1,
         space: 1,
       ),
@@ -223,7 +223,7 @@ import 'package:flutter/material.dart';
     );
   }
 
-  /// 获取状态颜�?  static Color getStatusColor(ColorScheme colorScheme, String status) {
+  /// 获取状态颜�?  static Color getStatusColor(ColorScheme colorScheme, String status) {
     switch (status.toLowerCase()) {
       case 'success':
       case 'completed':
@@ -281,7 +281,7 @@ import 'package:flutter/material.dart';
     }
   }
 
-  /// 获取课程状态图�?  static IconData getCourseStatusIcon(String status) {
+  /// 获取课程状态图�?  static IconData getCourseStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'current':
       case 'active':

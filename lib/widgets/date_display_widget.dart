@@ -16,71 +16,56 @@ class DateDisplayWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final now = NtpService().now;
-    final width = MediaQuery.sizeOf(context).width;
-    final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     return Card(
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: ResponsiveUtils.getHorizontalPadding(width),
-          vertical: ResponsiveUtils.value(12),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.calendar_today_rounded,
-              size: ResponsiveUtils.getIconSize(width, baseSize: 20),
+              size: 16,
               color: colorScheme.primary,
             ),
-            SizedBox(width: ResponsiveUtils.value(12)),
-            // 限制文本宽度，避免溢出
-            Flexible(
-              child: Text(
-                '日期',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-                ),
-                overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 8),
+            Text(
+              '日期',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 12,
               ),
             ),
-            const Spacer(),
-            // 限制日期文本宽度
-            Flexible(
-              child: Text(
-                '${now.month}月${now.day}日',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.onSurface,
-                  fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
-                ),
-                overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 12),
+            Text(
+              '${now.month}月${now.day}日',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface,
+                fontSize: 14,
               ),
             ),
-            SizedBox(width: ResponsiveUtils.value(8)),
+            const SizedBox(width: 6),
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ResponsiveUtils.value(8),
-                vertical: ResponsiveUtils.value(4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6,
+                vertical: 2,
               ),
               decoration: BoxDecoration(
                 color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 _getWeekdayName(now.weekday),
-                style: theme.textTheme.labelMedium?.copyWith(
+                style: theme.textTheme.labelSmall?.copyWith(
                   color: colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.w600,
-                  fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) * fontMultiplier,
+                  fontSize: 11,
                 ),
               ),
             ),

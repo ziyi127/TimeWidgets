@@ -186,7 +186,9 @@ class EnhancedLayoutEngine {
     
     for (final type in WidgetType.values) {
       final existing = existingLayout[type];
-      final defaultPos = defaultLayout[type]!;
+      // 获取默认布局中对应的位置
+      final defaultPos = defaultLayout[type];
+      if (defaultPos == null) continue;
       
       if (existing != null && _layoutValidator.isPositionValid(existing, containerSize)) {
         mergedLayout[type] = existing;
@@ -202,19 +204,16 @@ class EnhancedLayoutEngine {
 /// 位置计算器
 class PositionCalculator {
   static const double _padding = 16.0;
-  static const double _spacing = 12.0;
+  static const double _spacing = 16.0;  // 增加间距
 
-  /// 计算默认位置 - 支持多行多列布局
+  /// 计算默认位置 - 垂直单列布局，确保所有组件可见
   Map<WidgetType, WidgetPosition> calculateDefaultPositions(Size containerSize) {
     final positions = <WidgetType, WidgetPosition>{};
     
-    // 根据容器宽度决定列数
-    final columns = containerSize.width > 600 ? 2 : 1;
-    final cardWidth = (containerSize.width - 2 * _padding - (columns - 1) * _spacing) / columns;
+    // 使用更小的卡片宽度，让组件更紧凑
+    final cardWidth = math.min(containerSize.width - 2 * _padding, 300.0);
     
-    double currentX = _padding;
     double currentY = _padding;
-    double rowHeight = 0;
     
     // 按优先级排列组件 - 先不包括settings
     final orderedTypes = [
@@ -227,29 +226,24 @@ class PositionCalculator {
       WidgetType.timetable,
     ];
     
-    for (int i = 0; i < orderedTypes.length; i++) {
-      final type = orderedTypes[i];
+    for (final type in orderedTypes) {
       final height = _getDefaultHeight(type);
       
-      // 如果当前行空间不足，换行
-      if (i % columns == 0 && i > 0) {
-        currentX = _padding;
-        currentY += rowHeight + _spacing;
-        rowHeight = 0;
-      }
+      // 检查是否还有足够的空间
+      final remainingHeight = containerSize.height - currentY - _padding;
+      final adjustedHeight = remainingHeight > height ? height : math.max(50.0, remainingHeight);
       
       positions[type] = WidgetPosition(
         type: type,
-        x: currentX,
+        x: _padding,
         y: currentY,
         width: cardWidth,
-        height: height,
-        isVisible: true,
+        height: adjustedHeight,
+        isVisible: remainingHeight >= 50, // 只有在有足够空间时才显示
       );
       
-      // 更新行高和X坐标
-      rowHeight = math.max(rowHeight, height);
-      currentX += cardWidth + _spacing;
+      // 更新Y坐标
+      currentY += adjustedHeight + _spacing;
     }
     
     // 设置按钮单独处理 - 放置在右下角，确保不会与其他组件重叠
@@ -322,20 +316,23 @@ class PositionCalculator {
   double _getDefaultHeight(WidgetType type) {
     switch (type) {
       case WidgetType.time:
-        return 100.0;
+        return 50.0;
       case WidgetType.date:
-        return 80.0;
+        return 50.0;
       case WidgetType.week:
-        return 60.0;
+        return 45.0;
       case WidgetType.weather:
-        return 140.0;
+        return 130.0;  // 增加高度
       case WidgetType.currentClass:
+        return 90.0;
       case WidgetType.countdown:
-        return 120.0;
+        return 90.0;
       case WidgetType.timetable:
-        return 200.0;
+        return 140.0;  // 减小高度
       case WidgetType.settings:
         return 48.0;
+      default:
+        return 50.0;
     }
   }
 }
@@ -384,51 +381,43 @@ class CollisionDetector {
   double _getDefaultHeight(WidgetType type) {
     switch (type) {
       case WidgetType.time:
-        return 100.0;
+        return 50.0;
       case WidgetType.date:
-        return 80.0;
+        return 50.0;
       case WidgetType.week:
-        return 60.0;
+        return 45.0;
       case WidgetType.weather:
-        return 140.0;
+        return 130.0;  // 增加高度
       case WidgetType.currentClass:
+        return 90.0;
       case WidgetType.countdown:
-        return 120.0;
+        return 90.0;
       case WidgetType.timetable:
-        return 200.0;
+        return 140.0;  // 减小高度
       case WidgetType.settings:
         return 48.0;
+      default:
+        return 50.0;
     }
   }
   
-  /// 应用流式布局解决重叠 - 支持多行多列
+  /// 应用流式布局解决重叠 - 使用单列垂直布局
   Map<WidgetType, WidgetPosition> _applyFlowLayout(
     Map<WidgetType, WidgetPosition> layout,
     Size containerSize
   ) {
     final flowLayout = <WidgetType, WidgetPosition>{};
     const padding = 16.0;
-    const spacing = 12.0;
+    const spacing = 16.0;  // 增加间距
     
-    // 根据容器宽度决定列数，确保每列宽度足够
-    final maxColumns = containerSize.width > 1200 ? 3 : containerSize.width > 800 ? 2 : 1;
-    // 确保每列宽度不小于最小安全宽度
-    final minColumnWidth = 280.0;
-    final availableWidth = containerSize.width - 2 * padding;
-    final maxPossibleColumns = (availableWidth + spacing) ~/ (minColumnWidth + spacing);
-    final columns = math.min(maxColumns, maxPossibleColumns);
-    
-    // 计算每列宽度，确保总和不超过容器宽度
-    final cardWidth = columns > 0 ? (availableWidth - (columns - 1) * spacing) / columns : availableWidth;
+    // 使用更小的卡片宽度，让组件更紧凑
+    final cardWidth = math.min(containerSize.width - 2 * padding, 300.0);
     
     // 按Y坐标排序
     final sortedEntries = layout.entries.toList()
       ..sort((a, b) => a.value.y.compareTo(b.value.y));
     
-    double currentX = padding;
     double currentY = padding;
-    double rowHeight = 0;
-    int currentColumn = 0;
     
     // 保存settings按钮，最后处理
     WidgetType? settingsKey;
@@ -452,42 +441,27 @@ class CollisionDetector {
       // 确保组件高度合理
       final preferredHeight = _getDefaultHeight(position.type);
       final remainingHeight = containerSize.height - currentY - padding;
-      final adjustedHeight = math.min(preferredHeight, remainingHeight);
       
-      if (adjustedHeight < 50) {
-        // 如果剩余空间不足，隐藏组件
-        flowLayout[entry.key] = WidgetPosition(
-          type: position.type,
-          x: position.x,
-          y: position.y,
-          width: position.width,
-          height: position.height,
-          isVisible: false,
-        );
-        continue;
-      }
+      // 如果剩余高度不足，使用剩余空间或最小高度
+      final adjustedHeight = remainingHeight > preferredHeight 
+          ? preferredHeight 
+          : math.max(50.0, remainingHeight);
+      
+      // 只有在完全没有空间时才隐藏组件
+      final isVisible = remainingHeight >= 50;
       
       flowLayout[entry.key] = WidgetPosition(
         type: position.type,
-        x: currentX,
+        x: padding,
         y: currentY,
         width: cardWidth,
         height: adjustedHeight,
-        isVisible: true,
+        isVisible: isVisible,
       );
       
-      // 更新行高和位置
-      rowHeight = math.max(rowHeight, adjustedHeight);
-      currentColumn++;
-      
-      // 如果当前行已满，换行
-      if (currentColumn >= columns) {
-        currentColumn = 0;
-        currentX = padding;
-        currentY += rowHeight + spacing;
-        rowHeight = 0;
-      } else {
-        currentX += cardWidth + spacing;
+      // 只有可见的组件才更新Y坐标
+      if (isVisible) {
+        currentY += adjustedHeight + spacing;
       }
     }
     

@@ -12,12 +12,20 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:time_widgets/utils/logger.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
+import 'package:time_widgets/utils/memory_optimizer.dart';
+import 'package:time_widgets/utils/aggressive_optimizer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 初始化窗口管理器
-  // await windowManager.ensureInitialized(); // EnhancedWindowManager handles this
+  // 禁用调试信息以减少内存和CPU
+  debugPrint = (String? message, {int? wrapWidth}) {};
+  
+  // 设置极限内存限制
+  AggressiveOptimizer.setExtremeLimits();
+  
+  // 启动激进优化
+  AggressiveOptimizer.startAggressiveOptimization();
   
   runApp(const TimeWidgetsApp());
 }
@@ -90,11 +98,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
       final success = await EnhancedWindowManager.initializeWindow(
         onScreenSizeChanged: () {
           // 处理屏幕尺寸变化，可能需要重新布局
-          if (mounted) {
-            setState(() {
-              // 触发重建
-            });
-          }
+          // 延迟执行，避免在构建过程中触发重建
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (mounted) {
+              setState(() {
+                // 触发重建
+              });
+            }
+          });
         },
       );
       
@@ -162,9 +173,8 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
   void _navigateToSettings() {
     _hideMD3TrayMenu();
     
-    if (!_isWindowVisible) {
-      _showMainWindow();
-    }
+    // 创建独立的16:9窗口
+    EnhancedWindowManager.createEditWindow('设置');
     
     // 打开设置页面时，禁用指针穿透，确保可以交互
     EnhancedWindowManager.setIgnoreMouseEvents(false);
@@ -181,9 +191,8 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
   void _navigateToTimetableEdit() {
     _hideMD3TrayMenu();
     
-    if (!_isWindowVisible) {
-      _showMainWindow();
-    }
+    // 创建独立的16:9窗口
+    EnhancedWindowManager.createEditWindow('课表编辑');
     
     // 打开课表编辑页面时，禁用指针穿透，确保可以交互
     EnhancedWindowManager.setIgnoreMouseEvents(false);
@@ -263,7 +272,11 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
   void dispose() {
     _themeService.dispose();
     _courseReminderService.dispose();
+    _settingsService.dispose();
     MD3TrayMenuService.instance.destroy();
+    MemoryOptimizer.stopAggressiveGC();
+    MemoryOptimizer.clearImageCache();
+    AggressiveOptimizer.stopAggressiveOptimization();
     super.dispose();
   }
 

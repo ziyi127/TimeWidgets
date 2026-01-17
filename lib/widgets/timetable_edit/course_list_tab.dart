@@ -545,7 +545,8 @@ class _CourseListTabState extends State<CourseListTab> {
                         decoration: BoxDecoration(
                           color: selectedColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.withValues(alpha: 0.5)),
+                          border: Border.all(color: Colors.grey.withAlpha((255 * 0.5).round())),
+
                         ),
                       ),
                     ),

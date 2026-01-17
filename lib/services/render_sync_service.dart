@@ -24,14 +24,14 @@ class RenderSyncService {
   void initialize() {
     if (_isInitialized) return;
     
-    // 开始帧时间监控
-    SchedulerBinding.instance.addTimingsCallback(_onFrameTimings);
+    // 不启动帧时间监控以减少CPU占用
+    // SchedulerBinding.instance.addTimingsCallback(_onFrameTimings);
     
     // 设置帧回调
-    SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
+    // SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
     
     _isInitialized = true;
-    Logger.i('RenderSyncService initialized');
+    Logger.i('RenderSyncService initialized (lightweight mode)');
   }
 
   /// 销毁服务
@@ -48,36 +48,8 @@ class RenderSyncService {
 
   /// 同步执行渲染更新
   void syncUpdate(VoidCallback update, {String? key}) {
-    if (!_isInitialized) {
-      update();
-      return;
-    }
-
-    // 如果有key，取消之前的更新
-    if (key != null) {
-      _scheduledUpdates[key]?.cancel();
-      _scheduledUpdates.remove(key);
-    }
-
-    // 添加到待处理队列
-    _pendingUpdates.add(update);
-    
-    // 如果性能良好，立即执行
-    if (_averageFrameTime < 14.0) { // 留有余量
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        _processPendingUpdates();
-      });
-    } else {
-      // 性能不佳时，延迟执行
-      final timer = Timer(Duration(milliseconds: 1), () {
-        _processPendingUpdates();
-        if (key != null) _scheduledUpdates.remove(key);
-      });
-      
-      if (key != null) {
-        _scheduledUpdates[key] = timer;
-      }
-    }
+    // 简化版本：直接执行，不做复杂的性能检查
+    update();
   }
 
   /// 批量同步更新

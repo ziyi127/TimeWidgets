@@ -216,9 +216,8 @@ class ThemeService {
   }
 
   /// 释放资源
-  /// 由于主题服务现在是单例模式，此方法为空实现，仅保持向后兼容性
   void dispose() {
-    // 单例模式下，资源会在应用退出时自动释放
-    // 不需要手动关闭流控制器
+    _themeController.close();
+    Logger.i('ThemeService disposed');
   }
 }

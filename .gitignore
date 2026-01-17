@@ -12,6 +12,13 @@
 .swiftpm/
 migrate_working_dir/
 
+# Temporary documentation and logs
+*_SUMMARY.md
+*_GUIDE.md
+*_ANALYSIS.md
+problems_and_diagnostics.md
+flutter_*.log
+
 # IntelliJ related
 *.iml
 *.ipr

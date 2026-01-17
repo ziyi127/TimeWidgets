@@ -7,6 +7,8 @@ import 'package:time_widgets/screens/about_screen.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/widgets/city_search_dialog.dart';
+import 'package:time_widgets/services/enhanced_window_manager.dart';
+import 'package:time_widgets/widgets/window_controls.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -174,12 +176,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('设置'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // 恢复主窗口原始尺寸和位置
+            EnhancedWindowManager.restoreMainWindow();
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.restore),
             onPressed: _resetSettings,
             tooltip: '重置为默认值',
           ),
+          // 窗口控制按钮
+          const SizedBox(width: 8),
+          const WindowControls(restoreMainWindowOnClose: true),
+          const SizedBox(width: 8),
         ],
       ),
       body: ListView(
@@ -610,9 +624,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: const Icon(Icons.calendar_today),
                   title: const Text('学期开始日期'),
                   subtitle: Text(
-                    _settings.semesterStartDate != null
-                        ? '${_settings.semesterStartDate!.year}年${_settings.semesterStartDate!.month}月${_settings.semesterStartDate!.day}日'
-                        : '未设置',
+                    () {
+                      final date = _settings.semesterStartDate;
+                      return date != null
+                          ? '${date.year}年${date.month}月${date.day}日'
+                          : '未设置';
+                    }(),
                   ),
                   trailing: ElevatedButton(
                     onPressed: _selectSemesterStartDate,

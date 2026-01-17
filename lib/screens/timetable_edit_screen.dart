@@ -3,6 +3,8 @@ import 'package:time_widgets/services/timetable_edit_service.dart';
 import 'package:time_widgets/widgets/timetable_edit/course_list_tab.dart';
 import 'package:time_widgets/widgets/timetable_edit/time_slot_tab.dart';
 import 'package:time_widgets/widgets/timetable_edit/timetable_grid_tab.dart';
+import 'package:time_widgets/services/enhanced_window_manager.dart';
+import 'package:time_widgets/widgets/window_controls.dart';
 
 
 class TimetableEditScreen extends StatefulWidget {
@@ -45,6 +47,20 @@ class _TimetableEditScreenState extends State<TimetableEditScreen> with SingleTi
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑课表'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // 恢复主窗口原始尺寸和位置
+            EnhancedWindowManager.restoreMainWindow();
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          // 窗口控制按钮
+          const SizedBox(width: 8),
+          const WindowControls(restoreMainWindowOnClose: true),
+          const SizedBox(width: 8),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

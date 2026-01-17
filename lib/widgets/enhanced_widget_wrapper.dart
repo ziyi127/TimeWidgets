@@ -25,9 +25,31 @@ class EnhancedWidgetWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final width = MediaQuery.sizeOf(context).width;
+    // 使用默认主题作为回退
+    final defaultTheme = ThemeData();
+    final defaultColorScheme = defaultTheme.colorScheme;
+    
+    // 获取主题，添加空值检查
+    late ThemeData theme;
+    late ColorScheme colorScheme;
+    
+    try {
+      theme = Theme.of(context);
+      colorScheme = theme.colorScheme;
+    } catch (e) {
+      // 当上下文没有关联的Theme时，使用默认主题
+      theme = defaultTheme;
+      colorScheme = defaultColorScheme;
+    }
+    
+    // 获取MediaQuery尺寸，添加空值检查
+    double width = 300.0; // 默认宽度
+    try {
+      final size = MediaQuery.sizeOf(context);
+      width = size.width;
+    } catch (e) {
+      // 当上下文没有关联的MediaQuery时，使用默认宽度
+    }
     
     // 使用Surface Variant颜色作为默认背景，带有一些透明度
     final defaultBgColor = colorScheme.surfaceContainerHighest.withAlpha((255 * 0.6).round());

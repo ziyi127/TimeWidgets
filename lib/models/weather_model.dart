@@ -112,25 +112,44 @@ class WeatherData {
       description: json['description'] ?? 'Unknown',
       temperature: int.tryParse(json['temperature'].toString().replaceAll('℃', '')) ?? 0,
       temperatureRange: json['temperature_range'] ?? '0℃~0℃',
-      aqiLevel: json['aqilevel'] ?? 0,
-      humidity: json['humidity'] ?? 0,
+      aqiLevel: json['aqilevel'] is String ? int.tryParse(json['aqilevel']) ?? 0 : (json['aqilevel'] ?? 0),
+      humidity: json['humidity'] is String ? int.tryParse(json['humidity']) ?? 0 : (json['humidity'] ?? 0),
       wind: json['wind'] ?? 'Unknown',
       pressure: double.tryParse(json['pressure'].toString()) ?? 0.0,
       sunrise: _formatTime(json['sunrise']),
       sunset: _formatTime(json['sunset']),
-      weatherType: json['weather_type'] ?? 0,
-      weatherIcon: _getWeatherIcon(json['weather_type'] ?? 0),
-      feelsLike: json['feels_like'] ?? 0,
+      weatherType: json['weather_type'] is String ? int.tryParse(json['weather_type']) ?? 0 : (json['weather_type'] ?? 0),
+      weatherIcon: _getWeatherIcon(json['weather_type'] is String ? int.tryParse(json['weather_type']) ?? 0 : (json['weather_type'] ?? 0)),
+      feelsLike: json['feels_like'] is String ? int.tryParse(json['feels_like']) ?? 0 : (json['feels_like'] ?? 0),
       visibility: json['visibility']?.toString() ?? '',
       uvIndex: json['uv_index']?.toString() ?? '0',
       pubTime: json['pub_time']?.toString() ?? '',
     );
   }
 
-  static String _formatTime(int milliseconds) {
+  static String _formatTime(dynamic value) {
+    if (value == null) return '00:00';
+    
+    int milliseconds;
+    if (value is String) {
+      // 如果是字符串，尝试解析为毫秒数
+      milliseconds = int.tryParse(value) ?? 0;
+    } else if (value is int) {
+      // 如果是整数，直接使用
+      milliseconds = value;
+    } else {
+      // 其他类型，转换为字符串再解析
+      milliseconds = int.tryParse(value.toString()) ?? 0;
+    }
+    
     if (milliseconds == 0) return '00:00';
-    final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    try {
+      final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
+      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      // 如果解析失败，返回默认时间
+      return '00:00';
+    }
   }
 
   /// 从ISO时间字符串格式化时间

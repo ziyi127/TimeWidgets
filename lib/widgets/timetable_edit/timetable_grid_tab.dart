@@ -221,7 +221,7 @@ class TimetableGridTab extends StatelessWidget {
             right: BorderSide(color: theme.colorScheme.outlineVariant),
           ) : null,
           color: course != null 
-              ? Color(int.parse(course.color.replaceFirst('#', '0xFF'))).withValues(alpha: 0.2)
+              ? Color(int.parse(course.color.replaceFirst('#', '0xFF'))).withAlpha((255 * 0.2).round())
               : null,
         ),
         child: Stack(
@@ -261,7 +261,7 @@ class TimetableGridTab extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
                   decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest.withAlpha((255 * 0.5).round()),
                           borderRadius: BorderRadius.circular(2),
                         ),
                   child: Text(

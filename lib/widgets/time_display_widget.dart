@@ -16,8 +16,8 @@ class TimeDisplayWidget extends StatefulWidget {
 }
 
 class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
-  late String _currentTime;
-  late String _currentSeconds;
+  String _currentTime = '';
+  String _currentSeconds = '';
   late Timer _timer;
 
   @override
@@ -36,11 +36,21 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
   }
 
   void _updateTime() {
+    if (!mounted) return;
+    
     final now = DateTime.now();
-    setState(() {
-      _currentTime = DateFormat('HH:mm').format(now);
-      _currentSeconds = DateFormat('ss').format(now);
-    });
+    final newTime = DateFormat('HH:mm').format(now);
+    final newSeconds = DateFormat('ss').format(now);
+    
+    // 只有当时间真正改变时才调用 setState
+    if (_currentTime != newTime || _currentSeconds != newSeconds) {
+      if (mounted) {
+        setState(() {
+          _currentTime = newTime;
+          _currentSeconds = newSeconds;
+        });
+      }
+    }
   }
 
   @override
@@ -53,46 +63,41 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.schedule_rounded,
-              size: 20,
+              size: 16,
               color: colorScheme.primary,
             ),
-            const SizedBox(width: 12),
-            // 限制文本宽度，避免溢出
-            Flexible(
-              child: Text(
-                '当前时间',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 8),
+            Text(
+              '当前时间',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 12,
               ),
             ),
-            const Spacer(),
-            // 限制时间文本宽度
-            Flexible(
-              child: Text(
-                _currentTime,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.onSurface,
-                ),
-                overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 12),
+            Text(
+              _currentTime,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface,
+                fontSize: 20,
               ),
             ),
             const SizedBox(width: 4),
             Text(
               _currentSeconds,
-              style: theme.textTheme.titleMedium?.copyWith(
+              style: theme.textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
+                fontSize: 14,
               ),
             ),
           ],

@@ -133,7 +133,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
         // Header row with time slot names
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+          color: Theme.of(context).primaryColor.withAlpha((255 * 0.1).round()),
           child: Row(
             children: [
               const SizedBox(width: 80), // Space for course selector

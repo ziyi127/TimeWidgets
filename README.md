@@ -1,5 +1,9 @@
 # 智慧课程表 (Time Widgets)
 
+[![CI](https://github.com/your-username/time_widgets/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/time_widgets/actions/workflows/ci.yml)
+[![Build and Release](https://github.com/your-username/time_widgets/actions/workflows/build-release.yml/badge.svg)](https://github.com/your-username/time_widgets/actions/workflows/build-release.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 一款基于 Flutter 的智能课程表桌面应用，为学生提供课程管理、天气信息、倒计时等功能。
 
 ## ✨ 功能特性
@@ -47,6 +51,39 @@
    ```
 
 ### 构建发布版本
+
+**Windows:**
+```bash
+flutter build windows --release
+```
+
+构建完成后，可执行文件位于 `build/windows/x64/runner/Release/` 目录。
+
+## 📦 自动化构建
+
+本项目使用 GitHub Actions 进行自动化构建和发布：
+
+- **CI 测试**: 每次推送到 main/develop 分支时自动运行测试
+- **自动发布**: 创建新的 tag (如 `v1.0.0`) 时自动构建并发布 Windows 版本
+
+### 创建新版本发布
+
+```bash
+# 创建并推送 tag
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+GitHub Actions 将自动：
+1. 编译 Windows 版本
+2. 打包为 ZIP 文件
+3. 创建 GitHub Release
+4. 上传构建产物
+
+**版本号说明：**
+- `0.1.0` - 早期测试版本（Alpha/Beta）
+- `0.2.0` - 功能增强测试版
+- `1.0.0` - 正式稳定版本
 
 ```bash
 flutter build windows --release

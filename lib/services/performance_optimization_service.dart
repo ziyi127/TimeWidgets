@@ -385,7 +385,8 @@ class OptimizedAnimationController extends AnimationController {
       scaleFactor = 0.85; // 中等CPU使用率下减少15%
     }
     
-    final adjustedDuration = (duration ?? this.duration!) * scaleFactor;
+    final originalDuration = duration ?? this.duration ?? const Duration(milliseconds: 300);
+    final adjustedDuration = originalDuration * scaleFactor;
     
     animateTo(target, duration: adjustedDuration);
   }

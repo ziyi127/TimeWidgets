@@ -163,9 +163,9 @@ class MD3ButtonStyles {
       icon: icon,
       tooltip: tooltip,
       color: enabled ? colorScheme.primary : colorScheme.onSurfaceVariant,
-      hoverColor: enabled ? colorScheme.primary.withValues(alpha: 0.08) : null,
-      highlightColor: enabled ? colorScheme.primary.withValues(alpha: 0.12) : null,
-      splashColor: enabled ? colorScheme.primary.withValues(alpha: 0.16) : null,
+      hoverColor: enabled ? colorScheme.primary.withAlpha((255 * 0.08).round()) : null,
+      highlightColor: enabled ? colorScheme.primary.withAlpha((255 * 0.12).round()) : null,
+      splashColor: enabled ? colorScheme.primary.withAlpha((255 * 0.16).round()) : null,
       padding: const EdgeInsets.all(12),
     );
   }

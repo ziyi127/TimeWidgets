@@ -83,6 +83,7 @@ class CurrentClassWidget extends StatelessWidget {
           children: [
             // 头部
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   Icons.school_rounded,
@@ -97,7 +98,7 @@ class CurrentClassWidget extends StatelessWidget {
                     fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
                   ),
                 ),
-                const Spacer(),
+                SizedBox(width: ResponsiveUtils.value(16)),
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: ResponsiveUtils.value(10),

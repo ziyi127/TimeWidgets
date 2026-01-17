@@ -263,7 +263,7 @@ class MD3TypographyStyles {
     final theme = Theme.of(context);
     final base = baseStyle ?? bodyMedium(context);
     return base.copyWith(
-      color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+      color: theme.colorScheme.onSurface.withAlpha((255 * 0.38).round()),
     );
   }
 

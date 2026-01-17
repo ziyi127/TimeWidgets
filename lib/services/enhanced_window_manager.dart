@@ -6,23 +6,23 @@ import 'dart:async';
 import 'package:time_widgets/utils/logger.dart';
 
 /// 增强的窗口管理器
-/// 提供可靠的窗口初始化、定位和状态管�?
+/// 提供可靠的窗口初始化、定位和状态管理
 class EnhancedWindowManager {
   static bool _isInitialized = false;
   static Size? _lastScreenSize;
   static VoidCallback? _onScreenSizeChanged;
   
-  /// 初始化窗�?
+  /// 初始化窗口
   static Future<bool> initializeWindow({VoidCallback? onScreenSizeChanged}) async {
     if (_isInitialized) return true;
     
     _onScreenSizeChanged = onScreenSizeChanged;
     
     try {
-      // 确保窗口管理器已初始�?
+      // 确保窗口管理器已初始化
       await windowManager.ensureInitialized();
       
-      // 等待一帧以确保Flutter完全初始�?
+      // 等待一帧以确保Flutter完全初始化
       await Future.delayed(const Duration(milliseconds: 100));
       
       // 获取屏幕信息
@@ -34,10 +34,10 @@ class EnhancedWindowManager {
       
       _lastScreenSize = screenInfo;
       
-      // 计算窗口尺寸和位�?
+      // 计算窗口尺寸和位置
       final windowBounds = _calculateWindowBounds(screenInfo);
       
-      // 设置窗口属�?
+      // 设置窗口属性
       await _configureWindow(windowBounds);
       
       // 初始化bitsdojo_window
@@ -53,6 +53,93 @@ class EnhancedWindowManager {
     } catch (e) {
       Logger.e('Window initialization failed: $e');
       return await _initializeWithDefaultSize();
+    }
+  }
+  
+  /// 保存主窗口原始尺寸和位置
+  static Size? _mainWindowSize;
+  static Offset? _mainWindowPosition;
+  
+  /// 创建独立的16:9窗口
+  /// 用于编辑页面，如设置、课表编辑等
+  static Future<void> createEditWindow(String title) async {
+    try {
+      // 确保窗口管理器已初始化
+      await windowManager.ensureInitialized();
+      
+      // 保存主窗口原始尺寸和位置
+      if (_mainWindowSize == null) {
+        _mainWindowSize = await windowManager.getSize();
+      }
+      if (_mainWindowPosition == null) {
+        _mainWindowPosition = await windowManager.getPosition();
+      }
+      
+      // 获取屏幕尺寸
+      final screenSize = await _getScreenInfo() ?? const Size(1920, 1080);
+      
+      // 计算16:9窗口尺寸（基于屏幕高度的80%）
+      final windowHeight = screenSize.height * 0.8;
+      final windowWidth = windowHeight * (16 / 9);
+      
+      // 确保窗口尺寸不超过屏幕尺寸
+      final finalWidth = windowWidth.clamp(800.0, screenSize.width - 100);
+      final finalHeight = finalWidth * (9 / 16);
+      
+      // 计算窗口位置（居中）
+      final windowX = (screenSize.width - finalWidth) / 2;
+      final windowY = (screenSize.height - finalHeight) / 2;
+      
+      // 创建新窗口配置
+      final bounds = Rect.fromLTWH(windowX, windowY, finalWidth, finalHeight);
+      
+      // 设置窗口属性
+      await windowManager.setSize(bounds.size);
+      await windowManager.setPosition(bounds.topLeft);
+      
+      // 使用系统默认窗口样式，带边框和标题栏
+      // 不要设置为无框窗口
+      await windowManager.setBackgroundColor(Colors.transparent);
+      await windowManager.setHasShadow(true);
+      await windowManager.setAlwaysOnTop(false);
+      await windowManager.setAlwaysOnBottom(false);
+      await windowManager.setResizable(true);
+      await windowManager.show();
+      
+      // 设置窗口标题
+      appWindow.title = title;
+      
+      Logger.i('Created edit window: $title, size: ${bounds.size} at ${bounds.topLeft}');
+      
+    } catch (e) {
+      Logger.e('Error creating edit window: $e');
+      rethrow;
+    }
+  }
+  
+  /// 恢复主窗口原始尺寸和位置
+  static Future<void> restoreMainWindow() async {
+    try {
+      if (_mainWindowSize != null && _mainWindowPosition != null) {
+        await windowManager.setSize(_mainWindowSize!);
+        await windowManager.setPosition(_mainWindowPosition!);
+        await windowManager.setAsFrameless();
+        await windowManager.setResizable(false);
+        await windowManager.setHasShadow(false);
+        await windowManager.setBackgroundColor(Colors.transparent);
+        
+        // 设置窗口层级 - 确保主窗口回到桌面背景层
+        await windowManager.setAlwaysOnTop(false);
+        await windowManager.setAlwaysOnBottom(true);
+        
+        // 重置保存的主窗口信息
+        _mainWindowSize = null;
+        _mainWindowPosition = null;
+        
+        Logger.i('Restored main window to original size and position');
+      }
+    } catch (e) {
+      Logger.e('Error restoring main window: $e');
     }
   }
 
@@ -75,7 +162,7 @@ class EnhancedWindowManager {
   /// 获取Windows屏幕尺寸
   static Future<Size?> _getWindowsScreenSize() async {
     try {
-      // 使用PowerShell获取屏幕分辨�?
+      // 使用PowerShell获取屏幕分辨率
       final result = await Process.run('powershell', [
         '-Command',
         'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen.Bounds'
@@ -87,9 +174,15 @@ class EnhancedWindowManager {
         final match = regex.firstMatch(output);
         
         if (match != null) {
-          final width = double.parse(match.group(1)!);
-          final height = double.parse(match.group(2)!);
-          return Size(width, height);
+          final widthStr = match.group(1);
+          final heightStr = match.group(2);
+          if (widthStr != null && heightStr != null) {
+            final width = double.tryParse(widthStr);
+            final height = double.tryParse(heightStr);
+            if (width != null && height != null) {
+              return Size(width, height);
+            }
+          }
         }
       }
     } catch (e) {
@@ -108,7 +201,7 @@ class EnhancedWindowManager {
     // 窗口位置在屏幕右
     final windowY = 0.0;
     
-    // 确保最小尺�?
+    // 确保最小尺寸
     final minWidth = 300.0;
     final minHeight = 600.0;
     
@@ -119,7 +212,7 @@ class EnhancedWindowManager {
     return Rect.fromLTWH(finalX, windowY, finalWidth, finalHeight);
   }
 
-  /// 配置窗口属�?
+  /// 配置窗口属性
   static Future<void> _configureWindow(Rect bounds) async {
     try {
       // 设置窗口尺寸
@@ -133,9 +226,13 @@ class EnhancedWindowManager {
       await windowManager.setBackgroundColor(Colors.transparent);
       await windowManager.setHasShadow(false);
       
-      // 设置窗口层级 - 不要设置为最底层，这会影响交�?
+      // 设置窗口层级 - 在桌面背景上显示，但不遮挡其他应用
+      // 这样Win+D时会显示，同时不会影响其他应用
       await windowManager.setAlwaysOnTop(false);
-      await windowManager.setAlwaysOnBottom(false);
+      await windowManager.setAlwaysOnBottom(true);
+      
+      // 禁用鼠标穿透，确保小组件可以交互
+      await windowManager.setIgnoreMouseEvents(false);
       
       // 设置窗口可调整大小（可选）
       await windowManager.setResizable(false);
@@ -162,7 +259,7 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 使用默认尺寸初始�?
+  /// 使用默认尺寸初始化
   static Future<bool> _initializeWithDefaultSize() async {
     try {
       const defaultSize = Size(480, 1080);
@@ -173,8 +270,11 @@ class EnhancedWindowManager {
       await windowManager.setAsFrameless();
       await windowManager.setBackgroundColor(Colors.transparent);
       await windowManager.setHasShadow(false);
+      // 设置窗口层级 - 在桌面背景上显示，但不遮挡其他应用
       await windowManager.setAlwaysOnTop(false);
-      await windowManager.setAlwaysOnBottom(false);
+      await windowManager.setAlwaysOnBottom(true);
+      // 禁用鼠标穿透，确保小组件可以交互
+      await windowManager.setIgnoreMouseEvents(false);
       await windowManager.show();
       
       _initializeBitsdojoWindow();
@@ -188,10 +288,10 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 开始屏幕监�?
+  /// 开始屏幕监听
   static void _startScreenMonitoring() {
-    // 定期检查屏幕尺寸变�?
-    Timer.periodic(const Duration(seconds: 5), (timer) async {
+    // 减少检查频率，从5秒改为30秒
+    Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
         final currentSize = await _getScreenInfo();
         if (currentSize != null && 
@@ -270,7 +370,7 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 检查窗口是否已初始�?
+  /// 检查窗口是否已初始化
   static bool get isInitialized => _isInitialized;
 
   /// 获取最后记录的屏幕尺寸
