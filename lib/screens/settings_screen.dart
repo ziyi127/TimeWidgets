@@ -202,997 +202,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // 常规设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '常规设置',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.language_outlined),
-                  title: const Text('语言'),
-                  subtitle:
-                      Text(_settings.language == 'zh' ? '简体中文' : 'English'),
-                  trailing: DropdownButton<String>(
-                    value: _settings.language,
-                    underline: const SizedBox(),
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        _saveSettings(_settings.copyWith(language: newValue));
-                      }
-                    },
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'zh',
-                        child: Text('简体中文'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'en',
-                        child: Text('English'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          _buildGeneralSettings(theme),
+          const SizedBox(height: 16),
+          _buildThemeSettings(theme),
+          const SizedBox(height: 16),
+          _buildWidgetSettings(theme),
+          const SizedBox(height: 16),
+          _buildSemesterSettings(theme),
+          const SizedBox(height: 16),
+          _buildRefreshSettings(theme),
+          const SizedBox(height: 16),
+          _buildTimeSyncSettings(theme),
+          const SizedBox(height: 16),
+          _buildNotificationSettings(theme),
+          const SizedBox(height: 16),
+          _buildStartupSettings(theme),
+          const SizedBox(height: 16),
+          _buildAdvancedSettings(theme),
+          const SizedBox(height: 16),
+          _buildAboutSettings(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGeneralSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '常规设置',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(height: 16),
-
-          // 主题设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '外观设置',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+          ListTile(
+            leading: const Icon(Icons.language_outlined),
+            title: const Text('语言'),
+            subtitle: Text(_settings.language == 'zh' ? '简体中文' : 'English'),
+            trailing: DropdownButton<String>(
+              value: _settings.language,
+              underline: const SizedBox(),
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  _saveSettings(_settings.copyWith(language: newValue));
+                }
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: 'zh',
+                  child: Text('简体中文'),
                 ),
-
-                // 主题模式选择
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: DropdownButtonFormField<ThemeMode>(
-                    initialValue: _settings.themeSettings.themeMode,
-                    decoration: const InputDecoration(
-                      labelText: '主题模式',
-                      prefixIcon: Icon(Icons.brightness_6_outlined),
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (value) async {
-                      if (value != null) {
-                        final newThemeSettings =
-                            _settings.themeSettings.copyWith(themeMode: value);
-                        await _saveSettings(
-                          _settings.copyWith(
-                            themeSettings: newThemeSettings,
-                          ),
-                        );
-                        await _themeService.saveSettings(newThemeSettings);
-                      }
-                    },
-                    items: const [
-                      DropdownMenuItem(
-                        value: ThemeMode.system,
-                        child: Text('跟随系统'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.light,
-                        child: Text('浅色'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.dark,
-                        child: Text('深色'),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 动态颜色开关
-                SwitchListTile(
-                  secondary: const Icon(Icons.auto_awesome_outlined),
-                  title: const Text('动态颜色'),
-                  subtitle: const Text('使用 Material You 动态取色'),
-                  value: _settings.themeSettings.useDynamicColor,
-                  onChanged: (value) async {
-                    final newThemeSettings = _settings.themeSettings
-                        .copyWith(useDynamicColor: value);
-                    await _saveSettings(
-                      _settings.copyWith(themeSettings: newThemeSettings),
-                    );
-                    await _themeService.saveSettings(newThemeSettings);
-                  },
-                ),
-
-                // 系统颜色开关
-                SwitchListTile(
-                  secondary: const Icon(Icons.wallpaper),
-                  title: const Text('跟随系统颜色'),
-                  subtitle: const Text('使用系统的强调色'),
-                  value: _settings.themeSettings.useSystemColor,
-                  onChanged: (value) async {
-                    final newThemeSettings =
-                        _settings.themeSettings.copyWith(useSystemColor: value);
-                    // 同时更新 themeSettings 和顶层的 followSystemColor
-                    await _saveSettings(
-                      _settings.copyWith(
-                        themeSettings: newThemeSettings,
-                        followSystemColor: value,
-                      ),
-                    );
-                    await _themeService.saveSettings(newThemeSettings);
-                  },
-                ),
-
-                // 种子颜色选择
-                ListTile(
-                  leading: const Icon(Icons.palette_outlined),
-                  title: const Text('种子颜色'),
-                  subtitle: const Text('自定义应用主题颜色'),
-                  enabled:
-                      !_settings.themeSettings.useSystemColor, // 如果跟随系统，禁用手动选择
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 当前颜色显示
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: _settings.themeSettings.seedColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.colorScheme.outline,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: _settings.themeSettings.useSystemColor
-                            ? null
-                            : _showColorPicker,
-                        child: const Text('选择'),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Divider(),
-                ),
-
-                // 字体大小缩放
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.text_fields_outlined),
-                          const SizedBox(width: 16),
-                          Text(
-                            '字体大小: ${_settings.themeSettings.fontSizeScale.toStringAsFixed(1)}x',
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Slider(
-                        value: _settings.themeSettings.fontSizeScale,
-                        min: 0.7,
-                        max: 1.5,
-                        divisions: 8,
-                        label: _settings.themeSettings.fontSizeScale
-                            .toStringAsFixed(1),
-                        onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings
-                              .copyWith(fontSizeScale: value);
-                          await _saveSettings(
-                            _settings.copyWith(
-                              themeSettings: newThemeSettings,
-                            ),
-                          );
-                          await _themeService.saveSettings(newThemeSettings);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 圆角大小
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.rounded_corner_outlined),
-                          const SizedBox(width: 16),
-                          Text(
-                            '圆角大小: ${_settings.themeSettings.borderRadiusScale.toStringAsFixed(1)}x',
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Slider(
-                        value: _settings.themeSettings.borderRadiusScale,
-                        min: 0.5,
-                        max: 2,
-                        divisions: 15,
-                        label: _settings.themeSettings.borderRadiusScale
-                            .toStringAsFixed(1),
-                        onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings
-                              .copyWith(borderRadiusScale: value);
-                          await _saveSettings(
-                            _settings.copyWith(
-                              themeSettings: newThemeSettings,
-                            ),
-                          );
-                          await _themeService.saveSettings(newThemeSettings);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 组件透明度
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.opacity_outlined),
-                          const SizedBox(width: 16),
-                          Text(
-                            '组件透明度: ${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Slider(
-                        value: _settings.themeSettings.componentOpacity,
-                        min: 0.7,
-                        divisions: 3,
-                        label:
-                            '${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
-                        onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings
-                              .copyWith(componentOpacity: value);
-                          await _saveSettings(
-                            _settings.copyWith(
-                              themeSettings: newThemeSettings,
-                            ),
-                          );
-                          await _themeService.saveSettings(newThemeSettings);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 阴影强度
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.light_mode_outlined),
-                          const SizedBox(width: 16),
-                          Text(
-                            '阴影强度: ${_settings.themeSettings.shadowStrength.toStringAsFixed(1)}x',
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Slider(
-                        value: _settings.themeSettings.shadowStrength,
-                        max: 2,
-                        divisions: 20,
-                        label: _settings.themeSettings.shadowStrength
-                            .toStringAsFixed(1),
-                        onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings
-                              .copyWith(shadowStrength: value);
-                          await _saveSettings(
-                            _settings.copyWith(
-                              themeSettings: newThemeSettings,
-                            ),
-                          );
-                          await _themeService.saveSettings(newThemeSettings);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 启用渐变效果
-                SwitchListTile(
-                  secondary: const Icon(Icons.gradient_outlined),
-                  title: const Text('启用渐变效果'),
-                  subtitle: const Text('为按钮和卡片添加渐变效果'),
-                  value: _settings.themeSettings.enableGradients,
-                  onChanged: (value) async {
-                    final newThemeSettings = _settings.themeSettings
-                        .copyWith(enableGradients: value);
-                    await _saveSettings(
-                      _settings.copyWith(themeSettings: newThemeSettings),
-                    );
-                    await _themeService.saveSettings(newThemeSettings);
-                  },
-                ),
-
-                // UI缩放
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.display_settings_outlined),
-                          const SizedBox(width: 16),
-                          Text(
-                            '界面缩放: ${_settings.uiScale.toStringAsFixed(1)}x',
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Slider(
-                        value: _settings.uiScale,
-                        min: 0.5,
-                        max: 2,
-                        divisions: 15,
-                        label: _settings.uiScale.toStringAsFixed(1),
-                        onChanged: (value) {
-                          _saveSettings(_settings.copyWith(uiScale: value));
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 小部件显示设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '小部件显示',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.access_time_outlined),
-                  title: const Text('时间显示'),
-                  subtitle: const Text('在主屏幕显示时间'),
-                  value: _settings.showTimeDisplayWidget,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(showTimeDisplayWidget: value),
-                    );
-                  },
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.calendar_today_outlined),
-                  title: const Text('日期显示'),
-                  subtitle: const Text('在主屏幕显示日期'),
-                  value: _settings.showDateDisplayWidget,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(showDateDisplayWidget: value),
-                    );
-                  },
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.calendar_view_week_outlined),
-                  title: const Text('周数显示'),
-                  subtitle: const Text('在主屏幕显示当前周数'),
-                  value: _settings.showWeekDisplayWidget,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(showWeekDisplayWidget: value),
-                    );
-                  },
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.cloud_outlined),
-                  title: const Text('天气显示'),
-                  subtitle: const Text('在主屏幕显示天气信息'),
-                  value: _settings.showWeatherWidget,
-                  onChanged: (value) {
-                    _saveSettings(_settings.copyWith(showWeatherWidget: value));
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.location_on_outlined),
-                  title: const Text('天气地区'),
-                  subtitle: Text(_settings.cityName ?? '未设置'),
-                  trailing: ElevatedButton(
-                    onPressed: () async {
-                      final city = await showDialog<Map<String, dynamic>>(
-                        context: context,
-                        builder: (context) => const CitySearchDialog(),
-                      );
-                      if (city != null) {
-                        await _saveSettings(
-                          _settings.copyWith(
-                            latitude: city['latitude'] as double?,
-                            longitude: city['longitude'] as double?,
-                            cityName: city['name'] as String?,
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('更改'),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.timer_outlined),
-                  title: const Text('倒计时显示'),
-                  subtitle: const Text('在主屏幕显示倒计时'),
-                  value: _settings.showCountdownWidget,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(showCountdownWidget: value),
-                    );
-                  },
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.school_outlined),
-                  title: const Text('当前课程显示'),
-                  subtitle: const Text('在主屏幕显示当前课程'),
-                  value: _settings.showCurrentClassWidget,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(showCurrentClassWidget: value),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 桌面小组件设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '桌面小组件',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.desktop_windows_outlined),
-                  title: const Text('启用桌面小组件'),
-                  subtitle: const Text('在桌面上显示小组件'),
-                  value: _settings.enableDesktopWidgets,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(enableDesktopWidgets: value),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 学期设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '学期设置',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.calendar_today),
-                  title: const Text('学期开始日期'),
-                  subtitle: Text(
-                    () {
-                      final date = _settings.semesterStartDate;
-                      return date != null
-                          ? '${date.year}年${date.month}月${date.day}日'
-                          : '未设置';
-                    }(),
-                  ),
-                  trailing: ElevatedButton(
-                    onPressed: _selectSemesterStartDate,
-                    child: const Text('选择'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 刷新间隔设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '刷新间隔',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.cloud_sync_outlined),
-                  title: const Text('天气刷新间隔'),
-                  subtitle: Text('${_settings.weatherRefreshInterval} 分钟'),
-                  trailing: SizedBox(
-                    width: 120,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: _settings.weatherRefreshInterval > 5
-                              ? () => _saveSettings(
-                                    _settings.copyWith(
-                                      weatherRefreshInterval:
-                                          _settings.weatherRefreshInterval - 5,
-                                    ),
-                                  )
-                              : null,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: _settings.weatherRefreshInterval < 120
-                              ? () => _saveSettings(
-                                    _settings.copyWith(
-                                      weatherRefreshInterval:
-                                          _settings.weatherRefreshInterval + 5,
-                                    ),
-                                  )
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.timer_outlined),
-                  title: const Text('倒计时刷新间隔'),
-                  subtitle: Text('${_settings.countdownRefreshInterval} 秒'),
-                  trailing: SizedBox(
-                    width: 120,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: _settings.countdownRefreshInterval > 10
-                              ? () => _saveSettings(
-                                    _settings.copyWith(
-                                      countdownRefreshInterval:
-                                          _settings.countdownRefreshInterval -
-                                              10,
-                                    ),
-                                  )
-                              : null,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: _settings.countdownRefreshInterval < 300
-                              ? () => _saveSettings(
-                                    _settings.copyWith(
-                                      countdownRefreshInterval:
-                                          _settings.countdownRefreshInterval +
-                                              10,
-                                    ),
-                                  )
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 时间同步设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '时间同步',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.sync_rounded),
-                  title: const Text('自动NTP同步'),
-                  subtitle: const Text('开启后将自动校准系统时间'),
-                  value: _settings.enableNtpSync,
-                  onChanged: (value) {
-                    _saveSettings(_settings.copyWith(enableNtpSync: value));
-                    // If disabling, NtpService handles it via listener
-                    // If enabling, NtpService handles it via listener
-                  },
-                ),
-                if (_settings.enableNtpSync) ...[
-                  ListTile(
-                    leading: const Icon(Icons.dns_outlined),
-                    title: const Text('NTP服务器'),
-                    subtitle: Text(_settings.ntpServer),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit_outlined),
-                      onPressed: () async {
-                        final controller =
-                            TextEditingController(text: _settings.ntpServer);
-                        final result = await showDialog<String>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('修改NTP服务器'),
-                            content: TextField(
-                              controller: controller,
-                              decoration: const InputDecoration(
-                                labelText: '服务器地址',
-                                hintText: '例如: ntp.aliyun.com',
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('取消'),
-                              ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, controller.text),
-                                child: const Text('确定'),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (result != null && result.isNotEmpty) {
-                          await _saveSettings(
-                            _settings.copyWith(ntpServer: result),
-                          );
-                          // Trigger sync manually to give immediate feedback
-                          await NtpService().syncTime();
-                          setState(() {});
-                        }
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.timer_outlined),
-                    title: const Text('同步间隔'),
-                    subtitle: Text('${_settings.ntpSyncInterval} 分钟'),
-                    trailing: SizedBox(
-                      width: 120,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove_circle_outline),
-                            onPressed: _settings.ntpSyncInterval > 10
-                                ? () => _saveSettings(
-                                      _settings.copyWith(
-                                        ntpSyncInterval:
-                                            _settings.ntpSyncInterval - 10,
-                                      ),
-                                    )
-                                : null,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.add_circle_outline),
-                            onPressed: _settings.ntpSyncInterval < 1440
-                                ? () => _saveSettings(
-                                      _settings.copyWith(
-                                        ntpSyncInterval:
-                                            _settings.ntpSyncInterval + 10,
-                                      ),
-                                    )
-                                : null,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: const Text('当前状态'),
-                    subtitle: Text('时间偏移: ${NtpService().offset}ms'),
-                    trailing: TextButton(
-                      onPressed: () async {
-                        await NtpService().syncTime();
-                        setState(() {});
-                      },
-                      child: const Text('立即同步'),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 通知设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '通知设置',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.notifications_outlined),
-                  title: const Text('启用通知'),
-                  subtitle: const Text('接收课程和倒计时提醒'),
-                  value: _settings.enableNotifications,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(enableNotifications: value),
-                    );
-                  },
-                ),
-                if (_settings.enableNotifications) ...[
-                  SwitchListTile(
-                    secondary: const Icon(Icons.access_time_outlined),
-                    title: const Text('课程提醒'),
-                    subtitle: const Text('开启后将在课程开始前提醒'),
-                    value: _settings.enableCourseReminder,
-                    onChanged: (value) {
-                      _saveSettings(
-                        _settings.copyWith(enableCourseReminder: value),
-                      );
-                    },
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.volume_up_outlined),
-                    title: const Text('语音提醒'),
-                    subtitle: const Text('开启后将使用系统语音播报课程提醒'),
-                    value: _settings.enableTtsForReminder,
-                    onChanged: (value) {
-                      _saveSettings(
-                        _settings.copyWith(enableTtsForReminder: value),
-                      );
-                    },
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.class_outlined),
-                    title: const Text('课程开始通知'),
-                    subtitle: const Text('在课程开始时发送通知'),
-                    value: _settings.showNotificationOnClassStart,
-                    onChanged: (value) {
-                      _saveSettings(
-                        _settings.copyWith(
-                          showNotificationOnClassStart: value,
-                        ),
-                      );
-                    },
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.class_outlined),
-                    title: const Text('课程结束通知'),
-                    subtitle: const Text('在课程结束时发送通知'),
-                    value: _settings.showNotificationOnClassEnd,
-                    onChanged: (value) {
-                      _saveSettings(
-                        _settings.copyWith(
-                          showNotificationOnClassEnd: value,
-                        ),
-                      );
-                    },
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.timer_outlined),
-                    title: const Text('倒计时通知'),
-                    subtitle: const Text('在倒计时结束时发送通知'),
-                    value: _settings.showNotificationForCountdown,
-                    onChanged: (value) {
-                      _saveSettings(
-                        _settings.copyWith(
-                          showNotificationForCountdown: value,
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 启动行为设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '启动行为',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.start_outlined),
-                  title: const Text('开机自启'),
-                  subtitle: const Text('随系统启动时自动运行应用'),
-                  value: _settings.startWithWindows,
-                  onChanged: (value) async {
-                    if (value) {
-                      await StartupService().enable();
-                    } else {
-                      await StartupService().disable();
-                    }
-                    await _saveSettings(_settings.copyWith(startWithWindows: value));
-                  },
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.minimize_outlined),
-                  title: const Text('最小化到托盘'),
-                  subtitle: const Text('关闭窗口时最小化到系统托盘'),
-                  value: _settings.minimizeToTray,
-                  onChanged: (value) {
-                    _saveSettings(_settings.copyWith(minimizeToTray: value));
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 高级设置
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '高级设置',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.developer_mode_outlined),
-                  title: const Text('调试模式'),
-                  subtitle: const Text('显示调试信息和日志'),
-                  value: _settings.enableDebugMode,
-                  onChanged: (value) {
-                    _saveSettings(_settings.copyWith(enableDebugMode: value));
-                  },
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.speed_outlined),
-                  title: const Text('性能监控'),
-                  subtitle: const Text('监控应用性能指标'),
-                  value: _settings.enablePerformanceMonitoring,
-                  onChanged: (value) {
-                    _saveSettings(
-                      _settings.copyWith(enablePerformanceMonitoring: value),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.api_outlined),
-                  title: const Text('API基础地址'),
-                  subtitle: Text(_settings.apiBaseUrl),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.edit_outlined),
-                    onPressed: () async {
-                      final controller =
-                          TextEditingController(text: _settings.apiBaseUrl);
-                      final result = await showDialog<String>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('修改API基础地址'),
-                          content: TextField(
-                            controller: controller,
-                            decoration: const InputDecoration(
-                              labelText: 'API地址',
-                              hintText: '例如: http://localhost:3000/api',
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('取消'),
-                            ),
-                            TextButton(
-                              onPressed: () =>
-                                  Navigator.pop(context, controller.text),
-                              child: const Text('确定'),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (result != null && result.isNotEmpty) {
-                        await _saveSettings(
-                          _settings.copyWith(apiBaseUrl: result),
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 关于
-          Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    '关于',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  title: const Text('关于应用'),
-                  subtitle: const Text('查看应用版本、开发者信息等'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (context) => const AboutScreen(),
-                      ),
-                    );
-                  },
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Text('English'),
                 ),
               ],
             ),
@@ -1201,9 +266,916 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  Widget _buildThemeSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '外观设置',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: DropdownButtonFormField<ThemeMode>(
+              initialValue: _settings.themeSettings.themeMode,
+              decoration: const InputDecoration(
+                labelText: '主题模式',
+                prefixIcon: Icon(Icons.brightness_6_outlined),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) async {
+                if (value != null) {
+                  final newThemeSettings =
+                      _settings.themeSettings.copyWith(themeMode: value);
+                  await _saveSettings(
+                    _settings.copyWith(
+                      themeSettings: newThemeSettings,
+                    ),
+                  );
+                  await _themeService.saveSettings(newThemeSettings);
+                }
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: ThemeMode.system,
+                  child: Text('跟随系统'),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.light,
+                  child: Text('浅色'),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.dark,
+                  child: Text('深色'),
+                ),
+              ],
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.auto_awesome_outlined),
+            title: const Text('动态颜色'),
+            subtitle: const Text('使用 Material You 动态取色'),
+            value: _settings.themeSettings.useDynamicColor,
+            onChanged: (value) async {
+              final newThemeSettings =
+                  _settings.themeSettings.copyWith(useDynamicColor: value);
+              await _saveSettings(
+                _settings.copyWith(themeSettings: newThemeSettings),
+              );
+              await _themeService.saveSettings(newThemeSettings);
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.wallpaper),
+            title: const Text('跟随系统颜色'),
+            subtitle: const Text('使用系统的强调色'),
+            value: _settings.themeSettings.useSystemColor,
+            onChanged: (value) async {
+              final newThemeSettings =
+                  _settings.themeSettings.copyWith(useSystemColor: value);
+              await _saveSettings(
+                _settings.copyWith(
+                  themeSettings: newThemeSettings,
+                  followSystemColor: value,
+                ),
+              );
+              await _themeService.saveSettings(newThemeSettings);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: const Text('种子颜色'),
+            subtitle: const Text('自定义应用主题颜色'),
+            enabled: !_settings.themeSettings.useSystemColor,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: _settings.themeSettings.seedColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: theme.colorScheme.outline,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _settings.themeSettings.useSystemColor
+                      ? null
+                      : _showColorPicker,
+                  child: const Text('选择'),
+                ),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.text_fields_outlined),
+                    const SizedBox(width: 16),
+                    Text(
+                      '字体大小: ${_settings.themeSettings.fontSizeScale.toStringAsFixed(1)}x',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: _settings.themeSettings.fontSizeScale,
+                  min: 0.7,
+                  max: 1.5,
+                  divisions: 8,
+                  label: _settings.themeSettings.fontSizeScale.toStringAsFixed(1),
+                  onChanged: (value) async {
+                    final newThemeSettings =
+                        _settings.themeSettings.copyWith(fontSizeScale: value);
+                    await _saveSettings(
+                      _settings.copyWith(
+                        themeSettings: newThemeSettings,
+                      ),
+                    );
+                    await _themeService.saveSettings(newThemeSettings);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.rounded_corner_outlined),
+                    const SizedBox(width: 16),
+                    Text(
+                      '圆角大小: ${_settings.themeSettings.borderRadiusScale.toStringAsFixed(1)}x',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: _settings.themeSettings.borderRadiusScale,
+                  min: 0.5,
+                  max: 2,
+                  divisions: 15,
+                  label: _settings.themeSettings.borderRadiusScale
+                      .toStringAsFixed(1),
+                  onChanged: (value) async {
+                    final newThemeSettings = _settings.themeSettings
+                        .copyWith(borderRadiusScale: value);
+                    await _saveSettings(
+                      _settings.copyWith(
+                        themeSettings: newThemeSettings,
+                      ),
+                    );
+                    await _themeService.saveSettings(newThemeSettings);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.opacity_outlined),
+                    const SizedBox(width: 16),
+                    Text(
+                      '组件透明度: ${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: _settings.themeSettings.componentOpacity,
+                  min: 0.7,
+                  divisions: 3,
+                  label:
+                      '${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
+                  onChanged: (value) async {
+                    final newThemeSettings = _settings.themeSettings
+                        .copyWith(componentOpacity: value);
+                    await _saveSettings(
+                      _settings.copyWith(
+                        themeSettings: newThemeSettings,
+                      ),
+                    );
+                    await _themeService.saveSettings(newThemeSettings);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.light_mode_outlined),
+                    const SizedBox(width: 16),
+                    Text(
+                      '阴影强度: ${_settings.themeSettings.shadowStrength.toStringAsFixed(1)}x',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: _settings.themeSettings.shadowStrength,
+                  max: 2,
+                  divisions: 20,
+                  label: _settings.themeSettings.shadowStrength
+                      .toStringAsFixed(1),
+                  onChanged: (value) async {
+                    final newThemeSettings = _settings.themeSettings
+                        .copyWith(shadowStrength: value);
+                    await _saveSettings(
+                      _settings.copyWith(
+                        themeSettings: newThemeSettings,
+                      ),
+                    );
+                    await _themeService.saveSettings(newThemeSettings);
+                  },
+                ),
+              ],
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.gradient_outlined),
+            title: const Text('启用渐变效果'),
+            subtitle: const Text('为按钮和卡片添加渐变效果'),
+            value: _settings.themeSettings.enableGradients,
+            onChanged: (value) async {
+              final newThemeSettings = _settings.themeSettings
+                  .copyWith(enableGradients: value);
+              await _saveSettings(
+                _settings.copyWith(themeSettings: newThemeSettings),
+              );
+              await _themeService.saveSettings(newThemeSettings);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.display_settings_outlined),
+                    const SizedBox(width: 16),
+                    Text(
+                      '界面缩放: ${_settings.uiScale.toStringAsFixed(1)}x',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: _settings.uiScale,
+                  min: 0.5,
+                  max: 2,
+                  divisions: 15,
+                  label: _settings.uiScale.toStringAsFixed(1),
+                  onChanged: (value) {
+                    _saveSettings(_settings.copyWith(uiScale: value));
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWidgetSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '小部件显示',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.access_time_outlined),
+            title: const Text('时间显示'),
+            subtitle: const Text('在主屏幕显示时间'),
+            value: _settings.showTimeDisplayWidget,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(showTimeDisplayWidget: value),
+              );
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.calendar_today_outlined),
+            title: const Text('日期显示'),
+            subtitle: const Text('在主屏幕显示日期'),
+            value: _settings.showDateDisplayWidget,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(showDateDisplayWidget: value),
+              );
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.calendar_view_week_outlined),
+            title: const Text('周数显示'),
+            subtitle: const Text('在主屏幕显示当前周数'),
+            value: _settings.showWeekDisplayWidget,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(showWeekDisplayWidget: value),
+              );
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.cloud_outlined),
+            title: const Text('天气显示'),
+            subtitle: const Text('在主屏幕显示天气信息'),
+            value: _settings.showWeatherWidget,
+            onChanged: (value) {
+              _saveSettings(_settings.copyWith(showWeatherWidget: value));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on_outlined),
+            title: const Text('天气地区'),
+            subtitle: Text(_settings.cityName ?? '未设置'),
+            trailing: ElevatedButton(
+              onPressed: () async {
+                final city = await showDialog<Map<String, dynamic>>(
+                  context: context,
+                  builder: (context) => const CitySearchDialog(),
+                );
+                if (city != null) {
+                  await _saveSettings(
+                    _settings.copyWith(
+                      latitude: city['latitude'] as double?,
+                      longitude: city['longitude'] as double?,
+                      cityName: city['name'] as String?,
+                    ),
+                  );
+                }
+              },
+              child: const Text('更改'),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.timer_outlined),
+            title: const Text('倒计时显示'),
+            subtitle: const Text('在主屏幕显示倒计时'),
+            value: _settings.showCountdownWidget,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(showCountdownWidget: value),
+              );
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.school_outlined),
+            title: const Text('当前课程显示'),
+            subtitle: const Text('在主屏幕显示当前课程'),
+            value: _settings.showCurrentClassWidget,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(showCurrentClassWidget: value),
+              );
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '桌面小组件',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.desktop_windows_outlined),
+            title: const Text('启用桌面小组件'),
+            subtitle: const Text('在桌面上显示小组件'),
+            value: _settings.enableDesktopWidgets,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(enableDesktopWidgets: value),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSemesterSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '学期设置',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.calendar_today),
+            title: const Text('学期开始日期'),
+            subtitle: Text(
+              () {
+                final date = _settings.semesterStartDate;
+                return date != null
+                    ? '${date.year}年${date.month}月${date.day}日'
+                    : '未设置';
+              }(),
+            ),
+            trailing: ElevatedButton(
+              onPressed: _selectSemesterStartDate,
+              child: const Text('选择'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRefreshSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '刷新间隔',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.cloud_sync_outlined),
+            title: const Text('天气刷新间隔'),
+            subtitle: Text('${_settings.weatherRefreshInterval} 分钟'),
+            trailing: SizedBox(
+              width: 120,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: _settings.weatherRefreshInterval > 5
+                        ? () => _saveSettings(
+                              _settings.copyWith(
+                                weatherRefreshInterval:
+                                    _settings.weatherRefreshInterval - 5,
+                              ),
+                            )
+                        : null,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: _settings.weatherRefreshInterval < 120
+                        ? () => _saveSettings(
+                              _settings.copyWith(
+                                weatherRefreshInterval:
+                                    _settings.weatherRefreshInterval + 5,
+                              ),
+                            )
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.timer_outlined),
+            title: const Text('倒计时刷新间隔'),
+            subtitle: Text('${_settings.countdownRefreshInterval} 秒'),
+            trailing: SizedBox(
+              width: 120,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: _settings.countdownRefreshInterval > 10
+                        ? () => _saveSettings(
+                              _settings.copyWith(
+                                countdownRefreshInterval:
+                                    _settings.countdownRefreshInterval - 10,
+                              ),
+                            )
+                        : null,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: _settings.countdownRefreshInterval < 300
+                        ? () => _saveSettings(
+                              _settings.copyWith(
+                                countdownRefreshInterval:
+                                    _settings.countdownRefreshInterval + 10,
+                              ),
+                            )
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeSyncSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '时间同步',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.sync_rounded),
+            title: const Text('自动NTP同步'),
+            subtitle: const Text('开启后将自动校准系统时间'),
+            value: _settings.enableNtpSync,
+            onChanged: (value) {
+              _saveSettings(_settings.copyWith(enableNtpSync: value));
+            },
+          ),
+          if (_settings.enableNtpSync) ...[
+            ListTile(
+              leading: const Icon(Icons.dns_outlined),
+              title: const Text('NTP服务器'),
+              subtitle: Text(_settings.ntpServer),
+              trailing: IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () async {
+                  final controller =
+                      TextEditingController(text: _settings.ntpServer);
+                  final result = await showDialog<String>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('修改NTP服务器'),
+                      content: TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          labelText: '服务器地址',
+                          hintText: '例如: ntp.aliyun.com',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pop(context, controller.text),
+                          child: const Text('确定'),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (result != null && result.isNotEmpty) {
+                    await _saveSettings(
+                      _settings.copyWith(ntpServer: result),
+                    );
+                    await NtpService().syncTime();
+                    setState(() {});
+                  }
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.timer_outlined),
+              title: const Text('同步间隔'),
+              subtitle: Text('${_settings.ntpSyncInterval} 分钟'),
+              trailing: SizedBox(
+                width: 120,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline),
+                      onPressed: _settings.ntpSyncInterval > 10
+                          ? () => _saveSettings(
+                                _settings.copyWith(
+                                  ntpSyncInterval:
+                                      _settings.ntpSyncInterval - 10,
+                                ),
+                              )
+                          : null,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline),
+                      onPressed: _settings.ntpSyncInterval < 1440
+                          ? () => _saveSettings(
+                                _settings.copyWith(
+                                  ntpSyncInterval:
+                                      _settings.ntpSyncInterval + 10,
+                                ),
+                              )
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('当前状态'),
+              subtitle: Text('时间偏移: ${NtpService().offset}ms'),
+              trailing: TextButton(
+                onPressed: () async {
+                  await NtpService().syncTime();
+                  setState(() {});
+                },
+                child: const Text('立即同步'),
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '通知设置',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.notifications_outlined),
+            title: const Text('启用通知'),
+            subtitle: const Text('接收课程和倒计时提醒'),
+            value: _settings.enableNotifications,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(enableNotifications: value),
+              );
+            },
+          ),
+          if (_settings.enableNotifications) ...[
+            SwitchListTile(
+              secondary: const Icon(Icons.access_time_outlined),
+              title: const Text('课程提醒'),
+              subtitle: const Text('开启后将在课程开始前提醒'),
+              value: _settings.enableCourseReminder,
+              onChanged: (value) {
+                _saveSettings(
+                  _settings.copyWith(enableCourseReminder: value),
+                );
+              },
+            ),
+            SwitchListTile(
+              secondary: const Icon(Icons.volume_up_outlined),
+              title: const Text('语音提醒'),
+              subtitle: const Text('开启后将使用系统语音播报课程提醒'),
+              value: _settings.enableTtsForReminder,
+              onChanged: (value) {
+                _saveSettings(
+                  _settings.copyWith(enableTtsForReminder: value),
+                );
+              },
+            ),
+            SwitchListTile(
+              secondary: const Icon(Icons.class_outlined),
+              title: const Text('课程开始通知'),
+              subtitle: const Text('在课程开始时发送通知'),
+              value: _settings.showNotificationOnClassStart,
+              onChanged: (value) {
+                _saveSettings(
+                  _settings.copyWith(
+                    showNotificationOnClassStart: value,
+                  ),
+                );
+              },
+            ),
+            SwitchListTile(
+              secondary: const Icon(Icons.class_outlined),
+              title: const Text('课程结束通知'),
+              subtitle: const Text('在课程结束时发送通知'),
+              value: _settings.showNotificationOnClassEnd,
+              onChanged: (value) {
+                _saveSettings(
+                  _settings.copyWith(
+                    showNotificationOnClassEnd: value,
+                  ),
+                );
+              },
+            ),
+            SwitchListTile(
+              secondary: const Icon(Icons.timer_outlined),
+              title: const Text('倒计时通知'),
+              subtitle: const Text('在倒计时结束时发送通知'),
+              value: _settings.showNotificationForCountdown,
+              onChanged: (value) {
+                _saveSettings(
+                  _settings.copyWith(
+                    showNotificationForCountdown: value,
+                  ),
+                );
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStartupSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '启动行为',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.start_outlined),
+            title: const Text('开机自启'),
+            subtitle: const Text('随系统启动时自动运行应用'),
+            value: _settings.startWithWindows,
+            onChanged: (value) async {
+              if (value) {
+                await StartupService().enable();
+              } else {
+                await StartupService().disable();
+              }
+              await _saveSettings(_settings.copyWith(startWithWindows: value));
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.minimize_outlined),
+            title: const Text('最小化到托盘'),
+            subtitle: const Text('关闭窗口时最小化到系统托盘'),
+            value: _settings.minimizeToTray,
+            onChanged: (value) {
+              _saveSettings(_settings.copyWith(minimizeToTray: value));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdvancedSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '高级设置',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.developer_mode_outlined),
+            title: const Text('调试模式'),
+            subtitle: const Text('显示调试信息和日志'),
+            value: _settings.enableDebugMode,
+            onChanged: (value) {
+              _saveSettings(_settings.copyWith(enableDebugMode: value));
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.speed_outlined),
+            title: const Text('性能监控'),
+            subtitle: const Text('监控应用性能指标'),
+            value: _settings.enablePerformanceMonitoring,
+            onChanged: (value) {
+              _saveSettings(
+                _settings.copyWith(enablePerformanceMonitoring: value),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.api_outlined),
+            title: const Text('API基础地址'),
+            subtitle: Text(_settings.apiBaseUrl),
+            trailing: IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () async {
+                final controller =
+                    TextEditingController(text: _settings.apiBaseUrl);
+                final result = await showDialog<String>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('修改API基础地址'),
+                    content: TextField(
+                      controller: controller,
+                      decoration: const InputDecoration(
+                        labelText: 'API地址',
+                        hintText: '例如: http://localhost:3000/api',
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('取消'),
+                      ),
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pop(context, controller.text),
+                        child: const Text('确定'),
+                      ),
+                    ],
+                  ),
+                );
+                if (result != null && result.isNotEmpty) {
+                  await _saveSettings(
+                    _settings.copyWith(apiBaseUrl: result),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAboutSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              '关于',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('关于应用'),
+            subtitle: const Text('查看应用版本、开发者信息等'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => const AboutScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-/// 主题预览组件
 class ThemePreview extends StatelessWidget {
   const ThemePreview({
     super.key,

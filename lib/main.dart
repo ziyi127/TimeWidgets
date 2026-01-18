@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:time_widgets/models/temp_schedule_change_model.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/screens/desktop_widget_screen.dart';
@@ -947,6 +948,15 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
             return MaterialApp(
               navigatorKey: navigatorKey,
               title: '智慧课程表',
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('zh', 'CN'),
+                Locale('en', 'US'),
+              ],
               theme: lightTheme.copyWith(
                 scaffoldBackgroundColor: Colors.transparent,
                 canvasColor: Colors.transparent,

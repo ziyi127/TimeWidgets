@@ -77,8 +77,8 @@ class RenderSyncService {
       return;
     }
 
-    // 根据当前性能决定延迟时间
-    final delay = _calculateOptimalDelay();
+    // 默认延迟
+    const delay = Duration(milliseconds: 1);
 
     if (key != null) {
       _scheduledUpdates[key]?.cancel();
@@ -147,103 +147,17 @@ class RenderSyncService {
     }
   }
 
-  /// 帧时间回调
-  // ignore: unused_element
-  void _onFrameTimings(List<FrameTiming> timings) {
-    for (final timing in timings) {
-      final frameDuration = timing.totalSpan;
-      _frameTimes.add(frameDuration);
-
-      // 保持最近100帧的数据
-      if (_frameTimes.length > 100) {
-        _frameTimes.removeAt(0);
-      }
-
-      // 检测掉帧
-      if (frameDuration.inMicroseconds > 16670) {
-        // 超过16.67ms
-        _droppedFrames++;
-      }
-    }
-
-    // 更新平均帧时间
-    _updateAverageFrameTime();
-  }
-
-  /// 更新平均帧时间
-  void _updateAverageFrameTime() {
-    if (_frameTimes.isEmpty) return;
-
-    final totalMicroseconds = _frameTimes
-        .map((duration) => duration.inMicroseconds)
-        .reduce((a, b) => a + b);
-
-    _averageFrameTime =
-        totalMicroseconds / _frameTimes.length / 1000.0; // 转换为毫秒
-  }
-
-  /// 计算最优延迟时间
-  Duration _calculateOptimalDelay() {
-    if (_averageFrameTime < 12.0) {
-      return Duration.zero; // 性能很好，无需延迟
-    } else if (_averageFrameTime < 16.0) {
-      return const Duration(milliseconds: 1); // 轻微延迟
-    } else if (_averageFrameTime < 20.0) {
-      return const Duration(milliseconds: 2); // 中等延迟
-    } else {
-      return const Duration(milliseconds: 5); // 较大延迟
-    }
-  }
-
   /// 获取性能统计
   Map<String, dynamic> getPerformanceStats() {
     return {
-      'average_frame_time_ms': _averageFrameTime,
-      'dropped_frames': _droppedFrames,
       'pending_updates': _pendingUpdates.length,
       'scheduled_updates': _scheduledUpdates.length,
-      'performance_level': _getPerformanceLevel(),
-      'frame_rate': _averageFrameTime > 0 ? 1000.0 / _averageFrameTime : 0.0,
     };
-  }
-
-  /// 获取性能等级
-  String _getPerformanceLevel() {
-    if (_averageFrameTime < 12.0) return 'excellent';
-    if (_averageFrameTime < 16.0) return 'good';
-    if (_averageFrameTime < 20.0) return 'fair';
-    return 'poor';
   }
 
   /// 重置性能统计
   void resetStats() {
-    _frameTimes.clear();
-    _droppedFrames = 0;
-    _averageFrameTime = 16.67;
-  }
-
-  /// 检查是否需要性能优化
-  bool needsOptimization() {
-    return _averageFrameTime > 18.0 || _droppedFrames > 10;
-  }
-
-  /// 获取建议的优化措施
-  List<String> getOptimizationSuggestions() {
-    final suggestions = <String>[];
-
-    if (_averageFrameTime > 20.0) {
-      suggestions.add('减少同时更新的组件数量');
-    }
-
-    if (_droppedFrames > 20) {
-      suggestions.add('启用更激进的缓存策略');
-    }
-
-    if (_pendingUpdates.length > 10) {
-      suggestions.add('增加更新批次大小');
-    }
-
-    return suggestions;
+    // No stats to reset in lightweight mode
   }
 }
 

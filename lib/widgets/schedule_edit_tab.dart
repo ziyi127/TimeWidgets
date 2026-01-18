@@ -641,7 +641,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 }
 
 /// 课程单元格
-class _CourseCell extends StatefulWidget {
+class _CourseCell extends StatelessWidget {
   const _CourseCell({
     this.course,
     this.dailyCourse,
@@ -652,84 +652,89 @@ class _CourseCell extends StatefulWidget {
   final VoidCallback onTap;
 
   @override
-  State<_CourseCell> createState() => _CourseCellState();
-}
-
-class _CourseCellState extends State<_CourseCell> {
-  bool _isHovering = false;
-
-  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isHovering = ValueNotifier<bool>(false);
 
-    if (widget.course == null) {
+    if (course == null) {
       return MouseRegion(
-        onEnter: (_) => setState(() => _isHovering = true),
-        onExit: (_) => setState(() => _isHovering = false),
+        onEnter: (_) => isHovering.value = true,
+        onExit: (_) => isHovering.value = false,
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
-          onTap: widget.onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 100,
-            height: 64,
-            decoration: BoxDecoration(
-              color: _isHovering
-                  ? colorScheme.surfaceContainerHighest
-                      .withAlpha((255 * 0.5).round())
-                  : Colors.transparent,
-              border: Border.all(
-                color: _isHovering
-                    ? colorScheme.outline
-                    : colorScheme.outlineVariant.withAlpha((255 * 0.5).round()),
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.add_rounded,
-                color: _isHovering ? colorScheme.primary : colorScheme.outline,
-                size: 24,
-              ),
-            ),
+          onTap: onTap,
+          child: ValueListenableBuilder<bool>(
+            valueListenable: isHovering,
+            builder: (context, hovering, child) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 100,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: hovering
+                      ? colorScheme.surfaceContainerHighest
+                          .withAlpha((255 * 0.5).round())
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: hovering
+                        ? colorScheme.outline
+                        : colorScheme.outlineVariant.withAlpha((255 * 0.5).round()),
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.add_rounded,
+                    color: hovering ? colorScheme.primary : colorScheme.outline,
+                    size: 24,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       );
     }
 
-    final color = ColorUtils.parseHexColor(widget.course!.color) ??
-        ColorUtils.generateColorFromName(widget.course!.name);
+    final color = ColorUtils.parseHexColor(course!.color) ??
+        ColorUtils.generateColorFromName(course!.name);
     final textColor = ColorUtils.getContrastTextColor(color);
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
+      onEnter: (_) => isHovering.value = true,
+      onExit: (_) => isHovering.value = false,
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: 100,
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            color: color.withAlpha(_isHovering ? 255 : (255 * 0.9).round()),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: _isHovering
-                ? [
-                    BoxShadow(
-                      color: color.withAlpha((255 * 0.3).round()),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : [],
-          ),
+        onTap: onTap,
+        child: ValueListenableBuilder<bool>(
+          valueListenable: isHovering,
+          builder: (context, hovering, child) {
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 100,
+              height: 64,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: color.withAlpha(hovering ? 255 : (255 * 0.9).round()),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: hovering
+                    ? [
+                        BoxShadow(
+                          color: color.withAlpha((255 * 0.3).round()),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [],
+              ),
+              child: child,
+            );
+          },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                widget.course!.displayName,
+                course!.displayName,
                 style: TextStyle(
                   color: textColor,
                   fontSize: 13,
@@ -739,10 +744,10 @@ class _CourseCellState extends State<_CourseCell> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (widget.course!.classroom.isNotEmpty) ...[
+              if (course!.classroom.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
-                  widget.course!.classroom,
+                  course!.classroom,
                   style: TextStyle(
                     color: textColor.withAlpha((255 * 0.9).round()),
                     fontSize: 10,
@@ -751,8 +756,8 @@ class _CourseCellState extends State<_CourseCell> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-              if (widget.dailyCourse != null &&
-                  widget.dailyCourse!.weekType != WeekType.both) ...[
+              if (dailyCourse != null &&
+                  dailyCourse!.weekType != WeekType.both) ...[
                 const SizedBox(height: 2),
                 Container(
                   padding:
@@ -762,7 +767,7 @@ class _CourseCellState extends State<_CourseCell> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    widget.dailyCourse!.weekType == WeekType.single
+                    dailyCourse!.weekType == WeekType.single
                         ? '单周'
                         : '双周',
                     style: const TextStyle(
