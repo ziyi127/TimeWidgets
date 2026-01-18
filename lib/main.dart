@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
@@ -905,7 +906,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       //   );
       // }
     } else {
-      _exitApplication();
+      await _exitApplication();
     }
   }
 
