@@ -1,9 +1,9 @@
 import 'package:time_widgets/models/course_model.dart';
-import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
+import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/services/api_service.dart';
-import 'package:time_widgets/services/timetable_storage_service.dart';
 import 'package:time_widgets/services/ntp_service.dart';
+import 'package:time_widgets/services/timetable_storage_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class TimetableService {
@@ -13,22 +13,21 @@ class TimetableService {
   // Calculate week number (1-based) from a given date
   // Assuming week 1 starts from the first Monday of the year
   int _calculateWeekNumber(DateTime date) {
-    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final firstDayOfYear = DateTime(date.year);
     final firstMonday = firstDayOfYear.weekday > DateTime.monday 
         ? firstDayOfYear.add(Duration(days: 8 - firstDayOfYear.weekday))
         : firstDayOfYear;
     
     if (date.isBefore(firstMonday)) {
-      return _calculateWeekNumber(date.subtract(Duration(days: 7)));
+      return _calculateWeekNumber(date.subtract(const Duration(days: 7)));
     }
     
     return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
   }
   
-  // 获取当前适用的课表
+  // 确定周数
   Schedule? _getActiveSchedule(TimetableData timetableData, DateTime date) {
     final currentWeekNumber = _calculateWeekNumber(date);
-    final weekday = date.weekday; // DateTime.weekday 1=Mon...7=Sun
     
     // 获取所有自动启用的课表
     final matchingSchedules = timetableData.schedules.where((schedule) {
@@ -72,7 +71,7 @@ class TimetableService {
         if (activeSchedule.timeLayoutId != null) {
           final timeLayout = timetableData.timeLayouts.firstWhere(
             (tl) => tl.id == activeSchedule.timeLayoutId,
-            orElse: () => const TimeLayout(id: '', name: '', timeSlots: []),
+            orElse: () => const TimeLayout(id: '', name: ''),
           );
           timeSlots = timeLayout.timeSlots;
         }
@@ -86,7 +85,7 @@ class TimetableService {
       
       // 筛选当天的课程并检查周类型
       final filteredDailyCourses = dailyCourses.where((d) => 
-        d.dayOfWeek == dayOfWeek
+        d.dayOfWeek == dayOfWeek,
       ).toList();
       
       final List<Course> courses = [];
@@ -128,9 +127,9 @@ class TimetableService {
           final endParts = slot.endTime.split(':');
           if (startParts.length == 2 && endParts.length == 2) {
             final start = DateTime(now.year, now.month, now.day, 
-                int.parse(startParts[0]), int.parse(startParts[1]));
+                int.parse(startParts[0]), int.parse(startParts[1]),);
             final end = DateTime(now.year, now.month, now.day, 
-                int.parse(endParts[0]), int.parse(endParts[1]));
+                int.parse(endParts[0]), int.parse(endParts[1]),);
             if (now.isAfter(start) && now.isBefore(end)) {
               isCurrent = true;
             }
@@ -145,7 +144,7 @@ class TimetableService {
           time: '${slot.startTime}~${slot.endTime}',
           classroom: info.classroom,
           isCurrent: isCurrent,
-        ));
+        ),);
       }
       
       // 按开始时间排序
@@ -197,6 +196,66 @@ class TimetableService {
     } catch (e) {
       Logger.e('Failed to get current course: $e');
       return null;
+    }
+  }
+
+  // 获取当前和下一节课程
+  Future<Map<String, Course?>> getCurrentAndNextCourse() async {
+    try {
+      final ntpService = NtpService();
+      final now = ntpService.now;
+      final timetable = await getTimetable(now);
+      
+      final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      
+      Course? currentCourse;
+      Course? nextCourse;
+      
+      for (int i = 0; i < timetable.courses.length; i++) {
+        final course = timetable.courses[i];
+        final parts = course.time.split('~');
+        if (parts.length == 2) {
+          final start = parts[0];
+          final end = parts[1];
+          
+          // Check if current
+          if (currentTime.compareTo(start) >= 0 && currentTime.compareTo(end) <= 0) {
+            currentCourse = Course(
+              subject: course.subject,
+              teacher: course.teacher,
+              time: course.time,
+              classroom: course.classroom,
+              isCurrent: true,
+            );
+            
+            // If there is a next course in the list
+            if (i + 1 < timetable.courses.length) {
+              nextCourse = timetable.courses[i + 1];
+            }
+            break; // Found current, so next is set (if exists) and we are done
+          }
+          
+          // Check if this course is in the future (potential next course if no current course found yet)
+          if (currentTime.compareTo(start) < 0) {
+            nextCourse ??= course;
+            // If we haven't found a current course yet, this is the next upcoming one.
+            // Since the list is sorted, we can stop if we just want the *immediate* next.
+            // But if we want to be sure we didn't miss a current one (overlapping?), we should continue?
+            // The list is sorted by start time.
+            // If we are strictly before this course, and we haven't found a "current" course,
+            // then this is the next course.
+            break; 
+          }
+        }
+      }
+      
+      return {
+        'current': currentCourse,
+        'next': nextCourse,
+      };
+    } catch (e) {
+      Logger.e('Failed to get current and next course: $e');
+      return {'current': null, 'next': null};
     }
   }
   

@@ -95,15 +95,12 @@ class MD3FormStyles {
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest,
         border: UnderlineInputBorder(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: UnderlineInputBorder(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
       ),
@@ -344,13 +341,12 @@ class MD3FormStyles {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: colorScheme.outline,
-                  width: 1,
                 ),
               ),
             ),
             const SizedBox(width: 12),
             Text(
-              '#${color.value.toRadixString(16).substring(2).toUpperCase()}',
+              '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
               style: MD3TypographyStyles.bodyLarge(context),
             ),
           ],
@@ -422,7 +418,7 @@ class MD3FormStyles {
     Color selectedColor = initialColor;
     
     // 预定义的 MD3 颜色
-    final colors = [
+    const colors = [
       Color(0xFFEF4444), // Red
       Color(0xFFEC4899), // Pink
       Color(0xFF8B5CF6), // Purple
@@ -461,7 +457,7 @@ class MD3FormStyles {
               spacing: 8,
               runSpacing: 8,
               children: colors.map((color) {
-                final isSelected = selectedColor.value == color.value;
+                final isSelected = selectedColor.toARGB32() == color.toARGB32();
                 return InkWell(
                   onTap: () => setState(() => selectedColor = color),
                   borderRadius: BorderRadius.circular(20),
@@ -494,7 +490,7 @@ class MD3FormStyles {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('取消'),
             ),
             FilledButton(

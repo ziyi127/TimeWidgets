@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/theme_settings_model.dart';
 import 'package:time_widgets/utils/logger.dart';
+import 'package:time_widgets/utils/theme_utils.dart';
 
 /// 主题服务
 /// 管理应用的主题设置，包括种子颜色、主题模式等
 /// 支持 Material You 动态取色
 class ThemeService {
+  factory ThemeService() => _instance;
+  
+  ThemeService._internal();
   static const String _themeSettingsKey = 'theme_settings';
 
   // 单例模式实现
   static final ThemeService _instance = ThemeService._internal();
-  factory ThemeService() => _instance;
-  
-  ThemeService._internal();
 
   final StreamController<ThemeSettings> _themeController = 
       StreamController<ThemeSettings>.broadcast();
@@ -52,7 +53,7 @@ class ThemeService {
       final jsonString = prefs.getString(_themeSettingsKey);
 
       if (jsonString != null) {
-        final jsonData = jsonDecode(jsonString);
+        final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
         _currentSettings = ThemeSettings.fromJson(jsonData);
       } else {
         _currentSettings = ThemeSettings.defaultSettings();
@@ -83,14 +84,35 @@ class ThemeService {
     }
   }
 
+  /// 释放资源
+  void dispose() {
+    _isInitialized = false;
+    _currentSettings = ThemeSettings.defaultSettings();
+    _themeController.close();
+    Logger.i('ThemeService disposed');
+  }
+
   /// 生成浅色主题
   /// 使用 Material 3 完整生成符合 MD3 规范的主题
-  ThemeData generateLightTheme(Color seedColor) {
+  ThemeData generateLightTheme(Color seedColor, [ThemeSettings? settings]) {
     final colorScheme = generateColorScheme(seedColor, Brightness.light);
+    final effectiveSettings = settings ?? _currentSettings;
+    
+    // 应用字体缩放
+    var textTheme = ThemeUtils.buildTextTheme(colorScheme);
+    if (effectiveSettings.fontSizeScale != 1.0) {
+      textTheme = _scaleTextTheme(textTheme, effectiveSettings.fontSizeScale);
+    }
+
+    // 应用圆角缩放
+    final radiusScale = effectiveSettings.borderRadiusScale;
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      fontFamily: ThemeUtils.fontFamily,
+      fontFamilyFallback: ThemeUtils.fontFamilyFallback,
+      textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
@@ -102,41 +124,41 @@ class ThemeService {
         elevation: 0,
         surfaceTintColor: colorScheme.primary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12 * radiusScale),
         ),
         clipBehavior: Clip.antiAlias,
       ),
       dialogTheme: DialogThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(28 * radiusScale),
         ),
         surfaceTintColor: colorScheme.primary,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
@@ -145,12 +167,25 @@ class ThemeService {
 
   /// 生成深色主题
   /// 使用 Material 3 完整生成符合 MD3 规范的主题
-  ThemeData generateDarkTheme(Color seedColor) {
+  ThemeData generateDarkTheme(Color seedColor, [ThemeSettings? settings]) {
     final colorScheme = generateColorScheme(seedColor, Brightness.dark);
+    final effectiveSettings = settings ?? _currentSettings;
+
+    // 应用字体缩放
+    var textTheme = ThemeUtils.buildTextTheme(colorScheme);
+    if (effectiveSettings.fontSizeScale != 1.0) {
+      textTheme = _scaleTextTheme(textTheme, effectiveSettings.fontSizeScale);
+    }
+
+    // 应用圆角缩放
+    final radiusScale = effectiveSettings.borderRadiusScale;
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      fontFamily: ThemeUtils.fontFamily,
+      fontFamilyFallback: ThemeUtils.fontFamilyFallback,
+      textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
@@ -162,44 +197,65 @@ class ThemeService {
         elevation: 0,
         surfaceTintColor: colorScheme.primary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12 * radiusScale),
         ),
         clipBehavior: Clip.antiAlias,
       ),
       dialogTheme: DialogThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(28 * radiusScale),
         ),
         surfaceTintColor: colorScheme.primary,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8 * radiusScale),
           ),
         ),
       ),
+    );
+  }
+
+  /// 缩放文本主题
+  TextTheme _scaleTextTheme(TextTheme textTheme, double scale) {
+    return textTheme.copyWith(
+      displayLarge: textTheme.displayLarge?.copyWith(fontSize: (textTheme.displayLarge?.fontSize ?? 57) * scale),
+      displayMedium: textTheme.displayMedium?.copyWith(fontSize: (textTheme.displayMedium?.fontSize ?? 45) * scale),
+      displaySmall: textTheme.displaySmall?.copyWith(fontSize: (textTheme.displaySmall?.fontSize ?? 36) * scale),
+      headlineLarge: textTheme.headlineLarge?.copyWith(fontSize: (textTheme.headlineLarge?.fontSize ?? 32) * scale),
+      headlineMedium: textTheme.headlineMedium?.copyWith(fontSize: (textTheme.headlineMedium?.fontSize ?? 28) * scale),
+      headlineSmall: textTheme.headlineSmall?.copyWith(fontSize: (textTheme.headlineSmall?.fontSize ?? 24) * scale),
+      titleLarge: textTheme.titleLarge?.copyWith(fontSize: (textTheme.titleLarge?.fontSize ?? 22) * scale),
+      titleMedium: textTheme.titleMedium?.copyWith(fontSize: (textTheme.titleMedium?.fontSize ?? 16) * scale),
+      titleSmall: textTheme.titleSmall?.copyWith(fontSize: (textTheme.titleSmall?.fontSize ?? 14) * scale),
+      labelLarge: textTheme.labelLarge?.copyWith(fontSize: (textTheme.labelLarge?.fontSize ?? 14) * scale),
+      labelMedium: textTheme.labelMedium?.copyWith(fontSize: (textTheme.labelMedium?.fontSize ?? 12) * scale),
+      labelSmall: textTheme.labelSmall?.copyWith(fontSize: (textTheme.labelSmall?.fontSize ?? 11) * scale),
+      bodyLarge: textTheme.bodyLarge?.copyWith(fontSize: (textTheme.bodyLarge?.fontSize ?? 16) * scale),
+      bodyMedium: textTheme.bodyMedium?.copyWith(fontSize: (textTheme.bodyMedium?.fontSize ?? 14) * scale),
+      bodySmall: textTheme.bodySmall?.copyWith(fontSize: (textTheme.bodySmall?.fontSize ?? 12) * scale),
     );
   }
 
@@ -215,9 +271,4 @@ class ThemeService {
     );
   }
 
-  /// 释放资源
-  void dispose() {
-    _themeController.close();
-    Logger.i('ThemeService disposed');
-  }
 }

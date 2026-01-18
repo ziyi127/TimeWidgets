@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:flutter/material.dart';
 import 'package:time_widgets/utils/logger.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// 增强的窗口管理器
 /// 提供可靠的窗口初始化、定位和状态管理
@@ -11,6 +14,7 @@ class EnhancedWindowManager {
   static bool _isInitialized = false;
   static Size? _lastScreenSize;
   static VoidCallback? _onScreenSizeChanged;
+  static Timer? _screenMonitorTimer;
   
   /// 初始化窗口
   static Future<bool> initializeWindow({VoidCallback? onScreenSizeChanged}) async {
@@ -23,7 +27,7 @@ class EnhancedWindowManager {
       await windowManager.ensureInitialized();
       
       // 等待一帧以确保Flutter完全初始化
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       
       // 获取屏幕信息
       final screenInfo = await _getScreenInfo();
@@ -52,7 +56,7 @@ class EnhancedWindowManager {
       
     } catch (e) {
       Logger.e('Window initialization failed: $e');
-      return await _initializeWithDefaultSize();
+      return _initializeWithDefaultSize();
     }
   }
   
@@ -68,12 +72,8 @@ class EnhancedWindowManager {
       await windowManager.ensureInitialized();
       
       // 保存主窗口原始尺寸和位置
-      if (_mainWindowSize == null) {
-        _mainWindowSize = await windowManager.getSize();
-      }
-      if (_mainWindowPosition == null) {
-        _mainWindowPosition = await windowManager.getPosition();
-      }
+      _mainWindowSize ??= await windowManager.getSize();
+      _mainWindowPosition ??= await windowManager.getPosition();
       
       // 获取屏幕尺寸
       final screenSize = await _getScreenInfo() ?? const Size(1920, 1080);
@@ -165,7 +165,7 @@ class EnhancedWindowManager {
       // 使用PowerShell获取屏幕分辨率
       final result = await Process.run('powershell', [
         '-Command',
-        'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen.Bounds'
+        'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen.Bounds',
       ]);
       
       if (result.exitCode == 0) {
@@ -199,11 +199,11 @@ class EnhancedWindowManager {
     final windowHeight = screenSize.height;
     
     // 窗口位置在屏幕右
-    final windowY = 0.0;
+    const windowY = 0.0;
     
     // 确保最小尺寸
-    final minWidth = 300.0;
-    final minHeight = 600.0;
+    const minWidth = 300.0;
+    const minHeight = 600.0;
     
     final finalWidth = windowWidth.clamp(minWidth, screenSize.width);
     final finalHeight = windowHeight.clamp(minHeight, screenSize.height);
@@ -239,6 +239,9 @@ class EnhancedWindowManager {
       
       // 确保窗口可见
       await windowManager.show();
+
+      // 防止窗口直接关闭，交由应用层处理（实现最小化到托盘）
+      await windowManager.setPreventClose(true);
       
     } catch (e) {
       Logger.e('Error configuring window: $e');
@@ -276,6 +279,7 @@ class EnhancedWindowManager {
       // 禁用鼠标穿透，确保小组件可以交互
       await windowManager.setIgnoreMouseEvents(false);
       await windowManager.show();
+      await windowManager.setPreventClose(true);
       
       _initializeBitsdojoWindow();
       _isInitialized = true;
@@ -290,8 +294,11 @@ class EnhancedWindowManager {
 
   /// 开始屏幕监听
   static void _startScreenMonitoring() {
+    // 停止之前的定时器
+    _screenMonitorTimer?.cancel();
+    
     // 减少检查频率，从5秒改为30秒
-    Timer.periodic(const Duration(seconds: 30), (timer) async {
+    _screenMonitorTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
         final currentSize = await _getScreenInfo();
         if (currentSize != null && 
@@ -375,4 +382,72 @@ class EnhancedWindowManager {
 
   /// 获取最后记录的屏幕尺寸
   static Size? get lastScreenSize => _lastScreenSize;
+
+  static String? _dynamicIslandWindowId;
+
+  /// 切换灵动岛窗口（多窗口共存）
+  static Future<void> toggleDynamicIslandWindow() async {
+    try {
+      if (_dynamicIslandWindowId != null) {
+        // 尝试关闭
+        try {
+          // WindowController.fromWindowId 接收 String 类型的 ID
+          // 且没有 close 方法，我们需要发送消息通知窗口关闭
+          await WindowController.fromWindowId(_dynamicIslandWindowId!).invokeMethod('close');
+        } catch (e) {
+          Logger.w('Failed to close window: $e');
+        }
+        _dynamicIslandWindowId = null;
+        Logger.i('Closed Dynamic Island window');
+      } else {
+        // Create new
+        try {
+          final controller = await WindowController.create(WindowConfiguration(
+            arguments: jsonEncode({'type': 'dynamic_island'}),
+          ),);
+          
+          // Ensure we have a string ID. desktop_multi_window 0.3.0 usually has int ID, 
+          // but WindowController uses String? 
+          // If controller.windowId is int, toString() handles it.
+          // If it is String, toString() is safe.
+          _dynamicIslandWindowId = controller.windowId;
+          
+          final screenSize = await _getScreenInfo() ?? const Size(1920, 1080);
+          const islandWidth = 500.0;
+          const islandHeight = 150.0;
+          final islandX = (screenSize.width - islandWidth) / 2;
+          const islandY = 20.0;
+          
+          // Show the window
+          await controller.show();
+          
+          // Position the window via method call
+          await controller.invokeMethod('setFrame', {
+              'x': islandX,
+              'y': islandY,
+              'width': islandWidth,
+              'height': islandHeight,
+          });
+          
+          Logger.i('Created Dynamic Island window: $_dynamicIslandWindowId');
+        } catch (e) {
+           Logger.e('Failed to create Dynamic Island window: $e');
+           _dynamicIslandWindowId = null;
+        }
+      }
+    } catch (e) {
+      Logger.e('Error toggling Dynamic Island window: $e');
+      _dynamicIslandWindowId = null;
+    }
+  }
+
+  // 废弃的旧方法，保留为空实现以防调用报错，或直接删除
+  static Future<void> switchToDynamicIslandMode() async {}
+  static Future<void> exitDynamicIslandMode() async {}
+
+  /// 释放资源
+  static void dispose() {
+    _screenMonitorTimer?.cancel();
+    _screenMonitorTimer = null;
+  }
 }

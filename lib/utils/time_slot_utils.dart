@@ -41,7 +41,7 @@ class TimeSlotUtils {
   static TimeSlot? getNextTimeSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
 
-    for (var slot in timeSlots) {
+    for (final slot in timeSlots) {
       final startMinutes = _parseTimeToMinutes(slot.startTime);
       if (startMinutes > currentMinutes) {
         return slot;

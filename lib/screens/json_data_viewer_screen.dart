@@ -71,7 +71,7 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
       }
 
       final jsonString = clipboardData.text!;
-      final jsonData = jsonDecode(jsonString);
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
       final timetableData = TimetableData.fromJson(jsonData);
 
       await _storageService.saveTimetableData(timetableData);
@@ -127,7 +127,7 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
     final jsonString = const JsonEncoder.withIndent('  ').convert(jsonData);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -145,17 +145,17 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
           const SizedBox(height: 16),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.grey[300]!),
             ),
             child: SelectableText(
               jsonString,
               style: const TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 12.0,
+                fontSize: 12,
               ),
             ),
           ),
@@ -167,7 +167,7 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
   Widget _buildDataOverview() {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

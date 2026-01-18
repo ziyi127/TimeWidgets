@@ -103,23 +103,23 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
         ],
       ),
       body: _countdowns.isEmpty
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.timer_outlined,
                     size: 64,
                     color: Colors.grey,
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     '暂无倒计时',
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '点击下方按钮添加第一个倒计时',
+                  SizedBox(height: 8),
+                  Text(
+                    '点击右下角按钮添加第一个倒计时',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -196,12 +196,10 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                 );
               },
             ),
-      floatingActionButton: _countdowns.isNotEmpty
-          ? FloatingActionButton(
-              onPressed: _addCountdown,
-              child: const Icon(Icons.add),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addCountdown,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

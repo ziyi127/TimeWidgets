@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:time_widgets/widgets/time_display_widget.dart';
-import 'package:time_widgets/widgets/date_display_widget.dart';
-import 'package:time_widgets/widgets/weather_widget.dart';
+import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/models/settings_model.dart';
+import 'package:time_widgets/models/weather_model.dart';
+import 'package:time_widgets/screens/settings_screen.dart';
+import 'package:time_widgets/services/api_service.dart';
+import 'package:time_widgets/services/cache_service.dart';
+import 'package:time_widgets/services/settings_service.dart';
+import 'package:time_widgets/utils/error_handler.dart';
+import 'package:time_widgets/utils/md3_button_styles.dart';
+import 'package:time_widgets/utils/md3_navigation_styles.dart';
+import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/widgets/countdown_widget.dart';
 import 'package:time_widgets/widgets/current_class_widget.dart';
+import 'package:time_widgets/widgets/date_display_widget.dart';
+import 'package:time_widgets/widgets/time_display_widget.dart';
 import 'package:time_widgets/widgets/timetable_widget.dart';
+import 'package:time_widgets/widgets/weather_widget.dart';
 import 'package:time_widgets/widgets/week_display_widget.dart';
-import 'package:time_widgets/services/api_service.dart';
-import 'package:time_widgets/screens/settings_screen.dart';
-import 'package:time_widgets/services/cache_service.dart';
-import 'package:time_widgets/models/weather_model.dart';
-import 'package:time_widgets/models/countdown_model.dart';
-import 'package:time_widgets/utils/md3_button_styles.dart';
-import 'package:time_widgets/utils/md3_typography_styles.dart';
-import 'package:time_widgets/utils/md3_navigation_styles.dart';
-import 'package:time_widgets/services/settings_service.dart';
-import 'package:time_widgets/models/settings_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,23 +41,33 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadSettings();
-    _loadWeatherData();
-    _loadCountdownData();
   }
 
   Future<void> _loadSettings() async {
     try {
       final settings = await _settingsService.loadSettings();
-      setState(() {
-        _settings = settings;
-        _isLoadingSettings = false;
-      });
+      if (mounted) {
+        setState(() {
+          _settings = settings;
+          _isLoadingSettings = false;
+        });
+        
+        if (_settings.showWeatherWidget) {
+          _loadWeatherData();
+        }
+        
+        if (_settings.showCountdownWidget) {
+          _loadCountdownData();
+        }
+      }
     } catch (e) {
       // 如果加载失败，使用默认设置
-      setState(() {
-        _settings = AppSettings.defaultSettings();
-        _isLoadingSettings = false;
-      });
+      if (mounted) {
+        setState(() {
+          _settings = AppSettings.defaultSettings();
+          _isLoadingSettings = false;
+        });
+      }
     }
   }
 
@@ -84,8 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final appError = ErrorHandler.handleStorageError(e);
         setState(() {
-          _countdownError = e.toString();
+          _countdownError = appError.userMessage ?? appError.message;
           _isLoadingCountdown = false;
         });
       }
@@ -122,8 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final appError = ErrorHandler.handleNetworkError(e);
         setState(() {
-          _weatherError = e.toString();
+          _weatherError = appError.userMessage ?? appError.message;
           _isLoadingWeather = false;
         });
       }
@@ -146,9 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
-            return _buildResponsiveLayout(context, constraints);
-          },
+          builder: _buildResponsiveLayout,
         ),
       ),
     );
@@ -168,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final verticalPadding = isCompact ? 16.0 : 24.0;
     final cardSpacing = isCompact ? 12.0 : 16.0;
     
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -191,13 +202,15 @@ class _HomeScreenState extends State<HomeScreen> {
             flexibleSpace: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.primaryContainer.withAlpha((255 * 0.1).round()),
-                  colorScheme.secondaryContainer.withAlpha((255 * 0.1).round()),
-                ],
-              ),
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colorScheme.primaryContainer.withAlpha((255 * 0.05).round()),
+                    colorScheme.secondaryContainer.withAlpha((255 * 0.05).round()),
+                    colorScheme.surface.withAlpha(0),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
               ),
             ),
             title: Column(
@@ -217,7 +230,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Text(
                   'Your Intelligent Time Manager',
-                  style: MD3TypographyStyles.bodySmall(context),
+                  style: MD3TypographyStyles.bodySmall(context).copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -225,11 +240,13 @@ class _HomeScreenState extends State<HomeScreen> {
               MD3ButtonStyles.icon(
                 context: context,
                 icon: const Icon(Icons.settings_outlined),
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                    MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
                   );
+                  // Return from settings, reload
+                  _loadSettings();
                 },
                 tooltip: '设置',
               ),
@@ -259,12 +276,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final timeDateWidgets = <Widget>[];
     if (_settings.showTimeDisplayWidget) {
       timeDateWidgets.add(
-        Expanded(
-          flex: 2,
-          child: TimeDisplayWidget(
-            isCompact: true,
+        const Expanded(
+            flex: 2,
+            child: TimeDisplayWidget(
+              isCompact: true,
+            ),
           ),
-        ),
       );
     }
     if (_settings.showDateDisplayWidget) {
@@ -272,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
         timeDateWidgets.add(SizedBox(width: spacing));
       }
       timeDateWidgets.add(
-        Expanded(
+        const Expanded(
           child: DateDisplayWidget(
             isCompact: true,
           ),
@@ -303,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
         weatherClassWidgets.add(SizedBox(width: spacing));
       }
       weatherClassWidgets.add(
-        Expanded(
+        const Expanded(
           child: CurrentClassWidget(
             isCompact: true,
           ),
@@ -322,7 +339,6 @@ class _HomeScreenState extends State<HomeScreen> {
           countdownData: _isLoadingCountdown ? null : _countdownData,
           error: _countdownError,
           onRetry: _loadCountdownData,
-          isCompact: false,
         ),
       );
       children.add(SizedBox(height: spacing));
@@ -330,8 +346,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 课程表
     children.add(
-      TimetableWidget(
-        isCompact: false,
+      const TimetableWidget(
+        
       ),
     );
 
@@ -347,10 +363,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final firstRowWidgets = <Widget>[];
     if (_settings.showTimeDisplayWidget) {
       firstRowWidgets.add(
-        Expanded(
+        const Expanded(
           flex: 2,
           child: TimeDisplayWidget(
-            isCompact: false,
+            
           ),
         ),
       );
@@ -360,9 +376,9 @@ class _HomeScreenState extends State<HomeScreen> {
         firstRowWidgets.add(SizedBox(width: spacing));
       }
       firstRowWidgets.add(
-        Expanded(
+        const Expanded(
           child: DateDisplayWidget(
-            isCompact: false,
+            
           ),
         ),
       );
@@ -373,11 +389,14 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       firstRowWidgets.add(
         Expanded(
-          child: WeatherWidget(
-            weatherData: _isLoadingWeather ? null : _weatherData,
-            error: _weatherError,
-            onRetry: _loadWeatherData,
-            isCompact: false,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: WeatherWidget(
+              key: ValueKey('weather_expanded_${_isLoadingWeather}_${_weatherError == null}'),
+              weatherData: _isLoadingWeather ? null : _weatherData,
+              error: _weatherError,
+              onRetry: _loadWeatherData,
+            ),
           ),
         ),
       );
@@ -391,9 +410,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final secondRowWidgets = <Widget>[];
     if (_settings.showCurrentClassWidget) {
       secondRowWidgets.add(
-        Expanded(
+        const Expanded(
           child: CurrentClassWidget(
-            isCompact: false,
+            
           ),
         ),
       );
@@ -405,11 +424,14 @@ class _HomeScreenState extends State<HomeScreen> {
       secondRowWidgets.add(
         Expanded(
           flex: 2,
-          child: CountdownWidget(
-            countdownData: _isLoadingCountdown ? null : _countdownData,
-            error: _countdownError,
-            onRetry: _loadCountdownData,
-            isCompact: false,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: CountdownWidget(
+              key: ValueKey('countdown_expanded_${_isLoadingCountdown}_${_countdownError == null}'),
+              countdownData: _isLoadingCountdown ? null : _countdownData,
+              error: _countdownError,
+              onRetry: _loadCountdownData,
+            ),
           ),
         ),
       );
@@ -421,8 +443,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 第三行：课程表
     children.add(
-      TimetableWidget(
-        isCompact: false,
+      const TimetableWidget(
+        
       ),
     );
 

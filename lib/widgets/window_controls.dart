@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/material.dart';
 import 'package:time_widgets/services/enhanced_window_manager.dart';
 
 /// 窗口控制组件
 /// 包含最小化、最大化和关闭按钮
 class WindowControls extends StatelessWidget {
-  /// 是否在关闭时恢复主窗口
-  final bool restoreMainWindowOnClose;
   
   const WindowControls({
     super.key,
     this.restoreMainWindowOnClose = false,
   });
+  /// 是否在关闭时恢复主窗口
+  final bool restoreMainWindowOnClose;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +24,8 @@ class WindowControls extends StatelessWidget {
           icon: const Icon(Icons.minimize),
           onPressed: appWindow.minimize,
           tooltip: '最小化',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-          hoverColor: theme.colorScheme.onSurface.withOpacity(0.1),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          hoverColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
           iconSize: 20,
         ),
         
@@ -34,8 +34,8 @@ class WindowControls extends StatelessWidget {
           icon: const Icon(Icons.fullscreen),
           onPressed: appWindow.maximizeOrRestore,
           tooltip: '最大化',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-          hoverColor: theme.colorScheme.onSurface.withOpacity(0.1),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          hoverColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
           iconSize: 20,
         ),
         
@@ -51,8 +51,8 @@ class WindowControls extends StatelessWidget {
             Navigator.pop(context);
           },
           tooltip: '关闭',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
-          hoverColor: Colors.red.withOpacity(0.1),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          hoverColor: Colors.red.withValues(alpha: 0.1),
           iconSize: 20,
         ),
       ],

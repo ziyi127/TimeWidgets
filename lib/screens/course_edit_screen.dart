@@ -181,7 +181,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -237,7 +237,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                       builder: (context) => AlertDialog(
                                         title: const Text('确认删除'),
                                         content: Text(
-                                            '确定要删除课程"${course.name}"吗？'),
+                                            '确定要删除课程"${course.name}"吗？',),
                                         actions: [
                                           TextButton(
                                             onPressed: () =>

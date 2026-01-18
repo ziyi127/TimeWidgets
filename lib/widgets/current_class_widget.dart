@@ -4,9 +4,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 当前课程组件 - MD3紧凑版
 class CurrentClassWidget extends StatelessWidget {
-  final bool isCompact;
-  final Course? course;
-  final bool isLoading;
 
   const CurrentClassWidget({
     super.key,
@@ -14,6 +11,9 @@ class CurrentClassWidget extends StatelessWidget {
     this.course,
     this.isLoading = false,
   });
+  final bool isCompact;
+  final Course? course;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +28,31 @@ class CurrentClassWidget extends StatelessWidget {
         color: colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
-            ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+            ResponsiveUtils.getBorderRadius(width),
           ),
         ),
-        child: const Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: ResponsiveUtils.value(24),
+                height: ResponsiveUtils.value(24),
+                child: CircularProgressIndicator(
+                  strokeWidth: ResponsiveUtils.value(2),
+                  color: colorScheme.primary,
+                ),
+              ),
+              SizedBox(height: ResponsiveUtils.value(12)),
+              Text(
+                '正在获取课程...',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -41,7 +62,7 @@ class CurrentClassWidget extends StatelessWidget {
         color: colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
-            ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+            ResponsiveUtils.getBorderRadius(width),
           ),
         ),
         child: Center(
@@ -72,7 +93,7 @@ class CurrentClassWidget extends StatelessWidget {
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
       ),
       child: Padding(

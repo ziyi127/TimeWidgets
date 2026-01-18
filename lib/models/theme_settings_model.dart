@@ -3,6 +3,48 @@ import 'package:flutter/material.dart';
 /// 主题设置模型
 /// 用于存储和管理应用的主题配置，包括种子颜色、主题模式等
 class ThemeSettings {
+
+  const ThemeSettings({
+    required this.seedColor,
+    required this.themeMode,
+    required this.useDynamicColor,
+    required this.useSystemColor,
+    this.fontSizeScale = 1.0,
+    this.borderRadiusScale = 1.0,
+    this.componentOpacity = 1.0,
+    this.shadowStrength = 1.0,
+    this.enableGradients = true,
+  });
+
+  /// 默认主题设置
+  /// 使用 Material 3 默认的紫色作为种子颜色
+  factory ThemeSettings.defaultSettings() {
+    return const ThemeSettings(
+      seedColor: Color(0xFF6750A4), // Material 3 default purple
+      themeMode: ThemeMode.system,
+      useDynamicColor: false,
+      useSystemColor: false,
+      enableGradients: false,
+    );
+  }
+
+  /// 从 JSON 反序列化
+  factory ThemeSettings.fromJson(Map<String, dynamic> json) {
+    return ThemeSettings(
+      seedColor: Color(json['seedColor'] as int),
+      themeMode: ThemeMode.values.firstWhere(
+        (mode) => mode.toString() == json['themeMode'],
+        orElse: () => ThemeMode.system,
+      ),
+      useDynamicColor: json['useDynamicColor'] as bool? ?? true,
+      useSystemColor: json['useSystemColor'] as bool? ?? false,
+      fontSizeScale: (json['fontSizeScale'] as num? ?? 1.0).toDouble(),
+      borderRadiusScale: (json['borderRadiusScale'] as num? ?? 1.0).toDouble(),
+      componentOpacity: (json['componentOpacity'] as num? ?? 1.0).toDouble(),
+      shadowStrength: (json['shadowStrength'] as num? ?? 1.0).toDouble(),
+      enableGradients: json['enableGradients'] as bool? ?? true,
+    );
+  }
   /// 种子颜色 - 用于生成 Material You 动态配色方案
   final Color seedColor;
 
@@ -29,52 +71,6 @@ class ThemeSettings {
 
   /// 是否启用渐变效果
   final bool enableGradients;
-
-  const ThemeSettings({
-    required this.seedColor,
-    required this.themeMode,
-    required this.useDynamicColor,
-    required this.useSystemColor,
-    this.fontSizeScale = 1.0,
-    this.borderRadiusScale = 1.0,
-    this.componentOpacity = 1.0,
-    this.shadowStrength = 1.0,
-    this.enableGradients = true,
-  });
-
-  /// 默认主题设置
-  /// 使用 Material 3 默认的紫色作为种子颜色
-  factory ThemeSettings.defaultSettings() {
-    return const ThemeSettings(
-      seedColor: Color(0xFF6750A4), // Material 3 default purple
-      themeMode: ThemeMode.system,
-      useDynamicColor: true,
-      useSystemColor: false,
-      fontSizeScale: 1.0,
-      borderRadiusScale: 1.0,
-      componentOpacity: 1.0,
-      shadowStrength: 1.0,
-      enableGradients: true,
-    );
-  }
-
-  /// 从 JSON 反序列化
-  factory ThemeSettings.fromJson(Map<String, dynamic> json) {
-    return ThemeSettings(
-      seedColor: Color(json['seedColor'] as int),
-      themeMode: ThemeMode.values.firstWhere(
-        (mode) => mode.toString() == json['themeMode'],
-        orElse: () => ThemeMode.system,
-      ),
-      useDynamicColor: json['useDynamicColor'] as bool? ?? true,
-      useSystemColor: json['useSystemColor'] as bool? ?? false,
-      fontSizeScale: (json['fontSizeScale'] as num? ?? 1.0).toDouble(),
-      borderRadiusScale: (json['borderRadiusScale'] as num? ?? 1.0).toDouble(),
-      componentOpacity: (json['componentOpacity'] as num? ?? 1.0).toDouble(),
-      shadowStrength: (json['shadowStrength'] as num? ?? 1.0).toDouble(),
-      enableGradients: json['enableGradients'] as bool? ?? true,
-    );
-  }
 
   /// 序列化为 JSON
   Map<String, dynamic> toJson() {

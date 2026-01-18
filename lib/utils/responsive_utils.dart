@@ -13,7 +13,7 @@ class ResponsiveUtils {
   ResponsiveUtils._();
 
   /// UI缩放比例
-  static double _scaleFactor = 1.0;
+  static double _scaleFactor = 1;
   
   /// 设置缩放比例
   static void setScaleFactor(double factor) {

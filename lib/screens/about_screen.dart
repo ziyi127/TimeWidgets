@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -21,7 +20,6 @@ class AboutScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // 应用图标占位
                   Container(
@@ -71,15 +69,15 @@ class AboutScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: const Text('开发者'),
-                    subtitle: const Text('ziyi127'),
+                  const ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('开发者'),
+                    subtitle: Text('ziyi127'),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.email),
-                    title: const Text('联系邮箱'),
-                    subtitle: const Text('ziyihed@outlook.com'),
+                  const ListTile(
+                    leading: Icon(Icons.email),
+                    title: Text('联系邮箱'),
+                    subtitle: Text('ziyihed@outlook.com'),
                   ),
                   ListTile(
                     leading: const Icon(Icons.code),

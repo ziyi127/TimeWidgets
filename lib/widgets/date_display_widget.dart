@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/ntp_service.dart';
-import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 日期显示组件 - MD3紧凑版
 class DateDisplayWidget extends StatelessWidget {
-  final bool isCompact;
 
   const DateDisplayWidget({
     super.key,
     this.isCompact = false,
   });
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {

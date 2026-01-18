@@ -1,15 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'dart:async';
 import 'package:time_widgets/utils/logger.dart';
 
 /// 渲染同步服务
 /// 确保所有渲染操作与屏幕刷新率同步，消除撕裂现象
 class RenderSyncService {
-  static RenderSyncService? _instance;
-  static RenderSyncService get instance => _instance ??= RenderSyncService._();
   
   RenderSyncService._();
+  static RenderSyncService? _instance;
+  static RenderSyncService get instance => _instance ??= RenderSyncService._();
 
   bool _isInitialized = false;
   final List<VoidCallback> _pendingUpdates = [];
@@ -38,9 +39,11 @@ class RenderSyncService {
   void dispose() {
     if (!_isInitialized) return;
     
-    SchedulerBinding.instance.removeTimingsCallback(_onFrameTimings);
+    // SchedulerBinding.instance.removeTimingsCallback(_onFrameTimings);
     _pendingUpdates.clear();
-    _scheduledUpdates.values.forEach((timer) => timer.cancel());
+    for (final timer in _scheduledUpdates.values) {
+      timer.cancel();
+    }
     _scheduledUpdates.clear();
     
     _isInitialized = false;
@@ -55,7 +58,9 @@ class RenderSyncService {
   /// 批量同步更新
   void batchSyncUpdate(List<VoidCallback> updates) {
     if (!_isInitialized) {
-      updates.forEach((update) => update());
+      for (final update in updates) {
+        update();
+      }
       return;
     }
 
@@ -91,6 +96,7 @@ class RenderSyncService {
   }
 
   /// 处理帧更新
+  // ignore: unused_element
   void _processFrameUpdates(Duration timeStamp) {
     if (_pendingUpdates.isNotEmpty) {
       _processPendingUpdates();
@@ -143,6 +149,7 @@ class RenderSyncService {
   }
 
   /// 帧时间回调
+  // ignore: unused_element
   void _onFrameTimings(List<FrameTiming> timings) {
     for (final timing in timings) {
       final frameDuration = timing.totalSpan;
@@ -245,14 +252,14 @@ mixin RenderSyncMixin<T extends StatefulWidget> on State<T> {
   void syncSetState(VoidCallback fn, {String? key}) {
     RenderSyncService.instance.syncUpdate(() {
       if (mounted) setState(fn);
-    }, key: key);
+    }, key: key,);
   }
 
   /// 智能延迟setState
   void smartSetState(VoidCallback fn, {String? key}) {
     RenderSyncService.instance.smartDelayedUpdate(() {
       if (mounted) setState(fn);
-    }, key: key);
+    }, key: key,);
   }
 
   /// 批量setState
@@ -260,7 +267,7 @@ mixin RenderSyncMixin<T extends StatefulWidget> on State<T> {
     RenderSyncService.instance.batchSyncUpdate(
       updates.map((update) => () {
         if (mounted) setState(update);
-      }).toList(),
+      },).toList(),
     );
   }
 }

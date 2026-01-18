@@ -4,10 +4,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 天气组件 - MD3紧凑版
 class WeatherWidget extends StatelessWidget {
-  final WeatherData? weatherData;
-  final String? error;
-  final VoidCallback? onRetry;
-  final bool isCompact;
 
   const WeatherWidget({
     super.key,
@@ -16,6 +12,10 @@ class WeatherWidget extends StatelessWidget {
     this.onRetry,
     this.isCompact = false,
   });
+  final WeatherData? weatherData;
+  final String? error;
+  final VoidCallback? onRetry;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +23,10 @@ class WeatherWidget extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final width = MediaQuery.sizeOf(context).width;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
+
+    if (weatherData == null && error == null) {
+      return _buildLoadingCard(context, theme, colorScheme, width);
+    }
 
     if (error != null) {
       return _buildErrorCard(context, colorScheme, width);
@@ -40,7 +44,7 @@ class WeatherWidget extends StatelessWidget {
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
       ),
       child: Padding(
@@ -99,7 +103,7 @@ class WeatherWidget extends StatelessWidget {
                   style: theme.textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.w400,
                     color: colorScheme.onSurface,
-                    height: 1.0,
+                    height: 1,
                     fontSize: (theme.textTheme.displaySmall?.fontSize ?? 36) * fontMultiplier,
                   ),
                 ),
@@ -142,7 +146,7 @@ class WeatherWidget extends StatelessWidget {
         Icon(
           icon, 
           size: ResponsiveUtils.getIconSize(width, baseSize: 14), 
-          color: colorScheme.onSurfaceVariant
+          color: colorScheme.onSurfaceVariant,
         ),
         SizedBox(width: ResponsiveUtils.value(4)),
         Text(
@@ -156,6 +160,41 @@ class WeatherWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildLoadingCard(BuildContext context, ThemeData theme, ColorScheme colorScheme, double width) {
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(width),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(ResponsiveUtils.value(16)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: ResponsiveUtils.value(24),
+              height: ResponsiveUtils.value(24),
+              child: CircularProgressIndicator(
+                strokeWidth: ResponsiveUtils.value(2),
+                color: colorScheme.primary,
+              ),
+            ),
+            SizedBox(height: ResponsiveUtils.value(12)),
+            Text(
+              '获取天气中...',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildErrorCard(BuildContext context, ColorScheme colorScheme, double width) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
     
@@ -164,7 +203,7 @@ class WeatherWidget extends StatelessWidget {
       color: colorScheme.errorContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
       ),
       child: Padding(
@@ -174,7 +213,7 @@ class WeatherWidget extends StatelessWidget {
             Icon(
               Icons.cloud_off_rounded, 
               color: colorScheme.onErrorContainer, 
-              size: ResponsiveUtils.getIconSize(width, baseSize: 20)
+              size: ResponsiveUtils.getIconSize(width, baseSize: 20),
             ),
             SizedBox(width: ResponsiveUtils.value(12)),
             Expanded(

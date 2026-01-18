@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
 
 /// 内容适配服务
 /// 提供智能内容裁剪、响应式布局和溢出处�?
@@ -69,7 +70,7 @@ class ContentAdaptationService {
     bool enableScrolling = false,
   }) {
     final responsivePadding = _calculateResponsivePadding(
-      basePadding ?? const EdgeInsets.all(16.0),
+      basePadding ?? const EdgeInsets.all(16),
       containerSize,
     );
     
@@ -249,7 +250,7 @@ class ContentAdaptationService {
     double maxSize,
   ) {
     // 基于容器宽度的缩放因�?
-    double scaleFactor = 1.0;
+    double scaleFactor = 1;
     
     if (containerSize.width < 250) {
       scaleFactor = 0.8;
@@ -277,7 +278,7 @@ class ContentAdaptationService {
     EdgeInsets basePadding,
     Size containerSize,
   ) {
-    double scaleFactor = 1.0;
+    double scaleFactor = 1;
     
     if (containerSize.width < 250) {
       scaleFactor = 0.7;
@@ -300,7 +301,7 @@ class ContentAdaptationService {
     double baseSpacing,
     Size containerSize,
   ) {
-    double scaleFactor = 1.0;
+    double scaleFactor = 1;
     
     if (containerSize.width < 250) {
       scaleFactor = 0.6;
@@ -320,7 +321,7 @@ class ContentAdaptationService {
     double minSize,
     double maxSize,
   ) {
-    double scaleFactor = 1.0;
+    double scaleFactor = 1;
     
     if (containerSize.width < 250) {
       scaleFactor = 0.75;
@@ -491,7 +492,7 @@ class ContentAdaptationService {
   /// 创建响应式内边距（公共方法）
   static EdgeInsets createResponsivePadding({
     required Size containerSize,
-    EdgeInsets basePadding = const EdgeInsets.all(16.0),
+    EdgeInsets basePadding = const EdgeInsets.all(16),
   }) {
     return _calculateResponsivePadding(basePadding, containerSize);
   }

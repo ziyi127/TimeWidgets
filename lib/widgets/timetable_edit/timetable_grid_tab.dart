@@ -4,9 +4,9 @@ import 'package:time_widgets/services/timetable_edit_service.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class TimetableGridTab extends StatelessWidget {
-  final TimetableEditService service;
 
   const TimetableGridTab({super.key, required this.service});
+  final TimetableEditService service;
   
   /// Generate a simple unique ID using timestamp and random numbers
   String _generateId() {
@@ -107,7 +107,7 @@ class TimetableGridTab extends StatelessWidget {
     
     // Find courses for this slot
     final coursesInSlot = service.dailyCourses.where(
-      (d) => d.dayOfWeek == day && d.timeSlotId == slot.id
+      (d) => d.dayOfWeek == day && d.timeSlotId == slot.id,
     ).toList();
 
     final bothWeeksCourse = coursesInSlot.where((d) => d.weekType == WeekType.both).firstOrNull;
@@ -120,7 +120,7 @@ class TimetableGridTab extends StatelessWidget {
         day, 
         slot, 
         bothWeeksCourse,
-        isSplit: false
+        isSplit: false,
       );
     }
     
@@ -134,10 +134,9 @@ class TimetableGridTab extends StatelessWidget {
           id: '', 
           courseId: '', 
           dayOfWeek: day, 
-          timeSlotId: slot.id, 
-          weekType: WeekType.both
+          timeSlotId: slot.id,
         ),
-        isSplit: false
+        isSplit: false,
       );
     }
 
@@ -163,11 +162,11 @@ class TimetableGridTab extends StatelessWidget {
                 courseId: '', 
                 dayOfWeek: day, 
                 timeSlotId: slot.id, 
-                weekType: WeekType.single
+                weekType: WeekType.single,
               ),
               isSplit: true,
-              label: '单周'
-            )
+              label: '单周',
+            ),
           ),
           Container(width: 1, color: theme.colorScheme.outlineVariant),
           Expanded(
@@ -180,11 +179,11 @@ class TimetableGridTab extends StatelessWidget {
                 courseId: '', 
                 dayOfWeek: day, 
                 timeSlotId: slot.id, 
-                weekType: WeekType.double
+                weekType: WeekType.double,
               ),
               isSplit: true,
-              label: '双周'
-            )
+              label: '双周',
+            ),
           ),
         ],
       ),
@@ -196,7 +195,7 @@ class TimetableGridTab extends StatelessWidget {
     DayOfWeek day, 
     TimeSlot slot, 
     DailyCourse dailyCourse, 
-    {required bool isSplit, String? label}
+    {required bool isSplit, String? label,}
   ) {
     final theme = Theme.of(context);
     
@@ -280,12 +279,12 @@ class TimetableGridTab extends StatelessWidget {
     BuildContext context, 
     DayOfWeek day, 
     TimeSlot slot, 
-    DailyCourse currentDailyCourse
+    DailyCourse currentDailyCourse,
   ) async {
     final courses = service.courses;
     WeekType selectedWeekType = currentDailyCourse.weekType;
     
-    await showDialog(
+    await showDialog<void>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
@@ -303,7 +302,7 @@ class TimetableGridTab extends StatelessWidget {
                     ButtonSegment(value: WeekType.double, label: Text('双周')),
                   ],
                   selected: {selectedWeekType},
-                  onSelectionChanged: (Set<WeekType> newSelection) {
+                  onSelectionChanged: (newSelection) {
                     setState(() {
                       selectedWeekType = newSelection.first;
                     });
@@ -384,7 +383,7 @@ class TimetableGridTab extends StatelessWidget {
               ),
             ],
           );
-        }
+        },
       ),
     );
   }

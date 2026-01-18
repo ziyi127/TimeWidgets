@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:time_widgets/services/timetable_edit_service.dart';
-import 'package:time_widgets/widgets/timetable_edit/course_list_tab.dart';
-import 'package:time_widgets/widgets/timetable_edit/time_slot_tab.dart';
-import 'package:time_widgets/widgets/timetable_edit/timetable_grid_tab.dart';
-import 'package:time_widgets/services/enhanced_window_manager.dart';
+import 'package:time_widgets/services/timetable_storage_service.dart';
+// import 'package:time_widgets/services/ical_import_service.dart'; // 文件不存在
+import 'package:time_widgets/utils/md3_button_styles.dart';
+import 'package:time_widgets/utils/md3_navigation_styles.dart';
+import 'package:time_widgets/utils/md3_typography_styles.dart';
+import 'package:time_widgets/widgets/schedule_edit_tab.dart';
+import 'package:time_widgets/widgets/subject_edit_tab.dart';
+import 'package:time_widgets/widgets/time_layout_edit_tab.dart';
 import 'package:time_widgets/widgets/window_controls.dart';
-
 
 class TimetableEditScreen extends StatefulWidget {
   const TimetableEditScreen({super.key});
@@ -14,77 +18,123 @@ class TimetableEditScreen extends StatefulWidget {
   State<TimetableEditScreen> createState() => _TimetableEditScreenState();
 }
 
-class _TimetableEditScreenState extends State<TimetableEditScreen> with SingleTickerProviderStateMixin {
+class _TimetableEditScreenState extends State<TimetableEditScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final TimetableEditService _editService = TimetableEditService();
-  bool _isLoading = true;
+  late TimetableEditService _timetableEditService;
+  late TimetableStorageService _storageService;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    await _editService.refreshData();
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    _timetableEditService = TimetableEditService();
+    _storageService = TimetableStorageService();
+    _loadTimetableData();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _editService.dispose();
     super.dispose();
   }
 
+  Future<void> _loadTimetableData() async {
+    final data = await _storageService.loadTimetableData();
+    _timetableEditService.loadTimetableData(data);
+  }
+
+  Future<void> _saveTimetableData() async {
+    try {
+      await _timetableEditService.saveTimetableData();
+      _showSuccessSnackBar('课表数据已保存');
+    } catch (e) {
+      _showErrorSnackBar('保存失败: $e');
+    }
+  }
+
+  void _showSuccessSnackBar(String message) {
+    if (!mounted) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: colorScheme.onPrimaryContainer),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: colorScheme.primaryContainer,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: colorScheme.onErrorContainer),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: colorScheme.errorContainer,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  // 移除未使用的导入导出方法
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('编辑课表'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // 恢复主窗口原始尺寸和位置
-            EnhancedWindowManager.restoreMainWindow();
-            Navigator.pop(context);
-          },
+    return ChangeNotifierProvider.value(
+      value: _timetableEditService,
+      child: Scaffold(
+        appBar: MD3NavigationStyles.appBar(
+          context: context,
+          automaticallyImplyLeading: false,
+          title: Text(
+            '课表编辑',
+            style: MD3TypographyStyles.titleLarge(context),
+          ),
+          bottom: MD3NavigationStyles.tabBar(
+            context: context,
+            controller: _tabController,
+            tabs: const [
+              Tab(text: '课表'),
+              Tab(text: '时间表'),
+              Tab(text: '科目'),
+            ],
+          ),
+          actions: [
+            MD3ButtonStyles.icon(
+              context: context,
+              icon: const Icon(Icons.save),
+              onPressed: _saveTimetableData,
+              tooltip: '保存课表',
+            ),
+            const SizedBox(width: 8),
+            const WindowControls(),
+          ],
         ),
-        actions: [
-          // 窗口控制按钮
-          const SizedBox(width: 8),
-          const WindowControls(restoreMainWindowOnClose: true),
-          const SizedBox(width: 8),
-        ],
-        bottom: TabBar(
+        body: TabBarView(
           controller: _tabController,
-          tabs: const [
-            Tab(text: '科目管理', icon: Icon(Icons.class_outlined)),
-            Tab(text: '作息时间', icon: Icon(Icons.access_time)),
-            Tab(text: '课程表', icon: Icon(Icons.grid_on)),
+          children: const [
+            ScheduleEditTab(),
+            TimeLayoutEditTab(),
+            SubjectEditTab(),
           ],
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListenableBuilder(
-              listenable: _editService,
-              builder: (context, child) {
-                return TabBarView(
-                  controller: _tabController,
-                  children: [
-                    CourseListTab(service: _editService),
-                    TimeSlotTab(service: _editService),
-                    TimetableGridTab(service: _editService),
-                  ],
-                );
-              },
-            ),
     );
   }
 }

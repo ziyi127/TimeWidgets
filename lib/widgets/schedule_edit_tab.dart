@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/timetable_edit_model.dart';
+import '../services/classisland_import_service.dart';
 import '../services/timetable_edit_service.dart';
+import '../services/timetable_export_service.dart';
+import '../utils/color_utils.dart';
 import '../utils/md3_button_styles.dart';
-import '../utils/md3_card_styles.dart';
 import '../utils/md3_dialog_styles.dart';
 import '../utils/md3_form_styles.dart';
 import '../utils/md3_typography_styles.dart';
-import '../utils/color_utils.dart';
 
-/// 课表编辑标签�?- 网格视图
+/// 课表编辑标签页 - 网格视图
 class ScheduleEditTab extends StatefulWidget {
   const ScheduleEditTab({super.key});
 
@@ -20,6 +22,82 @@ class ScheduleEditTab extends StatefulWidget {
 class _ScheduleEditTabState extends State<ScheduleEditTab> {
   String? _selectedScheduleId;
   WeekType _filterWeekType = WeekType.both;
+  final TimetableExportService _exportService = TimetableExportService();
+
+  void _showSuccessSnackBar(String message) {
+    if (!mounted) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: colorScheme.onPrimaryContainer),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: colorScheme.primaryContainer,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: colorScheme.onErrorContainer),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: colorScheme.errorContainer,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  Future<void> _importFromJson(TimetableEditService service) async {
+    final result = await _exportService.importFromFileWithStats();
+    if (!mounted) return;
+    
+    if (result.success && result.data != null) {
+      service.loadTimetableData(result.data!);
+      _showSuccessSnackBar('已导入: ${result.stats}');
+    } else {
+      _showErrorSnackBar(result.errorMessage ?? '导入失败');
+    }
+  }
+
+  Future<void> _importFromClassIsland(TimetableEditService service) async {
+    final result = await ClassislandImportService.importFromFileWithStats();
+    if (!mounted) return;
+    
+    if (result.success && result.data != null) {
+      service.loadTimetableData(result.data!);
+      _showSuccessSnackBar('已导入: ${result.stats}');
+    } else {
+      _showErrorSnackBar(result.errorMessage ?? '导入失败');
+    }
+  }
+
+  Future<void> _exportTimetable(TimetableEditService service) async {
+    try {
+      final data = service.getTimetableData();
+      final success = await _exportService.exportToFile(data);
+      if (success && mounted) {
+        _showSuccessSnackBar('课表数据已导出');
+      }
+    } catch (e) {
+      _showErrorSnackBar('导出失败: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +113,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               child: _buildScheduleList(context, schedules, service),
             ),
             const VerticalDivider(width: 1),
-            // 右侧: 课程网格编辑�?
+            // 右侧: 课程网格编辑器
             Expanded(
               child: _buildScheduleGrid(context, service),
             ),
@@ -53,14 +131,62 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         // 列表头部
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('课表列表', style: MD3TypographyStyles.titleMedium(context)),
-              const Spacer(),
-              MD3ButtonStyles.iconFilledTonal(
-                icon: const Icon(Icons.add),
-                onPressed: () => _showAddScheduleDialog(context, service),
-                tooltip: '添加课表',
+              Row(
+                children: [
+                  Text('课表列表', style: MD3TypographyStyles.titleMedium(context)),
+                  const Spacer(),
+                  // 导入/导出菜单按钮
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, color: colorScheme.primary),
+                    tooltip: '导入/导出',
+                    onSelected: (result) {
+                      if (result == 'export_json') {
+                        _exportTimetable(service);
+                      } else if (result == 'import_json') {
+                        _importFromJson(service);
+                      } else if (result == 'import_classisland') {
+                        _importFromClassIsland(service);
+                      }
+                    },
+                    itemBuilder: (context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'import_json',
+                        child: ListTile(
+                          leading: Icon(Icons.file_upload_outlined),
+                          title: Text('导入课表'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'export_json',
+                        child: ListTile(
+                          leading: Icon(Icons.file_download_outlined),
+                          title: Text('导出课表'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem<String>(
+                        value: 'import_classisland',
+                        child: ListTile(
+                          leading: Icon(Icons.sync_alt),
+                          title: Text('从ClassIsland导入'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  MD3ButtonStyles.iconFilledTonal(
+                    context: context,
+                    icon: const Icon(Icons.add),
+                    onPressed: () => _showAddScheduleDialog(context, service),
+                    tooltip: '添加课表',
+                  ),
+                ],
               ),
             ],
           ),
@@ -144,9 +270,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             ),
           ),
           const SizedBox(height: 24),
-          MD3ButtonStyles.filledTonal(
+          MD3ButtonStyles.filledTonalButton(
+            context: context,
             onPressed: () => _showAddScheduleDialog(context, service),
-            child: const Text('创建课表'),
+            text: '创建课表',
           ),
         ],
       ),
@@ -199,7 +326,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              '请先�?时间�?中添加时间点',
+              '请先在时间表中添加时间点',
               style: MD3TypographyStyles.bodyLarge(context).copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -218,7 +345,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             children: [
               Text('课程安排', style: MD3TypographyStyles.titleMedium(context)),
               const Spacer(),
-              // 周类型筛�?
+              // 周类型筛选
               MD3FormStyles.segmentedButton<WeekType>(
                 context: context,
                 segments: const [
@@ -288,7 +415,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               final dailyCourse = dailyCourses.where((dc) =>
                 dc.dayOfWeek == day &&
                 dc.timeSlotId == slot.id &&
-                (_filterWeekType == WeekType.both || dc.weekType == _filterWeekType || dc.weekType == WeekType.both)
+                (_filterWeekType == WeekType.both || dc.weekType == _filterWeekType || dc.weekType == WeekType.both),
               ).firstOrNull;
               
               final course = dailyCourse != null 
@@ -311,7 +438,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 
   Future<void> _showAddScheduleDialog(BuildContext context, TimetableEditService service) async {
     final nameController = TextEditingController();
-    int weekDay = DateTime.now().weekday;
+    int weekDay = DateTime.now().weekday == 7 ? 0 : DateTime.now().weekday;
     WeekType weekType = WeekType.both;
     
     final result = await showDialog<bool>(
@@ -355,7 +482,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               MD3FormStyles.dropdown<WeekType>(
                 context: context,
                 value: weekType,
-                label: '周类�?,
+                label: '周类型',
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
@@ -372,30 +499,30 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             ],
           ),
           actions: [
-            MD3ButtonStyles.text(
+            MD3ButtonStyles.textButton(
+              context: context,
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('取消'),
+              text: '取消',
             ),
-            MD3ButtonStyles.filled(
+            MD3ButtonStyles.filledButton(
+              context: context,
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('创建'),
+              text: '创建',
             ),
           ],
         ),
       ),
     );
     
-    if (result == true && nameController.text.isNotEmpty) {
+    if ((result ?? false) && nameController.text.isNotEmpty) {
       final newSchedule = Schedule(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: nameController.text,
         triggerRule: ScheduleTriggerRule(
           weekDay: weekDay,
           weekType: weekType,
-          isEnabled: true,
         ),
         courses: [],
-        isAutoEnabled: true,
       );
       service.addSchedule(newSchedule);
       setState(() {
@@ -415,11 +542,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     final selectedCourse = await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
       context: context,
       title: '选择课程',
-      selectedValue: null,
       items: [
         const SelectionDialogItem(
           value: null,
-          title: '无课�?,
+          title: '无课程',
           icon: Icon(Icons.remove_circle_outline),
         ),
         ...courses.map((course) {
@@ -443,15 +569,15 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
     
     if (selectedCourse == null) {
-      // Remove existing daily course
+      // 删除现有课程
       final existing = service.dailyCourses.where((dc) =>
-        dc.dayOfWeek == day && dc.timeSlotId == slot.id
+        dc.dayOfWeek == day && dc.timeSlotId == slot.id,
       ).firstOrNull;
       if (existing != null) {
         service.deleteDailyCourse(existing.id);
       }
     } else {
-      // Add or update daily course
+      // 添加或更新课程
       final newDailyCourse = DailyCourse(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         dayOfWeek: day,
@@ -465,119 +591,155 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 
   String _getTriggerRuleText(ScheduleTriggerRule rule) {
     const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    String dayText = days[rule.weekDay];
-    String weekTypeText = '';
-    switch (rule.weekType) {
-      case WeekType.single:
-        weekTypeText = ' (单周)';
-        break;
-      case WeekType.double:
-        weekTypeText = ' (双周)';
-        break;
-      case WeekType.both:
-        weekTypeText = '';
-        break;
-    }
+    final dayText = days[rule.weekDay];
+    final weekTypeText = switch (rule.weekType) {
+      WeekType.single => ' (单周)',
+      WeekType.double => ' (双周)',
+      WeekType.both => '',
+    };
     return '$dayText$weekTypeText';
   }
 }
 
-/// 课程单元�?
-class _CourseCell extends StatelessWidget {
-  final CourseInfo? course;
-  final DailyCourse? dailyCourse;
-  final VoidCallback onTap;
+/// 课程单元格
+class _CourseCell extends StatefulWidget {
 
   const _CourseCell({
     this.course,
     this.dailyCourse,
     required this.onTap,
   });
+  final CourseInfo? course;
+  final DailyCourse? dailyCourse;
+  final VoidCallback onTap;
+
+  @override
+  State<_CourseCell> createState() => _CourseCellState();
+}
+
+class _CourseCellState extends State<_CourseCell> {
+  bool _isHovering = false;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     
-    if (course == null) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          width: 80,
-          height: 48,
-          decoration: BoxDecoration(
-            border: Border.all(color: colorScheme.outlineVariant),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.add,
-              color: colorScheme.outline,
-              size: 20,
+    if (widget.course == null) {
+      return MouseRegion(
+        onEnter: (_) => setState(() => _isHovering = true),
+        onExit: (_) => setState(() => _isHovering = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 100,
+            height: 64,
+            decoration: BoxDecoration(
+              color: _isHovering 
+                  ? colorScheme.surfaceContainerHighest.withAlpha((255 * 0.5).round())
+                  : Colors.transparent,
+              border: Border.all(
+                color: _isHovering 
+                    ? colorScheme.outline 
+                    : colorScheme.outlineVariant.withAlpha((255 * 0.5).round()),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Icon(
+                Icons.add_rounded,
+                color: _isHovering ? colorScheme.primary : colorScheme.outline,
+                size: 24,
+              ),
             ),
           ),
         ),
       );
     }
     
-    final color = ColorUtils.parseHexColor(course!.color) ?? 
-        ColorUtils.generateColorFromName(course!.name);
+    final color = ColorUtils.parseHexColor(widget.course!.color) ?? 
+        ColorUtils.generateColorFromName(widget.course!.name);
+    final textColor = ColorUtils.getContrastTextColor(color);
     
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 80,
-        height: 48,
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              course!.displayName,
-              style: TextStyle(
-                color: ColorUtils.getContrastTextColor(color),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (dailyCourse != null && dailyCourse!.weekType != WeekType.both)
-              Container(
-                margin: const EdgeInsets.only(top: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(4),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 100,
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withAlpha(_isHovering ? 255 : (255 * 0.9).round()),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: _isHovering 
+                ? [
+                    BoxShadow(
+                      color: color.withAlpha((255 * 0.3).round()),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.course!.displayName,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Text(
-                  dailyCourse!.weekType == WeekType.single ? '�? : '�?,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (widget.course!.classroom.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  widget.course!.classroom,
                   style: TextStyle(
-                    color: ColorUtils.getContrastTextColor(color),
+                    color: textColor.withAlpha((255 * 0.9).round()),
                     fontSize: 10,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-          ],
+              ],
+              if (widget.dailyCourse != null && widget.dailyCourse!.weekType != WeekType.both) ...[
+                const SizedBox(height: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    widget.dailyCourse!.weekType == WeekType.single ? '单周' : '双周',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-/// 课表网格编辑�?
+/// 课表网格编辑器
 class _ScheduleGridEditor extends StatelessWidget {
-  final Schedule schedule;
-  final TimetableEditService service;
-  final WeekType filterWeekType;
-  final ValueChanged<WeekType> onFilterChanged;
-  final VoidCallback onDelete;
 
   const _ScheduleGridEditor({
     required this.schedule,
@@ -586,15 +748,20 @@ class _ScheduleGridEditor extends StatelessWidget {
     required this.onFilterChanged,
     required this.onDelete,
   });
+  final Schedule schedule;
+  final TimetableEditService service;
+  final WeekType filterWeekType;
+  final ValueChanged<WeekType> onFilterChanged;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final timeSlots = widget.schedule.timeLayoutId != null
-        ? widget.service.getTimeLayoutById(widget.schedule.timeLayoutId!)
-            ?.timeSlots ?? widget.service.timeSlots
-        : widget.service.timeSlots;
-    final courses = widget.service.courses;
+    final timeSlots = schedule.timeLayoutId != null
+        ? service.getTimeLayoutById(schedule.timeLayoutId!)
+            ?.timeSlots ?? service.timeSlots
+        : service.timeSlots;
+    final courses = service.courses;
     
     return Column(
       children: [
@@ -603,7 +770,7 @@ class _ScheduleGridEditor extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text(widget.schedule.name, style: MD3TypographyStyles.titleMedium(context)),
+              Text(schedule.name, style: MD3TypographyStyles.titleMedium(context)),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -612,7 +779,7 @@ class _ScheduleGridEditor extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  _getTriggerRuleText(widget.schedule.triggerRule),
+                  _getTriggerRuleText(schedule.triggerRule),
                   style: MD3TypographyStyles.labelSmall(context),
                 ),
               ),
@@ -625,12 +792,12 @@ class _ScheduleGridEditor extends StatelessWidget {
                   ButtonSegment(value: WeekType.single, label: Text('单周')),
                   ButtonSegment(value: WeekType.double, label: Text('双周')),
                 ],
-                selected: {widget.filterWeekType},
-                onSelectionChanged: widget.onFilterChanged,
-                buttonStyle: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8))),
+                selected: {filterWeekType},
+                onSelectionChanged: (selected) => onFilterChanged(selected.first),
               ),
               const SizedBox(width: 8),
               MD3ButtonStyles.iconOutlined(
+                context: context,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () => _deleteSchedule(context),
                 tooltip: '删除课表',
@@ -718,14 +885,14 @@ class _ScheduleGridEditor extends StatelessWidget {
               ),
             ),
             ...DayOfWeek.values.map((day) {
-              final dailyCourse = widget.schedule.courses.where((dc) =>
+              final dailyCourse = schedule.courses.where((dc) =>
                 dc.dayOfWeek == day &&
                 dc.timeSlotId == slot.id &&
-                (widget.filterWeekType == WeekType.both || dc.weekType == widget.filterWeekType || dc.weekType == WeekType.both)
+                (filterWeekType == WeekType.both || dc.weekType == filterWeekType || dc.weekType == WeekType.both),
               ).firstOrNull;
               
               final course = dailyCourse != null 
-                  ? widget.service.getCourseById(dailyCourse.courseId)
+                  ? service.getCourseById(dailyCourse.courseId)
                   : null;
               
               return DataCell(
@@ -747,12 +914,11 @@ class _ScheduleGridEditor extends StatelessWidget {
     TimeSlot slot,
     DayOfWeek day,
   ) async {
-    final courses = widget.service.courses;
+    final courses = service.courses;
     
     final selectedCourse = await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
       context: context,
       title: '选择课程',
-      selectedValue: null,
       items: [
         const SelectionDialogItem(
           value: null,
@@ -779,14 +945,14 @@ class _ScheduleGridEditor extends StatelessWidget {
       ],
     );
     
-    // 更新课程
-    final updatedCourses = List<DailyCourse>.from(widget.schedule.courses);
+    // 更新课程列表
+    final updatedCourses = List<DailyCourse>.from(schedule.courses);
     
-    // 查找现有课程
+    // 查找现有课程索引
     final existingIndex = updatedCourses.indexWhere((dc) =>
       dc.dayOfWeek == day &&
       dc.timeSlotId == slot.id &&
-      dc.weekType == widget.filterWeekType
+      dc.weekType == filterWeekType,
     );
     
     if (selectedCourse == null) {
@@ -795,15 +961,16 @@ class _ScheduleGridEditor extends StatelessWidget {
         updatedCourses.removeAt(existingIndex);
       }
     } else {
-      // 添加或更新课程
+      // 创建新课程
       final newDailyCourse = DailyCourse(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         dayOfWeek: day,
         timeSlotId: slot.id,
         courseId: selectedCourse.id,
-        weekType: widget.filterWeekType,
+        weekType: filterWeekType,
       );
       
+      // 添加或更新课程
       if (existingIndex != -1) {
         updatedCourses[existingIndex] = newDailyCourse;
       } else {
@@ -812,41 +979,8 @@ class _ScheduleGridEditor extends StatelessWidget {
     }
     
     // 更新课表
-    final updatedSchedule = widget.schedule.copyWith(
-      courses: updatedCourses,
-    );
-    widget.service.updateSchedule(updatedSchedule);
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.schedule_outlined,
-            size: 64,
-            color: colorScheme.outline,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '暂无时间点',
-            style: MD3TypographyStyles.bodyLarge(context).copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '请在时间表中添加时间点',
-            style: MD3TypographyStyles.bodyMedium(context).copyWith(
-              color: colorScheme.outline,
-            ),
-          ),
-        ],
-      ),
-    );
+    final updatedSchedule = schedule.copyWith(courses: updatedCourses);
+    service.updateSchedule(updatedSchedule);
   }
 
   Future<void> _deleteSchedule(BuildContext context) async {
@@ -855,7 +989,7 @@ class _ScheduleGridEditor extends StatelessWidget {
       itemName: schedule.name,
     );
     
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       service.deleteSchedule(schedule.id);
       onDelete();
     }
@@ -863,19 +997,12 @@ class _ScheduleGridEditor extends StatelessWidget {
 
   String _getTriggerRuleText(ScheduleTriggerRule rule) {
     const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    String dayText = days[rule.weekDay];
-    String weekTypeText = '';
-    switch (rule.weekType) {
-      case WeekType.single:
-        weekTypeText = ' (单周)';
-        break;
-      case WeekType.double:
-        weekTypeText = ' (双周)';
-        break;
-      case WeekType.both:
-        weekTypeText = '';
-        break;
-    }
+    final dayText = days[rule.weekDay];
+    final weekTypeText = switch (rule.weekType) {
+      WeekType.single => ' (单周)',
+      WeekType.double => ' (双周)',
+      WeekType.both => '',
+    };
     return '$dayText$weekTypeText';
   }
 }

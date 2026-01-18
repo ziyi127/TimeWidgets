@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 
-/// Material Design 3 主题工具�?class ThemeUtils {
-  // 私有构造函数，防止实例�?  ThemeUtils._();
+/// Material Design 3 theme utilities
+class ThemeUtils {
+  // Private constructor to prevent instantiation
+  ThemeUtils._();
 
-  /// MD3 种子颜色
+  /// MD3 seed color
   static const Color _seedColor = Color(0xFF6750A4);
+  
+  /// Global Font Family
+  static const String fontFamily = 'Google Sans';
+  
+  /// Global Font Family Fallback
+  static const List<String> fontFamilyFallback = ['Noto Sans SC'];
 
-  /// 构建浅色主题
+  /// Build light theme
   static ThemeData buildLightTheme() {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: _seedColor,
-      brightness: Brightness.light,
     );
 
     return _buildTheme(colorScheme);
   }
 
-  /// 构建深色主题
+  /// Build dark theme
   static ThemeData buildDarkTheme() {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: _seedColor,
@@ -26,13 +33,16 @@ import 'package:flutter/material.dart';
     return _buildTheme(colorScheme);
   }
 
-  /// 构建通用主题配置
+  /// Build common theme configuration
   static ThemeData _buildTheme(ColorScheme colorScheme) {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       
-      // 应用栏主�?      appBarTheme: AppBarTheme(
+      // AppBar theme
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -41,10 +51,12 @@ import 'package:flutter/material.dart';
           color: colorScheme.onSurface,
           fontSize: 22,
           fontWeight: FontWeight.w600,
+          fontFamily: fontFamily,
+          fontFamilyFallback: fontFamilyFallback,
         ),
       ),
 
-      // 卡片主题
+      // Card theme
       cardTheme: CardThemeData(
         elevation: 0,
         color: colorScheme.surfaceContainer,
@@ -52,32 +64,40 @@ import 'package:flutter/material.dart';
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: colorScheme.outline.withAlpha((255 * 0.2).round()),
-            width: 1,
           ),
         ),
       ),
 
-      // 按钮主题
+      // Button theme
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          textStyle: const TextStyle(
+            fontFamily: fontFamily,
+            fontFamilyFallback: fontFamilyFallback,
+          ),
         ),
       ),
 
-      // 文本按钮主题
+      // Text button theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          textStyle: const TextStyle(
+            fontFamily: fontFamily,
+            fontFamilyFallback: fontFamilyFallback,
+          ),
         ),
       ),
 
-      // 输入框主�?      inputDecorationTheme: InputDecorationTheme(
+      // Input decoration theme
+      inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
@@ -100,121 +120,148 @@ import 'package:flutter/material.dart';
           ),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        labelStyle: const TextStyle(
+          fontFamily: fontFamily,
+          fontFamilyFallback: fontFamilyFallback,
+        ),
+        hintStyle: const TextStyle(
+          fontFamily: fontFamily,
+          fontFamilyFallback: fontFamilyFallback,
+        ),
       ),
 
-      // 进度指示器主�?      progressIndicatorTheme: ProgressIndicatorThemeData(
+      // Progress indicator theme
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: colorScheme.primary,
         linearTrackColor: colorScheme.surfaceContainerHighest,
       ),
 
-      // 分割线主�?      dividerTheme: DividerThemeData(
+      // Divider theme
+      dividerTheme: DividerThemeData(
         color: colorScheme.outline.withAlpha((255 * 0.2).round()),
         thickness: 1,
         space: 1,
       ),
 
-      // 图标主题
+      // Icon theme
       iconTheme: IconThemeData(
         color: colorScheme.onSurfaceVariant,
         size: 24,
       ),
 
-      // 文本主题
-      textTheme: _buildTextTheme(colorScheme),
+      // Text theme
+      textTheme: buildTextTheme(colorScheme),
     );
   }
 
-  /// 构建文本主题
-  static TextTheme _buildTextTheme(ColorScheme colorScheme) {
+  /// Helper to create text style with global font settings
+  static TextStyle _createTextStyle({
+    required Color color,
+    required double fontSize,
+    required FontWeight fontWeight,
+    double? letterSpacing,
+  }) {
+    return TextStyle(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+    );
+  }
+
+  /// Build text theme
+  static TextTheme buildTextTheme(ColorScheme colorScheme) {
     return TextTheme(
-      // 显示文本
-      displayLarge: TextStyle(
+      // Display text
+      displayLarge: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 57,
         fontWeight: FontWeight.w400,
         letterSpacing: -0.25,
       ),
-      displayMedium: TextStyle(
+      displayMedium: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 45,
         fontWeight: FontWeight.w400,
       ),
-      displaySmall: TextStyle(
+      displaySmall: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 36,
         fontWeight: FontWeight.w400,
       ),
 
-      // 标题文本
-      headlineLarge: TextStyle(
+      // Headline text
+      headlineLarge: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 32,
         fontWeight: FontWeight.w400,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 28,
         fontWeight: FontWeight.w400,
       ),
-      headlineSmall: TextStyle(
+      headlineSmall: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 24,
         fontWeight: FontWeight.w400,
       ),
 
-      // 标题文本
-      titleLarge: TextStyle(
+      // Title text
+      titleLarge: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 22,
         fontWeight: FontWeight.w400,
       ),
-      titleMedium: TextStyle(
+      titleMedium: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 16,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.15,
       ),
-      titleSmall: TextStyle(
+      titleSmall: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 14,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.1,
       ),
 
-      // 标签文本
-      labelLarge: TextStyle(
+      // Label text
+      labelLarge: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 14,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.1,
       ),
-      labelMedium: TextStyle(
+      labelMedium: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 12,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.5,
       ),
-      labelSmall: TextStyle(
+      labelSmall: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 11,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.5,
       ),
 
-      // 正文文本
-      bodyLarge: TextStyle(
+      // Body text
+      bodyLarge: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         letterSpacing: 0.5,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         letterSpacing: 0.25,
       ),
-      bodySmall: TextStyle(
+      bodySmall: _createTextStyle(
         color: colorScheme.onSurface,
         fontSize: 12,
         fontWeight: FontWeight.w400,
@@ -223,7 +270,8 @@ import 'package:flutter/material.dart';
     );
   }
 
-  /// 获取状态颜�?  static Color getStatusColor(ColorScheme colorScheme, String status) {
+  /// Get status color
+  static Color getStatusColor(ColorScheme colorScheme, String status) {
     switch (status.toLowerCase()) {
       case 'success':
       case 'completed':
@@ -243,7 +291,7 @@ import 'package:flutter/material.dart';
     }
   }
 
-  /// 获取事件类型颜色
+  /// Get event type color
   static Color getEventTypeColor(ColorScheme colorScheme, String eventType) {
     switch (eventType.toLowerCase()) {
       case 'exam':
@@ -262,7 +310,7 @@ import 'package:flutter/material.dart';
     }
   }
 
-  /// 获取事件类型图标
+  /// Get event type icon
   static IconData getEventTypeIcon(String eventType) {
     switch (eventType.toLowerCase()) {
       case 'exam':
@@ -281,7 +329,8 @@ import 'package:flutter/material.dart';
     }
   }
 
-  /// 获取课程状态图�?  static IconData getCourseStatusIcon(String status) {
+  /// Get course status icon
+  static IconData getCourseStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'current':
       case 'active':

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:time_widgets/services/week_service.dart';
-import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/ntp_service.dart';
-import 'package:time_widgets/utils/responsive_utils.dart';
+import 'package:time_widgets/services/settings_service.dart';
+import 'package:time_widgets/services/week_service.dart';
 
-/// 周次显示组件 - MD3紧凑版
+/// 周数显示组件 - MD3紧凑版
 class WeekDisplayWidget extends StatefulWidget {
-  final bool isCompact;
 
   const WeekDisplayWidget({
     super.key,
     this.isCompact = false,
   });
+  final bool isCompact;
 
   @override
   State<WeekDisplayWidget> createState() => _WeekDisplayWidgetState();

@@ -12,7 +12,7 @@ class TimetableStorageService {
       final jsonString = prefs.getString(_prefsKey);
       
       if (jsonString != null) {
-        final jsonData = jsonDecode(jsonString);
+        final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
         return TimetableData.fromJson(jsonData);
       } else {
         return _getDefaultTimetableData();
@@ -35,8 +35,8 @@ class TimetableStorageService {
   }
 
   TimetableData _getDefaultTimetableData() {
-    return TimetableData(
-      courses: const [
+    return const TimetableData(
+      courses: [
         CourseInfo(id: '1', name: '语文', teacher: '张老师'),
         CourseInfo(id: '2', name: '数学', teacher: '李老师'),
         CourseInfo(id: '3', name: '英语', teacher: '王老师'),
@@ -46,7 +46,7 @@ class TimetableStorageService {
         CourseInfo(id: '7', name: '历史', teacher: '周老师'),
         CourseInfo(id: '8', name: '地理', teacher: '吴老师'),
       ],
-      timeSlots: const [
+      timeSlots: [
         TimeSlot(id: '1', startTime: '08:00', endTime: '08:45', name: '早读'),
         TimeSlot(id: '2', startTime: '08:55', endTime: '09:40', name: '第一节课'),
         TimeSlot(id: '3', startTime: '10:00', endTime: '10:45', name: '第二节课'),
@@ -57,7 +57,7 @@ class TimetableStorageService {
         TimeSlot(id: '8', startTime: '19:00', endTime: '19:45', name: '晚自习一'),
         TimeSlot(id: '9', startTime: '20:00', endTime: '20:45', name: '晚自习二'),
       ],
-      dailyCourses: const [],
+      dailyCourses: [],
     );
   }
 }

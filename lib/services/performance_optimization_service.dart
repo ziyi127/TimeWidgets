@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'dart:async';
 import 'package:time_widgets/utils/logger.dart';
 
 /// 性能优化服务
@@ -8,6 +9,7 @@ import 'package:time_widgets/utils/logger.dart';
 class PerformanceOptimizationService {
   static final Map<String, dynamic> _cache = {};
   static final Map<String, Timer> _debounceTimers = {};
+  static Timer? _memoryMonitorTimer;
   static const Duration _debounceDelay = Duration(milliseconds: 300);
 
   /// 缓存布局计算结果
@@ -82,18 +84,25 @@ class PerformanceOptimizationService {
 
   /// 内存使用监控
   static void monitorMemoryUsage() {
-    Timer.periodic(const Duration(minutes: 1), (timer) {
+    _memoryMonitorTimer?.cancel();
+    _memoryMonitorTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       // 清理过期缓存
       _cleanupExpiredCache();
       
       // 如果缓存过大，清理一些旧条目
-      if (_cache.length > 100) {
+      if (_cache.length > 50) {
         final keysToRemove = _cache.keys.take(20).toList();
         for (final key in keysToRemove) {
           _cache.remove(key);
         }
       }
     });
+  }
+
+  /// 停止内存监控
+  static void stopMemoryMonitoring() {
+    _memoryMonitorTimer?.cancel();
+    _memoryMonitorTimer = null;
   }
 
   /// 清理过期缓存
@@ -140,7 +149,7 @@ class PerformanceOptimizationService {
       itemBuilder: itemBuilder,
       itemExtent: itemExtent,
       controller: controller,
-      cacheExtent: 200.0, // 缓存范围
+      cacheExtent: 200, // 缓存范围
       physics: const BouncingScrollPhysics(),
     );
   }
@@ -149,7 +158,7 @@ class PerformanceOptimizationService {
   static final Map<String, int> _apiCallCounts = {};
   static final Map<String, List<int>> _apiCallDurations = {};
   static final List<int> _frameDurations = [];
-  static const int _maxFrameSamples = 100;
+  static const int _maxFrameSamples = 50;
 
   /// 性能监控
   static void startPerformanceMonitoring() {
@@ -181,6 +190,10 @@ class PerformanceOptimizationService {
 
   /// 记录API调用开始
   static Map<String, dynamic> startApiCall(String endpoint) {
+    if (_apiCallCounts.length > 50 && !_apiCallCounts.containsKey(endpoint)) {
+      // 简单的清理策略：清理最早添加的或者随机清理
+      _apiCallCounts.remove(_apiCallCounts.keys.first);
+    }
     _apiCallCounts[endpoint] = (_apiCallCounts[endpoint] ?? 0) + 1;
     return {'startTime': DateTime.now().millisecondsSinceEpoch, 'endpoint': endpoint};
   }
@@ -195,7 +208,7 @@ class PerformanceOptimizationService {
     _apiCallDurations[endpoint]!.add(duration);
     
     // 限制每个端点的样本数量
-    if (_apiCallDurations[endpoint]!.length > 50) {
+    if (_apiCallDurations[endpoint]!.length > 20) {
       _apiCallDurations[endpoint]!.removeAt(0);
     }
     
@@ -320,14 +333,14 @@ abstract class OptimizedState<T extends OptimizedStatefulWidget> extends State<T
 
 /// 性能优化的布局构建�?
 class OptimizedLayoutBuilder extends StatelessWidget {
-  final Widget Function(BuildContext, BoxConstraints) builder;
-  final String? cacheKey;
 
   const OptimizedLayoutBuilder({
     super.key,
     required this.builder,
     this.cacheKey,
   });
+  final Widget Function(BuildContext, BoxConstraints) builder;
+  final String? cacheKey;
 
   @override
   Widget build(BuildContext context) {
@@ -348,7 +361,7 @@ class OptimizedLayoutBuilder extends StatelessWidget {
         PerformanceOptimizationService.setCachedResult(
           key, 
           widget, 
-          ttl: const Duration(seconds: 30)
+          ttl: const Duration(seconds: 30),
         );
         
         return widget;
@@ -375,7 +388,7 @@ class OptimizedAnimationController extends AnimationController {
     final cpuUsage = double.tryParse(stats['cpu_usage']?.toString() ?? '0') ?? 0;
     
     // 根据内存压力和CPU使用率调整动画时长
-    double scaleFactor = 1.0;
+    double scaleFactor = 1;
     
     if (isHighMemoryPressure) {
       scaleFactor = 0.6; // 高内存压力下减少40%
@@ -395,10 +408,10 @@ class OptimizedAnimationController extends AnimationController {
 /// 动画性能监控工具
 class AnimationPerformanceMonitor {
   /// 记录动画开始时间
-  static Map<String, int> _animationStartTimes = {};
+  static final Map<String, int> _animationStartTimes = {};
   
   /// 记录动画帧时间
-  static Map<String, List<int>> _animationFrameTimes = {};
+  static final Map<String, List<int>> _animationFrameTimes = {};
   
   /// 开始监控动画性能
   static void startMonitoring(String animationId) {

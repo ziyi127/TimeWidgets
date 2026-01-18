@@ -417,6 +417,11 @@ enum MD3NavigationVariant {
 /// MD3 Navigation Builder
 /// 提供更灵活的导航组件构建方式
 class MD3NavigationBuilder {
+
+  MD3NavigationBuilder({
+    required this.context,
+    required this.variant,
+  });
   final BuildContext context;
   final MD3NavigationVariant variant;
   
@@ -438,11 +443,6 @@ class MD3NavigationBuilder {
   List<Widget>? _tabs;
   TabController? _controller;
   bool _isScrollable = false;
-
-  MD3NavigationBuilder({
-    required this.context,
-    required this.variant,
-  });
 
   MD3NavigationBuilder title(Widget title) {
     _title = title;

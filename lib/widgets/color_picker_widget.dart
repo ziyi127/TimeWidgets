@@ -6,6 +6,13 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 /// 颜色选择器组件
 /// 提供预设颜色和自定义颜色选择功能
 class ColorPickerWidget extends StatefulWidget {
+
+  const ColorPickerWidget({
+    super.key,
+    required this.selectedColor,
+    required this.onColorChanged,
+    this.showPreview = true,
+  });
   /// 当前选中的颜色
   final Color selectedColor;
   
@@ -14,13 +21,6 @@ class ColorPickerWidget extends StatefulWidget {
   
   /// 是否显示预览
   final bool showPreview;
-
-  const ColorPickerWidget({
-    super.key,
-    required this.selectedColor,
-    required this.onColorChanged,
-    this.showPreview = true,
-  });
 
   @override
   State<ColorPickerWidget> createState() => _ColorPickerWidgetState();
@@ -95,7 +95,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
                       Text(
                         '#${widget.selectedColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
                         style: MD3TypographyStyles.bodyMedium(context, 
-                          color: colorScheme.onSurfaceVariant).copyWith(
+                          color: colorScheme.onSurfaceVariant,).copyWith(
                           fontSize: MD3TypographyStyles.bodyMedium(context).fontSize! * fontMultiplier,
                         ),
                       ),
@@ -126,12 +126,12 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
           itemCount: _presetColors.length,
           itemBuilder: (context, index) {
             final color = _presetColors[index];
-            final isSelected = color.value == widget.selectedColor.value;
+            final isSelected = color.toARGB32() == widget.selectedColor.toARGB32();
             
             return InkWell(
               onTap: () => widget.onColorChanged(color),
               borderRadius: BorderRadius.circular(ResponsiveUtils.value(24)),
-              child: Container(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: color,
                   shape: BoxShape.circle,

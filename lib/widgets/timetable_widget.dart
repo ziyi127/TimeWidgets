@@ -5,14 +5,14 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 课程表组件- MD3紧凑版，支持内部滚动
 class TimetableWidget extends StatelessWidget {
-  final List<Course>? courses;
-  final bool isCompact;
 
   const TimetableWidget({
     super.key,
     this.courses,
     this.isCompact = false,
   });
+  final List<Course>? courses;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +60,7 @@ class TimetableWidget extends StatelessWidget {
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
       ),
       child: Padding(
@@ -267,7 +267,7 @@ class TimetableWidget extends StatelessWidget {
                     Icon(
                       Icons.location_on_outlined,
                       size: ResponsiveUtils.getIconSize(width, baseSize: 12),
-                      color: colorScheme.onSurfaceVariant
+                      color: colorScheme.onSurfaceVariant,
                     ),
                     SizedBox(width: ResponsiveUtils.value(4)),
                     Expanded(

@@ -1,20 +1,4 @@
 class WeatherData {
-  final String cityName;
-  final String description;
-  final int temperature;
-  final String temperatureRange;
-  final int aqiLevel;
-  final int humidity;
-  final String wind;
-  final double pressure;
-  final String sunrise;
-  final String sunset;
-  final int weatherType;
-  final String weatherIcon;
-  final int feelsLike;
-  final String visibility;
-  final String uvIndex;
-  final String pubTime;
 
   const WeatherData({
     required this.cityName,
@@ -106,26 +90,65 @@ class WeatherData {
       return WeatherData.fromXiaomiJson(json);
     }
     
+    // 安全地转换为int
+    int safeParseInt(dynamic value, int defaultValue) {
+      if (value == null) return defaultValue;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? defaultValue;
+      return int.tryParse(value.toString()) ?? defaultValue;
+    }
+    
+    // 安全地转换为double
+    double safeParseDouble(dynamic value, double defaultValue) {
+      if (value == null) return defaultValue;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? defaultValue;
+      return double.tryParse(value.toString()) ?? defaultValue;
+    }
+    
+    // 安全地转换为String
+    String safeParseString(dynamic value, String defaultValue) {
+      if (value == null) return defaultValue;
+      return value.toString();
+    }
+    
     // 兼容旧格式
     return WeatherData(
-      cityName: json['city_name'] ?? 'Unknown',
-      description: json['description'] ?? 'Unknown',
-      temperature: int.tryParse(json['temperature'].toString().replaceAll('℃', '')) ?? 0,
-      temperatureRange: json['temperature_range'] ?? '0℃~0℃',
-      aqiLevel: json['aqilevel'] is String ? int.tryParse(json['aqilevel']) ?? 0 : (json['aqilevel'] ?? 0),
-      humidity: json['humidity'] is String ? int.tryParse(json['humidity']) ?? 0 : (json['humidity'] ?? 0),
-      wind: json['wind'] ?? 'Unknown',
-      pressure: double.tryParse(json['pressure'].toString()) ?? 0.0,
+      cityName: safeParseString(json['city_name'], 'Unknown'),
+      description: safeParseString(json['description'], 'Unknown'),
+      temperature: safeParseInt(json['temperature'], 0),
+      temperatureRange: safeParseString(json['temperature_range'], '0℃~0℃'),
+      aqiLevel: safeParseInt(json['aqilevel'], 0),
+      humidity: safeParseInt(json['humidity'], 0),
+      wind: safeParseString(json['wind'], 'Unknown'),
+      pressure: safeParseDouble(json['pressure'], 0),
       sunrise: _formatTime(json['sunrise']),
       sunset: _formatTime(json['sunset']),
-      weatherType: json['weather_type'] is String ? int.tryParse(json['weather_type']) ?? 0 : (json['weather_type'] ?? 0),
-      weatherIcon: _getWeatherIcon(json['weather_type'] is String ? int.tryParse(json['weather_type']) ?? 0 : (json['weather_type'] ?? 0)),
-      feelsLike: json['feels_like'] is String ? int.tryParse(json['feels_like']) ?? 0 : (json['feels_like'] ?? 0),
-      visibility: json['visibility']?.toString() ?? '',
-      uvIndex: json['uv_index']?.toString() ?? '0',
-      pubTime: json['pub_time']?.toString() ?? '',
+      weatherType: safeParseInt(json['weather_type'], 0),
+      weatherIcon: _getWeatherIcon(safeParseInt(json['weather_type'], 0)),
+      feelsLike: safeParseInt(json['feels_like'], 0),
+      visibility: safeParseString(json['visibility'], ''),
+      uvIndex: safeParseString(json['uv_index'], '0'),
+      pubTime: safeParseString(json['pub_time'], ''),
     );
   }
+  final String cityName;
+  final String description;
+  final int temperature;
+  final String temperatureRange;
+  final int aqiLevel;
+  final int humidity;
+  final String wind;
+  final double pressure;
+  final String sunrise;
+  final String sunset;
+  final int weatherType;
+  final String weatherIcon;
+  final int feelsLike;
+  final String visibility;
+  final String uvIndex;
+  final String pubTime;
 
   static String _formatTime(dynamic value) {
     if (value == null) return '00:00';

@@ -1,9 +1,4 @@
 class Course {
-  final String subject;
-  final String teacher;
-  final String time;
-  final String classroom;
-  final bool isCurrent;
 
   const Course({
     required this.subject,
@@ -12,14 +7,19 @@ class Course {
     required this.classroom,
     this.isCurrent = false,
   });
+  final String subject;
+  final String teacher;
+  final String time;
+  final String classroom;
+  final bool isCurrent;
 }
 
 class Timetable {
-  final List<Course> courses;
-  final DateTime date;
 
   const Timetable({
     required this.courses,
     required this.date,
   });
+  final List<Course> courses;
+  final DateTime date;
 }

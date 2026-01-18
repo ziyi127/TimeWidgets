@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:dynamic_color/dynamic_color.dart' as plugin;
+import 'package:flutter/material.dart';
 import 'package:time_widgets/models/theme_settings_model.dart';
 import 'package:time_widgets/services/theme_service.dart';
 
@@ -7,6 +9,13 @@ import 'package:time_widgets/services/theme_service.dart';
 /// 根据当前的主题设置动态生成浅色和深色主题
 /// 支持实时主题更新和系统动态取色
 class DynamicColorBuilder extends StatefulWidget {
+
+  const DynamicColorBuilder({
+    super.key,
+    required this.builder,
+    this.defaultSeedColor,
+    this.themeService,
+  });
   /// 构建器函数，接收生成的浅色和深色主题
   final Widget Function(ThemeData lightTheme, ThemeData darkTheme) builder;
 
@@ -16,13 +25,6 @@ class DynamicColorBuilder extends StatefulWidget {
   /// 主题服务实例，用于获取主题设置
   final ThemeService? themeService;
 
-  const DynamicColorBuilder({
-    super.key,
-    required this.builder,
-    this.defaultSeedColor,
-    this.themeService,
-  });
-
   @override
   State<DynamicColorBuilder> createState() => _DynamicColorBuilderState();
 }
@@ -30,6 +32,7 @@ class DynamicColorBuilder extends StatefulWidget {
 class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
   late ThemeService _themeService;
   ThemeSettings? _themeSettings;
+  StreamSubscription<ThemeSettings>? _themeSubscription;
 
   @override
   void initState() {
@@ -48,7 +51,7 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
         });
       }
 
-      _themeService.themeStream.listen((settings) {
+      _themeSubscription = _themeService.themeStream.listen((settings) {
         if (mounted) {
           setState(() {
             _themeSettings = settings;
@@ -66,6 +69,7 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
 
   @override
   void dispose() {
+    _themeSubscription?.cancel();
     if (widget.themeService == null) {
       _themeService.dispose();
     }
@@ -78,7 +82,7 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
     final themeSettings = _themeSettings ?? ThemeSettings.defaultSettings();
 
     return plugin.DynamicColorBuilder(
-      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+      builder: (lightDynamic, darkDynamic) {
         Color seedColor = themeSettings.seedColor;
 
         // 如果启用了系统取色且可用，使用系统颜色
@@ -98,6 +102,13 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
 /// 简化版的动态颜色构建器
 /// 用于只需要当前主题的场景
 class SimpleDynamicColorBuilder extends StatelessWidget {
+
+  const SimpleDynamicColorBuilder({
+    super.key,
+    required this.builder,
+    this.defaultSeedColor,
+    this.forceBrightness,
+  });
   /// 构建器函数，接收当前主题
   final Widget Function(ThemeData theme) builder;
 
@@ -106,13 +117,6 @@ class SimpleDynamicColorBuilder extends StatelessWidget {
 
   /// 强制使用的亮度模式
   final Brightness? forceBrightness;
-
-  const SimpleDynamicColorBuilder({
-    super.key,
-    required this.builder,
-    this.defaultSeedColor,
-    this.forceBrightness,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +137,13 @@ class SimpleDynamicColorBuilder extends StatelessWidget {
 /// 主题预览 widget
 /// 用于在设置界面预览不同的主题效果
 class ThemePreview extends StatelessWidget {
+
+  const ThemePreview({
+    super.key,
+    required this.seedColor,
+    this.isDark = false,
+    this.child,
+  });
   /// 种子颜色
   final Color seedColor;
 
@@ -142,17 +153,9 @@ class ThemePreview extends StatelessWidget {
   /// 预览内容
   final Widget? child;
 
-  const ThemePreview({
-    super.key,
-    required this.seedColor,
-    this.isDark = false,
-    this.child,
-  });
-
   @override
   Widget build(BuildContext context) {
     final themeService = ThemeService();
-    final themeSettings = ThemeSettings.defaultSettings();
     final theme = isDark
         ? themeService.generateDarkTheme(seedColor)
         : themeService.generateLightTheme(seedColor);

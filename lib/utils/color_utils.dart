@@ -24,7 +24,7 @@ class ColorUtils {
     // Lightness: 45-65% for better contrast and MD3 compliance
     final lightness = 0.45 + (((hash >> 16).abs() % 20) / 100);
     
-    return HSLColor.fromAHSL(1.0, hue, saturation, lightness).toColor();
+    return HSLColor.fromAHSL(1, hue, saturation, lightness).toColor();
   }
 
   /// Calculate the relative luminance of a color
@@ -134,9 +134,9 @@ extension DoublePow on double {
   double pow(double exponent) {
     if (this < 0) return 0;
     double result = 1;
-    double base = this;
-    int exp = exponent.toInt();
-    double frac = exponent - exp;
+    final double base = this;
+    final int exp = exponent.toInt();
+    final double frac = exponent - exp;
     
     // Integer part
     for (int i = 0; i < exp; i++) {
@@ -159,7 +159,7 @@ extension DoublePow on double {
     
     // Natural log approximation
     double ln = 0;
-    double x = (base - 1) / (base + 1);
+    final double x = (base - 1) / (base + 1);
     double term = x;
     for (int i = 1; i <= 10; i += 2) {
       ln += term / i;
@@ -168,7 +168,7 @@ extension DoublePow on double {
     ln *= 2;
     
     // Exp approximation
-    double expVal = frac * ln;
+    final double expVal = frac * ln;
     double result = 1;
     double factorial = 1;
     double power = 1;

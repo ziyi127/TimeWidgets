@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/timetable_edit_model.dart';
 import '../services/timetable_edit_service.dart';
+import '../utils/color_utils.dart';
 import '../utils/md3_button_styles.dart';
 import '../utils/md3_card_styles.dart';
 import '../utils/md3_dialog_styles.dart';
 import '../utils/md3_form_styles.dart';
 import '../utils/md3_typography_styles.dart';
-import '../utils/color_utils.dart';
 
-/// 科目编辑标签�?- 主从布局
+/// 科目编辑标签页 - 主从布局
 class SubjectEditTab extends StatefulWidget {
   const SubjectEditTab({super.key});
 
@@ -57,6 +58,7 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
               Text('科目列表', style: MD3TypographyStyles.titleMedium(context)),
               const Spacer(),
               MD3ButtonStyles.iconFilledTonal(
+                context: context,
                 icon: const Icon(Icons.add),
                 onPressed: () => _showAddSubjectDialog(context, service),
                 tooltip: '添加科目',
@@ -141,9 +143,10 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
             ),
           ),
           const SizedBox(height: 24),
-          MD3ButtonStyles.filledTonal(
+          MD3ButtonStyles.filledTonalButton(
+            context: context,
             onPressed: () => _showAddSubjectDialog(context, service),
-            child: const Text('添加科目'),
+            text: '添加科目',
           ),
         ],
       ),
@@ -183,7 +186,7 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
           ),
           const SizedBox(height: 16),
           Text(
-            '选择一个科目进行编�?,
+            '选择一个科目进行编辑',
             style: MD3TypographyStyles.bodyLarge(context).copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -219,14 +222,14 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
               MD3FormStyles.outlinedTextField(
                 context: context,
                 controller: abbreviationController,
-                label: '简�?(可�?',
-                hint: '例如: �?,
+                label: '简称(可选)',
+                hint: '例如: 数',
               ),
               const SizedBox(height: 16),
               MD3FormStyles.outlinedTextField(
                 context: context,
                 controller: teacherController,
-                label: '教师 (可�?',
+                label: '教师 (可选)',
                 hint: '例如: 张老师',
               ),
               const SizedBox(height: 16),
@@ -243,20 +246,22 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
             ],
           ),
           actions: [
-            MD3ButtonStyles.text(
+            MD3ButtonStyles.textButton(
+              context: context,
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('取消'),
+              text: '取消',
             ),
-            MD3ButtonStyles.filled(
+            MD3ButtonStyles.filledButton(
+              context: context,
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('添加'),
+              text: '添加',
             ),
           ],
         ),
       ),
     );
     
-    if (result == true && nameController.text.isNotEmpty) {
+    if ((result ?? false) && nameController.text.isNotEmpty) {
       final newSubject = CourseInfo(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: nameController.text,
@@ -273,17 +278,17 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
 }
 
 
-/// 科目详情编辑�?
+/// 科目详情编辑页
 class _SubjectDetailEditor extends StatefulWidget {
-  final CourseInfo subject;
-  final TimetableEditService service;
-  final VoidCallback onDelete;
 
   const _SubjectDetailEditor({
     required this.subject,
     required this.service,
     required this.onDelete,
   });
+  final CourseInfo subject;
+  final TimetableEditService service;
+  final VoidCallback onDelete;
 
   @override
   State<_SubjectDetailEditor> createState() => _SubjectDetailEditorState();
@@ -340,7 +345,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
       isOutdoor: _isOutdoor,
     );
     widget.service.updateCourse(updatedSubject);
-    _showSuccessSnackBar('科目已更�?);
+    _showSuccessSnackBar('科目已更新');
   }
 
   void _showSuccessSnackBar(String message) {
@@ -368,8 +373,8 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
       await MD3DialogStyles.showConfirmDialog(
         context: context,
         title: '无法删除',
-        message: '该科目正在被 ${usages.length} 个课程安排使用，请先移除相关课程安排后再删除�?,
-        confirmText: '知道�?,
+        message: '该科目正在被 ${usages.length} 个课程安排使用，请先移除相关课程安排后再删除。',
+        confirmText: '知道了',
         cancelText: '',
       );
       return;
@@ -380,7 +385,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
       itemName: widget.subject.name,
     );
     
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       widget.service.deleteCourse(widget.subject.id);
       widget.onDelete();
     }
@@ -393,7 +398,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 标题和操作按�?
+          // 标题和操作按钮
           Row(
             children: [
               Container(
@@ -436,6 +441,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
                 ),
               ),
               MD3ButtonStyles.iconOutlined(
+                context: context,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: _deleteSubject,
                 tooltip: '删除科目',
@@ -461,7 +467,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
                 MD3FormStyles.outlinedTextField(
                   context: context,
                   controller: _abbreviationController,
-                  label: '简�?,
+                  label: '简称',
                   hint: '用于在课表中显示',
                 ),
                 const SizedBox(height: 16),
@@ -509,7 +515,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
                     });
                   },
                   title: '户外课程',
-                  subtitle: '标记为户外课�?,
+                  subtitle: '标记为户外课程',
                   secondary: const Icon(Icons.wb_sunny_outlined),
                 ),
               ],
@@ -520,9 +526,10 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
           // 保存按钮
           SizedBox(
             width: double.infinity,
-            child: MD3ButtonStyles.filled(
+            child: MD3ButtonStyles.filledButton(
+              context: context,
               onPressed: _saveChanges,
-              child: const Text('保存更改'),
+              text: '保存更改',
             ),
           ),
         ],

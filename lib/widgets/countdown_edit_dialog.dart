@@ -3,9 +3,9 @@ import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
 class CountdownEditDialog extends StatefulWidget {
-  final CountdownData? countdown;
 
   const CountdownEditDialog({super.key, this.countdown});
+  final CountdownData? countdown;
 
   @override
   State<CountdownEditDialog> createState() => _CountdownEditDialogState();
@@ -39,21 +39,23 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final picked = await showDatePicker(
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _targetDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 3650)),
     );
 
     if (picked != null) {
+      if (!mounted) return;
       final pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_targetDate),
       );
 
       if (pickedTime != null) {
+        if (!mounted) return;
         setState(() {
           _targetDate = DateTime(
             picked.year,
@@ -152,7 +154,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                           ),
                           SizedBox(height: ResponsiveUtils.value(8)),
                           ElevatedButton.icon(
-                            onPressed: () => _selectDate(context),
+                            onPressed: _selectDate,
                             icon: Icon(
                               Icons.calendar_today,
                               size: ResponsiveUtils.getIconSize(width, baseSize: 18),
@@ -194,7 +196,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                         items: _types.map((type) => DropdownMenuItem(
                           value: type,
                           child: Text(type),
-                        )).toList(),
+                        ),).toList(),
                         onChanged: (value) {
                           if (value != null) {
                             setState(() {
@@ -219,11 +221,11 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                           contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
                         ),
                         items: [
-                          const DropdownMenuItem(value: null, child: Text('无分类')),
+                          const DropdownMenuItem(child: Text('无分类')),
                           ..._categories.map((category) => DropdownMenuItem(
                             value: category,
                             child: Text(category),
-                          )),
+                          ),),
                         ],
                         onChanged: (value) {
                           setState(() {

@@ -5,13 +5,13 @@ import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class SettingsService {
+  factory SettingsService() => _instance;
+  
+  SettingsService._internal();
   static const String _settingsKey = 'app_settings';
   
   // 单例模式实现
   static final SettingsService _instance = SettingsService._internal();
-  factory SettingsService() => _instance;
-  
-  SettingsService._internal();
   
   final StreamController<AppSettings> _settingsController = 
       StreamController<AppSettings>.broadcast();
@@ -32,7 +32,7 @@ class SettingsService {
       final jsonString = prefs.getString(_settingsKey);
       
       if (jsonString != null) {
-        final jsonData = jsonDecode(jsonString);
+        final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
         _currentSettings = AppSettings.fromJson(jsonData);
       } else {
         _currentSettings = AppSettings.defaultSettings();

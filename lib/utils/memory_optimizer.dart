@@ -10,14 +10,16 @@ class MemoryOptimizer {
   static void startAggressiveGC() {
     _gcTimer?.cancel();
     
-    // 改为每60秒触发一次，减少CPU占用
-    _gcTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
+    // 每30秒触发一次
+    _gcTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       // 在 release 模式下，这会提示 VM 进行 GC
       if (kReleaseMode) {
         // 创建一些临时对象然后立即丢弃，触发 GC
-        final temp = List.generate(100, (i) => i);
+        final temp = List.generate(1000, (i) => i);
         temp.clear();
       }
+      // 定期清理图片缓存
+      clearImageCache();
     });
   }
   

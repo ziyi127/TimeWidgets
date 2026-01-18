@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/services/enhanced_layout_engine.dart';
-import 'dart:convert';
 import 'package:time_widgets/utils/logger.dart';
 
 /// 小组件类型枚举
@@ -18,12 +19,6 @@ enum WidgetType {
 
 /// 小组件位置信息
 class WidgetPosition {
-  final WidgetType type;
-  final double x;
-  final double y;
-  final double width;
-  final double height;
-  final bool isVisible;
 
   WidgetPosition({
     required this.type,
@@ -33,6 +28,26 @@ class WidgetPosition {
     required this.height,
     this.isVisible = true,
   });
+
+  factory WidgetPosition.fromJson(Map<String, dynamic> json) {
+    return WidgetPosition(
+      type: WidgetType.values.firstWhere(
+        (e) => e.name == json['type'],
+        orElse: () => WidgetType.time,
+      ),
+      x: _parseDouble(json['x']) ?? 0.0,
+      y: _parseDouble(json['y']) ?? 0.0,
+      width: (_parseDouble(json['width']) ?? 280.0).clamp(50.0, 2000.0),
+      height: (_parseDouble(json['height']) ?? 120.0).clamp(50.0, 1500.0),
+      isVisible: json['isVisible'] is bool ? (json['isVisible'] as bool) : true,
+    );
+  }
+  final WidgetType type;
+  final double x;
+  final double y;
+  final double width;
+  final double height;
+  final bool isVisible;
 
   WidgetPosition copyWith({
     WidgetType? type,
@@ -63,20 +78,6 @@ class WidgetPosition {
     };
   }
 
-  factory WidgetPosition.fromJson(Map<String, dynamic> json) {
-    return WidgetPosition(
-      type: WidgetType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => WidgetType.time,
-      ),
-      x: _parseDouble(json['x']) ?? 0.0,
-      y: _parseDouble(json['y']) ?? 0.0,
-      width: (_parseDouble(json['width']) ?? 280.0).clamp(50.0, 2000.0),
-      height: (_parseDouble(json['height']) ?? 120.0).clamp(50.0, 1500.0),
-      isVisible: json['isVisible'] is bool ? json['isVisible'] : true,
-    );
-  }
-
   static double? _parseDouble(dynamic value) {
     if (value == null) return null;
     if (value is double) return value;
@@ -100,7 +101,7 @@ class DesktopWidgetService {
   static Map<WidgetType, WidgetPosition> getDefaultPositions([Size? screenSize]) {
     final containerSize = screenSize != null 
         ? Size(screenSize.width / 4, screenSize.height)
-        : const Size(480.0, 1080.0);
+        : const Size(480, 1080);
     
     return _layoutEngine.calculateOptimalLayout(containerSize, null);
   }
@@ -121,7 +122,7 @@ class DesktopWidgetService {
     
     final containerSize = screenSize != null 
         ? Size(screenSize.width / 4, screenSize.height)
-        : const Size(480.0, 1080.0);
+        : const Size(480, 1080);
     
     if (positionsString == null) {
       return _layoutEngine.calculateOptimalLayout(containerSize, null);
@@ -136,7 +137,7 @@ class DesktopWidgetService {
           (e) => e.name == entry.key,
           orElse: () => WidgetType.time,
         );
-        savedPositions[type] = WidgetPosition.fromJson(entry.value);
+        savedPositions[type] = WidgetPosition.fromJson(entry.value as Map<String, dynamic>);
       }
       
       // 使用布局引擎计算最优布局，考虑已保存的位置
@@ -210,7 +211,7 @@ class DesktopWidgetService {
     final position = defaultPositions[type];
     return position != null 
         ? Size(position.width, position.height)
-        : const Size(280.0, 80.0); // 默认尺寸
+        : const Size(280, 80); // 默认尺寸
   }
 
   /// 检查位置是否在屏幕边界内
@@ -237,7 +238,7 @@ class DesktopWidgetService {
   static Map<WidgetType, WidgetPosition> adjustLayoutForScreenSize(
     Map<WidgetType, WidgetPosition> currentLayout,
     Size oldSize,
-    Size newSize
+    Size newSize,
   ) {
     return _layoutEngine.adjustForScreenSize(currentLayout, oldSize, newSize);
   }

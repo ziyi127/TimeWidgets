@@ -7,9 +7,9 @@ import 'package:time_widgets/utils/md3_form_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class TimeSlotTab extends StatelessWidget {
-  final TimetableEditService service;
 
   const TimeSlotTab({super.key, required this.service});
+  final TimetableEditService service;
   
   /// Generate a simple unique ID using timestamp and random numbers
   String _generateId() {
@@ -108,7 +108,7 @@ class TimeSlotTab extends StatelessWidget {
     TimeOfDay startTime = slot != null ? parseTime(slot.startTime) : const TimeOfDay(hour: 8, minute: 0);
     TimeOfDay endTime = slot != null ? parseTime(slot.endTime) : const TimeOfDay(hour: 8, minute: 45);
 
-    await showDialog(
+    await showDialog<void>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
@@ -234,7 +234,7 @@ class TimeSlotTab extends StatelessWidget {
       isDestructive: true,
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       service.deleteTimeSlot(slot.id);
     }
   }

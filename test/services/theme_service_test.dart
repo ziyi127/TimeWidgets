@@ -27,12 +27,12 @@ void main() {
       // 获取种子颜色
       final loadedColor = await themeService.getSeedColor();
 
-      expect(loadedColor.value, equals(testColor.value));
+      expect(loadedColor.toARGB32(), equals(testColor.toARGB32()));
     });
 
     test('should persist theme settings across service instances', () async {
       const testColor = Color(0xFF2196F3); // Blue color
-      final testSettings = ThemeSettings(
+      const testSettings = ThemeSettings(
         seedColor: testColor,
         themeMode: ThemeMode.dark,
         useDynamicColor: false,
@@ -46,7 +46,7 @@ void main() {
       final newThemeService = ThemeService();
       final loadedSettings = await newThemeService.loadSettings();
 
-      expect(loadedSettings.seedColor.value, equals(testColor.value));
+      expect(loadedSettings.seedColor.toARGB32(), equals(testColor.toARGB32()));
       expect(loadedSettings.themeMode, equals(ThemeMode.dark));
       expect(loadedSettings.useDynamicColor, isFalse);
       expect(loadedSettings.useSystemColor, isTrue);
@@ -58,7 +58,7 @@ void main() {
       final loadedSettings = await themeService.loadSettings();
       final defaultSettings = ThemeSettings.defaultSettings();
 
-      expect(loadedSettings.seedColor.value, equals(defaultSettings.seedColor.value));
+      expect(loadedSettings.seedColor.toARGB32(), equals(defaultSettings.seedColor.toARGB32()));
       expect(loadedSettings.themeMode, equals(defaultSettings.themeMode));
       expect(loadedSettings.useDynamicColor, equals(defaultSettings.useDynamicColor));
       expect(loadedSettings.useSystemColor, equals(defaultSettings.useSystemColor));
@@ -80,7 +80,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 10));
 
       expect(streamEvents.length, greaterThanOrEqualTo(2));
-      expect(streamEvents.last.seedColor.value, equals(testColor2.value));
+      expect(streamEvents.last.seedColor.toARGB32(), equals(testColor2.toARGB32()));
 
       await subscription.cancel();
     });
@@ -118,7 +118,7 @@ void main() {
       final defaultSettings = ThemeSettings.defaultSettings();
 
       // 应该回退到默认设置
-      expect(loadedSettings.seedColor.value, equals(defaultSettings.seedColor.value));
+      expect(loadedSettings.seedColor.toARGB32(), equals(defaultSettings.seedColor.toARGB32()));
       expect(loadedSettings.themeMode, equals(defaultSettings.themeMode));
     });
   });

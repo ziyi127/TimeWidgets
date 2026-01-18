@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// 提供统一的 MD3 Dialog 样式和变量
 class MD3DialogStyles {
   /// MD3 标准圆角半径
-  static const double _cornerRadius = 28.0;
+  static const double _cornerRadius = 28;
   
   /// MD3 标准内边距
   static const EdgeInsets _contentPadding = EdgeInsets.fromLTRB(24, 16, 24, 0);
@@ -109,7 +109,6 @@ class MD3DialogStyles {
       title: '确认删除',
       message: additionalMessage ?? '确定要删除"$itemName"吗？此操作无法撤销。',
       confirmText: '删除',
-      cancelText: '取消',
       isDestructive: true,
       icon: Icon(
         Icons.delete_outline,
@@ -188,7 +187,7 @@ class MD3DialogStyles {
           actionsAlignment: MainAxisAlignment.end,
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
+              onPressed: () => Navigator.of(context).pop(),
               child: Text(cancelText),
             ),
             const SizedBox(width: 8),
@@ -273,7 +272,7 @@ class MD3DialogStyles {
 
   // 内部文本样式辅助方法
   static TextStyle _headlineSmall(BuildContext context) {
-    return Theme.of(context).textTheme.headlineSmall ?? TextStyle(
+    return Theme.of(context).textTheme.headlineSmall ?? const TextStyle(
       fontSize: 24,
       fontWeight: FontWeight.w400,
       letterSpacing: 0,
@@ -282,7 +281,7 @@ class MD3DialogStyles {
   }
 
   static TextStyle _bodyMedium(BuildContext context) {
-    return Theme.of(context).textTheme.bodyMedium ?? TextStyle(
+    return Theme.of(context).textTheme.bodyMedium ?? const TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.25,
@@ -291,7 +290,7 @@ class MD3DialogStyles {
   }
 
   static TextStyle _titleLarge(BuildContext context) {
-    return Theme.of(context).textTheme.titleLarge ?? TextStyle(
+    return Theme.of(context).textTheme.titleLarge ?? const TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.w400,
       letterSpacing: 0,
@@ -302,11 +301,6 @@ class MD3DialogStyles {
 
 /// 全屏对话框组件
 class _FullScreenDialog extends StatelessWidget {
-  final String title;
-  final Widget content;
-  final VoidCallback? onSave;
-  final String saveText;
-  final bool showSaveButton;
 
   const _FullScreenDialog({
     required this.title,
@@ -315,6 +309,11 @@ class _FullScreenDialog extends StatelessWidget {
     this.saveText = '保存',
     this.showSaveButton = true,
   });
+  final String title;
+  final Widget content;
+  final VoidCallback? onSave;
+  final String saveText;
+  final bool showSaveButton;
 
   @override
   Widget build(BuildContext context) {
@@ -354,10 +353,6 @@ class _FullScreenDialog extends StatelessWidget {
 
 /// 选择对话框项
 class SelectionDialogItem<T> {
-  final T value;
-  final String title;
-  final String? subtitle;
-  final Widget? icon;
 
   const SelectionDialogItem({
     required this.value,
@@ -365,4 +360,8 @@ class SelectionDialogItem<T> {
     this.subtitle,
     this.icon,
   });
+  final T value;
+  final String title;
+  final String? subtitle;
+  final Widget? icon;
 }

@@ -45,7 +45,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
     _startTime = null;
     _endTime = null;
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('添加时间段'),
@@ -175,7 +175,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
       minute: int.parse(endParts[1]),
     );
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('编辑时间段'),
@@ -343,7 +343,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -388,12 +388,12 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.delete),
                                   onPressed: () {
-                                    showDialog(
+                                    showDialog<void>(
                                       context: context,
                                       builder: (context) => AlertDialog(
                                         title: const Text('确认删除'),
                                         content: Text(
-                                            '确定要删除时间段"${timeSlot.name}"吗？'),
+                                            '确定要删除时间段"${timeSlot.name}"吗？',),
                                         actions: [
                                           TextButton(
                                             onPressed: () =>

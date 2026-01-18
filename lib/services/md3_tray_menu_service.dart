@@ -1,16 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:system_tray/system_tray.dart';
-import 'dart:io';
-import 'package:time_widgets/utils/logger.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 /// MD3风格的系统托盘菜单服务
 /// 使用C++实现基础托盘，右键时显示Flutter MD3悬浮菜单
 class MD3TrayMenuService {
-  static MD3TrayMenuService? _instance;
-  static MD3TrayMenuService get instance => _instance ??= MD3TrayMenuService._();
   
   MD3TrayMenuService._();
+  static MD3TrayMenuService? _instance;
+  static MD3TrayMenuService get instance => _instance ??= MD3TrayMenuService._();
 
   SystemTray? _systemTray;
   bool _isInitialized = false;
@@ -21,6 +22,7 @@ class MD3TrayMenuService {
   VoidCallback? onToggleWindow;
   VoidCallback? onToggleEditMode;
   VoidCallback? onExit;
+  VoidCallback? onTempScheduleChange;  // 新增：临时调课回调
   
   // MD3菜单显示回调 - 由main.dart设置
   VoidCallback? onShowMD3Menu;
@@ -33,7 +35,7 @@ class MD3TrayMenuService {
       _systemTray = SystemTray();
 
       // 系统托盘初始化 - 使用system_tray 2.0.3版本兼容的API
-      String iconPath = Platform.isWindows ? 'assets/icons/tray_icon.ico' : 'assets/icons/app_icon.png';
+      final String iconPath = Platform.isWindows ? 'assets/icons/tray_icon.ico' : 'assets/icons/app_icon.png';
       Logger.d('使用图标路径: $iconPath');
       
       await _systemTray!.initSystemTray(
@@ -74,6 +76,14 @@ class MD3TrayMenuService {
         },
       );
       
+      final tempScheduleItem = MenuItemLabel(
+        label: '临时调课',
+        onClicked: (menuItem) {
+          Logger.d('菜单点击: 临时调课');
+          onTempScheduleChange?.call();
+        },
+      );
+      
       final settingsItem = MenuItemLabel(
         label: '设置',
         onClicked: (menuItem) {
@@ -95,6 +105,7 @@ class MD3TrayMenuService {
         showHideItem,
         editTimetableItem,
         editLayoutItem,
+        tempScheduleItem,
         settingsItem,
         MenuSeparator(),
         exitItem,
@@ -150,12 +161,6 @@ class MD3TrayMenuService {
 /// MD3风格的托盘悬浮菜单
 /// 显示在屏幕右下角，靠近系统托盘位置
 class MD3TrayPopupMenu extends StatefulWidget {
-  final VoidCallback? onShowSettings;
-  final VoidCallback? onShowTimetableEdit;
-  final VoidCallback? onToggleWindow;
-  final VoidCallback? onToggleEditMode;
-  final VoidCallback? onExit;
-  final VoidCallback? onDismiss;
 
   const MD3TrayPopupMenu({
     super.key,
@@ -164,8 +169,18 @@ class MD3TrayPopupMenu extends StatefulWidget {
     this.onToggleWindow,
     this.onToggleEditMode,
     this.onExit,
+    // this.onImportExport,
+    this.onTempScheduleChange,  // 新增
     this.onDismiss,
   });
+  final VoidCallback? onShowSettings;
+  final VoidCallback? onShowTimetableEdit;
+  final VoidCallback? onToggleWindow;
+  final VoidCallback? onToggleEditMode;
+  final VoidCallback? onExit;
+  // final VoidCallback? onImportExport;
+  final VoidCallback? onTempScheduleChange;  // 新增
+  final VoidCallback? onDismiss;
 
   @override
   State<MD3TrayPopupMenu> createState() => _MD3TrayPopupMenuState();
@@ -191,8 +206,6 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
     _opacityAnimation = GlobalAnimationService.instance.createFadeAnimation(
       key: 'tray_menu',
       controller: _animationController,
-      begin: 0.0,
-      end: 1.0,
       curve: GlobalAnimationService.defaultCurve,
     );
     
@@ -200,15 +213,13 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
     _scaleAnimation = GlobalAnimationService.instance.createScaleAnimation(
       key: 'tray_menu',
       controller: _animationController,
-      begin: 0.95,
-      end: 1.0,
       curve: GlobalAnimationService.popCurve,
     );
     
     // 开始动画
     GlobalAnimationService.instance.smartAnimate(
       controller: _animationController,
-      target: 1.0,
+      target: 1,
     );
   }
 
@@ -247,7 +258,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
           widget.onDismiss?.call();
         },
         behavior: HitTestBehavior.opaque,
-        child: Container(
+        child: ColoredBox(
           color: Colors.transparent,
           child: Stack(
             children: [
@@ -355,6 +366,15 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                             
                             _buildMenuItem(
                               context: context,
+                              icon: Icons.swap_horiz_rounded,
+                              label: '临时调课',
+                              onTap: () {
+                                _safeCloseMenu(widget.onTempScheduleChange);
+                              },
+                            ),
+                            
+                            _buildMenuItem(
+                              context: context,
                               icon: Icons.settings_rounded,
                               label: '设置',
                               onTap: () {
@@ -407,17 +427,17 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
     final colorScheme = theme.colorScheme;
     
     final color = isDestructive ? colorScheme.error : colorScheme.onSurface;
-    final hoverColor = isDestructive ? colorScheme.errorContainer.withOpacity(0.2) : colorScheme.surfaceContainerHighest;
-    final focusColor = colorScheme.onSurface.withOpacity(0.1);
+    final hoverColor = isDestructive ? colorScheme.errorContainer.withValues(alpha: 0.2) : colorScheme.surfaceContainerHighest;
+    final focusColor = colorScheme.onSurface.withValues(alpha: 0.1);
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       hoverColor: hoverColor,
       focusColor: focusColor,
-      highlightColor: colorScheme.onSurface.withOpacity(0.1),
-      splashColor: colorScheme.onSurface.withOpacity(0.15),
-      child: Container(
+      highlightColor: colorScheme.onSurface.withValues(alpha: 0.1),
+      splashColor: colorScheme.onSurface.withValues(alpha: 0.15),
+      child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
         ),

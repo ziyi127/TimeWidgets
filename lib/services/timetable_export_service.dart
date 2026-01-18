@@ -5,9 +5,6 @@ import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class ValidationResult {
-  final bool isValid;
-  final String? errorMessage;
-  final List<String> warnings;
 
   ValidationResult({
     required this.isValid,
@@ -22,14 +19,13 @@ class ValidationResult {
   factory ValidationResult.invalid(String message) {
     return ValidationResult(isValid: false, errorMessage: message);
   }
+  final bool isValid;
+  final String? errorMessage;
+  final List<String> warnings;
 }
 
 /// 导入结果
 class ImportResult {
-  final bool success;
-  final TimetableData? data;
-  final String? errorMessage;
-  final ImportStats? stats;
 
   ImportResult({
     required this.success,
@@ -45,15 +41,14 @@ class ImportResult {
   factory ImportResult.failure(String message) {
     return ImportResult(success: false, errorMessage: message);
   }
+  final bool success;
+  final TimetableData? data;
+  final String? errorMessage;
+  final ImportStats? stats;
 }
 
 /// 导入统计
 class ImportStats {
-  final int coursesCount;
-  final int timeSlotsCount;
-  final int dailyCoursesCount;
-  final int timeLayoutsCount;
-  final int schedulesCount;
 
   ImportStats({
     required this.coursesCount,
@@ -62,6 +57,11 @@ class ImportStats {
     required this.timeLayoutsCount,
     required this.schedulesCount,
   });
+  final int coursesCount;
+  final int timeSlotsCount;
+  final int dailyCoursesCount;
+  final int timeLayoutsCount;
+  final int schedulesCount;
 
   @override
   String toString() {
@@ -85,7 +85,7 @@ class TimetableExportService {
   /// 从 JSON 字符串导入课表数据
   TimetableData? importFromJson(String jsonString) {
     try {
-      final jsonData = jsonDecode(jsonString);
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
       return TimetableData.fromJson(jsonData);
     } catch (e) {
       Logger.e('Error importing JSON: $e');
@@ -96,7 +96,7 @@ class TimetableExportService {
   /// 从 JSON 字符串导入课表数据(带统计)
   ImportResult importFromJsonWithStats(String jsonString) {
     try {
-      final jsonData = jsonDecode(jsonString);
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
       final data = TimetableData.fromJson(jsonData);
       final stats = ImportStats(
         coursesCount: data.courses.length,
@@ -108,7 +108,7 @@ class TimetableExportService {
       return ImportResult.success(data, stats);
     } catch (e) {
       Logger.e('Error importing JSON: $e');
-      return ImportResult.failure('导入失败: ${e.toString()}');
+      return ImportResult.failure('导入失败: $e');
     }
   }
 
@@ -122,7 +122,7 @@ class TimetableExportService {
     try {
       jsonData = jsonDecode(jsonString);
     } catch (e) {
-      return ValidationResult.invalid('JSON 格式无效: ${e.toString()}');
+      return ValidationResult.invalid('JSON 格式无效: $e');
     }
 
     if (jsonData is! Map<String, dynamic>) {
@@ -317,7 +317,7 @@ class TimetableExportService {
       return importFromJsonWithStats(jsonString);
     } catch (e) {
       Logger.e('Error importing from file: $e');
-      return ImportResult.failure('导入失败: ${e.toString()}');
+      return ImportResult.failure('导入失败: $e');
     }
   }
 }

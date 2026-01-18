@@ -2,6 +2,125 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/models/theme_settings_model.dart';
 
 class AppSettings {
+
+  const AppSettings({
+    required this.themeSettings,
+    this.apiBaseUrl = 'http://localhost:3000/api',
+    this.enableNotifications = true,
+    this.semesterStartDate,
+    this.language = 'zh',
+    this.weatherRefreshInterval = 30,
+    this.countdownRefreshInterval = 60,
+    this.latitude,
+    this.longitude,
+    this.cityName,
+    this.enableNtpSync = true,
+    this.ntpSyncInterval = 30,
+    this.ntpServer = 'ntp.aliyun.com',
+    this.uiScale = 1.0,
+    this.followSystemColor = true,
+    
+    // Widget display settings
+    this.showTimeDisplayWidget = true,
+    this.showDateDisplayWidget = true,
+    this.showWeekDisplayWidget = true,
+    this.showWeatherWidget = true,
+    this.showCountdownWidget = true,
+    this.showCurrentClassWidget = true,
+    
+    // Desktop widget settings
+    this.enableDesktopWidgets = true,
+    
+    // Notification settings
+    this.enableCourseReminder = true,
+    this.enableTtsForReminder = false,
+    this.showNotificationOnClassStart = true,
+    this.showNotificationOnClassEnd = false,
+    this.showNotificationForCountdown = true,
+    
+    // Startup settings
+    this.startWithWindows = false,
+    this.minimizeToTray = true,
+    
+    // Advanced settings
+    this.enableDebugMode = false,
+    this.enablePerformanceMonitoring = false,
+  });
+
+  factory AppSettings.defaultSettings() {
+    return AppSettings(
+      themeSettings: ThemeSettings.defaultSettings(),
+      enableNotifications: false,
+      latitude: 39.9042, // Beijing
+      longitude: 116.4074,
+      cityName: 'Beijing',
+      enableNtpSync: false,
+      
+      // Widget display settings
+      showTimeDisplayWidget: false,
+      showDateDisplayWidget: false,
+      showWeekDisplayWidget: false,
+      showWeatherWidget: false,
+      showCountdownWidget: false,
+      showCurrentClassWidget: false,
+      
+      // Notification settings
+      enableCourseReminder: false,
+      showNotificationOnClassStart: false,
+      showNotificationForCountdown: false,
+      minimizeToTray: false,
+    );
+  }
+
+  factory AppSettings.fromJson(Map<String, dynamic> json) {
+    return AppSettings(
+      themeSettings: json['themeSettings'] != null
+          ? ThemeSettings.fromJson(json['themeSettings'] as Map<String, dynamic>)
+          : ThemeSettings.defaultSettings(),
+      apiBaseUrl: json['apiBaseUrl'] as String? ?? 'http://localhost:3000/api',
+      enableNotifications: json['enableNotifications'] as bool? ?? true,
+      semesterStartDate: json['semesterStartDate'] != null
+          ? DateTime.parse(json['semesterStartDate'] as String)
+          : null,
+      language: json['language'] as String? ?? 'zh',
+      weatherRefreshInterval: json['weatherRefreshInterval'] as int? ?? 30,
+      countdownRefreshInterval: json['countdownRefreshInterval'] as int? ?? 60,
+      latitude: json['latitude'] as double?,
+      longitude: json['longitude'] as double?,
+      cityName: json['cityName'] as String?,
+      enableNtpSync: json['enableNtpSync'] as bool? ?? true,
+      ntpSyncInterval: json['ntpSyncInterval'] as int? ?? 30,
+      ntpServer: json['ntpServer'] as String? ?? 'ntp.aliyun.com',
+      uiScale: (json['uiScale'] as num?)?.toDouble() ?? 1.0,
+      followSystemColor: json['followSystemColor'] as bool? ?? true,
+      
+      // Widget display settings
+      showTimeDisplayWidget: json['showTimeDisplayWidget'] as bool? ?? true,
+      showDateDisplayWidget: json['showDateDisplayWidget'] as bool? ?? true,
+      showWeekDisplayWidget: json['showWeekDisplayWidget'] as bool? ?? true,
+      showWeatherWidget: json['showWeatherWidget'] as bool? ?? true,
+      showCountdownWidget: json['showCountdownWidget'] as bool? ?? true,
+      showCurrentClassWidget: json['showCurrentClassWidget'] as bool? ?? true,
+      
+      // Desktop widget settings
+      enableDesktopWidgets: json['enableDesktopWidgets'] as bool? ?? false,
+      
+      // Notification settings
+      enableCourseReminder: json['enableCourseReminder'] as bool? ?? true,
+      enableTtsForReminder: json['enableTtsForReminder'] as bool? ?? false,
+      showNotificationOnClassStart: json['showNotificationOnClassStart'] as bool? ?? true,
+      showNotificationOnClassEnd: json['showNotificationOnClassEnd'] as bool? ?? false,
+      showNotificationForCountdown: json['showNotificationForCountdown'] as bool? ?? true,
+      
+      // Startup settings
+      startWithWindows: json['startWithWindows'] as bool? ?? false,
+      minimizeToTray: json['minimizeToTray'] as bool? ?? true,
+      
+      // Advanced settings
+      enableDebugMode: json['enableDebugMode'] as bool? ?? false,
+      enablePerformanceMonitoring: json['enablePerformanceMonitoring'] as bool? ?? false,
+    );
+  }
   final ThemeSettings themeSettings;
   final String apiBaseUrl;
   final bool enableNotifications;
@@ -43,146 +162,6 @@ class AppSettings {
   // Advanced settings
   final bool enableDebugMode;
   final bool enablePerformanceMonitoring;
-
-  const AppSettings({
-    required this.themeSettings,
-    this.apiBaseUrl = 'http://localhost:3000/api',
-    this.enableNotifications = true,
-    this.semesterStartDate,
-    this.language = 'zh',
-    this.weatherRefreshInterval = 30,
-    this.countdownRefreshInterval = 60,
-    this.latitude,
-    this.longitude,
-    this.cityName,
-    this.enableNtpSync = true,
-    this.ntpSyncInterval = 30,
-    this.ntpServer = 'ntp.aliyun.com',
-    this.uiScale = 1.0,
-    this.followSystemColor = true,
-    
-    // Widget display settings
-    this.showTimeDisplayWidget = true,
-    this.showDateDisplayWidget = true,
-    this.showWeekDisplayWidget = true,
-    this.showWeatherWidget = true,
-    this.showCountdownWidget = true,
-    this.showCurrentClassWidget = true,
-    
-    // Desktop widget settings
-    this.enableDesktopWidgets = false,
-    
-    // Notification settings
-    this.enableCourseReminder = true,
-    this.enableTtsForReminder = false,
-    this.showNotificationOnClassStart = true,
-    this.showNotificationOnClassEnd = false,
-    this.showNotificationForCountdown = true,
-    
-    // Startup settings
-    this.startWithWindows = false,
-    this.minimizeToTray = true,
-    
-    // Advanced settings
-    this.enableDebugMode = false,
-    this.enablePerformanceMonitoring = false,
-  });
-
-  factory AppSettings.defaultSettings() {
-    return AppSettings(
-      themeSettings: ThemeSettings.defaultSettings(),
-      apiBaseUrl: 'http://localhost:3000/api',
-      enableNotifications: true,
-      semesterStartDate: null,
-      language: 'zh',
-      weatherRefreshInterval: 30,
-      countdownRefreshInterval: 60,
-      latitude: 39.9042, // Beijing
-      longitude: 116.4074,
-      cityName: 'Beijing',
-      enableNtpSync: true,
-      ntpSyncInterval: 30,
-      ntpServer: 'ntp.aliyun.com',
-      uiScale: 1.0,
-      followSystemColor: true,
-      
-      // Widget display settings
-      showTimeDisplayWidget: true,
-      showDateDisplayWidget: true,
-      showWeekDisplayWidget: true,
-      showWeatherWidget: true,
-      showCountdownWidget: true,
-      showCurrentClassWidget: true,
-      
-      // Desktop widget settings
-      enableDesktopWidgets: false,
-      
-      // Notification settings
-      enableCourseReminder: true,
-      enableTtsForReminder: false,
-      showNotificationOnClassStart: true,
-      showNotificationOnClassEnd: false,
-      showNotificationForCountdown: true,
-      
-      // Startup settings
-      startWithWindows: false,
-      minimizeToTray: true,
-      
-      // Advanced settings
-      enableDebugMode: false,
-      enablePerformanceMonitoring: false,
-    );
-  }
-
-  factory AppSettings.fromJson(Map<String, dynamic> json) {
-    return AppSettings(
-      themeSettings: json['themeSettings'] != null
-          ? ThemeSettings.fromJson(json['themeSettings'])
-          : ThemeSettings.defaultSettings(),
-      apiBaseUrl: json['apiBaseUrl'] ?? 'http://localhost:3000/api',
-      enableNotifications: json['enableNotifications'] ?? true,
-      semesterStartDate: json['semesterStartDate'] != null
-          ? DateTime.parse(json['semesterStartDate'])
-          : null,
-      language: json['language'] ?? 'zh',
-      weatherRefreshInterval: json['weatherRefreshInterval'] ?? 30,
-      countdownRefreshInterval: json['countdownRefreshInterval'] ?? 60,
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      cityName: json['cityName'],
-      enableNtpSync: json['enableNtpSync'] ?? true,
-      ntpSyncInterval: json['ntpSyncInterval'] ?? 30,
-      ntpServer: json['ntpServer'] ?? 'ntp.aliyun.com',
-      uiScale: (json['uiScale'] ?? 1.0).toDouble(),
-      followSystemColor: json['followSystemColor'] ?? true,
-      
-      // Widget display settings
-      showTimeDisplayWidget: json['showTimeDisplayWidget'] ?? true,
-      showDateDisplayWidget: json['showDateDisplayWidget'] ?? true,
-      showWeekDisplayWidget: json['showWeekDisplayWidget'] ?? true,
-      showWeatherWidget: json['showWeatherWidget'] ?? true,
-      showCountdownWidget: json['showCountdownWidget'] ?? true,
-      showCurrentClassWidget: json['showCurrentClassWidget'] ?? true,
-      
-      // Desktop widget settings
-      enableDesktopWidgets: json['enableDesktopWidgets'] ?? false,
-      
-      // Notification settings
-      enableCourseReminder: json['enableCourseReminder'] ?? true,
-      enableTtsForReminder: json['enableTtsForReminder'] ?? false,
-      showNotificationOnClassStart: json['showNotificationOnClassStart'] ?? true,
-      showNotificationOnClassEnd: json['showNotificationOnClassEnd'] ?? false,
-      showNotificationForCountdown: json['showNotificationForCountdown'] ?? true,
-      
-      // Startup settings
-      startWithWindows: json['startWithWindows'] ?? false,
-      minimizeToTray: json['minimizeToTray'] ?? true,
-      
-      // Advanced settings
-      enableDebugMode: json['enableDebugMode'] ?? false,
-      enablePerformanceMonitoring: json['enablePerformanceMonitoring'] ?? false,
-    );
-  }
 
   Map<String, dynamic> toJson() {
     return {

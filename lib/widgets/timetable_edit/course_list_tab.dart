@@ -7,9 +7,9 @@ import 'package:time_widgets/utils/md3_form_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class CourseListTab extends StatefulWidget {
-  final TimetableEditService service;
 
   const CourseListTab({super.key, required this.service});
+  final TimetableEditService service;
 
   @override
   State<CourseListTab> createState() => _CourseListTabState();
@@ -207,7 +207,7 @@ class _CourseListTabState extends State<CourseListTab> {
                       return InkWell(
                         onTap: () => setState(() => selectedColor = color),
                         borderRadius: BorderRadius.circular(20),
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: color,
                             shape: BoxShape.circle,
@@ -218,7 +218,6 @@ class _CourseListTabState extends State<CourseListTab> {
                                   )
                                 : Border.all(
                                     color: colorScheme.outlineVariant,
-                                    width: 1,
                                   ),
                           ),
                           child: isSelected
@@ -240,7 +239,7 @@ class _CourseListTabState extends State<CourseListTab> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('取消'),
             ),
             FilledButton(
@@ -467,7 +466,7 @@ class _CourseListTabState extends State<CourseListTab> {
       }
     }
 
-    await showDialog(
+    await showDialog<void>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
@@ -622,7 +621,7 @@ class _CourseListTabState extends State<CourseListTab> {
       isDestructive: true,
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       widget.service.deleteCourse(course.id);
     }
   }

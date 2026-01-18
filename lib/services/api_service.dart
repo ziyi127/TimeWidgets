@@ -1,9 +1,10 @@
+import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/models/weather_model.dart';
-import 'package:time_widgets/models/countdown_model.dart';
-import 'package:time_widgets/services/weather_service.dart';
-import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/countdown_storage_service.dart';
+import 'package:time_widgets/services/settings_service.dart';
+import 'package:time_widgets/services/weather_service.dart';
+import 'package:time_widgets/utils/error_handler.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class ApiService {
@@ -33,7 +34,7 @@ class ApiService {
         final weather = await _weatherService.getWeather(
           settings.latitude!, 
           settings.longitude!,
-          cityName: settings.cityName
+          cityName: settings.cityName,
         );
         if (weather != null) return weather;
       }
@@ -44,7 +45,8 @@ class ApiService {
       
       throw Exception('Failed to fetch weather');
     } catch (e) {
-      Logger.e('Failed to fetch weather from API: $e');
+      final appError = ErrorHandler.handleNetworkError(e);
+      Logger.e('Failed to fetch weather from API: ${appError.message}');
        return WeatherData(
         cityName: 'Beijing',
         description: 'Unknown',
@@ -85,7 +87,8 @@ class ApiService {
         category: 'General',
       );
     } catch (e) {
-      Logger.e('Failed to fetch countdown: $e');
+      final appError = ErrorHandler.handleStorageError(e);
+      Logger.e('Failed to fetch countdown: ${appError.message}');
       rethrow;
     }
   }

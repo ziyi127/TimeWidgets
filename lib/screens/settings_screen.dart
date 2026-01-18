@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/settings_model.dart';
-import 'package:time_widgets/services/settings_service.dart';
-import 'package:time_widgets/services/theme_service.dart';
-import 'package:time_widgets/screens/desktop_widget_config_screen.dart';
 import 'package:time_widgets/screens/about_screen.dart';
-import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/services/ntp_service.dart';
+import 'package:time_widgets/services/settings_service.dart';
+import 'package:time_widgets/services/startup_service.dart';
+import 'package:time_widgets/services/theme_service.dart';
+import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/widgets/city_search_dialog.dart';
-import 'package:time_widgets/services/enhanced_window_manager.dart';
-import 'package:time_widgets/widgets/window_controls.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -22,7 +20,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final ThemeService _themeService = ThemeService();
   late AppSettings _settings;
   bool _isLoading = true;
-  final TextEditingController _apiUrlController = TextEditingController();
 
   @override
   void initState() {
@@ -34,7 +31,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settings = await _settingsService.loadSettings();
     setState(() {
       _settings = settings;
-      _apiUrlController.text = settings.apiBaseUrl;
       _isLoading = false;
     });
   }
@@ -57,12 +53,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: '重置设置',
       message: '确定要将所有设置恢复为默认值吗？此操作无法撤销。',
       confirmText: '重置',
-      cancelText: '取消',
       isDestructive: true,
       icon: const Icon(Icons.restore),
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       await _settingsService.resetToDefaults();
       await _loadSettings();
       if (mounted) {
@@ -106,59 +101,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final selectedColor = await showDialog<Color>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('选择种子颜色'),
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              // 预设颜色网格
-              GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 6,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                ),
-                itemCount: presetColors.length,
-                itemBuilder: (context, index) {
-                  final color = presetColors[index];
-                  return GestureDetector(
-                    onTap: () => Navigator.of(context).pop(color),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: color == _settings.themeSettings.seedColor
-                            ? Border.all(width: 3, color: Theme.of(context).colorScheme.onSurface)
-                            : null,
+        content: SizedBox(
+          width: 300,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 预设颜色网格
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 6,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                  ),
+                  itemCount: presetColors.length,
+                  itemBuilder: (context, index) {
+                    final color = presetColors[index];
+                    return GestureDetector(
+                      onTap: () => Navigator.of(dialogContext).pop(color),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: color == _settings.themeSettings.seedColor
+                              ? Border.all(width: 3, color: Theme.of(context).colorScheme.onSurface)
+                              : null,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              // 保持不变选项
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(_settings.themeSettings.seedColor),
-                child: const Text('保持不变'),
-              ),
-            ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                // 保持不变选项
+                ElevatedButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(_settings.themeSettings.seedColor),
+                  child: const Text('保持不变'),
+                ),
+              ],
+            ),
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('取消'),
+          ),
+        ],
       ),
     );
 
-    if (selectedColor != null) {
+    if (selectedColor != null && selectedColor != _settings.themeSettings.seedColor) {
       final newThemeSettings = _settings.themeSettings.copyWith(seedColor: selectedColor);
       await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
       // 同时更新 ThemeService
-      await _themeService.setSeedColor(selectedColor);
+      await _themeService.saveSettings(newThemeSettings);
     }
   }
 
   @override
   void dispose() {
-    _apiUrlController.dispose();
     super.dispose();
   }
 
@@ -177,12 +182,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: const Text('设置'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // 恢复主窗口原始尺寸和位置
-            EnhancedWindowManager.restoreMainWindow();
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
@@ -190,15 +191,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: _resetSettings,
             tooltip: '重置为默认值',
           ),
-          // 窗口控制按钮
-          const SizedBox(width: 8),
-          const WindowControls(restoreMainWindowOnClose: true),
-          const SizedBox(width: 8),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // 常规设置
+          Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    '常规设置',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.language_outlined),
+                  title: const Text('语言'),
+                  subtitle: Text(_settings.language == 'zh' ? '简体中文' : 'English'),
+                  trailing: DropdownButton<String>(
+                    value: _settings.language,
+                    underline: const SizedBox(),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        _saveSettings(_settings.copyWith(language: newValue));
+                      }
+                    },
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'zh',
+                        child: Text('简体中文'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'en',
+                        child: Text('English'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // 主题设置
           Card(
             child: Column(
@@ -222,10 +260,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       prefixIcon: Icon(Icons.brightness_6_outlined),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       if (value != null) {
                         final newThemeSettings = _settings.themeSettings.copyWith(themeMode: value);
-                        _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                        await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                        await _themeService.saveSettings(newThemeSettings);
                       }
                     },
                     items: const [
@@ -257,7 +296,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.themeSettings.useSystemColor,
                   onChanged: (value) async {
                     final newThemeSettings = _settings.themeSettings.copyWith(useSystemColor: value);
-                    await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                    // 同时更新 themeSettings 和顶层的 followSystemColor
+                    await _saveSettings(_settings.copyWith(
+                      themeSettings: newThemeSettings,
+                      followSystemColor: value,
+                    ),);
                     await _themeService.saveSettings(newThemeSettings);
                   },
                 ),
@@ -280,7 +323,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: theme.colorScheme.outline,
-                            width: 1,
                           ),
                         ),
                       ),
@@ -321,9 +363,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         max: 1.5,
                         divisions: 8,
                         label: _settings.themeSettings.fontSizeScale.toStringAsFixed(1),
-                        onChanged: (value) {
+                        onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings.copyWith(fontSizeScale: value);
-                          _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
@@ -350,12 +393,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Slider(
                         value: _settings.themeSettings.borderRadiusScale,
                         min: 0.5,
-                        max: 2.0,
+                        max: 2,
                         divisions: 15,
                         label: _settings.themeSettings.borderRadiusScale.toStringAsFixed(1),
-                        onChanged: (value) {
+                        onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings.copyWith(borderRadiusScale: value);
-                          _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
@@ -382,12 +426,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Slider(
                         value: _settings.themeSettings.componentOpacity,
                         min: 0.7,
-                        max: 1.0,
                         divisions: 3,
                         label: '${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
-                        onChanged: (value) {
+                        onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings.copyWith(componentOpacity: value);
-                          _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
@@ -413,13 +457,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: 8),
                       Slider(
                         value: _settings.themeSettings.shadowStrength,
-                        min: 0.0,
-                        max: 2.0,
+                        max: 2,
                         divisions: 20,
                         label: _settings.themeSettings.shadowStrength.toStringAsFixed(1),
-                        onChanged: (value) {
+                        onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings.copyWith(shadowStrength: value);
-                          _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
@@ -459,7 +503,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Slider(
                         value: _settings.uiScale,
                         min: 0.5,
-                        max: 2.0,
+                        max: 2,
                         divisions: 15,
                         label: _settings.uiScale.toStringAsFixed(1),
                         onChanged: (value) {
@@ -536,10 +580,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       );
                       if (city != null) {
                         await _saveSettings(_settings.copyWith(
-                          latitude: city['latitude'],
-                          longitude: city['longitude'],
-                          cityName: city['name'],
-                        ));
+                          latitude: city['latitude'] as double?,
+                          longitude: city['longitude'] as double?,
+                          cityName: city['name'] as String?,
+                        ),);
                       }
                     },
                     child: const Text('更改'),
@@ -587,20 +631,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.enableDesktopWidgets,
                   onChanged: (value) {
                     _saveSettings(_settings.copyWith(enableDesktopWidgets: value));
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.widgets_outlined),
-                  title: const Text('小组件配置'),
-                  subtitle: const Text('管理桌面小组件的显示和位置'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DesktopWidgetConfigScreen(),
-                      ),
-                    );
                   },
                 ),
               ],
@@ -900,7 +930,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: const Text('开机自启'),
                   subtitle: const Text('随系统启动时自动运行应用'),
                   value: _settings.startWithWindows,
-                  onChanged: (value) {
+                  onChanged: (value) async {
+                    if (value) {
+                      await StartupService().enable();
+                    } else {
+                      await StartupService().disable();
+                    }
                     _saveSettings(_settings.copyWith(startWithWindows: value));
                   },
                 ),
@@ -1004,7 +1039,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      MaterialPageRoute<void>(
                         builder: (context) => const AboutScreen(),
                       ),
                     );
@@ -1021,14 +1056,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 /// 主题预览组件
 class ThemePreview extends StatelessWidget {
-  final Color seedColor;
-  final bool isDark;
 
   const ThemePreview({
     super.key,
     required this.seedColor,
     required this.isDark,
   });
+  final Color seedColor;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {

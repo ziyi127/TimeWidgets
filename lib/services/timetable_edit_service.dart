@@ -93,7 +93,7 @@ class TimetableEditService extends ChangeNotifier {
         _dailyCourses.removeWhere((d) => 
             d.dayOfWeek == dailyCourse.dayOfWeek && 
             d.timeSlotId == dailyCourse.timeSlotId &&
-            d.weekType != WeekType.both);
+            d.weekType != WeekType.both,);
     }
     
     // If adding 'single' or 'double', remove 'both' for this slot
@@ -101,14 +101,14 @@ class TimetableEditService extends ChangeNotifier {
         _dailyCourses.removeWhere((d) => 
             d.dayOfWeek == dailyCourse.dayOfWeek && 
             d.timeSlotId == dailyCourse.timeSlotId &&
-            d.weekType == WeekType.both);
+            d.weekType == WeekType.both,);
     }
 
     // Check if a course already exists for this time slot and week type
     final existingIndex = _dailyCourses.indexWhere((d) => 
         d.dayOfWeek == dailyCourse.dayOfWeek && 
         d.timeSlotId == dailyCourse.timeSlotId &&
-        d.weekType == dailyCourse.weekType);
+        d.weekType == dailyCourse.weekType,);
     
     if (existingIndex != -1) {
       // Update existing course
@@ -140,9 +140,7 @@ class TimetableEditService extends ChangeNotifier {
   Future<void> loadData() async {
     try {
       final data = await _storageService.loadTimetableData();
-      if (data != null) {
-        loadTimetableData(data);
-      }
+      loadTimetableData(data);
     } catch (e) {
       Logger.e('Failed to load timetable data: $e');
     }
@@ -204,7 +202,7 @@ class TimetableEditService extends ChangeNotifier {
     // Remove reference from all schedules
     for (final schedule in _schedules) {
       if (schedule.timeLayoutId == timeLayoutId) {
-        updateSchedule(schedule.copyWith(timeLayoutId: null));
+        updateSchedule(schedule.copyWith());
       }
     }
     _timeLayouts.removeWhere((t) => t.id == timeLayoutId);
@@ -302,7 +300,7 @@ class TimetableEditService extends ChangeNotifier {
         usages.add(SubjectUsage(
           type: SubjectUsageType.dailyCourse,
           description: '${dailyCourse.dayOfWeek.name} - ${timeSlot?.name ?? dailyCourse.timeSlotId}',
-        ));
+        ),);
       }
     }
     
@@ -314,7 +312,7 @@ class TimetableEditService extends ChangeNotifier {
           usages.add(SubjectUsage(
             type: SubjectUsageType.schedule,
             description: '${schedule.name} - ${timeSlot?.name ?? course.timeSlotId}',
-          ));
+          ),);
         }
       }
     }
@@ -377,11 +375,11 @@ enum SubjectUsageType {
 
 /// Subject usage information
 class SubjectUsage {
-  final SubjectUsageType type;
-  final String description;
 
   const SubjectUsage({
     required this.type,
     required this.description,
   });
+  final SubjectUsageType type;
+  final String description;
 }

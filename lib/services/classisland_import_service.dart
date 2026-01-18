@@ -1,15 +1,13 @@
 import 'dart:convert' show jsonDecode, utf8;
+
 import 'package:file_picker/file_picker.dart';
+
 import '../models/timetable_edit_model.dart';
-import '../utils/logger.dart';
 import '../utils/color_utils.dart';
+import '../utils/logger.dart';
 
 /// ClassIsland导入结果
 class ClassIslandImportResult {
-  final bool success;
-  final TimetableData? data;
-  final String? errorMessage;
-  final ClassIslandImportStats? stats;
 
   ClassIslandImportResult({
     required this.success,
@@ -25,14 +23,14 @@ class ClassIslandImportResult {
   factory ClassIslandImportResult.failure(String message) {
     return ClassIslandImportResult(success: false, errorMessage: message);
   }
+  final bool success;
+  final TimetableData? data;
+  final String? errorMessage;
+  final ClassIslandImportStats? stats;
 }
 
 /// ClassIsland导入统计
 class ClassIslandImportStats {
-  final int subjectsCount;
-  final int timeLayoutsCount;
-  final int classPlansCount;
-  final int totalTimeSlotsCount;
 
   ClassIslandImportStats({
     required this.subjectsCount,
@@ -40,6 +38,10 @@ class ClassIslandImportStats {
     required this.classPlansCount,
     required this.totalTimeSlotsCount,
   });
+  final int subjectsCount;
+  final int timeLayoutsCount;
+  final int classPlansCount;
+  final int totalTimeSlotsCount;
 
   @override
   String toString() {
@@ -64,7 +66,6 @@ class ClassislandImportService {
   static Future<ClassIslandImportResult> importFromFileWithStats() async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
         withData: true,
       );
 
@@ -78,12 +79,12 @@ class ClassislandImportService {
       }
 
       final contents = utf8.decode(bytes);
-      final classislandData = jsonDecode(contents);
+      final classislandData = jsonDecode(contents) as Map<String, dynamic>;
 
       return _convertClassislandToTimetable(classislandData);
     } catch (e) {
       Logger.e('导入失败: $e');
-      return ClassIslandImportResult.failure('导入失败: ${e.toString()}');
+      return ClassIslandImportResult.failure('导入失败: $e');
     }
   }
 
@@ -117,13 +118,12 @@ class ClassislandImportService {
         
         courses.add(CourseInfo(
           id: courseId,
-          name: value['Name'] ?? '未知课程',
+          name: value['Name'] as String? ?? '未知课程',
           abbreviation: initialName,
-          teacher: value['TeacherName'] ?? '',
-          classroom: '',
-          color: ColorUtils.toHexString(ColorUtils.generateColorFromName(value['Name'] ?? '')),
+          teacher: value['TeacherName'] as String? ?? '',
+          color: ColorUtils.toHexString(ColorUtils.generateColorFromName(value['Name'] as String? ?? '')),
           isOutdoor: isOutdoor,
-        ));
+        ),);
         idCounter++;
         subjectsCount++;
       });
@@ -165,7 +165,7 @@ class ClassislandImportService {
               id: '${layoutId}_$slotIdCounter',
               startTime: startTime,
               endTime: endTime,
-              name: layout['Name'] ?? '第${layoutTimeSlots.length + 1}节',
+              name: (layout['Name'] ?? '第${layoutTimeSlots.length + 1}节').toString(),
               type: type,
               defaultSubjectId: mappedSubjectId,
               isHiddenByDefault: layout['IsHideDefault'] as bool? ?? false,
@@ -184,9 +184,9 @@ class ClassislandImportService {
         
         timeLayouts.add(TimeLayout(
           id: layoutId,
-          name: layoutValue['Name'] ?? '时间表$layoutIdCounter',
+          name: (layoutValue['Name'] ?? '时间表$layoutIdCounter').toString(),
           timeSlots: layoutTimeSlots,
-        ));
+        ),);
         
         layoutIdCounter++;
         timeLayoutsCount++;
@@ -262,7 +262,7 @@ class ClassislandImportService {
           
           schedules.add(Schedule(
             id: scheduleIdCounter.toString(),
-            name: planValue['Name'] ?? '课表 $scheduleIdCounter',
+            name: (planValue['Name'] ?? '课表 $scheduleIdCounter').toString(),
             timeLayoutId: mappedTimeLayoutId,
             triggerRule: ScheduleTriggerRule(
               weekDay: weekDay,
@@ -272,7 +272,7 @@ class ClassislandImportService {
             courses: scheduleCourses,
             isAutoEnabled: planValue['IsEnabled'] as bool? ?? true,
             priority: scheduleIdCounter,
-          ));
+          ),);
           
           scheduleIdCounter++;
           classPlansCount++;

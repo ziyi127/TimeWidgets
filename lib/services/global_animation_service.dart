@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/performance_optimization_service.dart';
 
@@ -5,11 +7,11 @@ import 'package:time_widgets/services/performance_optimization_service.dart';
 /// 提供统一的动画配置、性能监控和自动调整机制
 /// 包含动画缓存、统一曲线和时长规范
 class GlobalAnimationService {
-  /// 单例实例
-  static final GlobalAnimationService instance = GlobalAnimationService._();
   
   /// 私有构造函数
   GlobalAnimationService._();
+  /// 单例实例
+  static final GlobalAnimationService instance = GlobalAnimationService._();
   
   /// 动画配置项
   static const Duration defaultDuration = Duration(milliseconds: 200);
@@ -25,6 +27,8 @@ class GlobalAnimationService {
   /// 动画缓存
   final Map<String, AnimationController> _animationControllerCache = {};
   final Map<String, Animation<dynamic>> _animationCache = {};
+  final Map<String, int> _lastAccessTime = {};
+  Timer? _cleanupTimer;
   
   /// 性能监控开关
   bool _performanceMonitoringEnabled = true;
@@ -41,14 +45,16 @@ class GlobalAnimationService {
     required TickerProvider vsync,
     Duration? duration,
   }) {
+    _updateAccessTime(key);
+    _ensureCleanupTimer();
+    
     // 检查缓存中是否存在
     if (_animationControllerCache.containsKey(key)) {
       final controller = _animationControllerCache[key];
       if (controller != null) {
         // 更新时长并重用
         controller.duration = duration ?? defaultDuration;
-        return controller;
-      }
+        return controller;}
     }
     
     // 创建新的动画控制器
@@ -81,6 +87,9 @@ class GlobalAnimationService {
     required Tween<T> tween,
     Curve? curve,
   }) {
+    _updateAccessTime(key);
+    _ensureCleanupTimer();
+
     // 检查缓存中是否存在
     if (_animationCache.containsKey(key)) {
       final animation = _animationCache[key] as Animation<T>?;
@@ -111,7 +120,7 @@ class GlobalAnimationService {
     final cpuUsage = double.tryParse(stats['cpu_usage']?.toString() ?? '0') ?? 0;
     
     // 根据内存压力和CPU使用率调整时长
-    double scaleFactor = 1.0;
+    double scaleFactor = 1;
     
     if (isHighMemoryPressure) {
       scaleFactor = 0.6; // 高内存压力下减少40%
@@ -203,6 +212,7 @@ class GlobalAnimationService {
     _animationControllerCache.clear();
     _animationCache.clear();
     _animationStats.clear();
+    _lastAccessTime.clear();
   }
   
   /// 启用/禁用性能监控
@@ -294,17 +304,66 @@ class GlobalAnimationService {
       curve: curve ?? defaultCurve,
     );
   }
+
+  /// 停止服务并清理资源
+  void dispose() {
+    _cleanupTimer?.cancel();
+    _cleanupTimer = null;
+    clearAllCache();
+    _animationStats.clear();
+  }
+  
+  void _updateAccessTime(String key) {
+    _lastAccessTime[key] = DateTime.now().millisecondsSinceEpoch;
+  }
+  
+  void _ensureCleanupTimer() {
+    if (_cleanupTimer != null) return;
+    
+    _cleanupTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      const expireTime = 5 * 60 * 1000; // 5分钟未使用则清理
+      
+      final keysToRemove = <String>[];
+      
+      _lastAccessTime.forEach((key, lastAccess) {
+        if (now - lastAccess > expireTime) {
+          keysToRemove.add(key);
+        }
+      });
+      
+      for (final key in keysToRemove) {
+        _lastAccessTime.remove(key);
+        
+        // 清理控制器
+        if (_animationControllerCache.containsKey(key)) {
+          clearControllerCache(key);
+        }
+        
+        // 清理动画对象
+        if (_animationCache.containsKey(key)) {
+          clearAnimationCache(key);
+        }
+      }
+      
+      // 如果没有活跃的缓存，停止定时器
+      if (_lastAccessTime.isEmpty) {
+        _cleanupTimer?.cancel();
+        _cleanupTimer = null;
+      }
+    });
+  }
 }
 
 /// 动画配置类
 class AnimationConfig {
-  final Duration duration;
-  final Curve curve;
   
   const AnimationConfig({
     required this.duration,
     required this.curve,
   });
+  final Duration duration;
+  final Curve curve;
 }
 
 /// 优化的动画组件基类

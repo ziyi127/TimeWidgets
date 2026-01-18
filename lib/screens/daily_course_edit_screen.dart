@@ -26,7 +26,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
           children: [
             // Day and week type selector
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Expanded(
@@ -114,7 +114,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
     
     // Filter daily courses for selected day and week type
     final filteredDailyCourses = dailyCourses.where((dc) =>
-        dc.dayOfWeek == _selectedDay && dc.weekType == _selectedWeekType).toList();
+        dc.dayOfWeek == _selectedDay && dc.weekType == _selectedWeekType,).toList();
     
     if (sortedTimeSlots.isEmpty) {
       return const Center(
@@ -145,7 +145,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              )),
+              ),),
             ],
           ),
         ),
@@ -169,7 +169,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                           filteredDailyCourses,
                           courses,
                         ),
-                      )),
+                      ),),
                     ],
                   ),
                 ),
@@ -189,7 +189,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
-                      )),
+                      ),),
                     ],
                   ),
                 ),
@@ -234,7 +234,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
             course.name,
             overflow: TextOverflow.ellipsis,
           ),
-        )),
+        ),),
       ],
       onChanged: (value) {
         if (value != null) {

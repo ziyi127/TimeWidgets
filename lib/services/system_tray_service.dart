@@ -14,14 +14,14 @@ enum TrayMenuItem {
 /// 系统托盘服务
 /// 管理系统托盘图标、菜单和相关功能
 class SystemTrayService {
-  static final SystemTrayService _instance = SystemTrayService._internal();
   factory SystemTrayService() => _instance;
   SystemTrayService._internal();
+  static final SystemTrayService _instance = SystemTrayService._internal();
 
   final SystemTray _systemTray = SystemTray();
   
   /// 菜单项选择回调
-  Function(TrayMenuItem)? onMenuItemSelected;
+  void Function(TrayMenuItem)? onMenuItemSelected;
   
   /// 窗口显示/隐藏回调
   VoidCallback? onToggleWindow;
@@ -33,7 +33,7 @@ class SystemTrayService {
   Future<void> initializeSystemTray() async {
     try {
       // 设置托盘图标 - 使用PNG文件，因为ICO文件可能有问题
-      String iconPath = 'assets/icons/weather_0.png';
+      const String iconPath = 'assets/icons/weather_0.png';
 
       await _systemTray.initSystemTray(
         title: "智慧课程表",

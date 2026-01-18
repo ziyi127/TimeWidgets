@@ -11,11 +11,9 @@ class AggressiveOptimizer {
   static void startAggressiveOptimization() {
     _optimizationTimer?.cancel();
     
-    // 每2分钟执行一次深度清理
-    _optimizationTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-      if (kReleaseMode) {
-        _performDeepCleanup();
-      }
+    // 每1分钟执行一次深度清理（即使在Debug模式下也执行，以解决用户反馈的内存高问题）
+    _optimizationTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      _performDeepCleanup();
     });
   }
   
@@ -31,19 +29,19 @@ class AggressiveOptimizer {
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
     
-    // 2. 清理字体缓存（如果有的话）
-    // FontLoader 相关的清理
-    
-    // 3. 触发GC
-    final temp = List.generate(1000, (i) => i);
-    temp.clear();
+    // 2. 强制垃圾回收建议
+    // 在Debug模式下这可能不会立即生效，但在Release模式下有助于减少RSS
+    try {
+      // 分配一个大对象然后立即释放，有时能触发GC
+      List.filled(10000, 0); 
+    } catch (_) {}
   }
   
   /// 设置极限内存限制
   static void setExtremeLimits() {
     // 图片缓存设置为最小
-    PaintingBinding.instance.imageCache.maximumSize = 20; // 只保留20张
-    PaintingBinding.instance.imageCache.maximumSizeBytes = 5 << 20; // 5MB
+    PaintingBinding.instance.imageCache.maximumSize = 10; // 进一步减少缓存
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 2 << 20; // 2MB
   }
   
   /// 禁用所有动画以节省CPU和内存

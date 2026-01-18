@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:time_widgets/models/settings_model.dart';
+
 import 'package:time_widgets/models/course_model.dart';
+import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/timetable_service.dart';
 import 'package:time_widgets/utils/logger.dart';
@@ -18,6 +18,7 @@ class CourseReminderService {
   final TimetableService _timetableService = TimetableService();
   
   Timer? _checkTimer;
+  StreamSubscription<AppSettings>? _settingsSubscription;
   bool _isInitialized = false;
   AppSettings? _settings;
   
@@ -30,7 +31,7 @@ class CourseReminderService {
     _settings = await _settingsService.loadSettings();
     
     // 监听设置变化
-    _settingsService.settingsStream.listen((newSettings) {
+    _settingsSubscription = _settingsService.settingsStream.listen((newSettings) {
       _settings = newSettings;
       _updateTimer();
     });
@@ -40,13 +41,20 @@ class CourseReminderService {
     
     Logger.d('CourseReminderService initialized');
   }
+
+  void dispose() {
+    _checkTimer?.cancel();
+    _settingsSubscription?.cancel();
+    _isInitialized = false;
+    Logger.d('CourseReminderService disposed');
+  }
   
   void _updateTimer() {
     // 取消现有定时器
     _checkTimer?.cancel();
     
     // 如果启用了课程提醒，设置定时器
-    if (_settings?.enableCourseReminder == true) {
+    if (_settings?.enableCourseReminder ?? false) {
       // 每分钟检查一次
       _checkTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
         _checkUpcomingCourses();
@@ -145,18 +153,12 @@ class CourseReminderService {
     Logger.i('Course reminder: $reminderMessage');
     
     // 根据不同类型和设置发送不同类型的提醒
-    if (type == ReminderType.start && _settings?.showNotificationOnClassStart == true) {
+    if (type == ReminderType.start && (_settings?.showNotificationOnClassStart ?? false)) {
       // 可以添加开始提醒的特殊处理
     }
     
-    if (type == ReminderType.end && _settings?.showNotificationOnClassEnd == true) {
+    if (type == ReminderType.end && (_settings?.showNotificationOnClassEnd ?? false)) {
       // 可以添加结束提醒的特殊处理
     }
-  }
-  
-  void dispose() {
-    _checkTimer?.cancel();
-    _isInitialized = false;
-    Logger.d('CourseReminderService disposed');
   }
 }

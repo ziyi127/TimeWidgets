@@ -12,14 +12,7 @@ enum TimePointType {
 }
 
 /// 科目/课程信息 (兼容 ClassIsland Subject)
-class CourseInfo {
-  final String id;
-  final String name;
-  final String abbreviation;  // 简称
-  final String teacher;
-  final String classroom;
-  final String color;
-  final bool isOutdoor;  // 是否户外课
+class CourseInfo {  // 是否户外课
 
   const CourseInfo({
     required this.id,
@@ -30,6 +23,25 @@ class CourseInfo {
     this.color = '#2196F3',
     this.isOutdoor = false,
   });
+
+  factory CourseInfo.fromJson(Map<String, dynamic> json) {
+    return CourseInfo(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      abbreviation: json['abbreviation'] as String? ?? '',
+      teacher: json['teacher'] as String,
+      classroom: json['classroom'] as String? ?? '',
+      color: json['color'] as String? ?? '#2196F3',
+      isOutdoor: json['isOutdoor'] as bool? ?? false,
+    );
+  }
+  final String id;
+  final String name;
+  final String abbreviation;  // 简称
+  final String teacher;
+  final String classroom;
+  final String color;
+  final bool isOutdoor;
 
   /// 获取显示名称 (优先使用简称)
   String get displayName => abbreviation.isNotEmpty ? abbreviation : name;
@@ -65,30 +77,11 @@ class CourseInfo {
       'isOutdoor': isOutdoor,
     };
   }
-
-  factory CourseInfo.fromJson(Map<String, dynamic> json) {
-    return CourseInfo(
-      id: json['id'],
-      name: json['name'],
-      abbreviation: json['abbreviation'] ?? '',
-      teacher: json['teacher'],
-      classroom: json['classroom'] ?? '',
-      color: json['color'] ?? '#2196F3',
-      isOutdoor: json['isOutdoor'] ?? false,
-    );
-  }
 }
 
 
 /// 时间段/时间点 (兼容 ClassIsland TimeLayout)
-class TimeSlot {
-  final String id;
-  final String startTime;  // "HH:MM"
-  final String endTime;    // "HH:MM"
-  final String name;
-  final TimePointType type;  // 时间点类型
-  final String? defaultSubjectId;  // 默认科目ID
-  final bool isHiddenByDefault;  // 默认隐藏
+class TimeSlot {  // 默认隐藏
 
   const TimeSlot({
     required this.id,
@@ -99,6 +92,27 @@ class TimeSlot {
     this.defaultSubjectId,
     this.isHiddenByDefault = false,
   });
+
+  factory TimeSlot.fromJson(Map<String, dynamic> json) {
+    return TimeSlot(
+      id: json['id'] as String,
+      startTime: json['startTime'] as String,
+      endTime: json['endTime'] as String,
+      name: json['name'] as String,
+      type: json['type'] != null 
+          ? TimePointType.values[json['type'] as int] 
+          : TimePointType.classTime,
+      defaultSubjectId: json['defaultSubjectId'] as String?,
+      isHiddenByDefault: json['isHiddenByDefault'] as bool? ?? false,
+    );
+  }
+  final String id;
+  final String startTime;  // "HH:MM"
+  final String endTime;    // "HH:MM"
+  final String name;
+  final TimePointType type;  // 时间点类型
+  final String? defaultSubjectId;  // 默认科目ID
+  final bool isHiddenByDefault;
 
   /// 获取时长 (分钟)
   int get durationMinutes {
@@ -140,30 +154,10 @@ class TimeSlot {
       'isHiddenByDefault': isHiddenByDefault,
     };
   }
-
-  factory TimeSlot.fromJson(Map<String, dynamic> json) {
-    return TimeSlot(
-      id: json['id'],
-      startTime: json['startTime'],
-      endTime: json['endTime'],
-      name: json['name'],
-      type: json['type'] != null 
-          ? TimePointType.values[json['type']] 
-          : TimePointType.classTime,
-      defaultSubjectId: json['defaultSubjectId'],
-      isHiddenByDefault: json['isHiddenByDefault'] ?? false,
-    );
-  }
 }
 
 /// 日课程安排
-class DailyCourse {
-  final String id;
-  final DayOfWeek dayOfWeek;
-  final String timeSlotId;
-  final String courseId;
-  final WeekType weekType;
-  final bool isChangedClass;  // 是否为换课课程
+class DailyCourse {  // 是否为换课课程
 
   const DailyCourse({
     required this.id,
@@ -173,6 +167,23 @@ class DailyCourse {
     this.weekType = WeekType.both,
     this.isChangedClass = false,
   });
+
+  factory DailyCourse.fromJson(Map<String, dynamic> json) {
+    return DailyCourse(
+      id: json['id'] as String,
+      dayOfWeek: DayOfWeek.values[json['dayOfWeek'] as int],
+      timeSlotId: json['timeSlotId'] as String,
+      courseId: json['courseId'] as String,
+      weekType: WeekType.values[json['weekType'] as int? ?? 2],
+      isChangedClass: json['isChangedClass'] as bool? ?? false,
+    );
+  }
+  final String id;
+  final DayOfWeek dayOfWeek;
+  final String timeSlotId;
+  final String courseId;
+  final WeekType weekType;
+  final bool isChangedClass;
 
   DailyCourse copyWith({
     String? id,
@@ -202,31 +213,28 @@ class DailyCourse {
       'isChangedClass': isChangedClass,
     };
   }
-
-  factory DailyCourse.fromJson(Map<String, dynamic> json) {
-    return DailyCourse(
-      id: json['id'],
-      dayOfWeek: DayOfWeek.values[json['dayOfWeek']],
-      timeSlotId: json['timeSlotId'],
-      courseId: json['courseId'],
-      weekType: WeekType.values[json['weekType'] ?? 2],
-      isChangedClass: json['isChangedClass'] ?? false,
-    );
-  }
 }
 
 
 /// 课表触发规则 (兼容 ClassIsland TimeRule)
 class ScheduleTriggerRule {
-  final int weekDay;  // 0-6, 0=周日
-  final WeekType weekType;
-  final bool isEnabled;
 
   const ScheduleTriggerRule({
     required this.weekDay,
     this.weekType = WeekType.both,
     this.isEnabled = true,
   });
+
+  factory ScheduleTriggerRule.fromJson(Map<String, dynamic> json) {
+    return ScheduleTriggerRule(
+      weekDay: json['weekDay'] as int,
+      weekType: WeekType.values[json['weekType'] as int? ?? 2],
+      isEnabled: json['isEnabled'] as bool? ?? true,
+    );
+  }
+  final int weekDay;  // 0-6, 0=周日
+  final WeekType weekType;
+  final bool isEnabled;
 
   /// 检查是否匹配指定日期
   bool matches(DateTime date, {int? currentWeekNumber}) {
@@ -251,13 +259,13 @@ class ScheduleTriggerRule {
   
   /// 计算周数 (1-based)
   int _calculateWeekNumber(DateTime date) {
-    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final firstDayOfYear = DateTime(date.year);
     final firstMonday = firstDayOfYear.weekday > DateTime.monday 
         ? firstDayOfYear.add(Duration(days: 8 - firstDayOfYear.weekday))
         : firstDayOfYear;
     
     if (date.isBefore(firstMonday)) {
-      return _calculateWeekNumber(date.subtract(Duration(days: 7)));
+      return _calculateWeekNumber(date.subtract(const Duration(days: 7)));
     }
     
     return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
@@ -282,27 +290,10 @@ class ScheduleTriggerRule {
       'isEnabled': isEnabled,
     };
   }
-
-  factory ScheduleTriggerRule.fromJson(Map<String, dynamic> json) {
-    return ScheduleTriggerRule(
-      weekDay: json['weekDay'],
-      weekType: WeekType.values[json['weekType'] ?? 2],
-      isEnabled: json['isEnabled'] ?? true,
-    );
-  }
 }
 
 /// 课表 (兼容 ClassIsland ClassPlan)
-class Schedule {
-  final String id;
-  final String name;
-  final String? timeLayoutId;  // 关联的时间表ID
-  final ScheduleTriggerRule triggerRule;
-  final List<DailyCourse> courses;
-  final bool isAutoEnabled;
-  final int priority;  // 优先级 (数字越小优先级越高)
-  final bool isOverlay;  // 是否为临时层课表
-  final String? overlaySourceId;  // 临时层来源课表ID
+class Schedule {  // 临时层来源课表ID
 
   const Schedule({
     required this.id,
@@ -315,6 +306,31 @@ class Schedule {
     this.isOverlay = false,
     this.overlaySourceId,
   });
+
+  factory Schedule.fromJson(Map<String, dynamic> json) {
+    return Schedule(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      timeLayoutId: json['timeLayoutId'] as String?,
+      triggerRule: ScheduleTriggerRule.fromJson(json['triggerRule'] as Map<String, dynamic>),
+      courses: (json['courses'] as List?)
+          ?.map((c) => DailyCourse.fromJson(c as Map<String, dynamic>))
+          .toList() ?? [],
+      isAutoEnabled: json['isAutoEnabled'] as bool? ?? true,
+      priority: json['priority'] as int? ?? 0,
+      isOverlay: json['isOverlay'] as bool? ?? false,
+      overlaySourceId: json['overlaySourceId'] as String?,
+    );
+  }
+  final String id;
+  final String name;
+  final String? timeLayoutId;  // 关联的时间表ID
+  final ScheduleTriggerRule triggerRule;
+  final List<DailyCourse> courses;
+  final bool isAutoEnabled;
+  final int priority;  // 优先级 (数字越小优先级越高)
+  final bool isOverlay;  // 是否为临时层课表
+  final String? overlaySourceId;
 
   Schedule copyWith({
     String? id,
@@ -353,36 +369,30 @@ class Schedule {
       'overlaySourceId': overlaySourceId,
     };
   }
-
-  factory Schedule.fromJson(Map<String, dynamic> json) {
-    return Schedule(
-      id: json['id'],
-      name: json['name'],
-      timeLayoutId: json['timeLayoutId'],
-      triggerRule: ScheduleTriggerRule.fromJson(json['triggerRule']),
-      courses: (json['courses'] as List?)
-          ?.map((c) => DailyCourse.fromJson(c))
-          .toList() ?? [],
-      isAutoEnabled: json['isAutoEnabled'] ?? true,
-      priority: json['priority'] ?? 0,
-      isOverlay: json['isOverlay'] ?? false,
-      overlaySourceId: json['overlaySourceId'],
-    );
-  }
 }
 
 
 /// 时间表/时间布局 (兼容 ClassIsland TimeLayout)
 class TimeLayout {
-  final String id;
-  final String name;
-  final List<TimeSlot> timeSlots;
 
   const TimeLayout({
     required this.id,
     required this.name,
     this.timeSlots = const [],
   });
+
+  factory TimeLayout.fromJson(Map<String, dynamic> json) {
+    return TimeLayout(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      timeSlots: (json['timeSlots'] as List?)
+          ?.map((t) => TimeSlot.fromJson(t as Map<String, dynamic>))
+          .toList() ?? [],
+    );
+  }
+  final String id;
+  final String name;
+  final List<TimeSlot> timeSlots;
 
   TimeLayout copyWith({
     String? id,
@@ -403,25 +413,10 @@ class TimeLayout {
       'timeSlots': timeSlots.map((t) => t.toJson()).toList(),
     };
   }
-
-  factory TimeLayout.fromJson(Map<String, dynamic> json) {
-    return TimeLayout(
-      id: json['id'],
-      name: json['name'],
-      timeSlots: (json['timeSlots'] as List?)
-          ?.map((t) => TimeSlot.fromJson(t))
-          .toList() ?? [],
-    );
-  }
 }
 
 /// 课表数据 (包含所有数据)
-class TimetableData {
-  final List<CourseInfo> courses;  // 科目列表
-  final List<TimeSlot> timeSlots;  // 时间段列表 (向后兼容)
-  final List<DailyCourse> dailyCourses;  // 日课程安排 (向后兼容)
-  final List<TimeLayout> timeLayouts;  // 时间表列表
-  final List<Schedule> schedules;  // 课表列表
+class TimetableData {  // 课表列表
 
   const TimetableData({
     required this.courses,
@@ -430,6 +425,31 @@ class TimetableData {
     this.timeLayouts = const [],
     this.schedules = const [],
   });
+
+  factory TimetableData.fromJson(Map<String, dynamic> json) {
+    return TimetableData(
+      courses: (json['courses'] as List?)
+          ?.map((c) => CourseInfo.fromJson(c as Map<String, dynamic>))
+          .toList() ?? [],
+      timeSlots: (json['timeSlots'] as List?)
+          ?.map((t) => TimeSlot.fromJson(t as Map<String, dynamic>))
+          .toList() ?? [],
+      dailyCourses: (json['dailyCourses'] as List?)
+          ?.map((d) => DailyCourse.fromJson(d as Map<String, dynamic>))
+          .toList() ?? [],
+      timeLayouts: (json['timeLayouts'] as List?)
+          ?.map((t) => TimeLayout.fromJson(t as Map<String, dynamic>))
+          .toList() ?? [],
+      schedules: (json['schedules'] as List?)
+          ?.map((s) => Schedule.fromJson(s as Map<String, dynamic>))
+          .toList() ?? [],
+    );
+  }
+  final List<CourseInfo> courses;  // 科目列表
+  final List<TimeSlot> timeSlots;  // 时间段列表 (向后兼容)
+  final List<DailyCourse> dailyCourses;  // 日课程安排 (向后兼容)
+  final List<TimeLayout> timeLayouts;  // 时间表列表
+  final List<Schedule> schedules;
 
   TimetableData copyWith({
     List<CourseInfo>? courses,
@@ -455,25 +475,5 @@ class TimetableData {
       'timeLayouts': timeLayouts.map((t) => t.toJson()).toList(),
       'schedules': schedules.map((s) => s.toJson()).toList(),
     };
-  }
-
-  factory TimetableData.fromJson(Map<String, dynamic> json) {
-    return TimetableData(
-      courses: (json['courses'] as List?)
-          ?.map((c) => CourseInfo.fromJson(c))
-          .toList() ?? [],
-      timeSlots: (json['timeSlots'] as List?)
-          ?.map((t) => TimeSlot.fromJson(t))
-          .toList() ?? [],
-      dailyCourses: (json['dailyCourses'] as List?)
-          ?.map((d) => DailyCourse.fromJson(d))
-          .toList() ?? [],
-      timeLayouts: (json['timeLayouts'] as List?)
-          ?.map((t) => TimeLayout.fromJson(t))
-          .toList() ?? [],
-      schedules: (json['schedules'] as List?)
-          ?.map((s) => Schedule.fromJson(s))
-          .toList() ?? [],
-    );
   }
 }

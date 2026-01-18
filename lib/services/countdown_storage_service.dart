@@ -1,10 +1,24 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class CountdownStorageService {
+  factory CountdownStorageService() => _instance;
+  CountdownStorageService._internal();
   static const String _countdownListKey = 'countdown_list';
+  
+  // 单例模式
+  static final CountdownStorageService _instance = CountdownStorageService._internal();
+
+  // 数据变更流
+  final _changeController = StreamController<void>.broadcast();
+  Stream<void> get onChange => _changeController.stream;
+
+  void dispose() {
+    _changeController.close();
+  }
 
   Future<List<CountdownData>> loadAllCountdowns() async {
     try {
@@ -12,8 +26,8 @@ class CountdownStorageService {
       final jsonString = prefs.getString(_countdownListKey);
 
       if (jsonString != null) {
-        final List<dynamic> jsonList = jsonDecode(jsonString);
-        return jsonList.map((json) => CountdownData.fromJson(json)).toList();
+        final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
+        return jsonList.map((json) => CountdownData.fromJson(json as Map<String, dynamic>)).toList();
       }
       return [];
     } catch (e) {
@@ -34,6 +48,7 @@ class CountdownStorageService {
       }
       
       await saveAllCountdowns(countdowns);
+      _changeController.add(null); // 通知变更
     } catch (e) {
       Logger.e('Error saving countdown: $e');
       throw Exception('Failed to save countdown');
@@ -48,6 +63,7 @@ class CountdownStorageService {
       if (index >= 0) {
         countdowns[index] = countdown;
         await saveAllCountdowns(countdowns);
+        _changeController.add(null); // 通知变更
       } else {
         throw Exception('Countdown not found');
       }
@@ -62,6 +78,7 @@ class CountdownStorageService {
       final countdowns = await loadAllCountdowns();
       countdowns.removeWhere((c) => c.id == id);
       await saveAllCountdowns(countdowns);
+      _changeController.add(null); // 通知变更
     } catch (e) {
       Logger.e('Error deleting countdown: $e');
       throw Exception('Failed to delete countdown');

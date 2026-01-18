@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
+  desktop_multi_window
   dynamic_color
   screen_retriever
   system_tray

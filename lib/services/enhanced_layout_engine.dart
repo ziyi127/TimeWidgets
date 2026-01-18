@@ -1,14 +1,15 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/desktop_widget_service.dart';
-import 'dart:math' as math;
 import 'package:time_widgets/utils/logger.dart';
 
 /// 增强的布局引擎
 /// 提供智能位置计算、碰撞检测和自适应布局功能
 class EnhancedLayoutEngine {
-  static const double _minWidgetSize = 50.0;
-  static const double _maxWidgetSize = 500.0;
-  static const double _padding = 16.0;
+  static const double _minWidgetSize = 50;
+  static const double _maxWidgetSize = 500;
+  static const double _padding = 16;
   
   /// 位置计算器
   final PositionCalculator _positionCalculator = PositionCalculator();
@@ -22,7 +23,7 @@ class EnhancedLayoutEngine {
   /// 计算最优布局
   Map<WidgetType, WidgetPosition> calculateOptimalLayout(
     Size screenSize, 
-    Map<WidgetType, WidgetPosition>? currentLayout
+    Map<WidgetType, WidgetPosition>? currentLayout,
   ) {
     try {
       // 1. 计算自适应容器大小，根据屏幕尺寸动态调整
@@ -96,7 +97,7 @@ class EnhancedLayoutEngine {
       Logger.e('Layout calculation failed: $e');
       // 返回安全的默认布局
       return _positionCalculator.calculateSafeDefaultLayout(
-        _calculateAdaptiveContainerSize(screenSize)
+        _calculateAdaptiveContainerSize(screenSize),
       );
     }
   }
@@ -119,7 +120,7 @@ class EnhancedLayoutEngine {
     }
     
     // 确保容器宽度不小于最小安全宽度
-    containerWidth = math.max(containerWidth, 280.0);
+    containerWidth = math.max(containerWidth, 280);
     return Size(containerWidth, screenSize.height);
   }
 
@@ -132,7 +133,7 @@ class EnhancedLayoutEngine {
   Map<WidgetType, WidgetPosition> adjustForScreenSize(
     Map<WidgetType, WidgetPosition> currentLayout,
     Size oldSize,
-    Size newSize
+    Size newSize,
   ) {
     final newContainerSize = _calculateAdaptiveContainerSize(newSize);
     final oldContainerSize = _calculateAdaptiveContainerSize(oldSize);
@@ -147,15 +148,15 @@ class EnhancedLayoutEngine {
       final position = entry.value;
       
       // 按比例调整位置和尺寸
-      final scaledWidth = (position.width * scaleX).clamp(_minWidgetSize, _maxWidgetSize);
-      final scaledHeight = (position.height * scaleY).clamp(_minWidgetSize, _maxWidgetSize);
+      final scaledWidth = (position.width * scaleX).clamp(_minWidgetSize, _maxWidgetSize).toDouble();
+      final scaledHeight = (position.height * scaleY).clamp(_minWidgetSize, _maxWidgetSize).toDouble();
       
       // 确保组件不会超出容器边界
-      final maxX = newContainerSize.width - scaledWidth;
-      final maxY = newContainerSize.height - scaledHeight;
+      final maxX = (newContainerSize.width - scaledWidth).toDouble();
+      final maxY = (newContainerSize.height - scaledHeight).toDouble();
       
-      final newX = (position.x * scaleX).clamp(0.0, maxX);
-      final newY = (position.y * scaleY).clamp(0.0, maxY);
+      final newX = (position.x * scaleX).clamp(0.0, maxX).toDouble();
+      final newY = (position.y * scaleY).clamp(0.0, maxY).toDouble();
       
       adjustedLayout[entry.key] = WidgetPosition(
         type: position.type,
@@ -171,6 +172,11 @@ class EnhancedLayoutEngine {
     return _collisionDetector.resolveCollisions(adjustedLayout, newContainerSize);
   }
 
+  /// 获取自适应容器大小
+  Size getAdaptiveContainerSize(Size screenSize) {
+    return _calculateAdaptiveContainerSize(screenSize);
+  }
+
   /// 验证布局有效性
   bool validateLayout(Map<WidgetType, WidgetPosition> layout, Size containerSize) {
     return _layoutValidator.validateLayout(layout, containerSize);
@@ -180,7 +186,7 @@ class EnhancedLayoutEngine {
   Map<WidgetType, WidgetPosition> _mergeWithExistingLayout(
     Map<WidgetType, WidgetPosition> defaultLayout,
     Map<WidgetType, WidgetPosition> existingLayout,
-    Size containerSize
+    Size containerSize,
   ) {
     final mergedLayout = <WidgetType, WidgetPosition>{};
     
@@ -203,15 +209,15 @@ class EnhancedLayoutEngine {
 
 /// 位置计算器
 class PositionCalculator {
-  static const double _padding = 16.0;
-  static const double _spacing = 16.0;  // 增加间距
+  static const double _padding = 16;
+  static const double _spacing = 16;  // 增加间距
 
   /// 计算默认位置 - 垂直单列布局，确保所有组件可见
   Map<WidgetType, WidgetPosition> calculateDefaultPositions(Size containerSize) {
     final positions = <WidgetType, WidgetPosition>{};
     
     // 使用更小的卡片宽度，让组件更紧凑
-    final cardWidth = math.min(containerSize.width - 2 * _padding, 300.0);
+    final cardWidth = math.min(containerSize.width - 2 * _padding, 300.0).toDouble();
     
     double currentY = _padding;
     
@@ -248,8 +254,8 @@ class PositionCalculator {
     
     // 设置按钮单独处理 - 放置在右下角，确保不会与其他组件重叠
     // 计算右下角位置，避免与其他组件重叠
-    final settingsWidth = 48.0;
-    final settingsHeight = 48.0;
+    const settingsWidth = 48.0;
+    const settingsHeight = 48.0;
     final settingsX = containerSize.width - _padding - settingsWidth;
     final settingsY = containerSize.height - _padding - settingsHeight;
     
@@ -259,7 +265,6 @@ class PositionCalculator {
       y: settingsY,
       width: settingsWidth,
       height: settingsHeight,
-      isVisible: true,
     );
     
     return positions;
@@ -269,9 +274,9 @@ class PositionCalculator {
   Map<WidgetType, WidgetPosition> calculateSafeDefaultLayout(Size containerSize) {
     final positions = <WidgetType, WidgetPosition>{};
     final safeWidth = math.min(280.0, containerSize.width - 32);
-    final safeHeight = 80.0;
+    const safeHeight = 80.0;
     
-    double currentY = 16.0;
+    double currentY = 16;
     
     for (final type in WidgetType.values) {
       if (type == WidgetType.settings) {
@@ -281,7 +286,6 @@ class PositionCalculator {
           y: 16,
           width: 48,
           height: 48,
-          isVisible: true,
         );
       } else {
         positions[type] = WidgetPosition(
@@ -290,7 +294,6 @@ class PositionCalculator {
           y: currentY,
           width: safeWidth,
           height: safeHeight,
-          isVisible: true,
         );
         currentY += safeHeight + 8;
       }
@@ -305,10 +308,10 @@ class PositionCalculator {
     double y, 
     double width, 
     double height, 
-    Size containerSize
+    Size containerSize,
   ) {
-    final adjustedX = x.clamp(0.0, math.max(0.0, containerSize.width - width).toDouble());
-    final adjustedY = y.clamp(0.0, math.max(0.0, containerSize.height - height).toDouble());
+    final adjustedX = x.clamp(0.0, math.max(0.0, containerSize.width - width)).toDouble();
+    final adjustedY = y.clamp(0.0, math.max(0.0, containerSize.height - height)).toDouble();
     return Offset(adjustedX, adjustedY);
   }
 
@@ -316,23 +319,21 @@ class PositionCalculator {
   double _getDefaultHeight(WidgetType type) {
     switch (type) {
       case WidgetType.time:
-        return 50.0;
+        return 50;
       case WidgetType.date:
-        return 50.0;
+        return 50;
       case WidgetType.week:
-        return 45.0;
+        return 45;
       case WidgetType.weather:
-        return 130.0;  // 增加高度
+        return 130;  // 增加高度
       case WidgetType.currentClass:
-        return 90.0;
+        return 90;
       case WidgetType.countdown:
-        return 90.0;
+        return 90;
       case WidgetType.timetable:
-        return 140.0;  // 减小高度
+        return 140;  // 减小高度
       case WidgetType.settings:
-        return 48.0;
-      default:
-        return 50.0;
+        return 48;
     }
   }
 }
@@ -358,7 +359,7 @@ class CollisionDetector {
   /// 解决碰撞问题
   Map<WidgetType, WidgetPosition> resolveCollisions(
     Map<WidgetType, WidgetPosition> layout,
-    Size containerSize
+    Size containerSize,
   ) {
     final resolvedLayout = Map<WidgetType, WidgetPosition>.from(layout);
     final collisions = detectCollisions(resolvedLayout);
@@ -381,37 +382,37 @@ class CollisionDetector {
   double _getDefaultHeight(WidgetType type) {
     switch (type) {
       case WidgetType.time:
-        return 50.0;
+        return 50;
       case WidgetType.date:
-        return 50.0;
+        return 50;
       case WidgetType.week:
-        return 45.0;
+        return 45;
       case WidgetType.weather:
-        return 130.0;  // 增加高度
+        return 130;  // 增加高度
       case WidgetType.currentClass:
-        return 90.0;
+        return 90;
       case WidgetType.countdown:
-        return 90.0;
+        return 90;
       case WidgetType.timetable:
-        return 140.0;  // 减小高度
+        return 140;  // 减小高度
       case WidgetType.settings:
-        return 48.0;
+        return 48;
       default:
-        return 50.0;
+        return 50;
     }
   }
   
   /// 应用流式布局解决重叠 - 使用单列垂直布局
   Map<WidgetType, WidgetPosition> _applyFlowLayout(
     Map<WidgetType, WidgetPosition> layout,
-    Size containerSize
+    Size containerSize,
   ) {
     final flowLayout = <WidgetType, WidgetPosition>{};
     const padding = 16.0;
     const spacing = 16.0;  // 增加间距
     
     // 使用更小的卡片宽度，让组件更紧凑
-    final cardWidth = math.min(containerSize.width - 2 * padding, 300.0);
+    final cardWidth = math.min(containerSize.width - 2 * padding, 300.0).toDouble();
     
     // 按Y坐标排序
     final sortedEntries = layout.entries.toList()
@@ -445,7 +446,7 @@ class CollisionDetector {
       // 如果剩余高度不足，使用剩余空间或最小高度
       final adjustedHeight = remainingHeight > preferredHeight 
           ? preferredHeight 
-          : math.max(50.0, remainingHeight);
+          : math.max(50.0, remainingHeight).toDouble();
       
       // 只有在完全没有空间时才隐藏组件
       final isVisible = remainingHeight >= 50;

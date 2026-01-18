@@ -248,6 +248,11 @@ enum MD3CardVariant {
 /// MD3 Card Builder
 /// 提供更灵活的 Card 构建方式
 class MD3CardBuilder {
+
+  MD3CardBuilder({
+    required this.context,
+    required this.child,
+  });
   final BuildContext context;
   final Widget child;
   
@@ -258,11 +263,6 @@ class MD3CardBuilder {
   Color? _backgroundColor;
   Color? _borderColor;
   double? _borderWidth;
-
-  MD3CardBuilder({
-    required this.context,
-    required this.child,
-  });
 
   MD3CardBuilder variant(MD3CardVariant variant) {
     _variant = variant;

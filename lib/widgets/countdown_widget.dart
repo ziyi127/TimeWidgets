@@ -5,12 +5,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 倒计时组件- MD3紧凑版
 class CountdownWidget extends StatelessWidget {
-  final CountdownData? countdownData;
-  final List<CountdownData>? allCountdowns;
-  final String? error;
-  final VoidCallback? onRetry;
-  final VoidCallback? onViewAll;
-  final bool isCompact;
 
   const CountdownWidget({
     super.key,
@@ -21,6 +15,12 @@ class CountdownWidget extends StatelessWidget {
     this.onViewAll,
     this.isCompact = false,
   });
+  final CountdownData? countdownData;
+  final List<CountdownData>? allCountdowns;
+  final String? error;
+  final VoidCallback? onRetry;
+  final VoidCallback? onViewAll;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +33,14 @@ class CountdownWidget extends StatelessWidget {
       return _buildErrorCard(context, colorScheme, width);
     }
 
-    final countdown = countdownData;
-    final description = countdown?.description ?? '期末考试';
-    final remainingDays = countdown?.remainingDays ?? 45;
-    final eventType = countdown?.type ?? 'exam';
+    if (countdownData == null) {
+      return _buildEmptyCard(context, theme, colorScheme, width);
+    }
+
+    final countdown = countdownData!;
+    final description = countdown.title;
+    final remainingDays = countdown.remainingDays;
+    final eventType = countdown.type;
     final typeColor = _getEventTypeColor(colorScheme, eventType);
 
     return Card(
@@ -44,18 +48,18 @@ class CountdownWidget extends StatelessWidget {
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
       ),
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CountdownListScreen()),
+            MaterialPageRoute<void>(builder: (context) => const CountdownListScreen()),
           );
         },
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
         child: Padding(
           padding: EdgeInsets.all(ResponsiveUtils.value(16)),
@@ -140,7 +144,7 @@ class CountdownWidget extends StatelessWidget {
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: typeColor,
                       fontWeight: FontWeight.w500,
-                      height: 1.0,
+                      height: 1,
                       fontSize: (theme.textTheme.headlineMedium?.fontSize ?? 28) * fontMultiplier,
                     ),
                   ),
@@ -157,7 +161,71 @@ class CountdownWidget extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 color: colorScheme.onSurfaceVariant,
-                size: ResponsiveUtils.getIconSize(width, baseSize: 24),
+                size: ResponsiveUtils.getIconSize(width),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyCard(BuildContext context, ThemeData theme, ColorScheme colorScheme, double width) {
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(width),
+        ),
+      ),
+      child: InkWell(
+        onTap: () {
+           Navigator.push(
+             context,
+             MaterialPageRoute<void>(builder: (context) => const CountdownListScreen()),
+           );
+         },
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(width),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(ResponsiveUtils.value(16)),
+          child: Row(
+            children: [
+              Container(
+                width: ResponsiveUtils.value(44),
+                height: ResponsiveUtils.value(44),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withAlpha(38),
+                  borderRadius: BorderRadius.circular(ResponsiveUtils.value(12)),
+                ),
+                child: Icon(
+                  Icons.add_alarm,
+                  size: ResponsiveUtils.getIconSize(width, baseSize: 22),
+                  color: colorScheme.primary,
+                ),
+              ),
+              SizedBox(width: ResponsiveUtils.value(12)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '暂无倒计时',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      '点击添加重要事件',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -174,7 +242,7 @@ class CountdownWidget extends StatelessWidget {
       color: colorScheme.errorContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width, baseRadius: 16),
+          ResponsiveUtils.getBorderRadius(width),
         ),
       ),
       child: Padding(
@@ -184,7 +252,7 @@ class CountdownWidget extends StatelessWidget {
             Icon(
               Icons.event_busy_rounded, 
               color: colorScheme.onErrorContainer, 
-              size: ResponsiveUtils.getIconSize(width, baseSize: 20)
+              size: ResponsiveUtils.getIconSize(width, baseSize: 20),
             ),
             SizedBox(width: ResponsiveUtils.value(12)),
             Expanded(

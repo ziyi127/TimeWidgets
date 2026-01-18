@@ -4,12 +4,12 @@ import 'package:intl/intl.dart';
 
 /// 时间显示组件 - MD3紧凑版
 class TimeDisplayWidget extends StatefulWidget {
-  final bool isCompact;
 
   const TimeDisplayWidget({
     super.key,
     this.isCompact = false,
   });
+  final bool isCompact;
 
   @override
   State<TimeDisplayWidget> createState() => _TimeDisplayWidgetState();

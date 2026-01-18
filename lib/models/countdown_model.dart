@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CountdownData {
-  final String id;
-  final String title;
-  final String description;
-  final DateTime targetDate;
-  final String type;
-  final double progress;
-  final String? category;
-  final Color? color;
 
   CountdownData({
     required this.id,
@@ -20,6 +12,28 @@ class CountdownData {
     this.category,
     this.color,
   });
+
+  // 从JSON解析
+  factory CountdownData.fromJson(Map<String, dynamic> json) {
+    return CountdownData(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      targetDate: DateTime.parse(json['targetDate'] as String? ?? DateTime.now().toIso8601String()),
+      type: json['type'] as String? ?? 'event',
+      progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+      category: json['category'] as String?,
+      color: json['color'] != null ? Color(json['color'] as int) : null,
+    );
+  }
+  final String id;
+  final String title;
+  final String description;
+  final DateTime targetDate;
+  final String type;
+  final double progress;
+  final String? category;
+  final Color? color;
 
   // 计算剩余天数
   int get remainingDays {
@@ -84,20 +98,6 @@ class CountdownData {
       default:
         return const Color(0xFF9E9E9E); // 灰色
     }
-  }
-
-  // 从JSON解析
-  factory CountdownData.fromJson(Map<String, dynamic> json) {
-    return CountdownData(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      targetDate: DateTime.parse(json['targetDate'] ?? DateTime.now().toIso8601String()),
-      type: json['type'] ?? 'event',
-      progress: (json['progress'] ?? 0.0).toDouble(),
-      category: json['category'],
-      color: json['color'] != null ? Color(json['color']) : null,
-    );
   }
 
   // 转换为JSON

@@ -3,12 +3,11 @@ import 'package:provider/provider.dart';
 import '../models/timetable_edit_model.dart';
 import '../services/timetable_edit_service.dart';
 import '../utils/md3_button_styles.dart';
-import '../utils/md3_card_styles.dart';
 import '../utils/md3_dialog_styles.dart';
 import '../utils/md3_form_styles.dart';
 import '../utils/md3_typography_styles.dart';
 
-/// 时间表编辑标签页 - 时间轴视�?
+/// 时间表编辑标签页 - 时间轴视图
 class TimeLayoutEditTab extends StatefulWidget {
   const TimeLayoutEditTab({super.key});
 
@@ -29,7 +28,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
         
         return Row(
           children: [
-            // 左侧: 时间表列�?
+            // 左侧: 时间表列表
             SizedBox(
               width: 280,
               child: _buildLayoutList(context, layouts, timeSlots, service),
@@ -55,21 +54,22 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text('时间�?, style: MD3TypographyStyles.titleMedium(context)),
+              Text('时间表', style: MD3TypographyStyles.titleMedium(context)),
               const Spacer(),
               MD3ButtonStyles.iconFilledTonal(
+                context: context,
                 icon: const Icon(Icons.add),
                 onPressed: () => _showAddLayoutDialog(context, service),
-                tooltip: '添加时间�?,
+                tooltip: '添加时间表',
               ),
             ],
           ),
         ),
         const Divider(height: 1),
-        // 默认时间�?
+        // 默认时间表
         ListTile(
           leading: const Icon(Icons.schedule),
-          title: const Text('默认时间�?),
+          title: const Text('默认时间表'),
           subtitle: Text('${timeSlots.length} 个时间点'),
           selected: _selectedLayoutId == null,
           selectedTileColor: colorScheme.secondaryContainer,
@@ -104,10 +104,10 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                       selected: isSelected,
                       selectedTileColor: colorScheme.secondaryContainer,
                       trailing: MD3ButtonStyles.icon(
+                        context: context,
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () => _deleteLayout(context, service, layout),
                         tooltip: '删除',
-                        isCompact: true,
                       ),
                       onTap: () {
                         setState(() {
@@ -123,20 +123,18 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Widget _buildTimelineEditor(BuildContext context, TimetableEditService service, List<TimeSlot> defaultTimeSlots) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     // Get the time slots to display
     List<TimeSlot> timeSlots;
     String title;
     
     if (_selectedLayoutId == null) {
       timeSlots = defaultTimeSlots;
-      title = '默认时间�?;
+      title = '默认时间表';
     } else {
       final layout = service.getTimeLayoutById(_selectedLayoutId!);
       if (layout == null) {
         timeSlots = defaultTimeSlots;
-        title = '默认时间�?;
+        title = '默认时间表';
       } else {
         timeSlots = layout.timeSlots;
         title = layout.name;
@@ -156,22 +154,17 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
             children: [
               Text(title, style: MD3TypographyStyles.titleMedium(context)),
               const Spacer(),
-              MD3ButtonStyles.filledTonal(
+              MD3ButtonStyles.filledTonalButton(
+                context: context,
                 onPressed: () => _showAddTimeSlotDialog(context, service),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add, size: 18),
-                    SizedBox(width: 8),
-                    Text('添加时间�?),
-                  ],
-                ),
+                icon: const Icon(Icons.add, size: 18),
+                text: '添加时间段',
               ),
             ],
           ),
         ),
         const Divider(height: 1),
-        // 时间�?
+        // 时间轴
         Expanded(
           child: sortedSlots.isEmpty
               ? _buildEmptyTimelineState(context, service)
@@ -204,7 +197,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
           ),
           const SizedBox(height: 16),
           Text(
-            '暂无时间�?,
+            '暂无时间点',
             style: MD3TypographyStyles.bodyLarge(context).copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -217,9 +210,10 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
             ),
           ),
           const SizedBox(height: 24),
-          MD3ButtonStyles.filledTonal(
+          MD3ButtonStyles.filledTonalButton(
+            context: context,
             onPressed: () => _showAddTimeSlotDialog(context, service),
-            child: const Text('添加时间�?),
+            text: '添加时间段',
           ),
         ],
       ),
@@ -227,13 +221,11 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Future<void> _showAddLayoutDialog(BuildContext context, TimetableEditService service) async {
-    final nameController = TextEditingController();
-    
     final result = await MD3DialogStyles.showInputDialog(
       context: context,
-      title: '添加时间�?,
-      labelText: '时间表名�?,
-      hintText: '例如: 周末时间�?,
+      title: '添加时间表',
+      labelText: '时间表名称',
+      hintText: '例如: 周末时间表',
     );
     
     if (result != null && result.isNotEmpty) {
@@ -255,7 +247,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
       itemName: layout.name,
     );
     
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       service.deleteTimeLayout(layout.id);
       if (_selectedLayoutId == layout.id) {
         setState(() {
@@ -276,7 +268,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => MD3DialogStyles.dialog(
           context: context,
-          title: '添加时间�?,
+          title: '添加时间点',
           scrollable: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -285,7 +277,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                 context: context,
                 controller: nameController,
                 label: '名称',
-                hint: '例如: 第一�?,
+                hint: '例如: 第一节',
               ),
               const SizedBox(height: 16),
               Row(
@@ -294,7 +286,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                     child: MD3FormStyles.timePickerButton(
                       context: context,
                       time: startTime,
-                      label: '开始时�?,
+                      label: '开始时间',
                       onChanged: (time) {
                         setState(() {
                           startTime = time;
@@ -332,26 +324,28 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                 items: const [
                   DropdownMenuItem(value: TimePointType.classTime, child: Text('上课')),
                   DropdownMenuItem(value: TimePointType.breakTime, child: Text('课间休息')),
-                  DropdownMenuItem(value: TimePointType.divider, child: Text('分割�?)),
+                  DropdownMenuItem(value: TimePointType.divider, child: Text('分割线')),
                 ],
               ),
             ],
           ),
           actions: [
-            MD3ButtonStyles.text(
+            MD3ButtonStyles.textButton(
+              context: context,
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('取消'),
+              text: '取消',
             ),
-            MD3ButtonStyles.filled(
+            MD3ButtonStyles.filledButton(
+              context: context,
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('添加'),
+              text: '添加',
             ),
           ],
         ),
       ),
     );
     
-    if (result == true && nameController.text.isNotEmpty) {
+    if ((result ?? false) && nameController.text.isNotEmpty) {
       final newSlot = TimeSlot(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: nameController.text,
@@ -376,7 +370,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => MD3DialogStyles.dialog(
           context: context,
-          title: '编辑时间�?,
+          title: '编辑时间点',
           scrollable: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -393,7 +387,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                     child: MD3FormStyles.timePickerButton(
                       context: context,
                       time: startTime,
-                      label: '开始时�?,
+                      label: '开始时间',
                       onChanged: (time) {
                         setState(() {
                           startTime = time;
@@ -431,26 +425,28 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                 items: const [
                   DropdownMenuItem(value: TimePointType.classTime, child: Text('上课')),
                   DropdownMenuItem(value: TimePointType.breakTime, child: Text('课间休息')),
-                  DropdownMenuItem(value: TimePointType.divider, child: Text('分割�?)),
+                  DropdownMenuItem(value: TimePointType.divider, child: Text('分割线')),
                 ],
               ),
             ],
           ),
           actions: [
-            MD3ButtonStyles.text(
+            MD3ButtonStyles.textButton(
+              context: context,
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('取消'),
+              text: '取消',
             ),
-            MD3ButtonStyles.filled(
+            MD3ButtonStyles.filledButton(
+              context: context,
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('保存'),
+              text: '保存',
             ),
           ],
         ),
       ),
     );
     
-    if (result == true) {
+    if (result ?? false) {
       final updatedSlot = slot.copyWith(
         name: nameController.text,
         startTime: '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
@@ -467,23 +463,23 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
       itemName: slot.name,
     );
     
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       service.deleteTimeSlot(slot.id);
     }
   }
 }
 
-/// 时间点卡�?
+/// 时间点卡片
 class _TimeSlotCard extends StatelessWidget {
-  final TimeSlot timeSlot;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
 
   const _TimeSlotCard({
     required this.timeSlot,
     required this.onEdit,
     required this.onDelete,
   });
+  final TimeSlot timeSlot;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -544,10 +540,10 @@ class _TimeSlotCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               MD3ButtonStyles.icon(
+                context: context,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: onDelete,
                 tooltip: '删除',
-                isCompact: true,
               ),
             ],
           ),

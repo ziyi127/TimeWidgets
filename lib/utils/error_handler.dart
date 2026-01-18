@@ -1,13 +1,10 @@
 import 'dart:io';
 import '../utils/logger.dart';
+import 'error_handling/enhanced_error_handler.dart';
+import 'error_handling/error_types.dart';
 
-/// 应用错误类
+/// 应用错误类 (向后兼容包装器)
 class AppError {
-  final String code;
-  final String message;
-  final String? userMessage;
-  final String? resolution;
-  final dynamic originalError;
 
   AppError({
     required this.code,
@@ -17,110 +14,66 @@ class AppError {
     this.originalError,
   });
 
+  /// 从增强错误创建
+  factory AppError.fromEnhanced(EnhancedAppError enhanced) {
+    return AppError(
+      code: enhanced.code,
+      message: enhanced.message,
+      userMessage: enhanced.userMessage,
+      resolution: enhanced.resolution,
+      originalError: enhanced.originalError,
+    );
+  }
+
+  final String code;
+  final String message;
+  final String? userMessage;
+  final String? resolution;
+  final dynamic originalError;
+
   @override
   String toString() => 'AppError($code): $message';
 }
 
-/// 错误处理工具类
+/// 错误处理工具类 (向后兼容包装器)
+/// 
+/// 此类保持原有 API 不变，内部委托给增强的错误处理系统
 class ErrorHandler {
+  static final EnhancedErrorHandler _enhancedHandler = EnhancedErrorHandler();
+
   /// 处理网络错误
   static AppError handleNetworkError(dynamic error) {
-    String code = 'NETWORK_ERROR';
-    String message = error.toString();
-    String userMessage = '网络连接失败';
-    String resolution = '请检查网络连接后重试';
-
-    if (error is SocketException) {
-      code = 'NO_INTERNET';
-      userMessage = '无法连接到网络';
-      resolution = '请检查网络设置';
-    } else if (error.toString().contains('timeout')) {
-      code = 'TIMEOUT';
-      userMessage = '网络连接超时';
-      resolution = '请检查网络连接后重试';
-    } else if (error.toString().contains('404')) {
-      code = 'NOT_FOUND';
-      userMessage = '请求的资源不存在';
-      resolution = '请检查请求地址是否正确';
-    } else if (error.toString().contains('500')) {
-      code = 'SERVER_ERROR';
-      userMessage = '服务器内部错误';
-      resolution = '请稍后重试';
-    } else if (error.toString().contains('503')) {
-      code = 'SERVICE_UNAVAILABLE';
-      userMessage = '服务暂时不可用';
-      resolution = '请稍后重试';
-    }
-
-    return AppError(
-      code: code,
-      message: message,
-      userMessage: userMessage,
-      resolution: resolution,
-      originalError: error,
-    );
+    final enhanced = _enhancedHandler.handleError(error);
+    return AppError.fromEnhanced(enhanced);
   }
 
   /// 处理存储错误
   static AppError handleStorageError(dynamic error) {
-    String code = 'STORAGE_ERROR';
-    String message = error.toString();
-    String userMessage = '数据存储失败';
-    String resolution = '请重试';
-
-    if (error.toString().contains('permission')) {
-      code = 'PERMISSION_DENIED';
-      userMessage = '没有文件访问权限';
-      resolution = '请授予应用文件访问权限';
-    } else if (error.toString().contains('space') || error.toString().contains('full')) {
-      code = 'STORAGE_FULL';
-      userMessage = '存储空间不足';
-      resolution = '请清理存储空间后重试';
-    } else if (error.toString().contains('not found') || error.toString().contains('exist')) {
-      code = 'FILE_NOT_FOUND';
-      userMessage = '文件不存在';
-      resolution = '请检查文件路径是否正确';
-    }
-
-    return AppError(
-      code: code,
-      message: message,
-      userMessage: userMessage,
-      resolution: resolution,
-      originalError: error,
-    );
+    final enhanced = _enhancedHandler.handleError(error);
+    return AppError.fromEnhanced(enhanced);
   }
 
   /// 处理验证错误
   static AppError handleValidationError(String message) {
-    return AppError(
-      code: 'VALIDATION_ERROR',
+    final enhanced = _enhancedHandler.handleValidationError(
+      fieldName: 'unknown',
+      value: null,
+      rule: 'unknown',
       message: message,
-      userMessage: message,
-      resolution: '请检查输入数据格式',
     );
+    return AppError.fromEnhanced(enhanced);
   }
 
   /// 处理 JSON 解析错误
   static AppError handleJsonError(dynamic error) {
-    return AppError(
-      code: 'JSON_ERROR',
-      message: error.toString(),
-      userMessage: '文件格式无效',
-      resolution: '请确保文件是有效的 JSON 格式',
-      originalError: error,
-    );
+    final enhanced = _enhancedHandler.handleJsonError(error);
+    return AppError.fromEnhanced(enhanced);
   }
 
   /// 处理未知错误
   static AppError handleUnknownError(dynamic error) {
-    return AppError(
-      code: 'UNKNOWN_ERROR',
-      message: error.toString(),
-      userMessage: '发生未知错误',
-      resolution: '请重试或联系支持',
-      originalError: error,
-    );
+    final enhanced = _enhancedHandler.handleError(error);
+    return AppError.fromEnhanced(enhanced);
   }
 
   /// 记录错误日志

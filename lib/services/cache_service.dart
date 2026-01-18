@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/models/countdown_model.dart';
+import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class CacheService {
@@ -42,7 +43,7 @@ class CacheService {
         return null;
       }
       
-      final weatherMap = jsonDecode(weatherJson);
+      final weatherMap = jsonDecode(weatherJson) as Map<String, dynamic>;
       return WeatherData.fromJson(weatherMap);
     } catch (e) {
       Logger.e('获取缓存天气数据失败: $e');
@@ -79,7 +80,7 @@ class CacheService {
         return null;
       }
       
-      final countdownMap = jsonDecode(countdownJson);
+      final countdownMap = jsonDecode(countdownJson) as Map<String, dynamic>;
       return CountdownData.fromJson(countdownMap);
     } catch (e) {
       Logger.e('获取缓存倒计时数据失败: $e');

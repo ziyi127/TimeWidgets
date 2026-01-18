@@ -4,12 +4,13 @@ import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class NtpService {
-  static final NtpService _instance = NtpService._internal();
   factory NtpService() => _instance;
   NtpService._internal();
+  static final NtpService _instance = NtpService._internal();
 
   final SettingsService _settingsService = SettingsService();
   Timer? _syncTimer;
+  StreamSubscription<dynamic>? _settingsSubscription;
   int _ntpOffset = 0; // Offset in milliseconds
   bool _isSyncing = false;
 
@@ -27,7 +28,7 @@ class NtpService {
 
   Future<void> initialize() async {
     // Listen to settings changes to restart sync if needed
-    _settingsService.settingsStream.listen((settings) {
+    _settingsSubscription = _settingsService.settingsStream.listen((settings) {
       // Check if relevant settings changed to avoid unnecessary restarts
       // But simple restart is fine
       _restartSync();
@@ -38,6 +39,12 @@ class NtpService {
       await syncTime();
       _startTimer();
     }
+  }
+
+  void dispose() {
+    _syncTimer?.cancel();
+    _settingsSubscription?.cancel();
+    Logger.i('NtpService disposed');
   }
 
   void _startTimer() {

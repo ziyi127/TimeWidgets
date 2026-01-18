@@ -63,7 +63,7 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                 suffixIcon: IconButton(
                   icon: Icon(
                     Icons.search,
-                    size: ResponsiveUtils.getIconSize(width, baseSize: 24),
+                    size: ResponsiveUtils.getIconSize(width),
                   ),
                   onPressed: _search,
                 ),
@@ -121,9 +121,9 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                               itemCount: _results.length,
                               itemBuilder: (context, index) {
                                 final city = _results[index];
-                                final name = city['name'] ?? 'Unknown';
-                                final admin1 = city['admin1'] ?? '';
-                                final country = city['country'] ?? '';
+                                final name = (city['name'] ?? 'Unknown').toString();
+                                final admin1 = (city['admin1'] ?? '').toString();
+                                final country = (city['country'] ?? '').toString();
                                 
                                 return ListTile(
                                   title: Text(
@@ -131,7 +131,7 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                                     style: TextStyle(fontSize: 16 * fontMultiplier),
                                   ),
                                   subtitle: Text(
-                                    [admin1, country].where((e) => e.toString().isNotEmpty).join(', '),
+                                    [admin1, country].where((e) => e.isNotEmpty).join(', '),
                                     style: TextStyle(fontSize: 14 * fontMultiplier),
                                   ),
                                   onTap: () {
