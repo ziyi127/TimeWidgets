@@ -284,16 +284,17 @@ class ErrorReporter {
   Future<void> cleanOldReports({int maxAgeDays = 30}) async {
     try {
       final dir = Directory(reportsDirectory);
-      if (!await dir.exists()) return;
+      if (!dir.existsSync()) return;
 
       final cutoffDate = DateTime.now().subtract(Duration(days: maxAgeDays));
       var deletedCount = 0;
 
-      await for (final entity in dir.list()) {
+      final entities = dir.listSync();
+      for (final entity in entities) {
         if (entity is File) {
-          final stat = await entity.stat();
+          final stat = entity.statSync();
           if (stat.modified.isBefore(cutoffDate)) {
-            await entity.delete();
+            entity.deleteSync();
             deletedCount++;
           }
         }

@@ -97,8 +97,9 @@ class DesktopWidgetService {
   static final EnhancedLayoutEngine _layoutEngine = EnhancedLayoutEngine();
 
   /// 默认小组件位置配置（使用增强布局引擎）
-  static Map<WidgetType, WidgetPosition> getDefaultPositions(
-      [Size? screenSize]) {
+  static Map<WidgetType, WidgetPosition> getDefaultPositions([
+    Size? screenSize,
+  ]) {
     final containerSize = screenSize != null
         ? Size(screenSize.width / 4, screenSize.height)
         : const Size(480, 1080);
@@ -108,7 +109,8 @@ class DesktopWidgetService {
 
   /// 保存小组件位置
   static Future<void> saveWidgetPositions(
-      Map<WidgetType, WidgetPosition> positions) async {
+    Map<WidgetType, WidgetPosition> positions,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final positionsJson = positions.map(
       (key, value) => MapEntry(key.name, value.toJson()),
@@ -117,8 +119,9 @@ class DesktopWidgetService {
   }
 
   /// 加载小组件位置（使用增强布局引擎）
-  static Future<Map<WidgetType, WidgetPosition>> loadWidgetPositions(
-      [Size? screenSize]) async {
+  static Future<Map<WidgetType, WidgetPosition>> loadWidgetPositions([
+    Size? screenSize,
+  ]) async {
     final prefs = await SharedPreferences.getInstance();
     final positionsString = prefs.getString(_positionsKey);
 
@@ -221,7 +224,12 @@ class DesktopWidgetService {
 
   /// 检查位置是否在屏幕边界内
   static bool isPositionValid(
-      double x, double y, double width, double height, Size screenSize) {
+    double x,
+    double y,
+    double width,
+    double height,
+    Size screenSize,
+  ) {
     return x >= 0 &&
         y >= 0 &&
         x + width <= screenSize.width &&
@@ -230,16 +238,27 @@ class DesktopWidgetService {
 
   /// 调整位置到屏幕边界内（使用增强布局引擎）
   static Offset adjustPositionToScreen(
-      double x, double y, double width, double height, Size screenSize) {
+    double x,
+    double y,
+    double width,
+    double height,
+    Size screenSize,
+  ) {
     final containerSize = Size(screenSize.width / 4, screenSize.height);
     final positionCalculator = PositionCalculator();
     return positionCalculator.adjustPositionToScreen(
-        x, y, width, height, containerSize);
+      x,
+      y,
+      width,
+      height,
+      containerSize,
+    );
   }
 
   /// 检测布局碰撞
   static List<WidgetType> detectCollisions(
-      Map<WidgetType, WidgetPosition> layout) {
+    Map<WidgetType, WidgetPosition> layout,
+  ) {
     return _layoutEngine.detectCollisions(layout);
   }
 

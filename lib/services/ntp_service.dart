@@ -91,7 +91,8 @@ class NtpService {
 
       _ntpOffset = offset;
       Logger.i(
-          'NTP Sync successful. Offset: $_ntpOffset ms. Corrected time: $now');
+        'NTP Sync successful. Offset: $_ntpOffset ms. Corrected time: $now',
+      );
     } catch (e) {
       Logger.e('NTP Sync failed: $e');
     } finally {

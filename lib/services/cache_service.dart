@@ -23,7 +23,9 @@ class CacheService {
       final weatherJson = jsonEncode(weatherData.toJson());
       await prefs.setString(_weatherKey, weatherJson);
       await prefs.setInt(
-          _weatherTimestampKey, DateTime.now().millisecondsSinceEpoch);
+        _weatherTimestampKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
     } catch (e) {
       Logger.e('缓存天气数据失败: $e');
     }
@@ -61,7 +63,9 @@ class CacheService {
       final countdownJson = jsonEncode(countdownData.toJson());
       await prefs.setString(_countdownKey, countdownJson);
       await prefs.setInt(
-          _countdownTimestampKey, DateTime.now().millisecondsSinceEpoch);
+        _countdownTimestampKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
     } catch (e) {
       Logger.e('缓存倒计时数据失败: $e');
     }

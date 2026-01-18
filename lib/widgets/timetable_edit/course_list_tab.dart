@@ -125,7 +125,9 @@ class _CourseListTabState extends State<CourseListTab> {
 
   /// Show a color picker dialog with predefined colors
   Future<Color?> _showColorPickerDialog(
-      BuildContext context, Color initialColor) async {
+    BuildContext context,
+    Color initialColor,
+  ) async {
     final colorScheme = Theme.of(context).colorScheme;
     Color selectedColor = initialColor;
 
@@ -373,11 +375,15 @@ class _CourseListTabState extends State<CourseListTab> {
                         ),
                         const SizedBox(height: 8),
                         if (_searchQuery.isNotEmpty)
-                          Text('尝试调整搜索条件',
-                              style: MD3TypographyStyles.bodyMedium(context)),
+                          Text(
+                            '尝试调整搜索条件',
+                            style: MD3TypographyStyles.bodyMedium(context),
+                          ),
                         if (!_searchQuery.isNotEmpty)
-                          Text('点击下方按钮添加科目',
-                              style: MD3TypographyStyles.bodyMedium(context)),
+                          Text(
+                            '点击下方按钮添加科目',
+                            style: MD3TypographyStyles.bodyMedium(context),
+                          ),
                       ],
                     ),
                   )
@@ -392,16 +398,20 @@ class _CourseListTabState extends State<CourseListTab> {
                           context: context,
                           child: ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Color(int.parse(
-                                  course.color.replaceFirst('#', '0xFF'))),
+                              backgroundColor: Color(
+                                int.parse(
+                                  course.color.replaceFirst('#', '0xFF'),
+                                ),
+                              ),
                               child: Text(
                                 course.name.isNotEmpty ? course.name[0] : '?',
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                            title: Text(course.name,
-                                style:
-                                    MD3TypographyStyles.titleMedium(context)),
+                            title: Text(
+                              course.name,
+                              style: MD3TypographyStyles.titleMedium(context),
+                            ),
                             subtitle: Text(
                               [
                                 if (course.teacher.isNotEmpty) course.teacher,
@@ -461,7 +471,9 @@ class _CourseListTabState extends State<CourseListTab> {
             .join()
             .toUpperCase();
         return abbreviation.substring(
-            0, abbreviation.length > 3 ? 3 : abbreviation.length);
+          0,
+          abbreviation.length > 3 ? 3 : abbreviation.length,
+        );
       }
     }
 
@@ -549,7 +561,9 @@ class _CourseListTabState extends State<CourseListTab> {
                     trailing: GestureDetector(
                       onTap: () async {
                         final color = await _showColorPickerDialog(
-                            context, selectedColor);
+                          context,
+                          selectedColor,
+                        );
                         if (color != null) {
                           setState(() => selectedColor = color);
                         }
@@ -561,8 +575,8 @@ class _CourseListTabState extends State<CourseListTab> {
                           color: selectedColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                              color:
-                                  Colors.grey.withAlpha((255 * 0.5).round())),
+                            color: Colors.grey.withAlpha((255 * 0.5).round()),
+                          ),
                         ),
                       ),
                     ),

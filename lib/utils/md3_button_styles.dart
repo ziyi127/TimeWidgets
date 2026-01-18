@@ -94,7 +94,8 @@ class MD3ButtonStyles {
         foregroundColor: colorScheme.primary,
         disabledForegroundColor: colorScheme.onSurfaceVariant,
         side: BorderSide(
-            color: enabled ? colorScheme.outline : colorScheme.outlineVariant),
+          color: enabled ? colorScheme.outline : colorScheme.outlineVariant,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
@@ -265,7 +266,8 @@ class MD3ButtonStyles {
         foregroundColor:
             enabled ? colorScheme.primary : colorScheme.onSurfaceVariant,
         side: BorderSide(
-            color: enabled ? colorScheme.outline : colorScheme.outlineVariant),
+          color: enabled ? colorScheme.outline : colorScheme.outlineVariant,
+        ),
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(12),
       ),

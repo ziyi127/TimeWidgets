@@ -16,8 +16,10 @@ class TempScheduleChangeService {
       if (jsonString != null) {
         final jsonList = jsonDecode(jsonString) as List;
         return jsonList
-            .map((json) =>
-                TempScheduleChange.fromJson(json as Map<String, dynamic>))
+            .map(
+              (json) =>
+                  TempScheduleChange.fromJson(json as Map<String, dynamic>),
+            )
             .toList();
       }
       return [];
@@ -66,7 +68,9 @@ class TempScheduleChangeService {
 
   /// 获取指定日期和节次的临时调课记录
   Future<TempScheduleChange?> getChangeForPeriod(
-      DateTime date, String timeSlotId) async {
+    DateTime date,
+    String timeSlotId,
+  ) async {
     final changes = await getChangesForDate(date);
 
     try {

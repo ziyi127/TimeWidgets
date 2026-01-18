@@ -150,8 +150,12 @@ class ResponsiveUtils {
   }
 
   /// 获取响应式网格交叉轴数量
-  static int getCrossAxisCount(double width,
-      {int? compactCount, int? mediumCount, int? expandedCount}) {
+  static int getCrossAxisCount(
+    double width, {
+    int? compactCount,
+    int? mediumCount,
+    int? expandedCount,
+  }) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:

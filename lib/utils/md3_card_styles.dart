@@ -265,32 +265,38 @@ class MD3CardBuilder {
 
   MD3CardBuilder variant(MD3CardVariant variant) {
     _variant = variant;
+    // ignore: avoid_returning_this
     return this;
   }
 
   MD3CardBuilder padding(EdgeInsetsGeometry padding) {
     _padding = padding;
+    // ignore: avoid_returning_this
     return this;
   }
 
   MD3CardBuilder onTap(VoidCallback onTap) {
     _onTap = onTap;
+    // ignore: avoid_returning_this
     return this;
   }
 
   MD3CardBuilder elevation(double elevation) {
     _elevation = elevation;
+    // ignore: avoid_returning_this
     return this;
   }
 
   MD3CardBuilder backgroundColor(Color color) {
     _backgroundColor = color;
+    // ignore: avoid_returning_this
     return this;
   }
 
   MD3CardBuilder border({Color? color, double? width}) {
     _borderColor = color;
     _borderWidth = width;
+    // ignore: avoid_returning_this
     return this;
   }
 

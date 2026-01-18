@@ -55,7 +55,8 @@ class CountdownWidget extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute<void>(
-                builder: (context) => const CountdownListScreen()),
+              builder: (context) => const CountdownListScreen(),
+            ),
           );
         },
         borderRadius: BorderRadius.circular(
@@ -181,8 +182,12 @@ class CountdownWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyCard(BuildContext context, ThemeData theme,
-      ColorScheme colorScheme, double width) {
+  Widget _buildEmptyCard(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+    double width,
+  ) {
     return Card(
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
@@ -196,7 +201,8 @@ class CountdownWidget extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute<void>(
-                builder: (context) => const CountdownListScreen()),
+              builder: (context) => const CountdownListScreen(),
+            ),
           );
         },
         borderRadius: BorderRadius.circular(
@@ -249,7 +255,10 @@ class CountdownWidget extends StatelessWidget {
   }
 
   Widget _buildErrorCard(
-      BuildContext context, ColorScheme colorScheme, double width) {
+    BuildContext context,
+    ColorScheme colorScheme,
+    double width,
+  ) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     return Card(

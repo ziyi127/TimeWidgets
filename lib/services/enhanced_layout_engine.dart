@@ -172,7 +172,9 @@ class EnhancedLayoutEngine {
 
     // 解决调整后可能出现的碰撞
     return _collisionDetector.resolveCollisions(
-        adjustedLayout, newContainerSize);
+      adjustedLayout,
+      newContainerSize,
+    );
   }
 
   /// 获取自适应容器大小
@@ -182,7 +184,9 @@ class EnhancedLayoutEngine {
 
   /// 验证布局有效性
   bool validateLayout(
-      Map<WidgetType, WidgetPosition> layout, Size containerSize) {
+    Map<WidgetType, WidgetPosition> layout,
+    Size containerSize,
+  ) {
     return _layoutValidator.validateLayout(layout, containerSize);
   }
 
@@ -219,7 +223,8 @@ class PositionCalculator {
 
   /// 计算默认位置 - 垂直单列布局，确保所有组件可见
   Map<WidgetType, WidgetPosition> calculateDefaultPositions(
-      Size containerSize) {
+    Size containerSize,
+  ) {
     final positions = <WidgetType, WidgetPosition>{};
 
     // 使用更小的卡片宽度，让组件更紧凑
@@ -279,7 +284,8 @@ class PositionCalculator {
 
   /// 计算安全的默认布局（用于错误恢复）
   Map<WidgetType, WidgetPosition> calculateSafeDefaultLayout(
-      Size containerSize) {
+    Size containerSize,
+  ) {
     final positions = <WidgetType, WidgetPosition>{};
     final safeWidth = math.min(280, containerSize.width - 32);
     const safeHeight = 80.0;
@@ -501,7 +507,9 @@ class CollisionDetector {
 class LayoutValidator {
   /// 验证整个布局的有效性
   bool validateLayout(
-      Map<WidgetType, WidgetPosition> layout, Size containerSize) {
+    Map<WidgetType, WidgetPosition> layout,
+    Size containerSize,
+  ) {
     // 检查所有组件是否在边界内
     for (final position in layout.values) {
       if (!isPositionValid(position, containerSize)) {
@@ -526,7 +534,9 @@ class LayoutValidator {
     // 检查尺寸
     if (position.width < 50 || position.height < 50) return false;
     if (position.width > containerSize.width ||
-        position.height > containerSize.height) return false;
+        position.height > containerSize.height) {
+      return false;
+    }
 
     return true;
   }

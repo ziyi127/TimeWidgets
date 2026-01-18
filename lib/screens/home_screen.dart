@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/models/settings_model.dart';
@@ -53,11 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
         });
 
         if (_settings.showWeatherWidget) {
-          _loadWeatherData();
+          unawaited(_loadWeatherData());
         }
 
         if (_settings.showCountdownWidget) {
-          _loadCountdownData();
+          unawaited(_loadCountdownData());
         }
       }
     } catch (e) {
@@ -166,7 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildResponsiveLayout(
-      BuildContext context, BoxConstraints constraints) {
+    BuildContext context,
+    BoxConstraints constraints,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -248,10 +251,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                        builder: (context) => const SettingsScreen()),
+                      builder: (context) => const SettingsScreen(),
+                    ),
                   );
                   // Return from settings, reload
-                  _loadSettings();
+                  await _loadSettings();
                 },
                 tooltip: '设置',
               ),
@@ -392,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: const Duration(milliseconds: 300),
             child: WeatherWidget(
               key: ValueKey(
-                  'weather_expanded_${_isLoadingWeather}_${_weatherError == null}'),
+                'weather_expanded_${_isLoadingWeather}_${_weatherError == null}',
+              ),
               weatherData: _isLoadingWeather ? null : _weatherData,
               error: _weatherError,
               onRetry: _loadWeatherData,
@@ -426,7 +431,8 @@ class _HomeScreenState extends State<HomeScreen> {
             duration: const Duration(milliseconds: 300),
             child: CountdownWidget(
               key: ValueKey(
-                  'countdown_expanded_${_isLoadingCountdown}_${_countdownError == null}'),
+                'countdown_expanded_${_isLoadingCountdown}_${_countdownError == null}',
+              ),
               countdownData: _isLoadingCountdown ? null : _countdownData,
               error: _countdownError,
               onRetry: _loadCountdownData,

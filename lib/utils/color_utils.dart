@@ -68,16 +68,22 @@ class ColorUtils {
 
   /// Check if a color combination meets WCAG AA standards
   /// Normal text: 4.5:1, Large text: 3:1
-  static bool meetsWcagAA(Color foreground, Color background,
-      {bool isLargeText = false}) {
+  static bool meetsWcagAA(
+    Color foreground,
+    Color background, {
+    bool isLargeText = false,
+  }) {
     final ratio = getContrastRatio(foreground, background);
     return isLargeText ? ratio >= 3.0 : ratio >= 4.5;
   }
 
   /// Check if a color combination meets WCAG AAA standards
   /// Normal text: 7:1, Large text: 4.5:1
-  static bool meetsWcagAAA(Color foreground, Color background,
-      {bool isLargeText = false}) {
+  static bool meetsWcagAAA(
+    Color foreground,
+    Color background, {
+    bool isLargeText = false,
+  }) {
     final ratio = getContrastRatio(foreground, background);
     return isLargeText ? ratio >= 4.5 : ratio >= 7.0;
   }

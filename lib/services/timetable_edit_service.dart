@@ -335,13 +335,17 @@ class TimetableEditService extends ChangeNotifier {
   }
 
   // Get courses for a specific day
-  List<DailyCourse> getDailyCoursesForDay(DayOfWeek dayOfWeek,
-      {WeekType? weekType}) {
+  List<DailyCourse> getDailyCoursesForDay(
+    DayOfWeek dayOfWeek, {
+    WeekType? weekType,
+  }) {
     return _dailyCourses.where((d) {
       if (d.dayOfWeek != dayOfWeek) return false;
       if (weekType != null &&
           d.weekType != weekType &&
-          d.weekType != WeekType.both) return false;
+          d.weekType != WeekType.both) {
+        return false;
+      }
       return true;
     }).toList();
   }

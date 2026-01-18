@@ -58,13 +58,19 @@ void main() {
       final loadedSettings = await themeService.loadSettings();
       final defaultSettings = ThemeSettings.defaultSettings();
 
-      expect(loadedSettings.seedColor.toARGB32(),
-          equals(defaultSettings.seedColor.toARGB32()));
+      expect(
+        loadedSettings.seedColor.toARGB32(),
+        equals(defaultSettings.seedColor.toARGB32()),
+      );
       expect(loadedSettings.themeMode, equals(defaultSettings.themeMode));
-      expect(loadedSettings.useDynamicColor,
-          equals(defaultSettings.useDynamicColor));
-      expect(loadedSettings.useSystemColor,
-          equals(defaultSettings.useSystemColor));
+      expect(
+        loadedSettings.useDynamicColor,
+        equals(defaultSettings.useDynamicColor),
+      );
+      expect(
+        loadedSettings.useSystemColor,
+        equals(defaultSettings.useSystemColor),
+      );
     });
 
     test('should emit theme changes through stream', () async {
@@ -76,15 +82,17 @@ void main() {
 
       // 设置第一个颜色
       await themeService.setSeedColor(testColor1);
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
 
       // 设置第二个颜色
       await themeService.setSeedColor(testColor2);
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
 
       expect(streamEvents.length, greaterThanOrEqualTo(2));
-      expect(streamEvents.last.seedColor.toARGB32(),
-          equals(testColor2.toARGB32()));
+      expect(
+        streamEvents.last.seedColor.toARGB32(),
+        equals(testColor2.toARGB32()),
+      );
 
       await subscription.cancel();
     });
@@ -100,7 +108,9 @@ void main() {
 
       expect(theme1.colorScheme.primary, equals(theme2.colorScheme.primary));
       expect(
-          theme1.colorScheme.secondary, equals(theme2.colorScheme.secondary));
+        theme1.colorScheme.secondary,
+        equals(theme2.colorScheme.secondary),
+      );
       expect(theme1.useMaterial3, isTrue);
       expect(theme2.useMaterial3, isTrue);
     });
@@ -115,8 +125,10 @@ void main() {
       final theme2 =
           themeService.generateLightTheme(seedColor2, defaultSettings);
 
-      expect(theme1.colorScheme.primary,
-          isNot(equals(theme2.colorScheme.primary)));
+      expect(
+        theme1.colorScheme.primary,
+        isNot(equals(theme2.colorScheme.primary)),
+      );
     });
 
     test('should handle invalid saved data gracefully', () async {
@@ -128,8 +140,10 @@ void main() {
       final defaultSettings = ThemeSettings.defaultSettings();
 
       // 应该回退到默认设置
-      expect(loadedSettings.seedColor.toARGB32(),
-          equals(defaultSettings.seedColor.toARGB32()));
+      expect(
+        loadedSettings.seedColor.toARGB32(),
+        equals(defaultSettings.seedColor.toARGB32()),
+      );
       expect(loadedSettings.themeMode, equals(defaultSettings.themeMode));
     });
   });

@@ -75,7 +75,8 @@ class AppSettings {
     return AppSettings(
       themeSettings: json['themeSettings'] != null
           ? ThemeSettings.fromJson(
-              json['themeSettings'] as Map<String, dynamic>)
+              json['themeSettings'] as Map<String, dynamic>,
+            )
           : ThemeSettings.defaultSettings(),
       apiBaseUrl: json['apiBaseUrl'] as String? ?? 'http://localhost:3000/api',
       enableNotifications: json['enableNotifications'] as bool? ?? true,

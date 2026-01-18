@@ -130,7 +130,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? Border.all(
                                   width: 3,
                                   color:
-                                      Theme.of(context).colorScheme.onSurface)
+                                      Theme.of(context).colorScheme.onSurface,
+                                )
                               : null,
                         ),
                       ),
@@ -271,18 +272,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       if (value != null) {
                         final newThemeSettings =
                             _settings.themeSettings.copyWith(themeMode: value);
-                        await _saveSettings(_settings.copyWith(
-                            themeSettings: newThemeSettings));
+                        await _saveSettings(
+                          _settings.copyWith(
+                            themeSettings: newThemeSettings,
+                          ),
+                        );
                         await _themeService.saveSettings(newThemeSettings);
                       }
                     },
                     items: const [
                       DropdownMenuItem(
-                          value: ThemeMode.system, child: Text('跟随系统')),
+                        value: ThemeMode.system,
+                        child: Text('跟随系统'),
+                      ),
                       DropdownMenuItem(
-                          value: ThemeMode.light, child: Text('浅色')),
+                        value: ThemeMode.light,
+                        child: Text('浅色'),
+                      ),
                       DropdownMenuItem(
-                          value: ThemeMode.dark, child: Text('深色')),
+                        value: ThemeMode.dark,
+                        child: Text('深色'),
+                      ),
                     ],
                   ),
                 ),
@@ -297,7 +307,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     final newThemeSettings = _settings.themeSettings
                         .copyWith(useDynamicColor: value);
                     await _saveSettings(
-                        _settings.copyWith(themeSettings: newThemeSettings));
+                      _settings.copyWith(themeSettings: newThemeSettings),
+                    );
                     await _themeService.saveSettings(newThemeSettings);
                   },
                 ),
@@ -388,8 +399,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings
                               .copyWith(fontSizeScale: value);
-                          await _saveSettings(_settings.copyWith(
-                              themeSettings: newThemeSettings));
+                          await _saveSettings(
+                            _settings.copyWith(
+                              themeSettings: newThemeSettings,
+                            ),
+                          );
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
@@ -425,8 +439,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings
                               .copyWith(borderRadiusScale: value);
-                          await _saveSettings(_settings.copyWith(
-                              themeSettings: newThemeSettings));
+                          await _saveSettings(
+                            _settings.copyWith(
+                              themeSettings: newThemeSettings,
+                            ),
+                          );
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
@@ -461,8 +478,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings
                               .copyWith(componentOpacity: value);
-                          await _saveSettings(_settings.copyWith(
-                              themeSettings: newThemeSettings));
+                          await _saveSettings(
+                            _settings.copyWith(
+                              themeSettings: newThemeSettings,
+                            ),
+                          );
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
@@ -497,8 +517,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (value) async {
                           final newThemeSettings = _settings.themeSettings
                               .copyWith(shadowStrength: value);
-                          await _saveSettings(_settings.copyWith(
-                              themeSettings: newThemeSettings));
+                          await _saveSettings(
+                            _settings.copyWith(
+                              themeSettings: newThemeSettings,
+                            ),
+                          );
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
@@ -516,7 +539,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     final newThemeSettings = _settings.themeSettings
                         .copyWith(enableGradients: value);
                     await _saveSettings(
-                        _settings.copyWith(themeSettings: newThemeSettings));
+                      _settings.copyWith(themeSettings: newThemeSettings),
+                    );
                     await _themeService.saveSettings(newThemeSettings);
                   },
                 ),
@@ -578,7 +602,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.showTimeDisplayWidget,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(showTimeDisplayWidget: value));
+                      _settings.copyWith(showTimeDisplayWidget: value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -588,7 +613,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.showDateDisplayWidget,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(showDateDisplayWidget: value));
+                      _settings.copyWith(showDateDisplayWidget: value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -598,7 +624,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.showWeekDisplayWidget,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(showWeekDisplayWidget: value));
+                      _settings.copyWith(showWeekDisplayWidget: value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -640,7 +667,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.showCountdownWidget,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(showCountdownWidget: value));
+                      _settings.copyWith(showCountdownWidget: value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -650,7 +678,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.showCurrentClassWidget,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(showCurrentClassWidget: value));
+                      _settings.copyWith(showCurrentClassWidget: value),
+                    );
                   },
                 ),
               ],
@@ -677,7 +706,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.enableDesktopWidgets,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(enableDesktopWidgets: value));
+                      _settings.copyWith(enableDesktopWidgets: value),
+                    );
                   },
                 ),
               ],
@@ -742,17 +772,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
                           onPressed: _settings.weatherRefreshInterval > 5
-                              ? () => _saveSettings(_settings.copyWith(
-                                  weatherRefreshInterval:
-                                      _settings.weatherRefreshInterval - 5))
+                              ? () => _saveSettings(
+                                    _settings.copyWith(
+                                      weatherRefreshInterval:
+                                          _settings.weatherRefreshInterval - 5,
+                                    ),
+                                  )
                               : null,
                         ),
                         IconButton(
                           icon: const Icon(Icons.add_circle_outline),
                           onPressed: _settings.weatherRefreshInterval < 120
-                              ? () => _saveSettings(_settings.copyWith(
-                                  weatherRefreshInterval:
-                                      _settings.weatherRefreshInterval + 5))
+                              ? () => _saveSettings(
+                                    _settings.copyWith(
+                                      weatherRefreshInterval:
+                                          _settings.weatherRefreshInterval + 5,
+                                    ),
+                                  )
                               : null,
                         ),
                       ],
@@ -771,17 +807,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
                           onPressed: _settings.countdownRefreshInterval > 10
-                              ? () => _saveSettings(_settings.copyWith(
-                                  countdownRefreshInterval:
-                                      _settings.countdownRefreshInterval - 10))
+                              ? () => _saveSettings(
+                                    _settings.copyWith(
+                                      countdownRefreshInterval:
+                                          _settings.countdownRefreshInterval -
+                                              10,
+                                    ),
+                                  )
                               : null,
                         ),
                         IconButton(
                           icon: const Icon(Icons.add_circle_outline),
                           onPressed: _settings.countdownRefreshInterval < 300
-                              ? () => _saveSettings(_settings.copyWith(
-                                  countdownRefreshInterval:
-                                      _settings.countdownRefreshInterval + 10))
+                              ? () => _saveSettings(
+                                    _settings.copyWith(
+                                      countdownRefreshInterval:
+                                          _settings.countdownRefreshInterval +
+                                              10,
+                                    ),
+                                  )
                               : null,
                         ),
                       ],
@@ -839,18 +883,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             actions: [
                               TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('取消')),
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('取消'),
+                              ),
                               TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, controller.text),
-                                  child: const Text('确定')),
+                                onPressed: () =>
+                                    Navigator.pop(context, controller.text),
+                                child: const Text('确定'),
+                              ),
                             ],
                           ),
                         );
                         if (result != null && result.isNotEmpty) {
                           await _saveSettings(
-                              _settings.copyWith(ntpServer: result));
+                            _settings.copyWith(ntpServer: result),
+                          );
                           // Trigger sync manually to give immediate feedback
                           await NtpService().syncTime();
                           setState(() {});
@@ -870,17 +917,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           IconButton(
                             icon: const Icon(Icons.remove_circle_outline),
                             onPressed: _settings.ntpSyncInterval > 10
-                                ? () => _saveSettings(_settings.copyWith(
-                                    ntpSyncInterval:
-                                        _settings.ntpSyncInterval - 10))
+                                ? () => _saveSettings(
+                                      _settings.copyWith(
+                                        ntpSyncInterval:
+                                            _settings.ntpSyncInterval - 10,
+                                      ),
+                                    )
                                 : null,
                           ),
                           IconButton(
                             icon: const Icon(Icons.add_circle_outline),
                             onPressed: _settings.ntpSyncInterval < 1440
-                                ? () => _saveSettings(_settings.copyWith(
-                                    ntpSyncInterval:
-                                        _settings.ntpSyncInterval + 10))
+                                ? () => _saveSettings(
+                                      _settings.copyWith(
+                                        ntpSyncInterval:
+                                            _settings.ntpSyncInterval + 10,
+                                      ),
+                                    )
                                 : null,
                           ),
                         ],
@@ -925,7 +978,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.enableNotifications,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(enableNotifications: value));
+                      _settings.copyWith(enableNotifications: value),
+                    );
                   },
                 ),
                 if (_settings.enableNotifications) ...[
@@ -936,7 +990,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _settings.enableCourseReminder,
                     onChanged: (value) {
                       _saveSettings(
-                          _settings.copyWith(enableCourseReminder: value));
+                        _settings.copyWith(enableCourseReminder: value),
+                      );
                     },
                   ),
                   SwitchListTile(
@@ -946,7 +1001,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _settings.enableTtsForReminder,
                     onChanged: (value) {
                       _saveSettings(
-                          _settings.copyWith(enableTtsForReminder: value));
+                        _settings.copyWith(enableTtsForReminder: value),
+                      );
                     },
                   ),
                   SwitchListTile(
@@ -955,8 +1011,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('在课程开始时发送通知'),
                     value: _settings.showNotificationOnClassStart,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(
-                          showNotificationOnClassStart: value));
+                      _saveSettings(
+                        _settings.copyWith(
+                          showNotificationOnClassStart: value,
+                        ),
+                      );
                     },
                   ),
                   SwitchListTile(
@@ -965,8 +1024,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('在课程结束时发送通知'),
                     value: _settings.showNotificationOnClassEnd,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(
-                          showNotificationOnClassEnd: value));
+                      _saveSettings(
+                        _settings.copyWith(
+                          showNotificationOnClassEnd: value,
+                        ),
+                      );
                     },
                   ),
                   SwitchListTile(
@@ -975,8 +1037,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('在倒计时结束时发送通知'),
                     value: _settings.showNotificationForCountdown,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(
-                          showNotificationForCountdown: value));
+                      _saveSettings(
+                        _settings.copyWith(
+                          showNotificationForCountdown: value,
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -1008,7 +1073,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     } else {
                       await StartupService().disable();
                     }
-                    _saveSettings(_settings.copyWith(startWithWindows: value));
+                    await _saveSettings(_settings.copyWith(startWithWindows: value));
                   },
                 ),
                 SwitchListTile(
@@ -1053,7 +1118,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.enablePerformanceMonitoring,
                   onChanged: (value) {
                     _saveSettings(
-                        _settings.copyWith(enablePerformanceMonitoring: value));
+                      _settings.copyWith(enablePerformanceMonitoring: value),
+                    );
                   },
                 ),
                 ListTile(
@@ -1078,18 +1144,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           actions: [
                             TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('取消')),
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('取消'),
+                            ),
                             TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, controller.text),
-                                child: const Text('确定')),
+                              onPressed: () =>
+                                  Navigator.pop(context, controller.text),
+                              child: const Text('确定'),
+                            ),
                           ],
                         ),
                       );
                       if (result != null && result.isNotEmpty) {
                         await _saveSettings(
-                            _settings.copyWith(apiBaseUrl: result));
+                          _settings.copyWith(apiBaseUrl: result),
+                        );
                       }
                     },
                   ),

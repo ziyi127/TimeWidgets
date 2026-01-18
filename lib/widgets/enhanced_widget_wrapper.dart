@@ -111,8 +111,10 @@ class _EnhancedWidgetWrapperState extends State<EnhancedWidgetWrapper> {
         color: enableGradients
             ? null
             : (_isHovered && widget.isInteractive
-                ? Color.alphaBlend(colorScheme.primary.withValues(alpha: 0.08),
-                    effectiveBgColor)
+                ? Color.alphaBlend(
+                    colorScheme.primary.withValues(alpha: 0.08),
+                    effectiveBgColor,
+                  )
                 : effectiveBgColor),
         gradient: enableGradients
             ? LinearGradient(
@@ -122,9 +124,12 @@ class _EnhancedWidgetWrapperState extends State<EnhancedWidgetWrapper> {
                   _isHovered && widget.isInteractive
                       ? Color.alphaBlend(
                           colorScheme.primary.withValues(alpha: 0.15),
-                          effectiveBgColor)
-                      : Color.alphaBlend(Colors.white.withValues(alpha: 0.1),
-                          effectiveBgColor),
+                          effectiveBgColor,
+                        )
+                      : Color.alphaBlend(
+                          Colors.white.withValues(alpha: 0.1),
+                          effectiveBgColor,
+                        ),
                   effectiveBgColor,
                 ],
               )
@@ -135,19 +140,24 @@ class _EnhancedWidgetWrapperState extends State<EnhancedWidgetWrapper> {
               ? colorScheme.primary.withValues(alpha: 0.5)
               : colorScheme.outlineVariant.withValues(alpha: 0.5),
           width: ResponsiveUtils.value(
-              _isHovered && widget.isInteractive ? 1.5 : 1),
+            _isHovered && widget.isInteractive ? 1.5 : 1,
+          ),
         ),
         boxShadow: (widget.elevation > 0 || _isHovered) && widget.isInteractive
             ? [
                 BoxShadow(
                   color: colorScheme.shadow.withValues(
-                      alpha: (_isHovered ? 0.15 : 0.1) * shadowStrength),
+                    alpha: (_isHovered ? 0.15 : 0.1) * shadowStrength,
+                  ),
                   blurRadius: ResponsiveUtils.value(
-                      (widget.elevation + (_isHovered ? 4 : 0)) * 2),
+                    (widget.elevation + (_isHovered ? 4 : 0)) * 2,
+                  ),
                   offset: Offset(
-                      0,
-                      ResponsiveUtils.value(
-                          widget.elevation + (_isHovered ? 2 : 0))),
+                    0,
+                    ResponsiveUtils.value(
+                      widget.elevation + (_isHovered ? 2 : 0),
+                    ),
+                  ),
                 ),
               ]
             : null,

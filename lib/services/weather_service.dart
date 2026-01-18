@@ -9,8 +9,11 @@ class WeatherService {
   static const String _geocodingUrl = 'https://geocoding-api.open-meteo.com/v1';
 
   // Get weather by coordinates
-  Future<WeatherData?> getWeather(double lat, double lon,
-      {String? cityName}) async {
+  Future<WeatherData?> getWeather(
+    double lat,
+    double lon, {
+    String? cityName,
+  }) async {
     try {
       final url = Uri.parse(
         '$_baseUrl/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto',
@@ -35,7 +38,8 @@ class WeatherService {
   Future<List<Map<String, dynamic>>> searchCity(String query) async {
     try {
       final url = Uri.parse(
-          '$_geocodingUrl/search?name=$query&count=5&language=zh&format=json');
+        '$_geocodingUrl/search?name=$query&count=5&language=zh&format=json',
+      );
       final response = await http.get(url).timeout(
         const Duration(seconds: 5),
         onTimeout: () {

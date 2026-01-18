@@ -75,11 +75,8 @@ class PerformanceLogger {
     required Duration duration,
     required int statusCode,
     int? requestSize,
-    int? responseSize,
+    required int? responseSize,
   }) {
-    final level =
-        duration.inMilliseconds > 3000 ? LogLevel.warning : LogLevel.info;
-
     _logger.info(
       'Network request completed: $method $url (${duration.inMilliseconds}ms)',
       category: LogCategory.performance,
@@ -212,8 +209,6 @@ class PerformanceLogger {
     required int totalMemoryMB,
   }) {
     final usagePercent = (usedMemoryMB / totalMemoryMB * 100).toInt();
-
-    final level = usagePercent > 80 ? LogLevel.warning : LogLevel.info;
 
     _logger.info(
       'Memory usage: ${usedMemoryMB}MB / ${totalMemoryMB}MB ($usagePercent%)',

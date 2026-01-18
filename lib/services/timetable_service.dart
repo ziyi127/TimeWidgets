@@ -4,11 +4,14 @@ import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/services/api_service.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/timetable_storage_service.dart';
+import 'package:time_widgets/utils/error_handling/enhanced_error_handler.dart';
 import 'package:time_widgets/utils/logger.dart';
+import 'package:time_widgets/utils/time_utils.dart';
 
 class TimetableService {
   final ApiService _apiService = ApiService();
   final TimetableStorageService _storageService = TimetableStorageService();
+  final EnhancedErrorHandler _errorHandler = EnhancedErrorHandler();
 
   // Calculate week number (1-based) from a given date
   // Assuming week 1 starts from the first Monday of the year
@@ -123,40 +126,18 @@ class TimetableService {
           orElse: () => const CourseInfo(id: '', name: 'Unknown', teacher: ''),
         );
 
-        bool isCurrent = false;
-        try {
-          final ntpService = NtpService();
-          final now = ntpService.now;
-          final startParts = slot.startTime.split(':');
-          final endParts = slot.endTime.split(':');
-          if (startParts.length == 2 && endParts.length == 2) {
-            final start = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              int.parse(startParts[0]),
-              int.parse(startParts[1]),
-            );
-            final end = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              int.parse(endParts[0]),
-              int.parse(endParts[1]),
-            );
-            if (now.isAfter(start) && now.isBefore(end)) {
-              isCurrent = true;
-            }
-          }
-        } catch (e) {
-          // Ignore parsing errors
-        }
+        final ntpService = NtpService();
+        final now = ntpService.now;
+
+        // Use TimeUtils to check range
+        final timeRange = '${slot.startTime}~${slot.endTime}';
+        final isCurrent = TimeUtils.isCurrentTimeInRange(timeRange, now);
 
         courses.add(
           Course(
             subject: info.displayName,
             teacher: info.teacher,
-            time: '${slot.startTime}~${slot.endTime}',
+            time: timeRange,
             classroom: info.classroom,
             isCurrent: isCurrent,
           ),
@@ -165,17 +146,23 @@ class TimetableService {
 
       // 按开始时间排序
       courses.sort((a, b) {
-        final aStartTime = a.time.split('~')[0];
-        final bStartTime = b.time.split('~')[0];
-        return aStartTime.compareTo(bStartTime);
+        final aRange = TimeUtils.parseTimeRange(a.time, date);
+        final bRange = TimeUtils.parseTimeRange(b.time, date);
+        if (aRange == null || bRange == null) return 0;
+        return aRange.start.compareTo(bRange.start);
       });
 
       return Timetable(
         date: date,
         courses: courses,
       );
-    } catch (e) {
-      Logger.e('Failed to fetch timetable: $e');
+    } catch (e, stackTrace) {
+      _errorHandler.handleError(
+        e,
+        stackTrace: stackTrace,
+        context: {'operation': 'getTimetable', 'date': date.toIso8601String()},
+      );
+      // Fallback: return empty timetable but log the error properly
       return Timetable(date: date, courses: []);
     }
   }
@@ -187,31 +174,25 @@ class TimetableService {
       final now = ntpService.now;
       final timetable = await getTimetable(now);
 
-      // 简单判断当前时间是否在课程时间内
-      final currentTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
       for (final course in timetable.courses) {
-        final parts = course.time.split('~');
-        if (parts.length == 2) {
-          final start = parts[0];
-          final end = parts[1];
-          if (currentTime.compareTo(start) >= 0 &&
-              currentTime.compareTo(end) <= 0) {
-            return Course(
-              subject: course.subject,
-              teacher: course.teacher,
-              time: course.time,
-              classroom: course.classroom,
-              isCurrent: true,
-            );
-          }
+        if (TimeUtils.isCurrentTimeInRange(course.time, now)) {
+          return Course(
+            subject: course.subject,
+            teacher: course.teacher,
+            time: course.time,
+            classroom: course.classroom,
+            isCurrent: true,
+          );
         }
       }
 
       return null;
-    } catch (e) {
-      Logger.e('Failed to get current course: $e');
+    } catch (e, stackTrace) {
+      _errorHandler.handleError(
+        e,
+        stackTrace: stackTrace,
+        context: {'operation': 'getCurrentCourse'},
+      );
       return null;
     }
   }
@@ -223,48 +204,32 @@ class TimetableService {
       final now = ntpService.now;
       final timetable = await getTimetable(now);
 
-      final currentTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
       Course? currentCourse;
       Course? nextCourse;
 
       for (int i = 0; i < timetable.courses.length; i++) {
         final course = timetable.courses[i];
-        final parts = course.time.split('~');
-        if (parts.length == 2) {
-          final start = parts[0];
-          final end = parts[1];
 
-          // Check if current
-          if (currentTime.compareTo(start) >= 0 &&
-              currentTime.compareTo(end) <= 0) {
-            currentCourse = Course(
-              subject: course.subject,
-              teacher: course.teacher,
-              time: course.time,
-              classroom: course.classroom,
-              isCurrent: true,
-            );
+        if (TimeUtils.isCurrentTimeInRange(course.time, now)) {
+          currentCourse = Course(
+            subject: course.subject,
+            teacher: course.teacher,
+            time: course.time,
+            classroom: course.classroom,
+            isCurrent: true,
+          );
 
-            // If there is a next course in the list
-            if (i + 1 < timetable.courses.length) {
-              nextCourse = timetable.courses[i + 1];
-            }
-            break; // Found current, so next is set (if exists) and we are done
+          if (i + 1 < timetable.courses.length) {
+            nextCourse = timetable.courses[i + 1];
           }
+          break;
+        }
 
-          // Check if this course is in the future (potential next course if no current course found yet)
-          if (currentTime.compareTo(start) < 0) {
-            nextCourse ??= course;
-            // If we haven't found a current course yet, this is the next upcoming one.
-            // Since the list is sorted, we can stop if we just want the *immediate* next.
-            // But if we want to be sure we didn't miss a current one (overlapping?), we should continue?
-            // The list is sorted by start time.
-            // If we are strictly before this course, and we haven't found a "current" course,
-            // then this is the next course.
-            break;
-          }
+        // If not current, check if it's future
+        final range = TimeUtils.parseTimeRange(course.time, now);
+        if (range != null && now.isBefore(range.start)) {
+          nextCourse = course;
+          break;
         }
       }
 
@@ -272,8 +237,12 @@ class TimetableService {
         'current': currentCourse,
         'next': nextCourse,
       };
-    } catch (e) {
-      Logger.e('Failed to get current and next course: $e');
+    } catch (e, stackTrace) {
+      _errorHandler.handleError(
+        e,
+        stackTrace: stackTrace,
+        context: {'operation': 'getCurrentAndNextCourse'},
+      );
       return {'current': null, 'next': null};
     }
   }
@@ -282,8 +251,16 @@ class TimetableService {
   Future<WeatherData> getWeather() async {
     try {
       return await _apiService.getWeather();
-    } catch (e) {
-      Logger.e('Failed to fetch weather from API, using mock data: $e');
+    } catch (e, stackTrace) {
+      // Let the caller handle UI feedback, but log here if needed or fallback
+      _errorHandler.handleNetworkError(
+        e,
+        url: 'WeatherAPI', // Ideally ApiService exposes the URL
+        method: 'GET',
+        stackTrace: stackTrace,
+      );
+      // Fallback mock data
+      Logger.w('Using mock weather data due to error: $e');
       return WeatherData(
         cityName: 'Beijing',
         description: 'sunny',

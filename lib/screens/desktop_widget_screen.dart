@@ -310,8 +310,11 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.widgets_outlined,
-                        size: 48, color: Theme.of(context).colorScheme.primary),
+                    Icon(
+                      Icons.widgets_outlined,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       '桌面小组件已禁用',
@@ -374,7 +377,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                               if (currentLayout != null) {
                                 // 保存位置
                                 DesktopWidgetService.saveWidgetPositions(
-                                    currentLayout);
+                                  currentLayout,
+                                );
                                 Logger.i('Widget positions saved after drag');
                               }
                             },
@@ -388,7 +392,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                                     width: ResponsiveUtils.value(2),
                                   ),
                                   borderRadius: BorderRadius.circular(
-                                      ResponsiveUtils.value(16)),
+                                    ResponsiveUtils.value(16),
+                                  ),
                                   color: Theme.of(context)
                                       .colorScheme
                                       .surface

@@ -24,8 +24,8 @@ class LogManager {
   Future<void> _initializeLogDirectory() async {
     try {
       final dir = Directory(config.logDirectory);
-      if (!await dir.exists()) {
-        await dir.create(recursive: true);
+      if (!dir.existsSync()) {
+        dir.createSync(recursive: true);
       }
 
       // 清理过期日志
@@ -167,10 +167,11 @@ class LogManager {
 
     try {
       final dir = Directory(config.logDirectory);
-      if (!await dir.exists()) return results;
+      if (!dir.existsSync()) return results;
 
       final files = <File>[];
-      await for (final entity in dir.list()) {
+      final entities = dir.listSync();
+      for (final entity in entities) {
         if (entity is File && entity.path.endsWith('.log')) {
           files.add(entity);
         }

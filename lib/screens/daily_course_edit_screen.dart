@@ -78,7 +78,11 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
             Expanded(
               child: _selectedDay != null && _selectedWeekType != null
                   ? _buildTimetableGrid(
-                      service, courses, timeSlots, dailyCourses)
+                      service,
+                      courses,
+                      timeSlots,
+                      dailyCourses,
+                    )
                   : const Center(
                       child: Text('请选择星期和周类型'),
                     ),
@@ -168,8 +172,10 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      const Text('课程',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        '课程',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       const SizedBox(width: 40),
                       ...sortedTimeSlots.map(
                         (timeSlot) => Expanded(
@@ -191,8 +197,10 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      const Text('时间',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        '时间',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       const SizedBox(width: 40),
                       ...sortedTimeSlots.map(
                         (timeSlot) => Expanded(

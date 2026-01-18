@@ -44,8 +44,12 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
     );
   }
 
-  Widget _buildLayoutList(BuildContext context, List<TimeLayout> layouts,
-      List<TimeSlot> timeSlots, TimetableEditService service) {
+  Widget _buildLayoutList(
+    BuildContext context,
+    List<TimeLayout> layouts,
+    List<TimeSlot> timeSlots,
+    TimetableEditService service,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -124,8 +128,11 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
     );
   }
 
-  Widget _buildTimelineEditor(BuildContext context,
-      TimetableEditService service, List<TimeSlot> defaultTimeSlots) {
+  Widget _buildTimelineEditor(
+    BuildContext context,
+    TimetableEditService service,
+    List<TimeSlot> defaultTimeSlots,
+  ) {
     // Get the time slots to display
     List<TimeSlot> timeSlots;
     String title;
@@ -190,7 +197,9 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Widget _buildEmptyTimelineState(
-      BuildContext context, TimetableEditService service) {
+    BuildContext context,
+    TimetableEditService service,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -226,7 +235,9 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Future<void> _showAddLayoutDialog(
-      BuildContext context, TimetableEditService service) async {
+    BuildContext context,
+    TimetableEditService service,
+  ) async {
     final result = await MD3DialogStyles.showInputDialog(
       context: context,
       title: '添加时间表',
@@ -247,8 +258,11 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
     }
   }
 
-  Future<void> _deleteLayout(BuildContext context, TimetableEditService service,
-      TimeLayout layout) async {
+  Future<void> _deleteLayout(
+    BuildContext context,
+    TimetableEditService service,
+    TimeLayout layout,
+  ) async {
     final confirmed = await MD3DialogStyles.showDeleteConfirmDialog(
       context: context,
       itemName: layout.name,
@@ -265,7 +279,9 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Future<void> _showAddTimeSlotDialog(
-      BuildContext context, TimetableEditService service) async {
+    BuildContext context,
+    TimetableEditService service,
+  ) async {
     final nameController = TextEditingController();
     TimeOfDay startTime = const TimeOfDay(hour: 8, minute: 0);
     TimeOfDay endTime = const TimeOfDay(hour: 8, minute: 45);
@@ -331,11 +347,17 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                 },
                 items: const [
                   DropdownMenuItem(
-                      value: TimePointType.classTime, child: Text('上课')),
+                    value: TimePointType.classTime,
+                    child: Text('上课'),
+                  ),
                   DropdownMenuItem(
-                      value: TimePointType.breakTime, child: Text('课间休息')),
+                    value: TimePointType.breakTime,
+                    child: Text('课间休息'),
+                  ),
                   DropdownMenuItem(
-                      value: TimePointType.divider, child: Text('分割线')),
+                    value: TimePointType.divider,
+                    child: Text('分割线'),
+                  ),
                 ],
               ),
             ],
@@ -371,12 +393,17 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Future<void> _showEditTimeSlotDialog(
-      BuildContext context, TimetableEditService service, TimeSlot slot) async {
+    BuildContext context,
+    TimetableEditService service,
+    TimeSlot slot,
+  ) async {
     final nameController = TextEditingController(text: slot.name);
     final startParts = slot.startTime.split(':');
     final endParts = slot.endTime.split(':');
     TimeOfDay startTime = TimeOfDay(
-        hour: int.parse(startParts[0]), minute: int.parse(startParts[1]));
+      hour: int.parse(startParts[0]),
+      minute: int.parse(startParts[1]),
+    );
     TimeOfDay endTime =
         TimeOfDay(hour: int.parse(endParts[0]), minute: int.parse(endParts[1]));
     TimePointType type = slot.type;
@@ -440,11 +467,17 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
                 },
                 items: const [
                   DropdownMenuItem(
-                      value: TimePointType.classTime, child: Text('上课')),
+                    value: TimePointType.classTime,
+                    child: Text('上课'),
+                  ),
                   DropdownMenuItem(
-                      value: TimePointType.breakTime, child: Text('课间休息')),
+                    value: TimePointType.breakTime,
+                    child: Text('课间休息'),
+                  ),
                   DropdownMenuItem(
-                      value: TimePointType.divider, child: Text('分割线')),
+                    value: TimePointType.divider,
+                    child: Text('分割线'),
+                  ),
                 ],
               ),
             ],
@@ -479,7 +512,10 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
   }
 
   Future<void> _deleteTimeSlot(
-      BuildContext context, TimetableEditService service, TimeSlot slot) async {
+    BuildContext context,
+    TimetableEditService service,
+    TimeSlot slot,
+  ) async {
     final confirmed = await MD3DialogStyles.showDeleteConfirmDialog(
       context: context,
       itemName: slot.name,
@@ -518,7 +554,7 @@ class _TimeSlotCard extends StatelessWidget {
         icon = Icons.coffee;
         break;
       case TimePointType.divider:
-        backgroundColor = colorScheme.outlineVariant.withOpacity(0.3);
+        backgroundColor = colorScheme.outlineVariant.withValues(alpha: 0.3);
         icon = Icons.remove;
         break;
     }

@@ -16,7 +16,9 @@ class ClassIslandImportResult {
   });
 
   factory ClassIslandImportResult.success(
-      TimetableData data, ClassIslandImportStats stats) {
+    TimetableData data,
+    ClassIslandImportStats stats,
+  ) {
     return ClassIslandImportResult(success: true, data: data, stats: stats);
   }
 
@@ -89,7 +91,8 @@ class ClassislandImportService {
 
   /// 将Classisland数据转换为课表数据
   static ClassIslandImportResult _convertClassislandToTimetable(
-      Map<String, dynamic> data) {
+    Map<String, dynamic> data,
+  ) {
     final courses = <CourseInfo>[];
     final timeSlots = <TimeSlot>[];
     final dailyCourses = <DailyCourse>[];
@@ -123,8 +126,11 @@ class ClassislandImportService {
             name: subjectMap['Name'] as String? ?? '未知课程',
             abbreviation: initialName,
             teacher: subjectMap['TeacherName'] as String? ?? '',
-            color: ColorUtils.toHexString(ColorUtils.generateColorFromName(
-                subjectMap['Name'] as String? ?? '')),
+            color: ColorUtils.toHexString(
+              ColorUtils.generateColorFromName(
+                subjectMap['Name'] as String? ?? '',
+              ),
+            ),
             isOutdoor: isOutdoor,
           ),
         );

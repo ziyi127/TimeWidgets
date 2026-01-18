@@ -321,7 +321,8 @@ class Schedule {
       name: json['name'] as String,
       timeLayoutId: json['timeLayoutId'] as String?,
       triggerRule: ScheduleTriggerRule.fromJson(
-          json['triggerRule'] as Map<String, dynamic>),
+        json['triggerRule'] as Map<String, dynamic>,
+      ),
       courses: (json['courses'] as List?)
               ?.map((c) => DailyCourse.fromJson(c as Map<String, dynamic>))
               .toList() ??

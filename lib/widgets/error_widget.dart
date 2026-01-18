@@ -225,7 +225,8 @@ class ErrorToast extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
         borderRadius: BorderRadius.circular(
-            ResponsiveUtils.getBorderRadius(width, baseRadius: 12)),
+          ResponsiveUtils.getBorderRadius(width, baseRadius: 12),
+        ),
         border: Border.all(
           color: colorScheme.error.withAlpha(128),
           width: ResponsiveUtils.value(1),
@@ -305,14 +306,19 @@ class ErrorDetailsDialog extends StatelessWidget {
     return AlertDialog(
       title: Row(
         children: [
-          Icon(Icons.error_outline,
-              color: colorScheme.error,
-              size: ResponsiveUtils.getIconSize(width)),
+          Icon(
+            Icons.error_outline,
+            color: colorScheme.error,
+            size: ResponsiveUtils.getIconSize(width),
+          ),
           SizedBox(width: ResponsiveUtils.value(12)),
-          Text(title ?? '错误详情',
-              style: TextStyle(
-                  fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) *
-                      fontMultiplier)),
+          Text(
+            title ?? '错误详情',
+            style: TextStyle(
+              fontSize:
+                  (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
+            ),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -320,8 +326,10 @@ class ErrorDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (description != null) ...[
-              Text(description!,
-                  style: TextStyle(fontSize: 16 * fontMultiplier)),
+              Text(
+                description!,
+                style: TextStyle(fontSize: 16 * fontMultiplier),
+              ),
               SizedBox(height: ResponsiveUtils.value(16)),
             ],
             if (error != null) ...[
@@ -334,8 +342,10 @@ class ErrorDetailsDialog extends StatelessWidget {
                 ),
               ),
               SizedBox(height: ResponsiveUtils.value(4)),
-              Text(error!.message,
-                  style: TextStyle(fontSize: 14 * fontMultiplier)),
+              Text(
+                error!.message,
+                style: TextStyle(fontSize: 14 * fontMultiplier),
+              ),
               SizedBox(height: ResponsiveUtils.value(16)),
               if (error!.userMessage != null &&
                   error!.userMessage != error!.message) ...[
@@ -348,8 +358,10 @@ class ErrorDetailsDialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: ResponsiveUtils.value(4)),
-                Text(error!.userMessage!,
-                    style: TextStyle(fontSize: 14 * fontMultiplier)),
+                Text(
+                  error!.userMessage!,
+                  style: TextStyle(fontSize: 14 * fontMultiplier),
+                ),
                 SizedBox(height: ResponsiveUtils.value(16)),
               ],
               if (error!.resolution != null) ...[
@@ -362,8 +374,10 @@ class ErrorDetailsDialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: ResponsiveUtils.value(4)),
-                Text(error!.resolution!,
-                    style: TextStyle(fontSize: 14 * fontMultiplier)),
+                Text(
+                  error!.resolution!,
+                  style: TextStyle(fontSize: 14 * fontMultiplier),
+                ),
                 SizedBox(height: ResponsiveUtils.value(16)),
               ],
               if (error!.code.isNotEmpty) ...[
@@ -376,8 +390,10 @@ class ErrorDetailsDialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: ResponsiveUtils.value(4)),
-                Text(error!.code,
-                    style: TextStyle(fontSize: 14 * fontMultiplier)),
+                Text(
+                  error!.code,
+                  style: TextStyle(fontSize: 14 * fontMultiplier),
+                ),
                 SizedBox(height: ResponsiveUtils.value(16)),
               ],
             ],
@@ -390,8 +406,10 @@ class ErrorDetailsDialog extends StatelessWidget {
               ),
             ),
             SizedBox(height: ResponsiveUtils.value(4)),
-            Text(error?.code ?? '未知',
-                style: TextStyle(fontSize: 14 * fontMultiplier)),
+            Text(
+              error?.code ?? '未知',
+              style: TextStyle(fontSize: 14 * fontMultiplier),
+            ),
           ],
         ),
       ),

@@ -21,7 +21,6 @@ import 'package:time_widgets/services/startup_service.dart';
 import 'package:time_widgets/services/temp_schedule_change_service.dart';
 import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/services/timetable_storage_service.dart';
-import 'package:time_widgets/utils/aggressive_optimizer.dart';
 import 'package:time_widgets/utils/logger.dart';
 import 'package:time_widgets/utils/memory_optimizer.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
@@ -70,11 +69,15 @@ void main(List<String> args) async {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Error: $e',
-                          style: const TextStyle(color: Colors.red)),
+                      Text(
+                        'Error: $e',
+                        style: const TextStyle(color: Colors.red),
+                      ),
                       const SizedBox(height: 16),
-                      Text('Args: $args',
-                          style: const TextStyle(color: Colors.black87)),
+                      Text(
+                        'Args: $args',
+                        style: const TextStyle(color: Colors.black87),
+                      ),
                     ],
                   ),
                 ),
@@ -87,12 +90,6 @@ void main(List<String> args) async {
   } else {
     // 禁用调试信息以减少内存和CPU
     debugPrint = (message, {wrapWidth}) {};
-
-    // 设置极限内存限制
-    AggressiveOptimizer.setExtremeLimits();
-
-    // 启动激进优化
-    AggressiveOptimizer.startAggressiveOptimization();
 
     runApp(const TimeWidgetsApp());
   }
@@ -229,7 +226,8 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
 
       if (!success) {
         Logger.w(
-            'Enhanced window initialization failed, falling back to default');
+          'Enhanced window initialization failed, falling back to default',
+        );
       }
 
       setState(() {
@@ -306,12 +304,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     }
 
     // 使用全屏对话框而不是创建新窗口，避免影响桌面小组件位置
-    unawaited(showDialog<void>(
-      context: context,
-      builder: (dialogContext) => const Dialog.fullscreen(
-        child: SettingsScreen(),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => const Dialog.fullscreen(
+          child: SettingsScreen(),
+        ),
       ),
-    ));
+    );
   }
 
   /// 导航到课表编辑页面
@@ -352,52 +352,54 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     }
 
     // 显示临时调课选项对话框
-    unawaited(showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('临时调课'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.today_outlined),
-              title: const Text('按天调课'),
-              subtitle: const Text('调整某一天的课程安排'),
-              onTap: () {
-                Navigator.pop(dialogContext);
-                _showDayScheduleChange();
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.schedule_outlined),
-              title: const Text('按节调课'),
-              subtitle: const Text('调整某一节课的内容'),
-              onTap: () {
-                Navigator.pop(dialogContext);
-                _showPeriodScheduleChange();
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.manage_history_outlined),
-              title: const Text('管理临时调课'),
-              subtitle: const Text('查看和删除已设置的调课'),
-              onTap: () {
-                Navigator.pop(dialogContext);
-                _navigateToTempScheduleManage();
-              },
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('临时调课'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.today_outlined),
+                title: const Text('按天调课'),
+                subtitle: const Text('调整某一天的课程安排'),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _showDayScheduleChange();
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.schedule_outlined),
+                title: const Text('按节调课'),
+                subtitle: const Text('调整某一节课的内容'),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _showPeriodScheduleChange();
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.manage_history_outlined),
+                title: const Text('管理临时调课'),
+                subtitle: const Text('查看和删除已设置的调课'),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _navigateToTempScheduleManage();
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('取消'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('取消'),
-          ),
-        ],
       ),
-    ));
+    );
   }
 
   /// 导航到临时调课管理页面
@@ -408,12 +410,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     }
 
     // 使用全屏对话框而不是创建新窗口，避免影响桌面小组件位置
-    unawaited(showDialog<void>(
-      context: context,
-      builder: (dialogContext) => const Dialog.fullscreen(
-        child: TempScheduleManageScreen(),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => const Dialog.fullscreen(
+          child: TempScheduleManageScreen(),
+        ),
       ),
-    ));
+    );
   }
 
   /// 按天调课
@@ -446,88 +450,90 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       return;
     }
 
-    unawaited(showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('按天调课'),
-          content: SizedBox(
-            width: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('选择要调整的日期：'),
-                const SizedBox(height: 8),
-                ListTile(
-                  leading: const Icon(Icons.calendar_today),
-                  title: Text(
-                    '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
-                  ),
-                  trailing: const Icon(Icons.arrow_drop_down),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: dialogContext,
-                      initialDate: selectedDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                    );
-                    if (date != null) {
-                      setState(() {
-                        selectedDate = date;
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                const Text('选择要使用的课表：'),
-                const SizedBox(height: 8),
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: timetableData.schedules.map((schedule) {
-                        return RadioListTile<String>(
-                          title: Text(schedule.name),
-                          subtitle: Text(_getScheduleDescription(schedule)),
-                          value: schedule.id,
-                          groupValue: selectedScheduleId,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedScheduleId = value;
-                            });
-                          },
-                        );
-                      }).toList(),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('按天调课'),
+            content: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('选择要调整的日期：'),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: Text(
+                      '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('取消'),
-            ),
-            FilledButton(
-              onPressed: selectedScheduleId == null
-                  ? null
-                  : () async {
-                      await _saveDayScheduleChange(
-                        selectedDate,
-                        selectedScheduleId!,
+                    trailing: const Icon(Icons.arrow_drop_down),
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: dialogContext,
+                        initialDate: selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
-                      if (dialogContext.mounted) {
-                        Navigator.pop(dialogContext);
+                      if (date != null) {
+                        setState(() {
+                          selectedDate = date;
+                        });
                       }
                     },
-              child: const Text('确定'),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('选择要使用的课表：'),
+                  const SizedBox(height: 8),
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 300),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: timetableData.schedules.map((schedule) {
+                          return RadioListTile<String>(
+                            title: Text(schedule.name),
+                            subtitle: Text(_getScheduleDescription(schedule)),
+                            value: schedule.id,
+                            groupValue: selectedScheduleId,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedScheduleId = value;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('取消'),
+              ),
+              FilledButton(
+                onPressed: selectedScheduleId == null
+                    ? null
+                    : () async {
+                        await _saveDayScheduleChange(
+                          selectedDate,
+                          selectedScheduleId!,
+                        );
+                        if (dialogContext.mounted) {
+                          Navigator.pop(dialogContext);
+                        }
+                      },
+                child: const Text('确定'),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   /// 获取课表描述
@@ -637,115 +643,119 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       return;
     }
 
-    unawaited(showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('按节调课'),
-          content: SizedBox(
-            width: 400,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('选择日期：'),
-                  const SizedBox(height: 8),
-                  ListTile(
-                    leading: const Icon(Icons.calendar_today),
-                    title: Text(
-                      '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('按节调课'),
+            content: SizedBox(
+              width: 400,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('选择日期：'),
+                    const SizedBox(height: 8),
+                    ListTile(
+                      leading: const Icon(Icons.calendar_today),
+                      title: Text(
+                        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
+                      ),
+                      trailing: const Icon(Icons.arrow_drop_down),
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: dialogContext,
+                          initialDate: selectedDate,
+                          firstDate: DateTime.now(),
+                          lastDate:
+                              DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (date != null) {
+                          setState(() {
+                            selectedDate = date;
+                          });
+                        }
+                      },
                     ),
-                    trailing: const Icon(Icons.arrow_drop_down),
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: dialogContext,
-                        initialDate: selectedDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                      );
-                      if (date != null) {
-                        setState(() {
-                          selectedDate = date;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('选择节次：'),
-                  const SizedBox(height: 8),
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 200),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: timeSlots.map((slot) {
-                          return RadioListTile<String>(
-                            title: Text(slot.name),
-                            subtitle:
-                                Text('${slot.startTime} - ${slot.endTime}'),
-                            value: slot.id,
-                            groupValue: selectedTimeSlotId,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedTimeSlotId = value;
-                              });
-                            },
-                          );
-                        }).toList(),
+                    const SizedBox(height: 16),
+                    const Text('选择节次：'),
+                    const SizedBox(height: 8),
+                    Container(
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: timeSlots.map((slot) {
+                            return RadioListTile<String>(
+                              title: Text(slot.name),
+                              subtitle:
+                                  Text('${slot.startTime} - ${slot.endTime}'),
+                              value: slot.id,
+                              groupValue: selectedTimeSlotId,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedTimeSlotId = value;
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('选择新课程：'),
-                  const SizedBox(height: 8),
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 200),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: timetableData.courses.map((course) {
-                          return RadioListTile<String>(
-                            title: Text(course.name),
-                            subtitle: Text(course.teacher),
-                            value: course.id,
-                            groupValue: selectedCourseId,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedCourseId = value;
-                              });
-                            },
-                          );
-                        }).toList(),
+                    const SizedBox(height: 16),
+                    const Text('选择新课程：'),
+                    const SizedBox(height: 8),
+                    Container(
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: timetableData.courses.map((course) {
+                            return RadioListTile<String>(
+                              title: Text(course.name),
+                              subtitle: Text(course.teacher),
+                              value: course.id,
+                              groupValue: selectedCourseId,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedCourseId = value;
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('取消'),
+              ),
+              FilledButton(
+                onPressed:
+                    selectedTimeSlotId == null || selectedCourseId == null
+                        ? null
+                        : () async {
+                            await _savePeriodScheduleChange(
+                              selectedDate,
+                              selectedTimeSlotId!,
+                              selectedCourseId!,
+                            );
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
+                          },
+                child: const Text('确定'),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('取消'),
-            ),
-            FilledButton(
-              onPressed: selectedTimeSlotId == null || selectedCourseId == null
-                  ? null
-                  : () async {
-                      await _savePeriodScheduleChange(
-                        selectedDate,
-                        selectedTimeSlotId!,
-                        selectedCourseId!,
-                      );
-                      if (dialogContext.mounted) {
-                        Navigator.pop(dialogContext);
-                      }
-                    },
-              child: const Text('确定'),
-            ),
-          ],
         ),
       ),
-    ));
+    );
   }
 
   /// 保存按节调课记录
@@ -862,9 +872,20 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   }
 
   /// 退出应用程序
-  void _exitApplication() {
-    MD3TrayMenuService.instance.destroy();
+  Future<void> _exitApplication() async {
+    await MD3TrayMenuService.instance.destroy();
+    
+    try {
+      // 允许窗口关闭
+      await windowManager.setPreventClose(false);
+    } catch (e) {
+      Logger.e('Error setting prevent close to false: $e');
+    }
+
     appWindow.close();
+    
+    // 强制退出进程，确保所有后台任务（如Timer）都被终止
+    exit(0);
   }
 
   @override
@@ -907,7 +928,6 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
 
     MemoryOptimizer.stopAggressiveGC();
     MemoryOptimizer.clearImageCache();
-    AggressiveOptimizer.stopAggressiveOptimization();
     super.dispose();
   }
 

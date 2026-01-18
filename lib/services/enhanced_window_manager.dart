@@ -17,8 +17,9 @@ class EnhancedWindowManager {
   static Timer? _screenMonitorTimer;
 
   /// 初始化窗口
-  static Future<bool> initializeWindow(
-      {VoidCallback? onScreenSizeChanged}) async {
+  static Future<bool> initializeWindow({
+    VoidCallback? onScreenSizeChanged,
+  }) async {
     if (_isInitialized) return true;
 
     _onScreenSizeChanged = onScreenSizeChanged;
@@ -53,7 +54,8 @@ class EnhancedWindowManager {
 
       _isInitialized = true;
       Logger.i(
-          'Window initialized successfully: ${windowBounds.size} at ${windowBounds.topLeft}');
+        'Window initialized successfully: ${windowBounds.size} at ${windowBounds.topLeft}',
+      );
       return true;
     } catch (e) {
       Logger.e('Window initialization failed: $e');
@@ -111,7 +113,8 @@ class EnhancedWindowManager {
       appWindow.title = title;
 
       Logger.i(
-          'Created edit window: $title, size: ${bounds.size} at ${bounds.topLeft}');
+        'Created edit window: $title, size: ${bounds.size} at ${bounds.topLeft}',
+      );
     } catch (e) {
       Logger.e('Error creating edit window: $e');
       rethrow;
@@ -285,7 +288,8 @@ class EnhancedWindowManager {
       _isInitialized = true;
 
       Logger.i(
-          'Window initialized with default size: $defaultSize at $defaultPosition');
+        'Window initialized with default size: $defaultSize at $defaultPosition',
+      );
       return true;
     } catch (e) {
       Logger.e('Failed to initialize with default size: $e');

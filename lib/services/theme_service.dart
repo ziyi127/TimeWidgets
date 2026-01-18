@@ -242,17 +242,23 @@ class ThemeService {
   TextTheme _scaleTextTheme(TextTheme textTheme, double scale) {
     return textTheme.copyWith(
       displayLarge: textTheme.displayLarge?.copyWith(
-          fontSize: (textTheme.displayLarge?.fontSize ?? 57) * scale),
+        fontSize: (textTheme.displayLarge?.fontSize ?? 57) * scale,
+      ),
       displayMedium: textTheme.displayMedium?.copyWith(
-          fontSize: (textTheme.displayMedium?.fontSize ?? 45) * scale),
+        fontSize: (textTheme.displayMedium?.fontSize ?? 45) * scale,
+      ),
       displaySmall: textTheme.displaySmall?.copyWith(
-          fontSize: (textTheme.displaySmall?.fontSize ?? 36) * scale),
+        fontSize: (textTheme.displaySmall?.fontSize ?? 36) * scale,
+      ),
       headlineLarge: textTheme.headlineLarge?.copyWith(
-          fontSize: (textTheme.headlineLarge?.fontSize ?? 32) * scale),
+        fontSize: (textTheme.headlineLarge?.fontSize ?? 32) * scale,
+      ),
       headlineMedium: textTheme.headlineMedium?.copyWith(
-          fontSize: (textTheme.headlineMedium?.fontSize ?? 28) * scale),
+        fontSize: (textTheme.headlineMedium?.fontSize ?? 28) * scale,
+      ),
       headlineSmall: textTheme.headlineSmall?.copyWith(
-          fontSize: (textTheme.headlineSmall?.fontSize ?? 24) * scale),
+        fontSize: (textTheme.headlineSmall?.fontSize ?? 24) * scale,
+      ),
       titleLarge: textTheme.titleLarge
           ?.copyWith(fontSize: (textTheme.titleLarge?.fontSize ?? 22) * scale),
       titleMedium: textTheme.titleMedium

@@ -155,8 +155,10 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
                   '• 切换开关控制小组件的显示隐藏\n'
                   '• 在桌面小组件界面点击"编辑布局"可拖拽调整位置\n'
                   '• 点击"重置位置"恢复默认布局',
-                  style: MD3TypographyStyles.bodyMedium(context,
-                      color: colorScheme.onSurfaceVariant),
+                  style: MD3TypographyStyles.bodyMedium(
+                    context,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -233,8 +235,10 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
                 Text(
                   '位置: (${position.x.toInt()}, ${position.y.toInt()}) • '
                   '尺寸: ${position.width.toInt()}×${position.height.toInt()}',
-                  style: MD3TypographyStyles.bodySmall(context,
-                      color: colorScheme.onSurfaceVariant),
+                  style: MD3TypographyStyles.bodySmall(
+                    context,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),

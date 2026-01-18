@@ -40,8 +40,11 @@ class ApiService {
       }
 
       // Fallback to Beijing if no settings
-      final defaultWeather = await _weatherService.getWeather(39.9042, 116.4074,
-          cityName: 'Beijing');
+      final defaultWeather = await _weatherService.getWeather(
+        39.9042,
+        116.4074,
+        cityName: 'Beijing',
+      );
       if (defaultWeather != null) return defaultWeather;
 
       throw Exception('Failed to fetch weather');

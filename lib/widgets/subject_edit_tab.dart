@@ -45,8 +45,11 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
     );
   }
 
-  Widget _buildSubjectList(BuildContext context, List<CourseInfo> subjects,
-      TimetableEditService service) {
+  Widget _buildSubjectList(
+    BuildContext context,
+    List<CourseInfo> subjects,
+    TimetableEditService service,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -200,7 +203,9 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
   }
 
   Future<void> _showAddSubjectDialog(
-      BuildContext context, TimetableEditService service) async {
+    BuildContext context,
+    TimetableEditService service,
+  ) async {
     final nameController = TextEditingController();
     final abbreviationController = TextEditingController();
     final teacherController = TextEditingController();

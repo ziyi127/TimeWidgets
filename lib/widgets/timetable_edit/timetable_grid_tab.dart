@@ -63,21 +63,28 @@ class TimetableGridTab extends StatelessWidget {
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                                color: theme.colorScheme.outlineVariant),
+                              color: theme.colorScheme.outlineVariant,
+                            ),
                             right: BorderSide(
-                                color: theme.colorScheme.outlineVariant),
+                              color: theme.colorScheme.outlineVariant,
+                            ),
                           ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(slot.name,
-                                style:
-                                    MD3TypographyStyles.labelMedium(context)),
-                            Text(slot.startTime,
-                                style: MD3TypographyStyles.labelSmall(context)),
-                            Text(slot.endTime,
-                                style: MD3TypographyStyles.labelSmall(context)),
+                            Text(
+                              slot.name,
+                              style: MD3TypographyStyles.labelMedium(context),
+                            ),
+                            Text(
+                              slot.startTime,
+                              style: MD3TypographyStyles.labelSmall(context),
+                            ),
+                            Text(
+                              slot.endTime,
+                              style: MD3TypographyStyles.labelSmall(context),
+                            ),
                           ],
                         ),
                       );
@@ -254,7 +261,8 @@ class TimetableGridTab extends StatelessWidget {
                       style: MD3TypographyStyles.bodySmall(context).copyWith(
                         fontWeight: FontWeight.bold,
                         color: Color(
-                            int.parse(course.color.replaceFirst('#', '0xFF'))),
+                          int.parse(course.color.replaceFirst('#', '0xFF')),
+                        ),
                         fontSize: isSplit ? 10 : null,
                       ),
                       maxLines: 2,
@@ -287,7 +295,9 @@ class TimetableGridTab extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
-                        fontSize: 8, color: theme.colorScheme.onSurfaceVariant),
+                      fontSize: 8,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),
@@ -360,8 +370,11 @@ class TimetableGridTab extends StatelessWidget {
 
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Color(int.parse(
-                                course.color.replaceFirst('#', '0xFF'))),
+                            backgroundColor: Color(
+                              int.parse(
+                                course.color.replaceFirst('#', '0xFF'),
+                              ),
+                            ),
                             radius: 12,
                           ),
                           title: Text(course.name),

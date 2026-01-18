@@ -15,6 +15,9 @@ class TimeDisplayWidget extends StatefulWidget {
 }
 
 class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
+  static final DateFormat _timeFormat = DateFormat('HH:mm');
+  static final DateFormat _secondsFormat = DateFormat('ss');
+
   String _currentTime = '';
   String _currentSeconds = '';
   late Timer _timer;
@@ -38,8 +41,8 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
     if (!mounted) return;
 
     final now = DateTime.now();
-    final newTime = DateFormat('HH:mm').format(now);
-    final newSeconds = DateFormat('ss').format(now);
+    final newTime = _timeFormat.format(now);
+    final newSeconds = _secondsFormat.format(now);
 
     // 只有当时间真正改变时才调用 setState
     if (_currentTime != newTime || _currentSeconds != newSeconds) {

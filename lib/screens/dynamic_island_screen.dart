@@ -216,8 +216,11 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
     );
   }
 
-  Widget _buildCourseRow(String title, String rightInfo,
-      {required bool isCurrent}) {
+  Widget _buildCourseRow(
+    String title,
+    String rightInfo, {
+    required bool isCurrent,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

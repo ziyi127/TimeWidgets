@@ -163,7 +163,8 @@ class TimetableExportService {
           !slot.containsKey('startTime') ||
           !slot.containsKey('endTime')) {
         return ValidationResult.invalid(
-            'timeSlots[$i] 缺少必需字段 (id, startTime, endTime)');
+          'timeSlots[$i] 缺少必需字段 (id, startTime, endTime)',
+        );
       }
     }
 

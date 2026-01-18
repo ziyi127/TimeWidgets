@@ -126,8 +126,12 @@ class WeatherWidget extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    _buildMiniDetail(context, Icons.water_drop_outlined,
-                        '$humidity%', width),
+                    _buildMiniDetail(
+                      context,
+                      Icons.water_drop_outlined,
+                      '$humidity%',
+                      width,
+                    ),
                     SizedBox(height: ResponsiveUtils.value(4)),
                     _buildMiniDetail(context, Icons.air_rounded, wind, width),
                   ],
@@ -141,7 +145,11 @@ class WeatherWidget extends StatelessWidget {
   }
 
   Widget _buildMiniDetail(
-      BuildContext context, IconData icon, String value, double width) {
+    BuildContext context,
+    IconData icon,
+    String value,
+    double width,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
@@ -167,8 +175,12 @@ class WeatherWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingCard(BuildContext context, ThemeData theme,
-      ColorScheme colorScheme, double width) {
+  Widget _buildLoadingCard(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+    double width,
+  ) {
     return Card(
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
@@ -204,7 +216,10 @@ class WeatherWidget extends StatelessWidget {
   }
 
   Widget _buildErrorCard(
-      BuildContext context, ColorScheme colorScheme, double width) {
+    BuildContext context,
+    ColorScheme colorScheme,
+    double width,
+  ) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     return Card(

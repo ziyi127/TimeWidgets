@@ -197,7 +197,7 @@ class PerformanceOptimizationService {
     _apiCallCounts[endpoint] = (_apiCallCounts[endpoint] ?? 0) + 1;
     return {
       'startTime': DateTime.now().millisecondsSinceEpoch,
-      'endpoint': endpoint
+      'endpoint': endpoint,
     };
   }
 
@@ -282,7 +282,8 @@ class PerformanceOptimizationService {
         final endpoint = entry.key;
         final endpointStats = entry.value as Map;
         Logger.i(
-            '$endpoint: ${endpointStats['count']} calls, ${endpointStats['avg_duration']}ms avg, ${endpointStats['max_duration']}ms max');
+          '$endpoint: ${endpointStats['count']} calls, ${endpointStats['avg_duration']}ms avg, ${endpointStats['max_duration']}ms max',
+        );
       }
     }
     Logger.i('=========================');

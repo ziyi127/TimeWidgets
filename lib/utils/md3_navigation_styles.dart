@@ -508,7 +508,8 @@ class MD3NavigationBuilder {
   }
 
   MD3NavigationBuilder onDestinationSelected(
-      ValueChanged<int> onDestinationSelected) {
+    ValueChanged<int> onDestinationSelected,
+  ) {
     _onDestinationSelected = onDestinationSelected;
     return this;
   }
@@ -570,7 +571,8 @@ class MD3NavigationBuilder {
         );
       default:
         throw UnimplementedError(
-            'Navigation variant not implemented: $variant');
+          'Navigation variant not implemented: $variant',
+        );
     }
   }
 }

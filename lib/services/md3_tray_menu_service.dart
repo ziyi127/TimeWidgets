@@ -151,8 +151,8 @@ class MD3TrayMenuService {
   }
 
   /// 销毁托盘
-  void destroy() {
-    _systemTray?.destroy();
+  Future<void> destroy() async {
+    await _systemTray?.destroy();
     _systemTray = null;
     _isInitialized = false;
   }
@@ -340,7 +340,9 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
                             ),
 
                             Divider(
-                                height: 1, color: colorScheme.outlineVariant),
+                              height: 1,
+                              color: colorScheme.outlineVariant,
+                            ),
 
                             // 菜单项 - 按功能分组
                             // 窗口控制

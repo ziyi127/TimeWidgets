@@ -19,7 +19,8 @@ class CountdownData {
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       targetDate: DateTime.parse(
-          json['targetDate'] as String? ?? DateTime.now().toIso8601String()),
+        json['targetDate'] as String? ?? DateTime.now().toIso8601String(),
+      ),
       type: json['type'] as String? ?? 'event',
       progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
       category: json['category'] as String?,

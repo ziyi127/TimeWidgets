@@ -33,14 +33,21 @@ class TimeSlotTab extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.access_time,
-                      size: 64, color: theme.colorScheme.outline),
+                  Icon(
+                    Icons.access_time,
+                    size: 64,
+                    color: theme.colorScheme.outline,
+                  ),
                   const SizedBox(height: 16),
-                  Text('暂无作息时间',
-                      style: MD3TypographyStyles.titleMedium(context)),
+                  Text(
+                    '暂无作息时间',
+                    style: MD3TypographyStyles.titleMedium(context),
+                  ),
                   const SizedBox(height: 8),
-                  Text('点击下方按钮添加时间段',
-                      style: MD3TypographyStyles.bodyMedium(context)),
+                  Text(
+                    '点击下方按钮添加时间段',
+                    style: MD3TypographyStyles.bodyMedium(context),
+                  ),
                 ],
               ),
             )
@@ -58,8 +65,10 @@ class TimeSlotTab extends StatelessWidget {
                         _getIconForType(slot.type),
                         color: theme.colorScheme.primary,
                       ),
-                      title: Text(slot.name,
-                          style: MD3TypographyStyles.titleMedium(context)),
+                      title: Text(
+                        slot.name,
+                        style: MD3TypographyStyles.titleMedium(context),
+                      ),
                       subtitle: Text(
                         '${slot.startTime} - ${slot.endTime}',
                         style: MD3TypographyStyles.bodySmall(context),
@@ -140,11 +149,17 @@ class TimeSlotTab extends StatelessWidget {
                     ),
                     items: const [
                       DropdownMenuItem(
-                          value: TimePointType.classTime, child: Text('上课')),
+                        value: TimePointType.classTime,
+                        child: Text('上课'),
+                      ),
                       DropdownMenuItem(
-                          value: TimePointType.breakTime, child: Text('休息')),
+                        value: TimePointType.breakTime,
+                        child: Text('休息'),
+                      ),
                       DropdownMenuItem(
-                          value: TimePointType.divider, child: Text('分割线')),
+                        value: TimePointType.divider,
+                        child: Text('分割线'),
+                      ),
                     ],
                     onChanged: (value) {
                       if (value != null) setState(() => selectedType = value);

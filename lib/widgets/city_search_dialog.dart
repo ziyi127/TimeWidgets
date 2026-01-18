@@ -84,8 +84,10 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                             children: [
                               Icon(
                                 Icons.cloud_off_outlined,
-                                size: ResponsiveUtils.getIconSize(width,
-                                    baseSize: 48),
+                                size: ResponsiveUtils.getIconSize(
+                                  width,
+                                  baseSize: 48,
+                                ),
                                 color: theme.colorScheme.error,
                               ),
                               SizedBox(height: ResponsiveUtils.value(16)),
@@ -132,14 +134,16 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                                   title: Text(
                                     name,
                                     style: TextStyle(
-                                        fontSize: 16 * fontMultiplier),
+                                      fontSize: 16 * fontMultiplier,
+                                    ),
                                   ),
                                   subtitle: Text(
                                     [admin1, country]
                                         .where((e) => e.isNotEmpty)
                                         .join(', '),
                                     style: TextStyle(
-                                        fontSize: 14 * fontMultiplier),
+                                      fontSize: 14 * fontMultiplier,
+                                    ),
                                   ),
                                   onTap: () {
                                     Navigator.pop(context, city);

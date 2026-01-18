@@ -123,8 +123,11 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildScheduleList(BuildContext context, List<Schedule> schedules,
-      TimetableEditService service) {
+  Widget _buildScheduleList(
+    BuildContext context,
+    List<Schedule> schedules,
+    TimetableEditService service,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -220,7 +223,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                           if (isActive)
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: colorScheme.primaryContainer,
                                 borderRadius: BorderRadius.circular(12),
@@ -249,7 +254,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Widget _buildEmptyScheduleList(
-      BuildContext context, TimetableEditService service) {
+    BuildContext context,
+    TimetableEditService service,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -285,7 +292,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Widget _buildScheduleGrid(
-      BuildContext context, TimetableEditService service) {
+    BuildContext context,
+    TimetableEditService service,
+  ) {
     if (_selectedScheduleId == null) {
       // Show daily courses grid (legacy mode)
       return _buildDailyCoursesGrid(context, service);
@@ -314,7 +323,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Widget _buildDailyCoursesGrid(
-      BuildContext context, TimetableEditService service) {
+    BuildContext context,
+    TimetableEditService service,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final timeSlots = service.timeSlots;
     final courses = service.courses;
@@ -376,7 +387,12 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             scrollDirection: Axis.horizontal,
             child: SingleChildScrollView(
               child: _buildCourseGrid(
-                  context, service, timeSlots, courses, dailyCourses),
+                context,
+                service,
+                timeSlots,
+                courses,
+                dailyCourses,
+              ),
             ),
           ),
         ),
@@ -409,8 +425,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(slot.name,
-                      style: MD3TypographyStyles.labelMedium(context)),
+                  Text(
+                    slot.name,
+                    style: MD3TypographyStyles.labelMedium(context),
+                  ),
                   Text(
                     '${slot.startTime}-${slot.endTime}',
                     style: MD3TypographyStyles.bodySmall(context).copyWith(
@@ -452,7 +470,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Future<void> _showAddScheduleDialog(
-      BuildContext context, TimetableEditService service) async {
+    BuildContext context,
+    TimetableEditService service,
+  ) async {
     final nameController = TextEditingController();
     int weekDay = DateTime.now().weekday == 7 ? 0 : DateTime.now().weekday;
     WeekType weekType = WeekType.both;
@@ -792,8 +812,10 @@ class _ScheduleGridEditor extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text(schedule.name,
-                  style: MD3TypographyStyles.titleMedium(context)),
+              Text(
+                schedule.name,
+                style: MD3TypographyStyles.titleMedium(context),
+              ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -899,8 +921,10 @@ class _ScheduleGridEditor extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(slot.name,
-                      style: MD3TypographyStyles.labelMedium(context)),
+                  Text(
+                    slot.name,
+                    style: MD3TypographyStyles.labelMedium(context),
+                  ),
                   Text(
                     '${slot.startTime}-${slot.endTime}',
                     style: MD3TypographyStyles.bodySmall(context).copyWith(

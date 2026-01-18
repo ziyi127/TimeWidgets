@@ -163,8 +163,10 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                             onPressed: _selectDate,
                             icon: Icon(
                               Icons.calendar_today,
-                              size: ResponsiveUtils.getIconSize(width,
-                                  baseSize: 18),
+                              size: ResponsiveUtils.getIconSize(
+                                width,
+                                baseSize: 18,
+                              ),
                             ),
                             label: Text(
                               '${_targetDate.year}-${_targetDate.month.toString().padLeft(2, '0')}-${_targetDate.day.toString().padLeft(2, '0')} ${_targetDate.hour.toString().padLeft(2, '0')}:${_targetDate.minute.toString().padLeft(2, '0')}',

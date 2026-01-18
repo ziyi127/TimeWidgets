@@ -45,10 +45,4 @@ class Logger {
       );
     }
   }
-
-  /// Internal log method (保留用于向后兼容)
-  static void _log(String level, String message) {
-    // ignore: avoid_print
-    print('[$level] ${DateTime.now().toIso8601String()}: $message');
-  }
 }
