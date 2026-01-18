@@ -45,18 +45,21 @@ class MD3NavigationStyles {
       surfaceTintColor: colorScheme.surfaceTint,
       shadowColor: colorScheme.shadow,
       shape: const RoundedRectangleBorder(),
-      iconTheme: iconTheme ?? IconThemeData(
-        color: colorScheme.onSurface,
-        size: 24,
-      ),
-      actionsIconTheme: actionsIconTheme ?? IconThemeData(
-        color: colorScheme.onSurfaceVariant,
-        size: 24,
-      ),
-      titleTextStyle: titleTextStyle ?? theme.textTheme.titleLarge?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w400,
-      ),
+      iconTheme: iconTheme ??
+          IconThemeData(
+            color: colorScheme.onSurface,
+            size: 24,
+          ),
+      actionsIconTheme: actionsIconTheme ??
+          IconThemeData(
+            color: colorScheme.onSurfaceVariant,
+            size: 24,
+          ),
+      titleTextStyle: titleTextStyle ??
+          theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w400,
+          ),
       toolbarHeight: toolbarHeight,
       leadingWidth: leadingWidth,
       automaticallyImplyLeading: automaticallyImplyLeading,
@@ -176,11 +179,13 @@ class MD3NavigationStyles {
       shadowColor: shadowColor ?? colorScheme.shadow,
       surfaceTintColor: surfaceTintColor ?? colorScheme.surfaceTint,
       indicatorColor: indicatorColor ?? colorScheme.secondaryContainer,
-      indicatorShape: indicatorShape ?? const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
+      indicatorShape: indicatorShape ??
+          const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
       height: height ?? 80,
-      labelBehavior: labelBehavior ?? NavigationDestinationLabelBehavior.alwaysShow,
+      labelBehavior:
+          labelBehavior ?? NavigationDestinationLabelBehavior.alwaysShow,
       overlayColor: overlayColor,
     );
   }
@@ -222,31 +227,37 @@ class MD3NavigationStyles {
       trailing: trailing,
       elevation: elevation ?? 0,
       groupAlignment: groupAlignment ?? -1.0,
-      labelType: labelType ?? (extended 
-        ? NavigationRailLabelType.none 
-        : NavigationRailLabelType.all),
-      unselectedLabelTextStyle: unselectedLabelTextStyle ?? theme.textTheme.labelMedium?.copyWith(
-        color: colorScheme.onSurfaceVariant,
-      ),
-      selectedLabelTextStyle: selectedLabelTextStyle ?? theme.textTheme.labelMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w500,
-      ),
-      unselectedIconTheme: unselectedIconTheme ?? IconThemeData(
-        color: colorScheme.onSurfaceVariant,
-        size: 24,
-      ),
-      selectedIconTheme: selectedIconTheme ?? IconThemeData(
-        color: colorScheme.onSecondaryContainer,
-        size: 24,
-      ),
+      labelType: labelType ??
+          (extended
+              ? NavigationRailLabelType.none
+              : NavigationRailLabelType.all),
+      unselectedLabelTextStyle: unselectedLabelTextStyle ??
+          theme.textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+      selectedLabelTextStyle: selectedLabelTextStyle ??
+          theme.textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
+      unselectedIconTheme: unselectedIconTheme ??
+          IconThemeData(
+            color: colorScheme.onSurfaceVariant,
+            size: 24,
+          ),
+      selectedIconTheme: selectedIconTheme ??
+          IconThemeData(
+            color: colorScheme.onSecondaryContainer,
+            size: 24,
+          ),
       minWidth: minWidth ?? 72,
       minExtendedWidth: minExtendedWidth ?? 256,
       useIndicator: useIndicator ?? true,
       indicatorColor: indicatorColor ?? colorScheme.secondaryContainer,
-      indicatorShape: indicatorShape ?? const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
+      indicatorShape: indicatorShape ??
+          const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
     );
   }
 
@@ -270,12 +281,13 @@ class MD3NavigationStyles {
       elevation: elevation ?? 1,
       shadowColor: shadowColor ?? colorScheme.shadow,
       surfaceTintColor: surfaceTintColor ?? colorScheme.surfaceTint,
-      shape: shape ?? const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
-      ),
+      shape: shape ??
+          const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            ),
+          ),
       width: width,
       child: Column(
         children: children,
@@ -309,10 +321,15 @@ class MD3NavigationStyles {
         ),
         tileColor: selected ? colorScheme.secondaryContainer : null,
         selectedTileColor: colorScheme.secondaryContainer,
-        iconColor: selected ? colorScheme.onSecondaryContainer : colorScheme.onSurfaceVariant,
+        iconColor: selected
+            ? colorScheme.onSecondaryContainer
+            : colorScheme.onSurfaceVariant,
         selectedColor: colorScheme.onSecondaryContainer,
-        textColor: selected ? colorScheme.onSecondaryContainer : colorScheme.onSurfaceVariant,
-        contentPadding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        textColor: selected
+            ? colorScheme.onSecondaryContainer
+            : colorScheme.onSurfaceVariant,
+        contentPadding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         dense: false,
         visualDensity: VisualDensity.standard,
         minLeadingWidth: 24,
@@ -360,11 +377,13 @@ class MD3NavigationStyles {
       indicatorSize: indicatorSize ?? TabBarIndicatorSize.label,
       dividerColor: dividerColor ?? colorScheme.surfaceContainerHighest,
       labelColor: labelColor ?? colorScheme.primary,
-      labelStyle: labelStyle ?? theme.textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w500,
-      ),
+      labelStyle: labelStyle ??
+          theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
       labelPadding: labelPadding,
-      unselectedLabelColor: unselectedLabelColor ?? colorScheme.onSurfaceVariant,
+      unselectedLabelColor:
+          unselectedLabelColor ?? colorScheme.onSurfaceVariant,
       unselectedLabelStyle: unselectedLabelStyle ?? theme.textTheme.titleSmall,
       mouseCursor: mouseCursor,
       enableFeedback: enableFeedback,
@@ -417,14 +436,13 @@ enum MD3NavigationVariant {
 /// MD3 Navigation Builder
 /// 提供更灵活的导航组件构建方式
 class MD3NavigationBuilder {
-
   MD3NavigationBuilder({
     required this.context,
     required this.variant,
   });
   final BuildContext context;
   final MD3NavigationVariant variant;
-  
+
   // 通用属�?
   Widget? _title;
   List<Widget>? _actions;
@@ -433,12 +451,12 @@ class MD3NavigationBuilder {
   double? _elevation;
   Color? _backgroundColor;
   Color? _foregroundColor;
-  
+
   // NavigationBar 特定属�?
   List<NavigationDestination>? _destinations;
   int? _selectedIndex;
   ValueChanged<int>? _onDestinationSelected;
-  
+
   // TabBar 特定属�?
   List<Widget>? _tabs;
   TabController? _controller;
@@ -489,7 +507,8 @@ class MD3NavigationBuilder {
     return this;
   }
 
-  MD3NavigationBuilder onDestinationSelected(ValueChanged<int> onDestinationSelected) {
+  MD3NavigationBuilder onDestinationSelected(
+      ValueChanged<int> onDestinationSelected) {
     _onDestinationSelected = onDestinationSelected;
     return this;
   }
@@ -550,7 +569,8 @@ class MD3NavigationBuilder {
           isScrollable: _isScrollable,
         );
       default:
-        throw UnimplementedError('Navigation variant not implemented: $variant');
+        throw UnimplementedError(
+            'Navigation variant not implemented: $variant');
     }
   }
 }

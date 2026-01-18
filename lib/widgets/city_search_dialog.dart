@@ -46,7 +46,8 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
       title: Text(
         '搜索城市',
         style: TextStyle(
-          fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
+          fontSize:
+              (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
         ),
       ),
       content: SizedBox(
@@ -83,7 +84,8 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                             children: [
                               Icon(
                                 Icons.cloud_off_outlined,
-                                size: ResponsiveUtils.getIconSize(width, baseSize: 48),
+                                size: ResponsiveUtils.getIconSize(width,
+                                    baseSize: 48),
                                 color: theme.colorScheme.error,
                               ),
                               SizedBox(height: ResponsiveUtils.value(16)),
@@ -111,9 +113,7 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                       : _results.isEmpty
                           ? Center(
                               child: Text(
-                                _controller.text.isEmpty
-                                    ? '请输入城市名称'
-                                    : '未找到城市',
+                                _controller.text.isEmpty ? '请输入城市名称' : '未找到城市',
                                 style: TextStyle(fontSize: 14 * fontMultiplier),
                               ),
                             )
@@ -121,18 +121,25 @@ class _CitySearchDialogState extends State<CitySearchDialog> {
                               itemCount: _results.length,
                               itemBuilder: (context, index) {
                                 final city = _results[index];
-                                final name = (city['name'] ?? 'Unknown').toString();
-                                final admin1 = (city['admin1'] ?? '').toString();
-                                final country = (city['country'] ?? '').toString();
-                                
+                                final name =
+                                    (city['name'] ?? 'Unknown').toString();
+                                final admin1 =
+                                    (city['admin1'] ?? '').toString();
+                                final country =
+                                    (city['country'] ?? '').toString();
+
                                 return ListTile(
                                   title: Text(
                                     name,
-                                    style: TextStyle(fontSize: 16 * fontMultiplier),
+                                    style: TextStyle(
+                                        fontSize: 16 * fontMultiplier),
                                   ),
                                   subtitle: Text(
-                                    [admin1, country].where((e) => e.isNotEmpty).join(', '),
-                                    style: TextStyle(fontSize: 14 * fontMultiplier),
+                                    [admin1, country]
+                                        .where((e) => e.isNotEmpty)
+                                        .join(', '),
+                                    style: TextStyle(
+                                        fontSize: 14 * fontMultiplier),
                                   ),
                                   onTap: () {
                                     Navigator.pop(context, city);

@@ -41,7 +41,7 @@ class ErrorClassifier {
   static bool _isNetworkError(dynamic error) {
     if (error is SocketException) return true;
     if (error is HttpException) return true;
-    
+
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('network') ||
         errorStr.contains('connection') ||
@@ -54,7 +54,7 @@ class ErrorClassifier {
   static bool _isStorageError(dynamic error) {
     if (error is FileSystemException) return true;
     if (error is PathNotFoundException) return true;
-    
+
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('file') ||
         errorStr.contains('directory') ||
@@ -66,7 +66,7 @@ class ErrorClassifier {
   /// 判断是否为格式错误
   static bool _isFormatError(dynamic error) {
     if (error is FormatException) return true;
-    
+
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('format') ||
         errorStr.contains('parse') ||
@@ -77,7 +77,7 @@ class ErrorClassifier {
   /// 判断是否为状态错误
   static bool _isStateError(dynamic error) {
     if (error is StateError) return true;
-    
+
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('state') ||
         errorStr.contains('disposed') ||
@@ -93,7 +93,6 @@ class ErrorClassifier {
     String code = 'NETWORK_ERROR';
     String userMessage = '网络连接失败';
     String resolution = '请检查网络连接后重试';
-    ErrorSeverity severity = ErrorSeverity.error;
 
     if (error is SocketException) {
       code = 'NO_INTERNET';
@@ -101,7 +100,7 @@ class ErrorClassifier {
       resolution = '请检查网络设置';
     } else {
       final errorStr = error.toString().toLowerCase();
-      
+
       if (errorStr.contains('timeout')) {
         code = 'TIMEOUT';
         userMessage = '网络连接超时';
@@ -110,7 +109,6 @@ class ErrorClassifier {
         code = 'NOT_FOUND';
         userMessage = '请求的资源不存在';
         resolution = '请检查请求地址是否正确';
-        severity = ErrorSeverity.warning;
       } else if (errorStr.contains('500')) {
         code = 'SERVER_ERROR';
         userMessage = '服务器内部错误';
@@ -142,7 +140,6 @@ class ErrorClassifier {
     String code = 'STORAGE_ERROR';
     String userMessage = '数据存储失败';
     String resolution = '请重试';
-    ErrorSeverity severity = ErrorSeverity.error;
 
     final errorStr = error.toString().toLowerCase();
 
@@ -158,7 +155,6 @@ class ErrorClassifier {
       code = 'FILE_NOT_FOUND';
       userMessage = '文件不存在';
       resolution = '请检查文件路径是否正确';
-      severity = ErrorSeverity.warning;
     }
 
     return EnhancedAppError.storage(
@@ -253,7 +249,7 @@ class ErrorClassifier {
     }
 
     // 某些类型的错误默认更严重
-    if (error.type == ErrorType.permission || 
+    if (error.type == ErrorType.permission ||
         error.type == ErrorType.storage && error.code == 'STORAGE_FULL') {
       return ErrorSeverity.fatal;
     }

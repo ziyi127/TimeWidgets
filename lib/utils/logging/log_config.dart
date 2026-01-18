@@ -83,12 +83,15 @@ class LogConfig {
       minLevel: minLevel ?? this.minLevel,
       enableConsoleOutput: enableConsoleOutput ?? this.enableConsoleOutput,
       enableFileOutput: enableFileOutput ?? this.enableFileOutput,
-      enableStructuredFormat: enableStructuredFormat ?? this.enableStructuredFormat,
+      enableStructuredFormat:
+          enableStructuredFormat ?? this.enableStructuredFormat,
       maxFileSizeBytes: maxFileSizeBytes ?? this.maxFileSizeBytes,
       maxFileAgeDays: maxFileAgeDays ?? this.maxFileAgeDays,
       logDirectory: logDirectory ?? this.logDirectory,
-      enableSensitiveDataFiltering: enableSensitiveDataFiltering ?? this.enableSensitiveDataFiltering,
-      enablePerformanceLogging: enablePerformanceLogging ?? this.enablePerformanceLogging,
+      enableSensitiveDataFiltering:
+          enableSensitiveDataFiltering ?? this.enableSensitiveDataFiltering,
+      enablePerformanceLogging:
+          enablePerformanceLogging ?? this.enablePerformanceLogging,
       bufferSize: bufferSize ?? this.bufferSize,
     );
   }

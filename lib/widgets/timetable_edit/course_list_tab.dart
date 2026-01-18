@@ -7,7 +7,6 @@ import 'package:time_widgets/utils/md3_form_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class CourseListTab extends StatefulWidget {
-
   const CourseListTab({super.key, required this.service});
   final TimetableEditService service;
 
@@ -45,22 +44,22 @@ class _CourseListTabState extends State<CourseListTab> {
   List<CourseInfo> get _filteredCourses {
     // Create a modifiable copy of the courses list first
     List<CourseInfo> filtered = List.from(widget.service.courses);
-    
+
     // Filter if needed
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       filtered = filtered.where((course) {
         return course.name.toLowerCase().contains(query) ||
-               course.abbreviation.toLowerCase().contains(query) ||
-               course.teacher.toLowerCase().contains(query) ||
-               course.classroom.toLowerCase().contains(query);
+            course.abbreviation.toLowerCase().contains(query) ||
+            course.teacher.toLowerCase().contains(query) ||
+            course.classroom.toLowerCase().contains(query);
       }).toList();
     }
-    
+
     // Then sort the modifiable list
     filtered.sort((a, b) {
       int comparison;
-      
+
       switch (_sortField) {
         case SortField.name:
           comparison = a.name.compareTo(b.name);
@@ -75,10 +74,10 @@ class _CourseListTabState extends State<CourseListTab> {
           comparison = a.classroom.compareTo(b.classroom);
           break;
       }
-      
+
       return _sortOrder == SortOrder.ascending ? comparison : -comparison;
     });
-    
+
     return filtered;
   }
 
@@ -104,8 +103,8 @@ class _CourseListTabState extends State<CourseListTab> {
   // Toggle sort order
   void _toggleSortOrder() {
     setState(() {
-      _sortOrder = _sortOrder == SortOrder.ascending 
-          ? SortOrder.descending 
+      _sortOrder = _sortOrder == SortOrder.ascending
+          ? SortOrder.descending
           : SortOrder.ascending;
     });
   }
@@ -116,19 +115,20 @@ class _CourseListTabState extends State<CourseListTab> {
       _sortField = field;
     });
   }
-  
+
   /// Generate a simple unique ID using timestamp and random numbers
   String _generateId() {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final random = DateTime.now().microsecond % 1000;
     return 'course_${timestamp}_$random';
   }
-  
+
   /// Show a color picker dialog with predefined colors
-  Future<Color?> _showColorPickerDialog(BuildContext context, Color initialColor) async {
+  Future<Color?> _showColorPickerDialog(
+      BuildContext context, Color initialColor) async {
     final colorScheme = Theme.of(context).colorScheme;
     Color selectedColor = initialColor;
-    
+
     // Expanded color palette with more options
     final colors = [
       // 红色系
@@ -159,7 +159,7 @@ class _CourseListTabState extends State<CourseListTab> {
       Colors.grey[500]!, Colors.grey[700]!, Colors.grey[300]!,
       Colors.blueGrey[500]!, Colors.blueGrey[700]!, Colors.blueGrey[300]!,
     ];
-    
+
     return showDialog<Color>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -194,7 +194,8 @@ class _CourseListTabState extends State<CourseListTab> {
                 // Color grid
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 8,
                       mainAxisSpacing: 8,
                       crossAxisSpacing: 8,
@@ -203,7 +204,8 @@ class _CourseListTabState extends State<CourseListTab> {
                     itemCount: colors.length,
                     itemBuilder: (context, index) {
                       final color = colors[index];
-                      final isSelected = selectedColor.toARGB32() == color.toARGB32();
+                      final isSelected =
+                          selectedColor.toARGB32() == color.toARGB32();
                       return InkWell(
                         onTap: () => setState(() => selectedColor = color),
                         borderRadius: BorderRadius.circular(20),
@@ -221,14 +223,14 @@ class _CourseListTabState extends State<CourseListTab> {
                                   ),
                           ),
                           child: isSelected
-                            ? Icon(
-                                Icons.check,
-                                color: color.computeLuminance() > 0.5
-                                    ? Colors.black
-                                    : Colors.white,
-                                size: 16,
-                              )
-                            : null,
+                              ? Icon(
+                                  Icons.check,
+                                  color: color.computeLuminance() > 0.5
+                                      ? Colors.black
+                                      : Colors.white,
+                                  size: 16,
+                                )
+                              : null,
                         ),
                       );
                     },
@@ -337,8 +339,8 @@ class _CourseListTabState extends State<CourseListTab> {
                     // Sort order toggle
                     IconButton(
                       icon: Icon(
-                        _sortOrder == SortOrder.ascending 
-                            ? Icons.arrow_upward 
+                        _sortOrder == SortOrder.ascending
+                            ? Icons.arrow_upward
                             : Icons.arrow_downward,
                         size: 18,
                       ),
@@ -358,7 +360,9 @@ class _CourseListTabState extends State<CourseListTab> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          _searchQuery.isNotEmpty ? Icons.search_off_outlined : Icons.class_outlined,
+                          _searchQuery.isNotEmpty
+                              ? Icons.search_off_outlined
+                              : Icons.class_outlined,
                           size: 64,
                           color: theme.colorScheme.outline,
                         ),
@@ -369,9 +373,11 @@ class _CourseListTabState extends State<CourseListTab> {
                         ),
                         const SizedBox(height: 8),
                         if (_searchQuery.isNotEmpty)
-                          Text('尝试调整搜索条件', style: MD3TypographyStyles.bodyMedium(context)),
+                          Text('尝试调整搜索条件',
+                              style: MD3TypographyStyles.bodyMedium(context)),
                         if (!_searchQuery.isNotEmpty)
-                          Text('点击下方按钮添加科目', style: MD3TypographyStyles.bodyMedium(context)),
+                          Text('点击下方按钮添加科目',
+                              style: MD3TypographyStyles.bodyMedium(context)),
                       ],
                     ),
                   )
@@ -386,17 +392,21 @@ class _CourseListTabState extends State<CourseListTab> {
                           context: context,
                           child: ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Color(int.parse(course.color.replaceFirst('#', '0xFF'))),
+                              backgroundColor: Color(int.parse(
+                                  course.color.replaceFirst('#', '0xFF'))),
                               child: Text(
                                 course.name.isNotEmpty ? course.name[0] : '?',
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                            title: Text(course.name, style: MD3TypographyStyles.titleMedium(context)),
+                            title: Text(course.name,
+                                style:
+                                    MD3TypographyStyles.titleMedium(context)),
                             subtitle: Text(
                               [
                                 if (course.teacher.isNotEmpty) course.teacher,
-                                if (course.classroom.isNotEmpty) course.classroom,
+                                if (course.classroom.isNotEmpty)
+                                  course.classroom,
                               ].join(' · '),
                               style: MD3TypographyStyles.bodySmall(context),
                             ),
@@ -427,8 +437,8 @@ class _CourseListTabState extends State<CourseListTab> {
     final abbrController = TextEditingController(text: course?.abbreviation);
     final teacherController = TextEditingController(text: course?.teacher);
     final classroomController = TextEditingController(text: course?.classroom);
-    Color selectedColor = course != null 
-        ? Color(int.parse(course.color.replaceFirst('#', '0xFF'))) 
+    Color selectedColor = course != null
+        ? Color(int.parse(course.color.replaceFirst('#', '0xFF')))
         : Colors.blue;
     bool isOutdoor = course?.isOutdoor ?? false;
     String? nameError;
@@ -436,18 +446,22 @@ class _CourseListTabState extends State<CourseListTab> {
     // 生成课程简称
     String generateAbbreviation(String name) {
       if (name.isEmpty) return '';
-      
+
       // 如果是中文，取每个字的首字母
       if (RegExp(r'[\u4e00-\u9fa5]').hasMatch(name)) {
         final chars = name.split('');
         final abbreviation = chars.take(3).join();
         return abbreviation;
-      } 
+      }
       // 如果是英文，取每个单词的首字母
       else {
         final words = name.split(RegExp(r'\s+'));
-        final abbreviation = words.map((word) => word.isNotEmpty ? word[0] : '').join().toUpperCase();
-        return abbreviation.substring(0, abbreviation.length > 3 ? 3 : abbreviation.length);
+        final abbreviation = words
+            .map((word) => word.isNotEmpty ? word[0] : '')
+            .join()
+            .toUpperCase();
+        return abbreviation.substring(
+            0, abbreviation.length > 3 ? 3 : abbreviation.length);
       }
     }
 
@@ -460,7 +474,8 @@ class _CourseListTabState extends State<CourseListTab> {
       } else {
         nameError = null;
         // 只有当用户没有手动输入简称时，才自动生成
-        if (abbrController.text.isEmpty || abbrController.text == course?.abbreviation) {
+        if (abbrController.text.isEmpty ||
+            abbrController.text == course?.abbreviation) {
           abbrController.text = generateAbbreviation(value);
         }
       }
@@ -495,7 +510,7 @@ class _CourseListTabState extends State<CourseListTab> {
                         Padding(
                           padding: const EdgeInsets.only(left: 16, top: 4),
                           child: Text(
-                            nameError!, 
+                            nameError!,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.error,
                               fontSize: 12,
@@ -533,7 +548,8 @@ class _CourseListTabState extends State<CourseListTab> {
                     title: const Text('颜色标识'),
                     trailing: GestureDetector(
                       onTap: () async {
-                        final color = await _showColorPickerDialog(context, selectedColor);
+                        final color = await _showColorPickerDialog(
+                            context, selectedColor);
                         if (color != null) {
                           setState(() => selectedColor = color);
                         }
@@ -544,8 +560,9 @@ class _CourseListTabState extends State<CourseListTab> {
                         decoration: BoxDecoration(
                           color: selectedColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.withAlpha((255 * 0.5).round())),
-
+                          border: Border.all(
+                              color:
+                                  Colors.grey.withAlpha((255 * 0.5).round())),
                         ),
                       ),
                     ),
@@ -578,7 +595,8 @@ class _CourseListTabState extends State<CourseListTab> {
                     abbreviation: abbrController.text,
                     teacher: teacherController.text,
                     classroom: classroomController.text,
-                    color: '#${selectedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
+                    color:
+                        '#${selectedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
                     isOutdoor: isOutdoor,
                   );
 
@@ -602,7 +620,7 @@ class _CourseListTabState extends State<CourseListTab> {
     // Check if the course is in use
     final usages = widget.service.findSubjectUsages(course.id);
     String message = '确定要删除科目"${course.name}"吗？';
-    
+
     if (usages.isNotEmpty) {
       message += ' 该科目正在被使用：\n';
       for (final usage in usages) {

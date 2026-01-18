@@ -13,9 +13,10 @@ class StartupService {
 
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
+
     // 仅在桌面端支持
-    if (kIsWeb || (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS)) {
+    if (kIsWeb ||
+        (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS)) {
       return;
     }
 

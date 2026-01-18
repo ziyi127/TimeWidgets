@@ -6,16 +6,16 @@ import 'package:time_widgets/utils/logger.dart';
 
 class SettingsService {
   factory SettingsService() => _instance;
-  
+
   SettingsService._internal();
   static const String _settingsKey = 'app_settings';
-  
+
   // 单例模式实现
   static final SettingsService _instance = SettingsService._internal();
-  
-  final StreamController<AppSettings> _settingsController = 
+
+  final StreamController<AppSettings> _settingsController =
       StreamController<AppSettings>.broadcast();
-  
+
   AppSettings _currentSettings = AppSettings.defaultSettings();
   bool _isInitialized = false;
 
@@ -26,18 +26,18 @@ class SettingsService {
     if (_isInitialized) {
       return _currentSettings;
     }
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_settingsKey);
-      
+
       if (jsonString != null) {
         final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
         _currentSettings = AppSettings.fromJson(jsonData);
       } else {
         _currentSettings = AppSettings.defaultSettings();
       }
-      
+
       _isInitialized = true;
       _settingsController.add(_currentSettings);
       return _currentSettings;

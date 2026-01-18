@@ -20,11 +20,11 @@ class DynamicIslandScreen extends StatefulWidget {
 class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
   final TimetableService _timetableService = TimetableService();
   final NtpService _ntpService = NtpService();
-  
+
   Course? _currentCourse;
   Course? _nextCourse;
   Timer? _timer;
-  
+
   @override
   void initState() {
     super.initState();
@@ -91,7 +91,7 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
     final now = _ntpService.now;
     final timeStr = DateFormat('HH:mm').format(now);
     final dateStr = DateFormat('MM-dd EEE', 'zh_CN').format(now);
-    
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GestureDetector(
@@ -100,10 +100,10 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
           if (widget.windowId != null) {
             windowManager.close();
           } else {
-             // Fallback for single window mode
-             Future.delayed(const Duration(milliseconds: 100), () {
-               // MD3TrayMenuService.instance.onToggleDynamicIsland?.call();
-             });
+            // Fallback for single window mode
+            Future.delayed(const Duration(milliseconds: 100), () {
+              // MD3TrayMenuService.instance.onToggleDynamicIsland?.call();
+            });
           }
         },
         child: widget.windowId != null
@@ -119,7 +119,7 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
       ),
     );
   }
-  
+
   Widget _buildContent() {
     final now = _ntpService.now;
     final timeStr = DateFormat('HH:mm').format(now);
@@ -167,7 +167,7 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(width: 20),
             Container(
               width: 1,
@@ -175,7 +175,7 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
               color: Colors.white12,
             ),
             const SizedBox(width: 20),
-            
+
             // Course Info Section
             Expanded(
               child: Column(
@@ -196,7 +196,6 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
                     ),
                     const SizedBox(height: 4),
                   ],
-                  
                   if (_nextCourse != null)
                     _buildCourseRow(
                       '下节: ${_nextCourse!.subject}',
@@ -216,8 +215,9 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
       ),
     );
   }
-  
-  Widget _buildCourseRow(String title, String rightInfo, {required bool isCurrent}) {
+
+  Widget _buildCourseRow(String title, String rightInfo,
+      {required bool isCurrent}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -250,14 +250,19 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
       final now = _ntpService.now;
       final parts = course.time.split('~');
       if (parts.length != 2) return '';
-      
+
       final endParts = parts[1].split(':');
-      final end = DateTime(now.year, now.month, now.day, 
-          int.parse(endParts[0]), int.parse(endParts[1]),);
-          
+      final end = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(endParts[0]),
+        int.parse(endParts[1]),
+      );
+
       final diff = end.difference(now);
       if (diff.isNegative) return '已结束';
-      
+
       if (diff.inHours > 0) {
         return '${diff.inHours}小时${diff.inMinutes % 60}分';
       }

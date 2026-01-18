@@ -1,5 +1,4 @@
 class WeatherData {
-
   const WeatherData({
     required this.cityName,
     required this.description,
@@ -21,48 +20,68 @@ class WeatherData {
 
   /// 从小米天气API数据创建WeatherData对象
   factory WeatherData.fromXiaomiJson(Map<String, dynamic> json) {
-    final current = json['current'] ?? {};
-    final aqi = json['aqi'] ?? {};
-    final forecastDaily = json['forecastDaily'] ?? {};
-    
+    final current = (json['current'] as Map<String, dynamic>?) ?? {};
+    final aqi = (json['aqi'] as Map<String, dynamic>?) ?? {};
+    final forecastDaily =
+        (json['forecastDaily'] as Map<String, dynamic>?) ?? {};
+
     // 解析当前温度
-    final temperature = int.tryParse(current['temperature']?['value']?.toString() ?? '0') ?? 0;
-    
+    final currentTemp = current['temperature'] as Map<String, dynamic>?;
+    final temperature =
+        int.tryParse(currentTemp?['value']?.toString() ?? '0') ?? 0;
+
     // 解析体感温度
-    final feelsLike = int.tryParse(current['feelsLike']?['value']?.toString() ?? '0') ?? 0;
-    
+    final currentFeelsLike = current['feelsLike'] as Map<String, dynamic>?;
+    final feelsLike =
+        int.tryParse(currentFeelsLike?['value']?.toString() ?? '0') ?? 0;
+
     // 解析湿度
-    final humidity = int.tryParse(current['humidity']?['value']?.toString() ?? '0') ?? 0;
-    
+    final currentHumidity = current['humidity'] as Map<String, dynamic>?;
+    final humidity =
+        int.tryParse(currentHumidity?['value']?.toString() ?? '0') ?? 0;
+
     // 解析气压
-    final pressure = double.tryParse(current['pressure']?['value']?.toString() ?? '0') ?? 0.0;
-    
+    final currentPressure = current['pressure'] as Map<String, dynamic>?;
+    final pressure =
+        double.tryParse(currentPressure?['value']?.toString() ?? '0') ?? 0.0;
+
     // 解析风向
-    final windSpeed = current['wind']?['speed']?['value']?.toString() ?? '0';
+    final currentWind = current['wind'] as Map<String, dynamic>?;
+    final currentWindSpeed = currentWind?['speed'] as Map<String, dynamic>?;
+    final windSpeed = currentWindSpeed?['value']?.toString() ?? '0';
     final wind = '${windSpeed}km/h';
-    
+
     // 解析天气类型
-    final weatherType = int.tryParse(current['weather']?.toString() ?? '0') ?? 0;
-    
+    final weatherType =
+        int.tryParse(current['weather']?.toString() ?? '0') ?? 0;
+
     // 解析AQI
     final aqiLevel = int.tryParse(aqi['aqi']?.toString() ?? '0') ?? 0;
-    
+
     // 解析日出日落时间
-    final sunRiseSet = forecastDaily['sunRiseSet']?['value']?[0] ?? {};
+    final sunRiseSetList =
+        forecastDaily['sunRiseSet']?['value'] as List<dynamic>?;
+    final sunRiseSet = (sunRiseSetList != null && sunRiseSetList.isNotEmpty)
+        ? sunRiseSetList[0] as Map<String, dynamic>
+        : <String, dynamic>{};
     final sunrise = _formatTimeFromISO(sunRiseSet['from']?.toString() ?? '');
     final sunset = _formatTimeFromISO(sunRiseSet['to']?.toString() ?? '');
-    
+
     // 解析温度范围（从今日预报获取）
-    final todayTemp = forecastDaily['temperature']?['value']?[0] ?? {};
+    final tempList = forecastDaily['temperature']?['value'] as List<dynamic>?;
+    final todayTemp = (tempList != null && tempList.isNotEmpty)
+        ? tempList[0] as Map<String, dynamic>
+        : <String, dynamic>{};
     final tempMax = todayTemp['from']?.toString() ?? '0';
     final tempMin = todayTemp['to']?.toString() ?? '0';
     final temperatureRange = '$tempMin℃~$tempMax℃';
-    
+
     // 其他信息
-    final visibility = current['visibility']?['value']?.toString() ?? '';
+    final currentVisibility = current['visibility'] as Map<String, dynamic>?;
+    final visibility = currentVisibility?['value']?.toString() ?? '';
     final uvIndex = current['uvIndex']?.toString() ?? '0';
     final pubTime = current['pubTime']?.toString() ?? '';
-    
+
     return WeatherData(
       cityName: '北京', // 可以根据locationKey解析城市名
       description: _getWeatherDescription(weatherType),
@@ -89,7 +108,7 @@ class WeatherData {
     if (json.containsKey('current')) {
       return WeatherData.fromXiaomiJson(json);
     }
-    
+
     // 安全地转换为int
     int safeParseInt(dynamic value, int defaultValue) {
       if (value == null) return defaultValue;
@@ -97,7 +116,7 @@ class WeatherData {
       if (value is String) return int.tryParse(value) ?? defaultValue;
       return int.tryParse(value.toString()) ?? defaultValue;
     }
-    
+
     // 安全地转换为double
     double safeParseDouble(dynamic value, double defaultValue) {
       if (value == null) return defaultValue;
@@ -106,13 +125,13 @@ class WeatherData {
       if (value is String) return double.tryParse(value) ?? defaultValue;
       return double.tryParse(value.toString()) ?? defaultValue;
     }
-    
+
     // 安全地转换为String
     String safeParseString(dynamic value, String defaultValue) {
       if (value == null) return defaultValue;
       return value.toString();
     }
-    
+
     // 兼容旧格式
     return WeatherData(
       cityName: safeParseString(json['city_name'], 'Unknown'),
@@ -152,7 +171,7 @@ class WeatherData {
 
   static String _formatTime(dynamic value) {
     if (value == null) return '00:00';
-    
+
     int milliseconds;
     if (value is String) {
       // 如果是字符串，尝试解析为毫秒数
@@ -164,7 +183,7 @@ class WeatherData {
       // 其他类型，转换为字符串再解析
       milliseconds = int.tryParse(value.toString()) ?? 0;
     }
-    
+
     if (milliseconds == 0) return '00:00';
     try {
       final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
@@ -189,32 +208,58 @@ class WeatherData {
   /// 根据天气代码获取天气描述
   static String _getWeatherDescription(int weatherType) {
     switch (weatherType) {
-      case 0: return '晴';
-      case 1: return '多云';
-      case 2: return '阴';
-      case 3: return '小雨';
-      case 4: return '中雨';
-      case 5: return '大雨';
-      case 6: return '暴雨';
-      case 7: return '小雪';
-      case 8: return '中雪';
-      case 9: return '大雪';
-      case 10: return '暴雪';
-      case 11: return '沙尘暴';
-      case 12: return '雾';
-      case 13: return '霾';
-      case 14: return '霜冻';
-      case 15: return '雨夹雪';
-      case 16: return '雷阵雨';
-      case 17: return '雷阵雨伴冰雹';
-      case 18: return '沙尘';
-      case 19: return '浮尘';
-      case 20: return '扬沙';
-      case 21: return '强沙尘暴';
-      case 22: return '雷阵雨';
-      case 23: return '雾';
-      case 24: return '冰雹';
-      default: return '晴';
+      case 0:
+        return '晴';
+      case 1:
+        return '多云';
+      case 2:
+        return '阴';
+      case 3:
+        return '小雨';
+      case 4:
+        return '中雨';
+      case 5:
+        return '大雨';
+      case 6:
+        return '暴雨';
+      case 7:
+        return '小雪';
+      case 8:
+        return '中雪';
+      case 9:
+        return '大雪';
+      case 10:
+        return '暴雪';
+      case 11:
+        return '沙尘暴';
+      case 12:
+        return '雾';
+      case 13:
+        return '霾';
+      case 14:
+        return '霜冻';
+      case 15:
+        return '雨夹雪';
+      case 16:
+        return '雷阵雨';
+      case 17:
+        return '雷阵雨伴冰雹';
+      case 18:
+        return '沙尘';
+      case 19:
+        return '浮尘';
+      case 20:
+        return '扬沙';
+      case 21:
+        return '强沙尘暴';
+      case 22:
+        return '雷阵雨';
+      case 23:
+        return '雾';
+      case 24:
+        return '冰雹';
+      default:
+        return '晴';
     }
   }
 

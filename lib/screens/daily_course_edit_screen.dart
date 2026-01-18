@@ -13,7 +13,7 @@ class DailyCourseEditScreen extends StatefulWidget {
 class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
   DayOfWeek? _selectedDay;
   WeekType? _selectedWeekType;
-  
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TimetableEditService>(
@@ -21,7 +21,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
         final courses = service.courses;
         final timeSlots = service.timeSlots;
         final dailyCourses = service.dailyCourses;
-        
+
         return Column(
           children: [
             // Day and week type selector
@@ -73,11 +73,12 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
                 ],
               ),
             ),
-            
+
             // Timetable grid
             Expanded(
               child: _selectedDay != null && _selectedWeekType != null
-                  ? _buildTimetableGrid(service, courses, timeSlots, dailyCourses)
+                  ? _buildTimetableGrid(
+                      service, courses, timeSlots, dailyCourses)
                   : const Center(
                       child: Text('请选择星期和周类型'),
                     ),
@@ -100,34 +101,38 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
         // Parse time strings "HH:MM" and compare
         final aParts = a.startTime.split(':');
         final bParts = b.startTime.split(':');
-        
+
         final aHour = int.parse(aParts[0]);
         final aMinute = int.parse(aParts[1]);
         final bHour = int.parse(bParts[0]);
         final bMinute = int.parse(bParts[1]);
-        
+
         final aTotalMinutes = aHour * 60 + aMinute;
         final bTotalMinutes = bHour * 60 + bMinute;
-        
+
         return aTotalMinutes.compareTo(bTotalMinutes);
       });
-    
+
     // Filter daily courses for selected day and week type
-    final filteredDailyCourses = dailyCourses.where((dc) =>
-        dc.dayOfWeek == _selectedDay && dc.weekType == _selectedWeekType,).toList();
-    
+    final filteredDailyCourses = dailyCourses
+        .where(
+          (dc) =>
+              dc.dayOfWeek == _selectedDay && dc.weekType == _selectedWeekType,
+        )
+        .toList();
+
     if (sortedTimeSlots.isEmpty) {
       return const Center(
         child: Text('请先在时间表中添加时间段'),
       );
     }
-    
+
     if (courses.isEmpty) {
       return const Center(
         child: Text('请先在课程表中添加课程'),
       );
     }
-    
+
     return Column(
       children: [
         // Header row with time slot names
@@ -137,19 +142,21 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
           child: Row(
             children: [
               const SizedBox(width: 80), // Space for course selector
-              ...sortedTimeSlots.map((timeSlot) => Expanded(
-                child: Center(
-                  child: Text(
-                    timeSlot.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+              ...sortedTimeSlots.map(
+                (timeSlot) => Expanded(
+                  child: Center(
+                    child: Text(
+                      timeSlot.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              ),),
+              ),
             ],
           ),
         ),
-        
+
         // Course row
         Expanded(
           child: SingleChildScrollView(
@@ -157,39 +164,47 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
               children: [
                 // Course selector row
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      const Text('课程', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('课程',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(width: 40),
-                      ...sortedTimeSlots.map((timeSlot) => Expanded(
-                        child: _buildCourseSelector(
-                          service,
-                          timeSlot,
-                          filteredDailyCourses,
-                          courses,
+                      ...sortedTimeSlots.map(
+                        (timeSlot) => Expanded(
+                          child: _buildCourseSelector(
+                            service,
+                            timeSlot,
+                            filteredDailyCourses,
+                            courses,
+                          ),
                         ),
-                      ),),
+                      ),
                     ],
                   ),
                 ),
-                
+
                 // Time display row
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      const Text('时间', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('时间',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(width: 40),
-                      ...sortedTimeSlots.map((timeSlot) => Expanded(
-                        child: Center(
-                          child: Text(
-                            '${_formatTime(timeSlot.startTime)}\n${_formatTime(timeSlot.endTime)}',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 12),
+                      ...sortedTimeSlots.map(
+                        (timeSlot) => Expanded(
+                          child: Center(
+                            child: Text(
+                              '${_formatTime(timeSlot.startTime)}\n${_formatTime(timeSlot.endTime)}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
                         ),
-                      ),),
+                      ),
                     ],
                   ),
                 ),
@@ -218,7 +233,7 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
         courseId: '',
       ),
     );
-    
+
     return DropdownButton<String>(
       isExpanded: true,
       value: existingCourse.courseId.isEmpty ? null : existingCourse.courseId,
@@ -228,13 +243,15 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
           value: '',
           child: Text('无课程'),
         ),
-        ...courses.map((course) => DropdownMenuItem(
-          value: course.id,
-          child: Text(
-            course.name,
-            overflow: TextOverflow.ellipsis,
+        ...courses.map(
+          (course) => DropdownMenuItem(
+            value: course.id,
+            child: Text(
+              course.name,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),),
+        ),
       ],
       onChanged: (value) {
         if (value != null) {
@@ -244,13 +261,15 @@ class _DailyCourseEditScreenState extends State<DailyCourseEditScreen> {
           } else {
             // Update or add the daily course
             final updatedCourse = DailyCourse(
-              id: existingCourse.id.isEmpty ? DateTime.now().millisecondsSinceEpoch.toString() : existingCourse.id,
+              id: existingCourse.id.isEmpty
+                  ? DateTime.now().millisecondsSinceEpoch.toString()
+                  : existingCourse.id,
               dayOfWeek: _selectedDay!,
               weekType: _selectedWeekType!,
               timeSlotId: timeSlot.id,
               courseId: value,
             );
-            
+
             if (existingCourse.id.isEmpty) {
               service.addDailyCourse(updatedCourse);
             } else {

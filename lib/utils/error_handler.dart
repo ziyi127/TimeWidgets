@@ -4,7 +4,6 @@ import 'error_handling/error_types.dart';
 
 /// 应用错误类 (向后兼容包装器)
 class AppError {
-
   AppError({
     required this.code,
     required this.message,
@@ -35,7 +34,7 @@ class AppError {
 }
 
 /// 错误处理工具类 (向后兼容包装器)
-/// 
+///
 /// 此类保持原有 API 不变，内部委托给增强的错误处理系统
 class ErrorHandler {
   static final EnhancedErrorHandler _enhancedHandler = EnhancedErrorHandler();

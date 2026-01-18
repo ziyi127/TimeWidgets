@@ -9,7 +9,7 @@ class LoggingInit {
     bool isProduction = kReleaseMode,
   }) async {
     final logger = EnhancedLogger();
-    
+
     LogConfig config;
     if (isProduction) {
       config = LogConfig.production();
@@ -18,9 +18,9 @@ class LoggingInit {
     } else {
       config = LogConfig.development();
     }
-    
+
     await logger.initialize(config);
-    
+
     logger.info(
       'Logging system initialized',
       metadata: {
@@ -36,7 +36,7 @@ class LoggingInit {
   static Future<void> initializeWithConfig(LogConfig config) async {
     final logger = EnhancedLogger();
     await logger.initialize(config);
-    
+
     logger.info(
       'Logging system initialized with custom config',
       metadata: {

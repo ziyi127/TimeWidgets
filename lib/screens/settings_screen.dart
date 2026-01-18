@@ -68,7 +68,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-
   Future<void> _selectSemesterStartDate() async {
     final date = await showDatePicker(
       context: context,
@@ -128,7 +127,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           color: color,
                           shape: BoxShape.circle,
                           border: color == _settings.themeSettings.seedColor
-                              ? Border.all(width: 3, color: Theme.of(context).colorScheme.onSurface)
+                              ? Border.all(
+                                  width: 3,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)
                               : null,
                         ),
                       ),
@@ -138,7 +140,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 // 保持不变选项
                 ElevatedButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(_settings.themeSettings.seedColor),
+                  onPressed: () => Navigator.of(dialogContext)
+                      .pop(_settings.themeSettings.seedColor),
                   child: const Text('保持不变'),
                 ),
               ],
@@ -154,8 +157,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
 
-    if (selectedColor != null && selectedColor != _settings.themeSettings.seedColor) {
-      final newThemeSettings = _settings.themeSettings.copyWith(seedColor: selectedColor);
+    if (selectedColor != null &&
+        selectedColor != _settings.themeSettings.seedColor) {
+      final newThemeSettings =
+          _settings.themeSettings.copyWith(seedColor: selectedColor);
       await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
       // 同时更新 ThemeService
       await _themeService.saveSettings(newThemeSettings);
@@ -211,7 +216,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   leading: const Icon(Icons.language_outlined),
                   title: const Text('语言'),
-                  subtitle: Text(_settings.language == 'zh' ? '简体中文' : 'English'),
+                  subtitle:
+                      Text(_settings.language == 'zh' ? '简体中文' : 'English'),
                   trailing: DropdownButton<String>(
                     value: _settings.language,
                     underline: const SizedBox(),
@@ -249,10 +255,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
-                
+
                 // 主题模式选择
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: DropdownButtonFormField<ThemeMode>(
                     initialValue: _settings.themeSettings.themeMode,
                     decoration: const InputDecoration(
@@ -262,19 +269,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onChanged: (value) async {
                       if (value != null) {
-                        final newThemeSettings = _settings.themeSettings.copyWith(themeMode: value);
-                        await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                        final newThemeSettings =
+                            _settings.themeSettings.copyWith(themeMode: value);
+                        await _saveSettings(_settings.copyWith(
+                            themeSettings: newThemeSettings));
                         await _themeService.saveSettings(newThemeSettings);
                       }
                     },
                     items: const [
-                      DropdownMenuItem(value: ThemeMode.system, child: Text('跟随系统')),
-                      DropdownMenuItem(value: ThemeMode.light, child: Text('浅色')),
-                      DropdownMenuItem(value: ThemeMode.dark, child: Text('深色')),
+                      DropdownMenuItem(
+                          value: ThemeMode.system, child: Text('跟随系统')),
+                      DropdownMenuItem(
+                          value: ThemeMode.light, child: Text('浅色')),
+                      DropdownMenuItem(
+                          value: ThemeMode.dark, child: Text('深色')),
                     ],
                   ),
                 ),
-                
+
                 // 动态颜色开关
                 SwitchListTile(
                   secondary: const Icon(Icons.auto_awesome_outlined),
@@ -282,12 +294,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('使用 Material You 动态取色'),
                   value: _settings.themeSettings.useDynamicColor,
                   onChanged: (value) async {
-                    final newThemeSettings = _settings.themeSettings.copyWith(useDynamicColor: value);
-                    await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                    final newThemeSettings = _settings.themeSettings
+                        .copyWith(useDynamicColor: value);
+                    await _saveSettings(
+                        _settings.copyWith(themeSettings: newThemeSettings));
                     await _themeService.saveSettings(newThemeSettings);
                   },
                 ),
-                
+
                 // 系统颜色开关
                 SwitchListTile(
                   secondary: const Icon(Icons.wallpaper),
@@ -295,22 +309,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('使用系统的强调色'),
                   value: _settings.themeSettings.useSystemColor,
                   onChanged: (value) async {
-                    final newThemeSettings = _settings.themeSettings.copyWith(useSystemColor: value);
+                    final newThemeSettings =
+                        _settings.themeSettings.copyWith(useSystemColor: value);
                     // 同时更新 themeSettings 和顶层的 followSystemColor
-                    await _saveSettings(_settings.copyWith(
-                      themeSettings: newThemeSettings,
-                      followSystemColor: value,
-                    ),);
+                    await _saveSettings(
+                      _settings.copyWith(
+                        themeSettings: newThemeSettings,
+                        followSystemColor: value,
+                      ),
+                    );
                     await _themeService.saveSettings(newThemeSettings);
                   },
                 ),
-                
+
                 // 种子颜色选择
                 ListTile(
                   leading: const Icon(Icons.palette_outlined),
                   title: const Text('种子颜色'),
                   subtitle: const Text('自定义应用主题颜色'),
-                  enabled: !_settings.themeSettings.useSystemColor, // 如果跟随系统，禁用手动选择
+                  enabled:
+                      !_settings.themeSettings.useSystemColor, // 如果跟随系统，禁用手动选择
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -328,21 +346,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
-                        onPressed: _settings.themeSettings.useSystemColor ? null : _showColorPicker,
+                        onPressed: _settings.themeSettings.useSystemColor
+                            ? null
+                            : _showColorPicker,
                         child: const Text('选择'),
                       ),
                     ],
                   ),
                 ),
-                
+
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Divider(),
                 ),
-                
+
                 // 字体大小缩放
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -362,20 +383,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         min: 0.7,
                         max: 1.5,
                         divisions: 8,
-                        label: _settings.themeSettings.fontSizeScale.toStringAsFixed(1),
+                        label: _settings.themeSettings.fontSizeScale
+                            .toStringAsFixed(1),
                         onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings.copyWith(fontSizeScale: value);
-                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          final newThemeSettings = _settings.themeSettings
+                              .copyWith(fontSizeScale: value);
+                          await _saveSettings(_settings.copyWith(
+                              themeSettings: newThemeSettings));
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
                   ),
                 ),
-                
+
                 // 圆角大小
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -395,20 +420,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         min: 0.5,
                         max: 2,
                         divisions: 15,
-                        label: _settings.themeSettings.borderRadiusScale.toStringAsFixed(1),
+                        label: _settings.themeSettings.borderRadiusScale
+                            .toStringAsFixed(1),
                         onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings.copyWith(borderRadiusScale: value);
-                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          final newThemeSettings = _settings.themeSettings
+                              .copyWith(borderRadiusScale: value);
+                          await _saveSettings(_settings.copyWith(
+                              themeSettings: newThemeSettings));
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
                   ),
                 ),
-                
+
                 // 组件透明度
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -427,20 +456,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _settings.themeSettings.componentOpacity,
                         min: 0.7,
                         divisions: 3,
-                        label: '${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
+                        label:
+                            '${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
                         onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings.copyWith(componentOpacity: value);
-                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          final newThemeSettings = _settings.themeSettings
+                              .copyWith(componentOpacity: value);
+                          await _saveSettings(_settings.copyWith(
+                              themeSettings: newThemeSettings));
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
                   ),
                 ),
-                
+
                 // 阴影强度
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -459,17 +492,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: _settings.themeSettings.shadowStrength,
                         max: 2,
                         divisions: 20,
-                        label: _settings.themeSettings.shadowStrength.toStringAsFixed(1),
+                        label: _settings.themeSettings.shadowStrength
+                            .toStringAsFixed(1),
                         onChanged: (value) async {
-                          final newThemeSettings = _settings.themeSettings.copyWith(shadowStrength: value);
-                          await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                          final newThemeSettings = _settings.themeSettings
+                              .copyWith(shadowStrength: value);
+                          await _saveSettings(_settings.copyWith(
+                              themeSettings: newThemeSettings));
                           await _themeService.saveSettings(newThemeSettings);
                         },
                       ),
                     ],
                   ),
                 ),
-                
+
                 // 启用渐变效果
                 SwitchListTile(
                   secondary: const Icon(Icons.gradient_outlined),
@@ -477,15 +513,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('为按钮和卡片添加渐变效果'),
                   value: _settings.themeSettings.enableGradients,
                   onChanged: (value) async {
-                    final newThemeSettings = _settings.themeSettings.copyWith(enableGradients: value);
-                    await _saveSettings(_settings.copyWith(themeSettings: newThemeSettings));
+                    final newThemeSettings = _settings.themeSettings
+                        .copyWith(enableGradients: value);
+                    await _saveSettings(
+                        _settings.copyWith(themeSettings: newThemeSettings));
                     await _themeService.saveSettings(newThemeSettings);
                   },
                 ),
-                
+
                 // UI缩放
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -513,7 +552,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
               ],
             ),
@@ -538,7 +577,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('在主屏幕显示时间'),
                   value: _settings.showTimeDisplayWidget,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(showTimeDisplayWidget: value));
+                    _saveSettings(
+                        _settings.copyWith(showTimeDisplayWidget: value));
                   },
                 ),
                 SwitchListTile(
@@ -547,7 +587,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('在主屏幕显示日期'),
                   value: _settings.showDateDisplayWidget,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(showDateDisplayWidget: value));
+                    _saveSettings(
+                        _settings.copyWith(showDateDisplayWidget: value));
                   },
                 ),
                 SwitchListTile(
@@ -556,7 +597,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('在主屏幕显示当前周数'),
                   value: _settings.showWeekDisplayWidget,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(showWeekDisplayWidget: value));
+                    _saveSettings(
+                        _settings.copyWith(showWeekDisplayWidget: value));
                   },
                 ),
                 SwitchListTile(
@@ -579,11 +621,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (context) => const CitySearchDialog(),
                       );
                       if (city != null) {
-                        await _saveSettings(_settings.copyWith(
-                          latitude: city['latitude'] as double?,
-                          longitude: city['longitude'] as double?,
-                          cityName: city['name'] as String?,
-                        ),);
+                        await _saveSettings(
+                          _settings.copyWith(
+                            latitude: city['latitude'] as double?,
+                            longitude: city['longitude'] as double?,
+                            cityName: city['name'] as String?,
+                          ),
+                        );
                       }
                     },
                     child: const Text('更改'),
@@ -595,7 +639,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('在主屏幕显示倒计时'),
                   value: _settings.showCountdownWidget,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(showCountdownWidget: value));
+                    _saveSettings(
+                        _settings.copyWith(showCountdownWidget: value));
                   },
                 ),
                 SwitchListTile(
@@ -604,7 +649,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('在主屏幕显示当前课程'),
                   value: _settings.showCurrentClassWidget,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(showCurrentClassWidget: value));
+                    _saveSettings(
+                        _settings.copyWith(showCurrentClassWidget: value));
                   },
                 ),
               ],
@@ -630,7 +676,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('在桌面上显示小组件'),
                   value: _settings.enableDesktopWidgets,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(enableDesktopWidgets: value));
+                    _saveSettings(
+                        _settings.copyWith(enableDesktopWidgets: value));
                   },
                 ),
               ],
@@ -694,14 +741,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: _settings.weatherRefreshInterval > 5 
-                              ? () => _saveSettings(_settings.copyWith(weatherRefreshInterval: _settings.weatherRefreshInterval - 5))
+                          onPressed: _settings.weatherRefreshInterval > 5
+                              ? () => _saveSettings(_settings.copyWith(
+                                  weatherRefreshInterval:
+                                      _settings.weatherRefreshInterval - 5))
                               : null,
                         ),
                         IconButton(
                           icon: const Icon(Icons.add_circle_outline),
                           onPressed: _settings.weatherRefreshInterval < 120
-                              ? () => _saveSettings(_settings.copyWith(weatherRefreshInterval: _settings.weatherRefreshInterval + 5))
+                              ? () => _saveSettings(_settings.copyWith(
+                                  weatherRefreshInterval:
+                                      _settings.weatherRefreshInterval + 5))
                               : null,
                         ),
                       ],
@@ -719,14 +770,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: _settings.countdownRefreshInterval > 10 
-                              ? () => _saveSettings(_settings.copyWith(countdownRefreshInterval: _settings.countdownRefreshInterval - 10))
+                          onPressed: _settings.countdownRefreshInterval > 10
+                              ? () => _saveSettings(_settings.copyWith(
+                                  countdownRefreshInterval:
+                                      _settings.countdownRefreshInterval - 10))
                               : null,
                         ),
                         IconButton(
                           icon: const Icon(Icons.add_circle_outline),
                           onPressed: _settings.countdownRefreshInterval < 300
-                              ? () => _saveSettings(_settings.copyWith(countdownRefreshInterval: _settings.countdownRefreshInterval + 10))
+                              ? () => _saveSettings(_settings.copyWith(
+                                  countdownRefreshInterval:
+                                      _settings.countdownRefreshInterval + 10))
                               : null,
                         ),
                       ],
@@ -769,30 +824,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailing: IconButton(
                       icon: const Icon(Icons.edit_outlined),
                       onPressed: () async {
-                         final controller = TextEditingController(text: _settings.ntpServer);
-                         final result = await showDialog<String>(
-                           context: context,
-                           builder: (context) => AlertDialog(
-                             title: const Text('修改NTP服务器'),
-                             content: TextField(
-                               controller: controller,
-                               decoration: const InputDecoration(
-                                 labelText: '服务器地址',
-                                 hintText: '例如: ntp.aliyun.com',
-                               ),
-                             ),
-                             actions: [
-                               TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
-                               TextButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('确定')),
-                             ],
-                           ),
-                         );
-                         if (result != null && result.isNotEmpty) {
-                           await _saveSettings(_settings.copyWith(ntpServer: result));
-                           // Trigger sync manually to give immediate feedback
-                           await NtpService().syncTime();
-                           setState(() {});
-                         }
+                        final controller =
+                            TextEditingController(text: _settings.ntpServer);
+                        final result = await showDialog<String>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('修改NTP服务器'),
+                            content: TextField(
+                              controller: controller,
+                              decoration: const InputDecoration(
+                                labelText: '服务器地址',
+                                hintText: '例如: ntp.aliyun.com',
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('取消')),
+                              TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, controller.text),
+                                  child: const Text('确定')),
+                            ],
+                          ),
+                        );
+                        if (result != null && result.isNotEmpty) {
+                          await _saveSettings(
+                              _settings.copyWith(ntpServer: result));
+                          // Trigger sync manually to give immediate feedback
+                          await NtpService().syncTime();
+                          setState(() {});
+                        }
                       },
                     ),
                   ),
@@ -807,14 +869,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.remove_circle_outline),
-                            onPressed: _settings.ntpSyncInterval > 10 
-                                ? () => _saveSettings(_settings.copyWith(ntpSyncInterval: _settings.ntpSyncInterval - 10))
+                            onPressed: _settings.ntpSyncInterval > 10
+                                ? () => _saveSettings(_settings.copyWith(
+                                    ntpSyncInterval:
+                                        _settings.ntpSyncInterval - 10))
                                 : null,
                           ),
                           IconButton(
                             icon: const Icon(Icons.add_circle_outline),
                             onPressed: _settings.ntpSyncInterval < 1440
-                                ? () => _saveSettings(_settings.copyWith(ntpSyncInterval: _settings.ntpSyncInterval + 10))
+                                ? () => _saveSettings(_settings.copyWith(
+                                    ntpSyncInterval:
+                                        _settings.ntpSyncInterval + 10))
                                 : null,
                           ),
                         ],
@@ -826,11 +892,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: const Text('当前状态'),
                     subtitle: Text('时间偏移: ${NtpService().offset}ms'),
                     trailing: TextButton(
-                        onPressed: () async {
-                            await NtpService().syncTime();
-                            setState((){});
-                        },
-                        child: const Text('立即同步'),
+                      onPressed: () async {
+                        await NtpService().syncTime();
+                        setState(() {});
+                      },
+                      child: const Text('立即同步'),
                     ),
                   ),
                 ],
@@ -858,7 +924,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('接收课程和倒计时提醒'),
                   value: _settings.enableNotifications,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(enableNotifications: value));
+                    _saveSettings(
+                        _settings.copyWith(enableNotifications: value));
                   },
                 ),
                 if (_settings.enableNotifications) ...[
@@ -868,7 +935,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('开启后将在课程开始前提醒'),
                     value: _settings.enableCourseReminder,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(enableCourseReminder: value));
+                      _saveSettings(
+                          _settings.copyWith(enableCourseReminder: value));
                     },
                   ),
                   SwitchListTile(
@@ -877,7 +945,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('开启后将使用系统语音播报课程提醒'),
                     value: _settings.enableTtsForReminder,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(enableTtsForReminder: value));
+                      _saveSettings(
+                          _settings.copyWith(enableTtsForReminder: value));
                     },
                   ),
                   SwitchListTile(
@@ -886,7 +955,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('在课程开始时发送通知'),
                     value: _settings.showNotificationOnClassStart,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(showNotificationOnClassStart: value));
+                      _saveSettings(_settings.copyWith(
+                          showNotificationOnClassStart: value));
                     },
                   ),
                   SwitchListTile(
@@ -895,7 +965,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('在课程结束时发送通知'),
                     value: _settings.showNotificationOnClassEnd,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(showNotificationOnClassEnd: value));
+                      _saveSettings(_settings.copyWith(
+                          showNotificationOnClassEnd: value));
                     },
                   ),
                   SwitchListTile(
@@ -904,7 +975,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text('在倒计时结束时发送通知'),
                     value: _settings.showNotificationForCountdown,
                     onChanged: (value) {
-                      _saveSettings(_settings.copyWith(showNotificationForCountdown: value));
+                      _saveSettings(_settings.copyWith(
+                          showNotificationForCountdown: value));
                     },
                   ),
                 ],
@@ -980,7 +1052,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('监控应用性能指标'),
                   value: _settings.enablePerformanceMonitoring,
                   onChanged: (value) {
-                    _saveSettings(_settings.copyWith(enablePerformanceMonitoring: value));
+                    _saveSettings(
+                        _settings.copyWith(enablePerformanceMonitoring: value));
                   },
                 ),
                 ListTile(
@@ -990,27 +1063,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.edit_outlined),
                     onPressed: () async {
-                       final controller = TextEditingController(text: _settings.apiBaseUrl);
-                       final result = await showDialog<String>(
-                         context: context,
-                         builder: (context) => AlertDialog(
-                           title: const Text('修改API基础地址'),
-                           content: TextField(
-                             controller: controller,
-                             decoration: const InputDecoration(
-                               labelText: 'API地址',
-                               hintText: '例如: http://localhost:3000/api',
-                             ),
-                           ),
-                           actions: [
-                             TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
-                             TextButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('确定')),
-                           ],
-                         ),
-                       );
-                       if (result != null && result.isNotEmpty) {
-                         await _saveSettings(_settings.copyWith(apiBaseUrl: result));
-                       }
+                      final controller =
+                          TextEditingController(text: _settings.apiBaseUrl);
+                      final result = await showDialog<String>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('修改API基础地址'),
+                          content: TextField(
+                            controller: controller,
+                            decoration: const InputDecoration(
+                              labelText: 'API地址',
+                              hintText: '例如: http://localhost:3000/api',
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('取消')),
+                            TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, controller.text),
+                                child: const Text('确定')),
+                          ],
+                        ),
+                      );
+                      if (result != null && result.isNotEmpty) {
+                        await _saveSettings(
+                            _settings.copyWith(apiBaseUrl: result));
+                      }
                     },
                   ),
                 ),
@@ -1018,7 +1098,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // 关于
           Card(
             child: Column(
@@ -1056,7 +1136,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 /// 主题预览组件
 class ThemePreview extends StatelessWidget {
-
   const ThemePreview({
     super.key,
     required this.seedColor,

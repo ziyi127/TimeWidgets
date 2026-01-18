@@ -12,11 +12,12 @@ class TempScheduleChangeService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_prefsKey);
-      
+
       if (jsonString != null) {
         final jsonList = jsonDecode(jsonString) as List;
         return jsonList
-            .map((json) => TempScheduleChange.fromJson(json as Map<String, dynamic>))
+            .map((json) =>
+                TempScheduleChange.fromJson(json as Map<String, dynamic>))
             .toList();
       }
       return [];
@@ -56,7 +57,7 @@ class TempScheduleChangeService {
   Future<List<TempScheduleChange>> getChangesForDate(DateTime date) async {
     final changes = await loadChanges();
     final targetDate = DateTime(date.year, date.month, date.day);
-    
+
     return changes.where((c) {
       final changeDate = DateTime(c.date.year, c.date.month, c.date.day);
       return changeDate.isAtSameMomentAs(targetDate);
@@ -64,9 +65,10 @@ class TempScheduleChangeService {
   }
 
   /// 获取指定日期和节次的临时调课记录
-  Future<TempScheduleChange?> getChangeForPeriod(DateTime date, String timeSlotId) async {
+  Future<TempScheduleChange?> getChangeForPeriod(
+      DateTime date, String timeSlotId) async {
     final changes = await getChangesForDate(date);
-    
+
     try {
       return changes.firstWhere(
         (c) => c.type == TempChangeType.period && c.timeSlotId == timeSlotId,
@@ -79,7 +81,7 @@ class TempScheduleChangeService {
   /// 获取指定日期的按天调课记录
   Future<TempScheduleChange?> getDayChangeForDate(DateTime date) async {
     final changes = await getChangesForDate(date);
-    
+
     try {
       return changes.firstWhere((c) => c.type == TempChangeType.day);
     } catch (e) {
@@ -91,9 +93,10 @@ class TempScheduleChangeService {
   Future<void> cleanupOldChanges() async {
     final changes = await loadChanges();
     final cutoffDate = DateTime.now().subtract(const Duration(days: 30));
-    
-    final validChanges = changes.where((c) => c.date.isAfter(cutoffDate)).toList();
-    
+
+    final validChanges =
+        changes.where((c) => c.date.isAfter(cutoffDate)).toList();
+
     if (validChanges.length != changes.length) {
       await saveChanges(validChanges);
       Logger.i('清理了 ${changes.length - validChanges.length} 条过期的临时调课记录');

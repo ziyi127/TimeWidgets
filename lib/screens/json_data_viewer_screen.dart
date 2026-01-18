@@ -44,9 +44,9 @@ class _JsonDataViewerScreenState extends State<JsonDataViewerScreen> {
     try {
       final jsonData = _timetableData!.toJson();
       final jsonString = const JsonEncoder.withIndent('  ').convert(jsonData);
-      
+
       await Clipboard.setData(ClipboardData(text: jsonString));
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('JSON数据已复制到剪贴板')),

@@ -8,17 +8,19 @@ class WeekService {
   /// 返回周数（从1开始）
   int calculateWeekNumber(DateTime semesterStart, DateTime currentDate) {
     // 将日期标准化到当天的开始
-    final start = DateTime(semesterStart.year, semesterStart.month, semesterStart.day);
-    final current = DateTime(currentDate.year, currentDate.month, currentDate.day);
-    
+    final start =
+        DateTime(semesterStart.year, semesterStart.month, semesterStart.day);
+    final current =
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
+
     // 如果当前日期在学期开始之前，返回0
     if (current.isBefore(start)) {
       return 0;
     }
-    
+
     // 计算天数差
     final daysDifference = current.difference(start).inDays;
-    
+
     // 计算周数（向上取整，第一天就是第1周）
     return (daysDifference ~/ 7) + 1;
   }

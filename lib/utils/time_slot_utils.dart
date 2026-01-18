@@ -16,7 +16,8 @@ class TimeSlotUtils {
   /// [timeSlots] 所有时间段
   /// [currentTime] 当前时间
   /// 返回当前时间段的索引，如果没有则返回 -1
-  static int findCurrentTimeSlotIndex(List<TimeSlot> timeSlots, DateTime currentTime) {
+  static int findCurrentTimeSlotIndex(
+      List<TimeSlot> timeSlots, DateTime currentTime) {
     for (var i = 0; i < timeSlots.length; i++) {
       if (isCurrentTimeSlot(timeSlots[i], currentTime)) {
         return i;
@@ -29,7 +30,8 @@ class TimeSlotUtils {
   /// [timeSlots] 所有时间段
   /// [currentTime] 当前时间
   /// 返回当前时间段，如果没有则返回 null
-  static TimeSlot? getCurrentTimeSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
+  static TimeSlot? getCurrentTimeSlot(
+      List<TimeSlot> timeSlots, DateTime currentTime) {
     final index = findCurrentTimeSlotIndex(timeSlots, currentTime);
     return index >= 0 ? timeSlots[index] : null;
   }
@@ -38,7 +40,8 @@ class TimeSlotUtils {
   /// [timeSlots] 所有时间段
   /// [currentTime] 当前时间
   /// 返回下一个时间段，如果没有则返回 null
-  static TimeSlot? getNextTimeSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
+  static TimeSlot? getNextTimeSlot(
+      List<TimeSlot> timeSlots, DateTime currentTime) {
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
 
     for (final slot in timeSlots) {
@@ -51,7 +54,8 @@ class TimeSlotUtils {
   }
 
   /// 计算距离下一个时间段的分钟数
-  static int? getMinutesUntilNextSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
+  static int? getMinutesUntilNextSlot(
+      List<TimeSlot> timeSlots, DateTime currentTime) {
     final nextSlot = getNextTimeSlot(timeSlots, currentTime);
     if (nextSlot == null) return null;
 
@@ -61,7 +65,8 @@ class TimeSlotUtils {
   }
 
   /// 计算当前时间段的剩余分钟�?
-  static int? getRemainingMinutesInCurrentSlot(List<TimeSlot> timeSlots, DateTime currentTime) {
+  static int? getRemainingMinutesInCurrentSlot(
+      List<TimeSlot> timeSlots, DateTime currentTime) {
     final currentSlot = getCurrentTimeSlot(timeSlots, currentTime);
     if (currentSlot == null) return null;
 
@@ -96,7 +101,8 @@ class TimeSlotUtils {
   }
 
   /// 判断时间段是否即将开始（15分钟内）
-  static bool isTimeSlotUpcoming(TimeSlot timeSlot, DateTime currentTime, {int withinMinutes = 15}) {
+  static bool isTimeSlotUpcoming(TimeSlot timeSlot, DateTime currentTime,
+      {int withinMinutes = 15}) {
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
     final startMinutes = _parseTimeToMinutes(timeSlot.startTime);
     final diff = startMinutes - currentMinutes;

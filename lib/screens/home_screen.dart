@@ -51,11 +51,11 @@ class _HomeScreenState extends State<HomeScreen> {
           _settings = settings;
           _isLoadingSettings = false;
         });
-        
+
         if (_settings.showWeatherWidget) {
           _loadWeatherData();
         }
-        
+
         if (_settings.showCountdownWidget) {
           _loadCountdownData();
         }
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingCountdown = false;
         });
       }
-      
+
       // 然后从API获取最新数�?
       final countdownData = await _apiService.getCountdown();
       if (mounted) {
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoadingWeather = true;
         _weatherError = null;
       });
-      
+
       // 首先尝试从缓存获取数�?
       final cachedWeather = await CacheService.getCachedWeatherData();
       if (cachedWeather != null && mounted) {
@@ -119,10 +119,10 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingWeather = false;
         });
       }
-      
+
       // 然后从API获取最新数�?
       final weatherData = await _apiService.getWeather();
-      
+
       if (mounted) {
         setState(() {
           _weatherData = weatherData;
@@ -147,14 +147,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     if (_isLoadingSettings) {
       return Scaffold(
         backgroundColor: colorScheme.surface,
         body: const Center(child: CircularProgressIndicator()),
       );
     }
-    
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: SafeArea(
@@ -165,20 +165,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildResponsiveLayout(BuildContext context, BoxConstraints constraints) {
+  Widget _buildResponsiveLayout(
+      BuildContext context, BoxConstraints constraints) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // 响应式断�?
     final isCompact = constraints.maxWidth < 600;
     final isMedium = constraints.maxWidth >= 600 && constraints.maxWidth < 840;
     final isExpanded = constraints.maxWidth >= 840;
-    
+
     // 计算间距和尺�?
     final horizontalPadding = isCompact ? 16.0 : (isMedium ? 24.0 : 32.0);
     final verticalPadding = isCompact ? 16.0 : 24.0;
     final cardSpacing = isCompact ? 12.0 : 16.0;
-    
+
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -205,8 +206,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    colorScheme.primaryContainer.withAlpha((255 * 0.05).round()),
-                    colorScheme.secondaryContainer.withAlpha((255 * 0.05).round()),
+                    colorScheme.primaryContainer
+                        .withAlpha((255 * 0.05).round()),
+                    colorScheme.secondaryContainer
+                        .withAlpha((255 * 0.05).round()),
                     colorScheme.surface.withAlpha(0),
                   ],
                   stops: const [0.0, 0.5, 1.0],
@@ -220,7 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       'Smart Schedule',
-                      style: MD3TypographyStyles.headlineSmall(context).copyWith(
+                      style:
+                          MD3TypographyStyles.headlineSmall(context).copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -243,7 +247,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () async {
                   await Navigator.push(
                     context,
-                    MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
+                    MaterialPageRoute<void>(
+                        builder: (context) => const SettingsScreen()),
                   );
                   // Return from settings, reload
                   _loadSettings();
@@ -253,16 +258,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
             toolbarHeight: 80,
           ),
-          
+
           // Content
           SliverPadding(
             padding: EdgeInsets.symmetric(
               horizontal: horizontalPadding,
               vertical: verticalPadding,
             ),
-            sliver: isExpanded 
-              ? _buildExpandedLayout(cardSpacing)
-              : _buildCompactLayout(cardSpacing),
+            sliver: isExpanded
+                ? _buildExpandedLayout(cardSpacing)
+                : _buildCompactLayout(cardSpacing),
           ),
         ],
       ),
@@ -277,11 +282,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_settings.showTimeDisplayWidget) {
       timeDateWidgets.add(
         const Expanded(
-            flex: 2,
-            child: TimeDisplayWidget(
-              isCompact: true,
-            ),
+          flex: 2,
+          child: TimeDisplayWidget(
+            isCompact: true,
           ),
+        ),
       );
     }
     if (_settings.showDateDisplayWidget) {
@@ -346,9 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 课程表
     children.add(
-      const TimetableWidget(
-        
-      ),
+      const TimetableWidget(),
     );
 
     return SliverList(
@@ -365,9 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
       firstRowWidgets.add(
         const Expanded(
           flex: 2,
-          child: TimeDisplayWidget(
-            
-          ),
+          child: TimeDisplayWidget(),
         ),
       );
     }
@@ -377,9 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       firstRowWidgets.add(
         const Expanded(
-          child: DateDisplayWidget(
-            
-          ),
+          child: DateDisplayWidget(),
         ),
       );
     }
@@ -392,7 +391,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: WeatherWidget(
-              key: ValueKey('weather_expanded_${_isLoadingWeather}_${_weatherError == null}'),
+              key: ValueKey(
+                  'weather_expanded_${_isLoadingWeather}_${_weatherError == null}'),
               weatherData: _isLoadingWeather ? null : _weatherData,
               error: _weatherError,
               onRetry: _loadWeatherData,
@@ -411,9 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_settings.showCurrentClassWidget) {
       secondRowWidgets.add(
         const Expanded(
-          child: CurrentClassWidget(
-            
-          ),
+          child: CurrentClassWidget(),
         ),
       );
     }
@@ -427,7 +425,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: CountdownWidget(
-              key: ValueKey('countdown_expanded_${_isLoadingCountdown}_${_countdownError == null}'),
+              key: ValueKey(
+                  'countdown_expanded_${_isLoadingCountdown}_${_countdownError == null}'),
               countdownData: _isLoadingCountdown ? null : _countdownData,
               error: _countdownError,
               onRetry: _loadCountdownData,
@@ -443,9 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 第三行：课程表
     children.add(
-      const TimetableWidget(
-        
-      ),
+      const TimetableWidget(),
     );
 
     return SliverList(

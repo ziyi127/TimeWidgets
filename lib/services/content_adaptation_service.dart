@@ -23,9 +23,9 @@ class ContentAdaptationService {
       minFontSize ?? 10.0,
       maxFontSize ?? 24.0,
     );
-    
+
     final responsiveStyle = baseStyle.copyWith(fontSize: responsiveFontSize);
-    
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // 检查文本是否会溢出
@@ -34,11 +34,11 @@ class ContentAdaptationService {
           textDirection: TextDirection.ltr,
           maxLines: maxLines,
         );
-        
+
         textPainter.layout(maxWidth: constraints.maxWidth);
-        
+
         // 如果文本溢出，应用智能裁�?
-        if (textPainter.didExceedMaxLines || 
+        if (textPainter.didExceedMaxLines ||
             textPainter.size.height > constraints.maxHeight) {
           return _createAdaptiveText(
             text: text,
@@ -49,7 +49,7 @@ class ContentAdaptationService {
             textAlign: textAlign,
           );
         }
-        
+
         return Text(
           text,
           style: responsiveStyle,
@@ -73,19 +73,19 @@ class ContentAdaptationService {
       basePadding ?? const EdgeInsets.all(16),
       containerSize,
     );
-    
+
     Widget content = Container(
       padding: responsivePadding,
       child: child,
     );
-    
+
     if (enableScrolling) {
       content = SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: content,
       );
     }
-    
+
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: containerSize.width,
@@ -107,7 +107,7 @@ class ContentAdaptationService {
       baseSpacing ?? 8.0,
       containerSize,
     );
-    
+
     return ListView.separated(
       shrinkWrap: shrinkWrap,
       physics: physics ?? const BouncingScrollPhysics(),
@@ -129,12 +129,12 @@ class ContentAdaptationService {
       baseColumns ?? 2,
       containerSize,
     );
-    
+
     final responsiveSpacing = _calculateResponsiveSpacing(
       baseSpacing ?? 8.0,
       containerSize,
     );
-    
+
     return GridView.count(
       crossAxisCount: responsiveColumns,
       crossAxisSpacing: responsiveSpacing,
@@ -161,7 +161,7 @@ class ContentAdaptationService {
       minSize ?? 16.0,
       maxSize ?? 48.0,
     );
-    
+
     return Icon(
       icon,
       size: responsiveSize,
@@ -184,16 +184,16 @@ class ContentAdaptationService {
           textDirection: TextDirection.ltr,
           maxLines: maxLines,
         );
-        
+
         textPainter.layout(maxWidth: constraints.maxWidth);
-        
+
         final isOverflowing = textPainter.didExceedMaxLines ||
             textPainter.size.height > constraints.maxHeight;
-        
+
         if (!isOverflowing) {
           return Text(content, style: style, maxLines: maxLines);
         }
-        
+
         if (enableExpansion) {
           return _createExpandableText(
             content: content,
@@ -226,7 +226,7 @@ class ContentAdaptationService {
       spacing ?? 8.0,
       containerSize,
     );
-    
+
     if (direction == Axis.vertical) {
       return Column(
         mainAxisAlignment: mainAxisAlignment,
@@ -251,7 +251,7 @@ class ContentAdaptationService {
   ) {
     // 基于容器宽度的缩放因�?
     double scaleFactor = 1;
-    
+
     if (containerSize.width < 250) {
       scaleFactor = 0.8;
     } else if (containerSize.width < 300) {
@@ -261,14 +261,14 @@ class ContentAdaptationService {
     } else if (containerSize.width > 500) {
       scaleFactor = 1.2;
     }
-    
+
     // 基于容器高度的额外调�?
     if (containerSize.height < 100) {
       scaleFactor *= 0.9;
     } else if (containerSize.height > 200) {
       scaleFactor *= 1.05;
     }
-    
+
     final adjustedSize = baseFontSize * scaleFactor;
     return adjustedSize.clamp(minSize, maxSize);
   }
@@ -279,7 +279,7 @@ class ContentAdaptationService {
     Size containerSize,
   ) {
     double scaleFactor = 1;
-    
+
     if (containerSize.width < 250) {
       scaleFactor = 0.7;
     } else if (containerSize.width < 300) {
@@ -287,7 +287,7 @@ class ContentAdaptationService {
     } else if (containerSize.width > 400) {
       scaleFactor = 1.15;
     }
-    
+
     return EdgeInsets.only(
       left: (basePadding.left * scaleFactor).clamp(4.0, 32.0),
       top: (basePadding.top * scaleFactor).clamp(4.0, 32.0),
@@ -302,7 +302,7 @@ class ContentAdaptationService {
     Size containerSize,
   ) {
     double scaleFactor = 1;
-    
+
     if (containerSize.width < 250) {
       scaleFactor = 0.6;
     } else if (containerSize.width < 300) {
@@ -310,7 +310,7 @@ class ContentAdaptationService {
     } else if (containerSize.width > 400) {
       scaleFactor = 1.2;
     }
-    
+
     return (baseSpacing * scaleFactor).clamp(2.0, 24.0);
   }
 
@@ -322,7 +322,7 @@ class ContentAdaptationService {
     double maxSize,
   ) {
     double scaleFactor = 1;
-    
+
     if (containerSize.width < 250) {
       scaleFactor = 0.75;
     } else if (containerSize.width < 300) {
@@ -330,7 +330,7 @@ class ContentAdaptationService {
     } else if (containerSize.width > 400) {
       scaleFactor = 1.2;
     }
-    
+
     final adjustedSize = baseSize * scaleFactor;
     return adjustedSize.clamp(minSize, maxSize);
   }
@@ -361,7 +361,7 @@ class ContentAdaptationService {
     double fontSize = style.fontSize ?? 14.0;
     const minFontSize = 8.0;
     const step = 0.5;
-    
+
     while (fontSize >= minFontSize) {
       final testStyle = style.copyWith(fontSize: fontSize);
       final textPainter = TextPainter(
@@ -369,9 +369,9 @@ class ContentAdaptationService {
         textDirection: TextDirection.ltr,
         maxLines: maxLines,
       );
-      
+
       textPainter.layout(maxWidth: constraints.maxWidth);
-      
+
       if (textPainter.size.height <= constraints.maxHeight &&
           (!textPainter.didExceedMaxLines || maxLines == null)) {
         return Text(
@@ -382,10 +382,10 @@ class ContentAdaptationService {
           textAlign: textAlign,
         );
       }
-      
+
       fontSize -= step;
     }
-    
+
     // 如果无法适配，使用最小字体大�?
     return Text(
       text,
@@ -434,12 +434,12 @@ class ContentAdaptationService {
     Axis direction,
   ) {
     if (children.isEmpty) return children;
-    
+
     final spacedChildren = <Widget>[];
-    
+
     for (int i = 0; i < children.length; i++) {
       spacedChildren.add(children[i]);
-      
+
       if (i < children.length - 1) {
         if (direction == Axis.vertical) {
           spacedChildren.add(SizedBox(height: spacing));
@@ -448,7 +448,7 @@ class ContentAdaptationService {
         }
       }
     }
-    
+
     return spacedChildren;
   }
 
@@ -464,11 +464,11 @@ class ContentAdaptationService {
       textDirection: TextDirection.ltr,
       maxLines: maxLines,
     );
-    
+
     textPainter.layout(maxWidth: containerSize.width);
-    
+
     return textPainter.didExceedMaxLines ||
-           textPainter.size.height > containerSize.height;
+        textPainter.size.height > containerSize.height;
   }
 
   /// 计算文本所需的最小尺�?
@@ -483,9 +483,9 @@ class ContentAdaptationService {
       textDirection: TextDirection.ltr,
       maxLines: maxLines,
     );
-    
+
     textPainter.layout(maxWidth: maxWidth ?? double.infinity);
-    
+
     return textPainter.size;
   }
 

@@ -8,7 +8,6 @@ import '../utils/logger.dart';
 
 /// ClassIsland导入结果
 class ClassIslandImportResult {
-
   ClassIslandImportResult({
     required this.success,
     this.data,
@@ -16,7 +15,8 @@ class ClassIslandImportResult {
     this.stats,
   });
 
-  factory ClassIslandImportResult.success(TimetableData data, ClassIslandImportStats stats) {
+  factory ClassIslandImportResult.success(
+      TimetableData data, ClassIslandImportStats stats) {
     return ClassIslandImportResult(success: true, data: data, stats: stats);
   }
 
@@ -31,7 +31,6 @@ class ClassIslandImportResult {
 
 /// ClassIsland导入统计
 class ClassIslandImportStats {
-
   ClassIslandImportStats({
     required this.subjectsCount,
     required this.timeLayoutsCount,
@@ -89,7 +88,8 @@ class ClassislandImportService {
   }
 
   /// 将Classisland数据转换为课表数据
-  static ClassIslandImportResult _convertClassislandToTimetable(Map<String, dynamic> data) {
+  static ClassIslandImportResult _convertClassislandToTimetable(
+      Map<String, dynamic> data) {
     final courses = <CourseInfo>[];
     final timeSlots = <TimeSlot>[];
     final dailyCourses = <DailyCourse>[];
@@ -98,32 +98,36 @@ class ClassislandImportService {
 
     final subjectIdToCourseId = <String, String>{};
     final timeLayoutIdMap = <String, String>{};
-    
+
     int subjectsCount = 0;
     int timeLayoutsCount = 0;
     int classPlansCount = 0;
     int totalTimeSlotsCount = 0;
-    
+
     // 转换科目为课程
     if (data['Subjects'] != null) {
       final subjects = data['Subjects'] as Map<String, dynamic>;
       int idCounter = 1;
-      
+
       subjects.forEach((key, value) {
         final courseId = idCounter.toString();
         subjectIdToCourseId[key] = courseId;
-        
-        final initialName = value['InitialName'] as String? ?? '';
-        final isOutdoor = value['IsOutDoor'] as bool? ?? false;
-        
-        courses.add(CourseInfo(
-          id: courseId,
-          name: value['Name'] as String? ?? '未知课程',
-          abbreviation: initialName,
-          teacher: value['TeacherName'] as String? ?? '',
-          color: ColorUtils.toHexString(ColorUtils.generateColorFromName(value['Name'] as String? ?? '')),
-          isOutdoor: isOutdoor,
-        ),);
+
+        final subjectMap = value as Map<String, dynamic>;
+        final initialName = subjectMap['InitialName'] as String? ?? '';
+        final isOutdoor = subjectMap['IsOutDoor'] as bool? ?? false;
+
+        courses.add(
+          CourseInfo(
+            id: courseId,
+            name: subjectMap['Name'] as String? ?? '未知课程',
+            abbreviation: initialName,
+            teacher: subjectMap['TeacherName'] as String? ?? '',
+            color: ColorUtils.toHexString(ColorUtils.generateColorFromName(
+                subjectMap['Name'] as String? ?? '')),
+            isOutdoor: isOutdoor,
+          ),
+        );
         idCounter++;
         subjectsCount++;
       });
@@ -131,63 +135,70 @@ class ClassislandImportService {
 
     // 转换时间表(TimeLayouts)
     if (data['TimeLayouts'] != null) {
-      final classIslandTimeLayouts = data['TimeLayouts'] as Map<String, dynamic>;
+      final classIslandTimeLayouts =
+          data['TimeLayouts'] as Map<String, dynamic>;
       int layoutIdCounter = 1;
-      
+
       classIslandTimeLayouts.forEach((layoutKey, layoutValue) {
         final layoutId = layoutIdCounter.toString();
         timeLayoutIdMap[layoutKey] = layoutId;
-        
+
+        final layoutMap = layoutValue as Map<String, dynamic>;
         final layoutTimeSlots = <TimeSlot>[];
         int slotIdCounter = 1;
-        
-        if (layoutValue['Layouts'] != null) {
-          final layouts = layoutValue['Layouts'] as List<dynamic>;
-          
+
+        if (layoutMap['Layouts'] != null) {
+          final layouts = layoutMap['Layouts'] as List<dynamic>;
+
           for (var i = 0; i < layouts.length; i++) {
-            final layout = layouts[i];
-            final startSecond = layout['StartSecond'] as String? ?? '2024-01-01T08:00:00';
-            final endSecond = layout['EndSecond'] as String? ?? '2024-01-01T08:45:00';
-            
+            final layout = layouts[i] as Map<String, dynamic>;
+            final startSecond =
+                layout['StartSecond'] as String? ?? '2024-01-01T08:00:00';
+            final endSecond =
+                layout['EndSecond'] as String? ?? '2024-01-01T08:45:00';
+
             final startTime = _extractTime(startSecond);
             final endTime = _extractTime(endSecond);
-            
+
             // 转换时间点类型(ClassIsland: 0=上课, 1=课间, 2=分割线)
             final timeType = layout['TimeType'] as int? ?? 0;
             final type = TimePointType.values[timeType.clamp(0, 2)];
-            
+
             final defaultSubjectId = layout['DefaultClassId'] as String?;
-            final mappedSubjectId = defaultSubjectId != null 
-                ? subjectIdToCourseId[defaultSubjectId] 
+            final mappedSubjectId = defaultSubjectId != null
+                ? subjectIdToCourseId[defaultSubjectId]
                 : null;
-            
+
             final slot = TimeSlot(
               id: '${layoutId}_$slotIdCounter',
               startTime: startTime,
               endTime: endTime,
-              name: (layout['Name'] ?? '第${layoutTimeSlots.length + 1}节').toString(),
+              name: (layout['Name'] ?? '第${layoutTimeSlots.length + 1}节')
+                  .toString(),
               type: type,
               defaultSubjectId: mappedSubjectId,
               isHiddenByDefault: layout['IsHideDefault'] as bool? ?? false,
             );
-            
+
             layoutTimeSlots.add(slot);
-            
+
             if (type == TimePointType.classTime && timeSlots.length < 20) {
               timeSlots.add(slot.copyWith(id: slotIdCounter.toString()));
             }
-            
+
             slotIdCounter++;
             totalTimeSlotsCount++;
           }
         }
-        
-        timeLayouts.add(TimeLayout(
-          id: layoutId,
-          name: (layoutValue['Name'] ?? '时间表$layoutIdCounter').toString(),
-          timeSlots: layoutTimeSlots,
-        ),);
-        
+
+        timeLayouts.add(
+          TimeLayout(
+            id: layoutId,
+            name: (layoutMap['Name'] ?? '时间表$layoutIdCounter').toString(),
+            timeSlots: layoutTimeSlots,
+          ),
+        );
+
         layoutIdCounter++;
         timeLayoutsCount++;
       });
@@ -198,37 +209,38 @@ class ClassislandImportService {
       final classPlans = data['ClassPlans'] as Map<String, dynamic>;
       int scheduleIdCounter = 1;
       int dailyCourseIdCounter = 1;
-      
+
       classPlans.forEach((planKey, planValue) {
-        if (planValue['TimeRule'] != null) {
-          final timeRule = planValue['TimeRule'];
-          final classes = planValue['Classes'] as List<dynamic>? ?? [];
-          
+        final planMap = planValue as Map<String, dynamic>;
+        if (planMap['TimeRule'] != null) {
+          final timeRule = planMap['TimeRule'] as Map<String, dynamic>;
+          final classes = planMap['Classes'] as List<dynamic>? ?? [];
+
           final weekDay = timeRule['WeekDay'] as int? ?? 1;
           final weekCountDiv = timeRule['WeekCountDiv'] as int? ?? 0;
-          
+
           // 转换周类型(ClassIsland: 0=全部, 1=单周, 2=双周)
-          final weekType = weekCountDiv == 0 
-              ? WeekType.both 
+          final weekType = weekCountDiv == 0
+              ? WeekType.both
               : (weekCountDiv == 1 ? WeekType.single : WeekType.double);
-          
-          final timeLayoutKey = planValue['TimeLayoutId'] as String?;
-          final mappedTimeLayoutId = timeLayoutKey != null 
-              ? timeLayoutIdMap[timeLayoutKey] 
-              : null;
-          
+
+          final timeLayoutKey = planMap['TimeLayoutId'] as String?;
+          final mappedTimeLayoutId =
+              timeLayoutKey != null ? timeLayoutIdMap[timeLayoutKey] : null;
+
           final scheduleCourses = <DailyCourse>[];
-          
+
           // 转换星期几(ClassIsland: 0=周日, 1=周一...; 我们: 0=周一, 1=周二..., 6=周日)
           final dayOfWeek = weekDay == 0 ? 6 : weekDay - 1;
-          
+
           for (var i = 0; i < classes.length; i++) {
-            final classItem = classes[i];
+            final classItem = classes[i] as Map<String, dynamic>;
             final subjectId = classItem['SubjectId'] as String?;
-            
-            if (subjectId != null && subjectIdToCourseId.containsKey(subjectId)) {
+
+            if (subjectId != null &&
+                subjectIdToCourseId.containsKey(subjectId)) {
               final courseId = subjectIdToCourseId[subjectId]!;
-              
+
               String timeSlotId;
               if (mappedTimeLayoutId != null && i < timeLayouts.length) {
                 final layout = timeLayouts.firstWhere(
@@ -245,35 +257,39 @@ class ClassislandImportService {
               } else {
                 timeSlotId = (i + 1).toString();
               }
-              
+
               final dailyCourse = DailyCourse(
                 id: dailyCourseIdCounter.toString(),
-                dayOfWeek: dayOfWeek < 7 ? DayOfWeek.values[dayOfWeek] : DayOfWeek.monday,
+                dayOfWeek: dayOfWeek < 7
+                    ? DayOfWeek.values[dayOfWeek]
+                    : DayOfWeek.monday,
                 timeSlotId: timeSlotId,
                 courseId: courseId,
                 weekType: weekType,
               );
-              
+
               scheduleCourses.add(dailyCourse);
               dailyCourses.add(dailyCourse);
               dailyCourseIdCounter++;
             }
           }
-          
-          schedules.add(Schedule(
-            id: scheduleIdCounter.toString(),
-            name: (planValue['Name'] ?? '课表 $scheduleIdCounter').toString(),
-            timeLayoutId: mappedTimeLayoutId,
-            triggerRule: ScheduleTriggerRule(
-              weekDay: weekDay,
-              weekType: weekType,
-              isEnabled: planValue['IsEnabled'] as bool? ?? true,
+
+          schedules.add(
+            Schedule(
+              id: scheduleIdCounter.toString(),
+              name: (planMap['Name'] ?? '课表 $scheduleIdCounter').toString(),
+              timeLayoutId: mappedTimeLayoutId,
+              triggerRule: ScheduleTriggerRule(
+                weekDay: weekDay,
+                weekType: weekType,
+                isEnabled: planMap['IsEnabled'] as bool? ?? true,
+              ),
+              courses: scheduleCourses,
+              isAutoEnabled: planMap['IsEnabled'] as bool? ?? true,
+              priority: scheduleIdCounter,
             ),
-            courses: scheduleCourses,
-            isAutoEnabled: planValue['IsEnabled'] as bool? ?? true,
-            priority: scheduleIdCounter,
-          ),);
-          
+          );
+
           scheduleIdCounter++;
           classPlansCount++;
         }

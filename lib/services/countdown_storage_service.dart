@@ -8,9 +8,10 @@ class CountdownStorageService {
   factory CountdownStorageService() => _instance;
   CountdownStorageService._internal();
   static const String _countdownListKey = 'countdown_list';
-  
+
   // 单例模式
-  static final CountdownStorageService _instance = CountdownStorageService._internal();
+  static final CountdownStorageService _instance =
+      CountdownStorageService._internal();
 
   // 数据变更流
   final _changeController = StreamController<void>.broadcast();
@@ -27,7 +28,9 @@ class CountdownStorageService {
 
       if (jsonString != null) {
         final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
-        return jsonList.map((json) => CountdownData.fromJson(json as Map<String, dynamic>)).toList();
+        return jsonList
+            .map((json) => CountdownData.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       return [];
     } catch (e) {
@@ -40,13 +43,13 @@ class CountdownStorageService {
     try {
       final countdowns = await loadAllCountdowns();
       final existingIndex = countdowns.indexWhere((c) => c.id == countdown.id);
-      
+
       if (existingIndex >= 0) {
         countdowns[existingIndex] = countdown;
       } else {
         countdowns.add(countdown);
       }
-      
+
       await saveAllCountdowns(countdowns);
       _changeController.add(null); // 通知变更
     } catch (e) {
@@ -59,7 +62,7 @@ class CountdownStorageService {
     try {
       final countdowns = await loadAllCountdowns();
       final index = countdowns.indexWhere((c) => c.id == countdown.id);
-      
+
       if (index >= 0) {
         countdowns[index] = countdown;
         await saveAllCountdowns(countdowns);
@@ -116,7 +119,7 @@ class CountdownStorageService {
   Future<CountdownData?> getNextCountdown() async {
     final countdowns = await getSortedCountdowns();
     final now = DateTime.now();
-    
+
     try {
       return countdowns.firstWhere(
         (c) => c.targetDate.isAfter(now),

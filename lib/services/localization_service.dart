@@ -8,7 +8,7 @@ class LocalizationService {
     // 应用标题
     'app_title': '智慧课程表',
     'app_subtitle': '智能课程管理助手',
-    
+
     // 主界面
     'home': '首页',
     'today': '今天',
@@ -21,7 +21,7 @@ class LocalizationService {
     'next_class': '下节课程',
     'class_in_progress': '正在上课',
     'class_break': '课间休息',
-    
+
     // 导航和菜单
     'settings': '设置',
     'timetable_edit': '课表编辑',
@@ -36,7 +36,7 @@ class LocalizationService {
     'add': '添加',
     'confirm': '确认',
     'close': '关闭',
-    
+
     // 设置页面
     'theme_settings': '主题设置',
     'theme_mode': '主题模式',
@@ -57,7 +57,7 @@ class LocalizationService {
     'language_settings': '语言设置',
     'reset_settings': '重置设置',
     'reset_settings_confirm': '确定要重置所有设置吗？',
-    
+
     // 课表编辑
     'timetable_management': '课表管理',
     'course_management': '课程管理',
@@ -82,7 +82,7 @@ class LocalizationService {
     'friday': '星期五',
     'saturday': '星期六',
     'sunday': '星期日',
-    
+
     // 倒计时
     'countdown_events': '倒计时事件',
     'add_countdown': '添加倒计时',
@@ -101,7 +101,7 @@ class LocalizationService {
     'event_passed': '事件已过期',
     'view_all_countdowns': '查看全部',
     'no_countdowns': '暂无倒计时事件',
-    
+
     // 天气
     'weather_info': '天气信息',
     'temperature': '温度',
@@ -110,7 +110,7 @@ class LocalizationService {
     'wind_speed': '风速',
     'weather_loading': '天气加载中..',
     'weather_error': '天气信息获取失败',
-    
+
     // 数据导入导出
     'import_export': '导入导出',
     'export_timetable': '导出课表',
@@ -121,7 +121,7 @@ class LocalizationService {
     'select_file': '选择文件',
     'file_format_error': '文件格式错误',
     'export_location': '导出位置',
-    
+
     // 错误消息
     'error': '错误',
     'warning': '警告',
@@ -138,7 +138,7 @@ class LocalizationService {
     'window_show_failed': '窗口显示失败',
     'localization_error': '本地化资源加载失败',
     'unknown_error': '未知错误',
-    
+
     // 错误解决建议
     'check_network_connection': '请检查网络连接后重试',
     'check_network_settings': '请检查网络设置',
@@ -148,7 +148,7 @@ class LocalizationService {
     'restart_application': '请重启应用程序',
     'check_window_manager': '请检查窗口管理器设置',
     'reinstall_application': '请重新安装应用程序',
-    
+
     // 对话
     'dialog_title_confirm': '确认',
     'dialog_title_error': '错误',
@@ -159,14 +159,14 @@ class LocalizationService {
     'dialog_button_yes': '是',
     'dialog_button_no': '否',
     'dialog_button_retry': '重试',
-    
+
     // 时间格式
     'time_format_24h': 'HH:mm',
     'date_format_short': 'MM-dd',
     'date_format_long': 'yyyy年MM月dd日',
     'datetime_format': 'yyyy年MM月dd日 HH:mm',
     'weekday_format': 'EEEE',
-    
+
     // 单位
     'unit_minutes': '分钟',
     'unit_hours': '小时',
@@ -176,7 +176,7 @@ class LocalizationService {
     'unit_fahrenheit': '°F',
     'unit_percent': '%',
     'unit_kmh': 'km/h',
-    
+
     // 状态
     'status_loading': '加载中..',
     'status_saving': '保存中..',
@@ -185,7 +185,7 @@ class LocalizationService {
     'status_online': '在线',
     'status_connected': '已连接',
     'status_disconnected': '已断开',
-    
+
     // 空状态
     'empty_courses': '暂无课程',
     'empty_schedule': '今日无课程安排',
@@ -194,29 +194,29 @@ class LocalizationService {
   };
 
   /// 获取本地化字符串
-  /// 
+  ///
   /// [key] 字符串键
   /// [params] 参数映射，用于替换字符串中的占位符
-  /// 
+  ///
   /// 返回本地化后的字符串，如果键不存在则返回键本身
   static String getString(String key, {Map<String, dynamic>? params}) {
     String text = chineseStrings[key] ?? key;
-    
+
     // 替换参数占位符
     if (params != null) {
       params.forEach((paramKey, value) {
         text = text.replaceAll('{$paramKey}', value.toString());
       });
     }
-    
+
     return text;
   }
 
   /// 格式化日期为中文格式
-  /// 
+  ///
   /// [date] 要格式化的日期
   /// [format] 格式类型，可选值：'short', 'long', 'datetime'
-  /// 
+  ///
   /// 返回格式化后的中文日期字符串
   static String formatDate(DateTime date, {String format = 'long'}) {
     try {
@@ -239,10 +239,10 @@ class LocalizationService {
   }
 
   /// 格式化时间为中文格式
-  /// 
+  ///
   /// [time] 要格式化的时间
   /// [use24Hour] 是否使用24小时制，默认为true
-  /// 
+  ///
   /// 返回格式化后的中文时间字符串
   static String formatTime(DateTime time, {bool use24Hour = true}) {
     try {
@@ -258,59 +258,64 @@ class LocalizationService {
   }
 
   /// 格式化周次显示
-  /// 
+  ///
   /// [weekNumber] 周次数字
-  /// 
+  ///
   /// 返回格式化后的周次字符串
   static String formatWeek(int weekNumber) {
     return getString('week_format', params: {'week': weekNumber});
   }
 
   /// 获取中文星期名称
-  /// 
+  ///
   /// [weekday] 星期数字，1-7，1为星期一
-  /// 
+  ///
   /// 返回中文星期名称
   static String _getChineseWeekday(int weekday) {
     const weekdays = [
-      '星期一', '星期二', '星期三', '星期四', 
-      '星期五', '星期六', '星期日',
+      '星期一',
+      '星期二',
+      '星期三',
+      '星期四',
+      '星期五',
+      '星期六',
+      '星期日',
     ];
-    
+
     if (weekday >= 1 && weekday <= 7) {
       return weekdays[weekday - 1];
     }
-    
+
     return '星期一'; // 默认值
   }
 
   /// 获取中文星期名称（通过日期）
-  /// 
+  ///
   /// [date] 日期
-  /// 
+  ///
   /// 返回中文星期名称
   static String getChineseWeekday(DateTime date) {
     return _getChineseWeekday(date.weekday);
   }
 
   /// 格式化倒计时显示
-  /// 
+  ///
   /// [targetDate] 目标日期
   /// [currentDate] 当前日期，默认为现在
-  /// 
+  ///
   /// 返回格式化后的倒计时字符串
   static String formatCountdown(DateTime targetDate, {DateTime? currentDate}) {
     currentDate ??= DateTime.now();
     final difference = targetDate.difference(currentDate);
-    
+
     if (difference.isNegative) {
       return getString('event_passed');
     }
-    
+
     final days = difference.inDays;
     final hours = difference.inHours % 24;
     final minutes = difference.inMinutes % 60;
-    
+
     if (days > 0) {
       return getString('days_remaining', params: {'days': days});
     } else if (hours > 0) {
@@ -321,10 +326,10 @@ class LocalizationService {
   }
 
   /// 获取错误消息
-  /// 
+  ///
   /// [errorCode] 错误代码
   /// [context] 错误上下文信息
-  /// 
+  ///
   /// 返回本地化的错误消息
   static String getErrorMessage(String errorCode, {String? context}) {
     final message = getString(errorCode);
@@ -335,9 +340,9 @@ class LocalizationService {
   }
 
   /// 获取错误解决建议
-  /// 
+  ///
   /// [errorCode] 错误代码
-  /// 
+  ///
   /// 返回本地化的解决建议
   static String getErrorResolution(String errorCode) {
     final resolutionKey = '${errorCode}_resolution';
@@ -345,9 +350,9 @@ class LocalizationService {
   }
 
   /// 检查字符串是否为中文
-  /// 
+  ///
   /// [text] 要检查的文本
-  /// 
+  ///
   /// 返回是否包含中文字符
   static bool isChineseText(String text) {
     final chineseRegex = RegExp(r'[\u4e00-\u9fa5]');
@@ -355,16 +360,16 @@ class LocalizationService {
   }
 
   /// 获取所有可用的字符串键
-  /// 
+  ///
   /// 返回所有字符串键的列表
   static List<String> getAllKeys() {
     return chineseStrings.keys.toList();
   }
 
   /// 检查字符串键是否存在
-  /// 
+  ///
   /// [key] 字符串键
-  /// 
+  ///
   /// 返回键是否存在
   static bool hasKey(String key) {
     return chineseStrings.containsKey(key);

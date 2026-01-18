@@ -5,7 +5,6 @@ import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class ValidationResult {
-
   ValidationResult({
     required this.isValid,
     this.errorMessage,
@@ -26,7 +25,6 @@ class ValidationResult {
 
 /// 导入结果
 class ImportResult {
-
   ImportResult({
     required this.success,
     this.data,
@@ -49,7 +47,6 @@ class ImportResult {
 
 /// 导入统计
 class ImportStats {
-
   ImportStats({
     required this.coursesCount,
     required this.timeSlotsCount,
@@ -162,8 +159,11 @@ class TimetableExportService {
       if (slot is! Map<String, dynamic>) {
         return ValidationResult.invalid('timeSlots[$i] 必须是对象');
       }
-      if (!slot.containsKey('id') || !slot.containsKey('startTime') || !slot.containsKey('endTime')) {
-        return ValidationResult.invalid('timeSlots[$i] 缺少必需字段 (id, startTime, endTime)');
+      if (!slot.containsKey('id') ||
+          !slot.containsKey('startTime') ||
+          !slot.containsKey('endTime')) {
+        return ValidationResult.invalid(
+            'timeSlots[$i] 缺少必需字段 (id, startTime, endTime)');
       }
     }
 
@@ -185,10 +185,10 @@ class TimetableExportService {
       if (dc is! Map<String, dynamic>) {
         return ValidationResult.invalid('dailyCourses[$i] 必须是对象');
       }
-      
+
       final courseId = dc['courseId']?.toString();
       final timeSlotId = dc['timeSlotId']?.toString();
-      
+
       if (courseId != null && !courseIds.contains(courseId)) {
         warnings.add('dailyCourses[$i] 引用了不存在的课程 ID: $courseId');
       }
@@ -274,11 +274,11 @@ class TimetableExportService {
         if (bytes != null) {
           final jsonString = utf8.decode(bytes);
           final validation = validateJson(jsonString);
-          
+
           if (!validation.isValid) {
             throw Exception(validation.errorMessage);
           }
-          
+
           return importFromJson(jsonString);
         }
       }
@@ -309,11 +309,11 @@ class TimetableExportService {
 
       final jsonString = utf8.decode(bytes);
       final validation = validateJson(jsonString);
-      
+
       if (!validation.isValid) {
         return ImportResult.failure(validation.errorMessage ?? '验证失败');
       }
-      
+
       return importFromJsonWithStats(jsonString);
     } catch (e) {
       Logger.e('Error importing from file: $e');

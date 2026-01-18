@@ -11,7 +11,7 @@ class TimetableEditService extends ChangeNotifier {
   final List<DailyCourse> _dailyCourses = [];
   final List<TimeLayout> _timeLayouts = [];
   final List<Schedule> _schedules = [];
-  
+
   // Getters
   List<CourseInfo> get courses => List.unmodifiable(_courses);
   List<TimeSlot> get timeSlots => List.unmodifiable(_timeSlots);
@@ -29,7 +29,7 @@ class TimetableEditService extends ChangeNotifier {
         timeLayouts: List.from(_timeLayouts),
         schedules: List.from(_schedules),
       );
-      
+
       await _storageService.saveTimetableData(updatedData);
       _timetableData = updatedData;
     } catch (e) {
@@ -43,7 +43,7 @@ class TimetableEditService extends ChangeNotifier {
     _autoSave();
     notifyListeners();
   }
-  
+
   void updateCourse(CourseInfo course) {
     final index = _courses.indexWhere((c) => c.id == course.id);
     if (index != -1) {
@@ -52,7 +52,7 @@ class TimetableEditService extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void deleteCourse(String courseId) {
     _courses.removeWhere((c) => c.id == courseId);
     // Also remove related daily courses
@@ -60,14 +60,14 @@ class TimetableEditService extends ChangeNotifier {
     _autoSave();
     notifyListeners();
   }
-  
+
   // Time slot management methods
   void addTimeSlot(TimeSlot timeSlot) {
     _timeSlots.add(timeSlot);
     _autoSave();
     notifyListeners();
   }
-  
+
   void updateTimeSlot(TimeSlot timeSlot) {
     final index = _timeSlots.indexWhere((t) => t.id == timeSlot.id);
     if (index != -1) {
@@ -76,7 +76,7 @@ class TimetableEditService extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void deleteTimeSlot(String timeSlotId) {
     _timeSlots.removeWhere((t) => t.id == timeSlotId);
     // Also remove related daily courses
@@ -84,32 +84,38 @@ class TimetableEditService extends ChangeNotifier {
     _autoSave();
     notifyListeners();
   }
-  
+
   // Daily course management methods
   void addDailyCourse(DailyCourse dailyCourse) {
     // Conflict resolution:
     // If adding 'both', remove any 'single' or 'double' for this slot
     if (dailyCourse.weekType == WeekType.both) {
-        _dailyCourses.removeWhere((d) => 
-            d.dayOfWeek == dailyCourse.dayOfWeek && 
+      _dailyCourses.removeWhere(
+        (d) =>
+            d.dayOfWeek == dailyCourse.dayOfWeek &&
             d.timeSlotId == dailyCourse.timeSlotId &&
-            d.weekType != WeekType.both,);
+            d.weekType != WeekType.both,
+      );
     }
-    
+
     // If adding 'single' or 'double', remove 'both' for this slot
     if (dailyCourse.weekType != WeekType.both) {
-        _dailyCourses.removeWhere((d) => 
-            d.dayOfWeek == dailyCourse.dayOfWeek && 
+      _dailyCourses.removeWhere(
+        (d) =>
+            d.dayOfWeek == dailyCourse.dayOfWeek &&
             d.timeSlotId == dailyCourse.timeSlotId &&
-            d.weekType == WeekType.both,);
+            d.weekType == WeekType.both,
+      );
     }
 
     // Check if a course already exists for this time slot and week type
-    final existingIndex = _dailyCourses.indexWhere((d) => 
-        d.dayOfWeek == dailyCourse.dayOfWeek && 
-        d.timeSlotId == dailyCourse.timeSlotId &&
-        d.weekType == dailyCourse.weekType,);
-    
+    final existingIndex = _dailyCourses.indexWhere(
+      (d) =>
+          d.dayOfWeek == dailyCourse.dayOfWeek &&
+          d.timeSlotId == dailyCourse.timeSlotId &&
+          d.weekType == dailyCourse.weekType,
+    );
+
     if (existingIndex != -1) {
       // Update existing course
       _dailyCourses[existingIndex] = dailyCourse;
@@ -120,7 +126,7 @@ class TimetableEditService extends ChangeNotifier {
     _autoSave();
     notifyListeners();
   }
-  
+
   void updateDailyCourse(DailyCourse dailyCourse) {
     final index = _dailyCourses.indexWhere((d) => d.id == dailyCourse.id);
     if (index != -1) {
@@ -129,13 +135,13 @@ class TimetableEditService extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void deleteDailyCourse(String dailyCourseId) {
     _dailyCourses.removeWhere((d) => d.id == dailyCourseId);
     _autoSave();
     notifyListeners();
   }
-  
+
   // Load timetable data
   Future<void> loadData() async {
     try {
@@ -150,22 +156,22 @@ class TimetableEditService extends ChangeNotifier {
     _timetableData = data;
     _courses.clear();
     _courses.addAll(data.courses);
-    
+
     _timeSlots.clear();
     _timeSlots.addAll(data.timeSlots);
-    
+
     _dailyCourses.clear();
     _dailyCourses.addAll(data.dailyCourses);
-    
+
     _timeLayouts.clear();
     _timeLayouts.addAll(data.timeLayouts);
-    
+
     _schedules.clear();
     _schedules.addAll(data.schedules);
-    
+
     notifyListeners();
   }
-  
+
   // Save timetable data
   Future<void> saveTimetableData() async {
     if (_timetableData != null) {
@@ -176,7 +182,7 @@ class TimetableEditService extends ChangeNotifier {
         timeLayouts: List.from(_timeLayouts),
         schedules: List.from(_schedules),
       );
-      
+
       await _storageService.saveTimetableData(updatedData);
       _timetableData = updatedData;
     }
@@ -253,7 +259,8 @@ class TimetableEditService extends ChangeNotifier {
   Schedule? getActiveSchedule(DateTime date, {int? currentWeekNumber}) {
     final matchingSchedules = _schedules.where((schedule) {
       if (!schedule.isAutoEnabled) return false;
-      return schedule.triggerRule.matches(date, currentWeekNumber: currentWeekNumber);
+      return schedule.triggerRule
+          .matches(date, currentWeekNumber: currentWeekNumber);
     }).toList();
 
     if (matchingSchedules.isEmpty) return null;
@@ -267,7 +274,8 @@ class TimetableEditService extends ChangeNotifier {
   List<Schedule> getMatchingSchedules(DateTime date, {int? currentWeekNumber}) {
     final matchingSchedules = _schedules.where((schedule) {
       if (!schedule.isAutoEnabled) return false;
-      return schedule.triggerRule.matches(date, currentWeekNumber: currentWeekNumber);
+      return schedule.triggerRule
+          .matches(date, currentWeekNumber: currentWeekNumber);
     }).toList();
 
     // Sort by priority (lower number = higher priority)
@@ -286,45 +294,54 @@ class TimetableEditService extends ChangeNotifier {
   /// Check if a course/subject can be deleted (not in use)
   bool canDeleteCourse(String courseId) {
     return !_dailyCourses.any((d) => d.courseId == courseId) &&
-           !_schedules.any((s) => s.courses.any((c) => c.courseId == courseId));
+        !_schedules.any((s) => s.courses.any((c) => c.courseId == courseId));
   }
 
   /// Find all usages of a subject/course
   List<SubjectUsage> findSubjectUsages(String courseId) {
     final usages = <SubjectUsage>[];
-    
+
     // Check daily courses
     for (final dailyCourse in _dailyCourses) {
       if (dailyCourse.courseId == courseId) {
         final timeSlot = getTimeSlotById(dailyCourse.timeSlotId);
-        usages.add(SubjectUsage(
-          type: SubjectUsageType.dailyCourse,
-          description: '${dailyCourse.dayOfWeek.name} - ${timeSlot?.name ?? dailyCourse.timeSlotId}',
-        ),);
+        usages.add(
+          SubjectUsage(
+            type: SubjectUsageType.dailyCourse,
+            description:
+                '${dailyCourse.dayOfWeek.name} - ${timeSlot?.name ?? dailyCourse.timeSlotId}',
+          ),
+        );
       }
     }
-    
+
     // Check schedules
     for (final schedule in _schedules) {
       for (final course in schedule.courses) {
         if (course.courseId == courseId) {
           final timeSlot = getTimeSlotById(course.timeSlotId);
-          usages.add(SubjectUsage(
-            type: SubjectUsageType.schedule,
-            description: '${schedule.name} - ${timeSlot?.name ?? course.timeSlotId}',
-          ),);
+          usages.add(
+            SubjectUsage(
+              type: SubjectUsageType.schedule,
+              description:
+                  '${schedule.name} - ${timeSlot?.name ?? course.timeSlotId}',
+            ),
+          );
         }
       }
     }
-    
+
     return usages;
   }
 
   // Get courses for a specific day
-  List<DailyCourse> getDailyCoursesForDay(DayOfWeek dayOfWeek, {WeekType? weekType}) {
+  List<DailyCourse> getDailyCoursesForDay(DayOfWeek dayOfWeek,
+      {WeekType? weekType}) {
     return _dailyCourses.where((d) {
       if (d.dayOfWeek != dayOfWeek) return false;
-      if (weekType != null && d.weekType != weekType && d.weekType != WeekType.both) return false;
+      if (weekType != null &&
+          d.weekType != weekType &&
+          d.weekType != WeekType.both) return false;
       return true;
     }).toList();
   }
@@ -375,7 +392,6 @@ enum SubjectUsageType {
 
 /// Subject usage information
 class SubjectUsage {
-
   const SubjectUsage({
     required this.type,
     required this.description,

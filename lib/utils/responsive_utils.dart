@@ -1,10 +1,8 @@
-
-
 /// 屏幕尺寸类型枚举
 enum ScreenSize {
-  compact,    // < 600dp
-  medium,     // 600dp - 839dp
-  expanded,   // >= 840dp
+  compact, // < 600dp
+  medium, // 600dp - 839dp
+  expanded, // >= 840dp
 }
 
 /// 响应式设计工具类
@@ -14,15 +12,15 @@ class ResponsiveUtils {
 
   /// UI缩放比例
   static double _scaleFactor = 1;
-  
+
   /// 设置缩放比例
   static void setScaleFactor(double factor) {
     _scaleFactor = factor;
   }
-  
+
   /// 获取当前缩放比例
   static double get scaleFactor => _scaleFactor;
-  
+
   /// 缩放数值
   static double value(double val) {
     return val * _scaleFactor;
@@ -152,7 +150,8 @@ class ResponsiveUtils {
   }
 
   /// 获取响应式网格交叉轴数量
-  static int getCrossAxisCount(double width, {int? compactCount, int? mediumCount, int? expandedCount}) {
+  static int getCrossAxisCount(double width,
+      {int? compactCount, int? mediumCount, int? expandedCount}) {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:

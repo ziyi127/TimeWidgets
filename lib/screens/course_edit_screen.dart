@@ -84,10 +84,10 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                   teacher: _teacherController.text,
                   classroom: _classroomController.text,
                 );
-                
+
                 Provider.of<TimetableEditService>(context, listen: false)
                     .addCourse(course);
-                
+
                 Navigator.of(context).pop();
               }
             },
@@ -158,10 +158,10 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                   teacher: _teacherController.text,
                   classroom: _classroomController.text,
                 );
-                
+
                 Provider.of<TimetableEditService>(context, listen: false)
                     .updateCourse(updatedCourse);
-                
+
                 Navigator.of(context).pop();
               }
             },
@@ -177,7 +177,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
     return Consumer<TimetableEditService>(
       builder: (context, service, child) {
         final courses = service.courses;
-        
+
         return Column(
           children: [
             Padding(
@@ -227,7 +227,8 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.edit),
-                                  onPressed: () => _showEditCourseDialog(course),
+                                  onPressed: () =>
+                                      _showEditCourseDialog(course),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete),
@@ -237,7 +238,8 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                       builder: (context) => AlertDialog(
                                         title: const Text('确认删除'),
                                         content: Text(
-                                            '确定要删除课程"${course.name}"吗？',),
+                                          '确定要删除课程"${course.name}"吗？',
+                                        ),
                                         actions: [
                                           TextButton(
                                             onPressed: () =>

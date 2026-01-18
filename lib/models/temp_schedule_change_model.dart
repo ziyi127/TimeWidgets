@@ -1,11 +1,12 @@
 /// 临时调课类型
 enum TempChangeType {
-  day,    // 按天调课
+  day, // 按天调课
   period, // 按节调课
 }
 
 /// 临时调课记录
-class TempScheduleChange {  // 备注
+class TempScheduleChange {
+  // 备注
 
   const TempScheduleChange({
     required this.id,
@@ -36,13 +37,13 @@ class TempScheduleChange {  // 备注
   }
   final String id;
   final TempChangeType type;
-  final DateTime date;  // 生效日期
-  final String? timeSlotId;  // 节次ID (按节调课时使用)
-  final String? originalCourseId;  // 原课程ID (按节调课时使用)
-  final String? newCourseId;  // 新课程ID (按节调课时使用)
-  final String? originalScheduleId;  // 原课表ID (按天调课时使用)
-  final String? newScheduleId;  // 新课表ID (按天调课时使用)
-  final DateTime createdAt;  // 创建时间
+  final DateTime date; // 生效日期
+  final String? timeSlotId; // 节次ID (按节调课时使用)
+  final String? originalCourseId; // 原课程ID (按节调课时使用)
+  final String? newCourseId; // 新课程ID (按节调课时使用)
+  final String? originalScheduleId; // 原课表ID (按天调课时使用)
+  final String? newScheduleId; // 新课表ID (按天调课时使用)
+  final DateTime createdAt; // 创建时间
   final String? note;
 
   TempScheduleChange copyWith({

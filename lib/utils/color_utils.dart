@@ -9,13 +9,13 @@ class ColorUtils {
     if (name.isEmpty) {
       return const Color(0xFF3B82F6); // Default MD3 blue
     }
-    
+
     // Use a simple hash function for deterministic color generation
     int hash = 0;
     for (int i = 0; i < name.length; i++) {
       hash = name.codeUnitAt(i) + ((hash << 5) - hash);
     }
-    
+
     // Generate HSL color following MD3 guidelines
     // Hue: 0-360 degrees, but using MD3 preferred hue ranges
     final hue = (hash.abs() % 360).toDouble();
@@ -23,7 +23,7 @@ class ColorUtils {
     final saturation = 0.6 + (((hash >> 8).abs() % 25) / 100);
     // Lightness: 45-65% for better contrast and MD3 compliance
     final lightness = 0.45 + (((hash >> 16).abs() % 20) / 100);
-    
+
     return HSLColor.fromAHSL(1, hue, saturation, lightness).toColor();
   }
 
@@ -33,11 +33,11 @@ class ColorUtils {
     double r = (color.r * 255.0).round() / 255;
     double g = (color.g * 255.0).round() / 255;
     double b = (color.b * 255.0).round() / 255;
-    
+
     r = r <= 0.03928 ? r / 12.92 : ((r + 0.055) / 1.055).pow(2.4);
     g = g <= 0.03928 ? g / 12.92 : ((g + 0.055) / 1.055).pow(2.4);
     b = b <= 0.03928 ? b / 12.92 : ((b + 0.055) / 1.055).pow(2.4);
-    
+
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
 
@@ -46,10 +46,10 @@ class ColorUtils {
   static double getContrastRatio(Color foreground, Color background) {
     final l1 = getRelativeLuminance(foreground);
     final l2 = getRelativeLuminance(background);
-    
+
     final lighter = l1 > l2 ? l1 : l2;
     final darker = l1 > l2 ? l2 : l1;
-    
+
     return (lighter + 0.05) / (darker + 0.05);
   }
 
@@ -58,24 +58,26 @@ class ColorUtils {
   static Color getContrastTextColor(Color backgroundColor) {
     const white = Color(0xFFFFFFFF);
     const black = Color(0xFF000000);
-    
+
     final whiteContrast = getContrastRatio(white, backgroundColor);
     final blackContrast = getContrastRatio(black, backgroundColor);
-    
+
     // Return the color with better contrast
     return whiteContrast > blackContrast ? white : black;
   }
 
   /// Check if a color combination meets WCAG AA standards
   /// Normal text: 4.5:1, Large text: 3:1
-  static bool meetsWcagAA(Color foreground, Color background, {bool isLargeText = false}) {
+  static bool meetsWcagAA(Color foreground, Color background,
+      {bool isLargeText = false}) {
     final ratio = getContrastRatio(foreground, background);
     return isLargeText ? ratio >= 3.0 : ratio >= 4.5;
   }
 
   /// Check if a color combination meets WCAG AAA standards
   /// Normal text: 7:1, Large text: 4.5:1
-  static bool meetsWcagAAA(Color foreground, Color background, {bool isLargeText = false}) {
+  static bool meetsWcagAAA(Color foreground, Color background,
+      {bool isLargeText = false}) {
     final ratio = getContrastRatio(foreground, background);
     return isLargeText ? ratio >= 4.5 : ratio >= 7.0;
   }
@@ -137,26 +139,26 @@ extension DoublePow on double {
     final double base = this;
     final int exp = exponent.toInt();
     final double frac = exponent - exp;
-    
+
     // Integer part
     for (int i = 0; i < exp; i++) {
       result *= base;
     }
-    
+
     // Fractional part approximation using Newton's method
     if (frac > 0) {
       // For 2.4 exponent, we can use a simpler approximation
       result *= _powFractional(base, frac);
     }
-    
+
     return result;
   }
-  
+
   static double _powFractional(double base, double frac) {
     // Simple approximation for fractional exponents
     // Using exp(frac * ln(base))
     if (base <= 0) return 0;
-    
+
     // Natural log approximation
     double ln = 0;
     final double x = (base - 1) / (base + 1);
@@ -166,7 +168,7 @@ extension DoublePow on double {
       term *= x * x;
     }
     ln *= 2;
-    
+
     // Exp approximation
     final double expVal = frac * ln;
     double result = 1;
@@ -177,7 +179,7 @@ extension DoublePow on double {
       power *= expVal;
       result += power / factorial;
     }
-    
+
     return result;
   }
 }

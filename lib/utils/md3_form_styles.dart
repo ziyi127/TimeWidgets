@@ -23,7 +23,7 @@ class MD3FormStyles {
     bool autofocus = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -83,7 +83,7 @@ class MD3FormStyles {
     bool autofocus = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -128,7 +128,7 @@ class MD3FormStyles {
     FormFieldValidator<T>? validator,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return DropdownButtonFormField<T>(
       initialValue: value,
       items: items,
@@ -169,7 +169,7 @@ class MD3FormStyles {
     final timeText = time != null
         ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
         : '选择时间';
-    
+
     return InkWell(
       onTap: enabled
           ? () async {
@@ -237,10 +237,9 @@ class MD3FormStyles {
     bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    final dateText = date != null
-        ? '${date.year}年${date.month}月${date.day}日'
-        : '选择日期';
-    
+    final dateText =
+        date != null ? '${date.year}年${date.month}月${date.day}日' : '选择日期';
+
     return InkWell(
       onTap: enabled
           ? () async {
@@ -309,7 +308,7 @@ class MD3FormStyles {
     bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return InkWell(
       onTap: enabled
           ? () async {
@@ -416,7 +415,7 @@ class MD3FormStyles {
   ) async {
     final colorScheme = Theme.of(context).colorScheme;
     Color selectedColor = initialColor;
-    
+
     // 预定义的 MD3 颜色
     const colors = [
       Color(0xFFEF4444), // Red
@@ -438,7 +437,7 @@ class MD3FormStyles {
       Color(0xFF14B8A6), // Emerald
       Color(0xFFFBBF24), // Gold
     ];
-    
+
     return showDialog<Color>(
       context: context,
       builder: (context) => StatefulBuilder(

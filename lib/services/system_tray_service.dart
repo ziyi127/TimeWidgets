@@ -5,10 +5,10 @@ import 'package:time_widgets/utils/logger.dart';
 
 /// 系统托盘菜单项枚举
 enum TrayMenuItem {
-  settings,      // 设置
+  settings, // 设置
   timetableEdit, // 课表编辑
-  toggleWindow,  // 显示/隐藏
-  exit          // 退出
+  toggleWindow, // 显示/隐藏
+  exit // 退出
 }
 
 /// 系统托盘服务
@@ -19,13 +19,13 @@ class SystemTrayService {
   static final SystemTrayService _instance = SystemTrayService._internal();
 
   final SystemTray _systemTray = SystemTray();
-  
+
   /// 菜单项选择回调
   void Function(TrayMenuItem)? onMenuItemSelected;
-  
+
   /// 窗口显示/隐藏回调
   VoidCallback? onToggleWindow;
-  
+
   /// 应用退出回调
   VoidCallback? onExitApplication;
 
@@ -89,7 +89,7 @@ class SystemTrayService {
   /// 处理菜单点击事件
   void _handleMenuClick(TrayMenuItem item) {
     Logger.d('Tray menu item clicked: $item');
-    
+
     switch (item) {
       case TrayMenuItem.settings:
       case TrayMenuItem.timetableEdit:
@@ -107,7 +107,7 @@ class SystemTrayService {
   /// 处理托盘事件
   void _onTrayEvent(String eventName) {
     Logger.d('Tray event: $eventName');
-    
+
     switch (eventName) {
       case kSystemTrayEventClick:
         // 左键点击 - 显示/隐藏窗口

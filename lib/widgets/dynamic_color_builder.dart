@@ -9,13 +9,13 @@ import 'package:time_widgets/services/theme_service.dart';
 /// 根据当前的主题设置动态生成浅色和深色主题
 /// 支持实时主题更新和系统动态取色
 class DynamicColorBuilder extends StatefulWidget {
-
   const DynamicColorBuilder({
     super.key,
     required this.builder,
     this.defaultSeedColor,
     this.themeService,
   });
+
   /// 构建器函数，接收生成的浅色和深色主题
   final Widget Function(ThemeData lightTheme, ThemeData darkTheme) builder;
 
@@ -102,13 +102,13 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
 /// 简化版的动态颜色构建器
 /// 用于只需要当前主题的场景
 class SimpleDynamicColorBuilder extends StatelessWidget {
-
   const SimpleDynamicColorBuilder({
     super.key,
     required this.builder,
     this.defaultSeedColor,
     this.forceBrightness,
   });
+
   /// 构建器函数，接收当前主题
   final Widget Function(ThemeData theme) builder;
 
@@ -124,9 +124,9 @@ class SimpleDynamicColorBuilder extends StatelessWidget {
       defaultSeedColor: defaultSeedColor,
       builder: (lightTheme, darkTheme) {
         // 根据当前系统亮度或强制亮度选择主题
-        final brightness = forceBrightness ?? 
-            MediaQuery.of(context).platformBrightness;
-        
+        final brightness =
+            forceBrightness ?? MediaQuery.of(context).platformBrightness;
+
         final theme = brightness == Brightness.dark ? darkTheme : lightTheme;
         return builder(theme);
       },
@@ -137,13 +137,13 @@ class SimpleDynamicColorBuilder extends StatelessWidget {
 /// 主题预览 widget
 /// 用于在设置界面预览不同的主题效果
 class ThemePreview extends StatelessWidget {
-
   const ThemePreview({
     super.key,
     required this.seedColor,
     this.isDark = false,
     this.child,
   });
+
   /// 种子颜色
   final Color seedColor;
 
@@ -188,7 +188,7 @@ class ThemePreview extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // 按钮示例
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -208,7 +208,7 @@ class ThemePreview extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          
+
           // 卡片示例
           Card(
             child: Padding(

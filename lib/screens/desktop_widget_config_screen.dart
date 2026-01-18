@@ -10,7 +10,8 @@ class DesktopWidgetConfigScreen extends StatefulWidget {
   const DesktopWidgetConfigScreen({super.key});
 
   @override
-  State<DesktopWidgetConfigScreen> createState() => _DesktopWidgetConfigScreenState();
+  State<DesktopWidgetConfigScreen> createState() =>
+      _DesktopWidgetConfigScreenState();
 }
 
 class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
@@ -154,26 +155,27 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
                   '• 切换开关控制小组件的显示隐藏\n'
                   '• 在桌面小组件界面点击"编辑布局"可拖拽调整位置\n'
                   '• 点击"重置位置"恢复默认布局',
-                  style: MD3TypographyStyles.bodyMedium(context, color: colorScheme.onSurfaceVariant),
+                  style: MD3TypographyStyles.bodyMedium(context,
+                      color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           Text(
             '小组件管理',
             style: MD3TypographyStyles.titleLarge(context),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 小组件列表
           ...WidgetType.values.map((type) {
             final position = _widgetPositions[type];
             if (position == null) return const SizedBox.shrink();
-            
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _buildWidgetConfigItem(context, type, position),
@@ -202,22 +204,22 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: position.isVisible 
-                  ? colorScheme.primaryContainer 
+              color: position.isVisible
+                  ? colorScheme.primaryContainer
                   : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               _getWidgetIcon(type),
-              color: position.isVisible 
-                  ? colorScheme.onPrimaryContainer 
+              color: position.isVisible
+                  ? colorScheme.onPrimaryContainer
                   : colorScheme.onSurfaceVariant,
               size: 24,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // 信息
           Expanded(
             child: Column(
@@ -231,12 +233,13 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
                 Text(
                   '位置: (${position.x.toInt()}, ${position.y.toInt()}) • '
                   '尺寸: ${position.width.toInt()}×${position.height.toInt()}',
-                  style: MD3TypographyStyles.bodySmall(context, color: colorScheme.onSurfaceVariant),
+                  style: MD3TypographyStyles.bodySmall(context,
+                      color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-          
+
           // 开关
           Switch(
             value: position.isVisible,

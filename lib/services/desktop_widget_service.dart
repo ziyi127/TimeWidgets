@@ -19,7 +19,6 @@ enum WidgetType {
 
 /// 小组件位置信息
 class WidgetPosition {
-
   WidgetPosition({
     required this.type,
     required this.x,
@@ -93,21 +92,23 @@ class WidgetPosition {
 /// 管理桌面小组件的位置、可见性和配置
 class DesktopWidgetService {
   static const String _positionsKey = 'desktop_widget_positions';
-  
+
   // 使用增强的布局引擎
   static final EnhancedLayoutEngine _layoutEngine = EnhancedLayoutEngine();
 
   /// 默认小组件位置配置（使用增强布局引擎）
-  static Map<WidgetType, WidgetPosition> getDefaultPositions([Size? screenSize]) {
-    final containerSize = screenSize != null 
+  static Map<WidgetType, WidgetPosition> getDefaultPositions(
+      [Size? screenSize]) {
+    final containerSize = screenSize != null
         ? Size(screenSize.width / 4, screenSize.height)
         : const Size(480, 1080);
-    
+
     return _layoutEngine.calculateOptimalLayout(containerSize, null);
   }
 
   /// 保存小组件位置
-  static Future<void> saveWidgetPositions(Map<WidgetType, WidgetPosition> positions) async {
+  static Future<void> saveWidgetPositions(
+      Map<WidgetType, WidgetPosition> positions) async {
     final prefs = await SharedPreferences.getInstance();
     final positionsJson = positions.map(
       (key, value) => MapEntry(key.name, value.toJson()),
@@ -116,33 +117,37 @@ class DesktopWidgetService {
   }
 
   /// 加载小组件位置（使用增强布局引擎）
-  static Future<Map<WidgetType, WidgetPosition>> loadWidgetPositions([Size? screenSize]) async {
+  static Future<Map<WidgetType, WidgetPosition>> loadWidgetPositions(
+      [Size? screenSize]) async {
     final prefs = await SharedPreferences.getInstance();
     final positionsString = prefs.getString(_positionsKey);
-    
-    final containerSize = screenSize != null 
+
+    final containerSize = screenSize != null
         ? Size(screenSize.width / 4, screenSize.height)
         : const Size(480, 1080);
-    
+
     if (positionsString == null) {
       return _layoutEngine.calculateOptimalLayout(containerSize, null);
     }
 
     try {
-      final positionsJson = json.decode(positionsString) as Map<String, dynamic>;
+      final positionsJson =
+          json.decode(positionsString) as Map<String, dynamic>;
       final savedPositions = <WidgetType, WidgetPosition>{};
-      
+
       for (final entry in positionsJson.entries) {
         final type = WidgetType.values.firstWhere(
           (e) => e.name == entry.key,
           orElse: () => WidgetType.time,
         );
-        savedPositions[type] = WidgetPosition.fromJson(entry.value as Map<String, dynamic>);
+        savedPositions[type] =
+            WidgetPosition.fromJson(entry.value as Map<String, dynamic>);
       }
-      
+
       // 使用布局引擎计算最优布局，考虑已保存的位置
-      final optimizedLayout = _layoutEngine.calculateOptimalLayout(containerSize, savedPositions);
-      
+      final optimizedLayout =
+          _layoutEngine.calculateOptimalLayout(containerSize, savedPositions);
+
       // 验证布局有效性
       if (_layoutEngine.validateLayout(optimizedLayout, containerSize)) {
         return optimizedLayout;
@@ -166,7 +171,7 @@ class DesktopWidgetService {
   }) async {
     final positions = await loadWidgetPositions();
     final currentPosition = positions[type];
-    
+
     if (currentPosition != null) {
       positions[type] = WidgetPosition(
         type: type,
@@ -176,7 +181,7 @@ class DesktopWidgetService {
         height: height ?? currentPosition.height,
         isVisible: currentPosition.isVisible,
       );
-      
+
       await saveWidgetPositions(positions);
     }
   }
@@ -185,7 +190,7 @@ class DesktopWidgetService {
   static Future<void> toggleWidgetVisibility(WidgetType type) async {
     final positions = await loadWidgetPositions();
     final currentPosition = positions[type];
-    
+
     if (currentPosition != null) {
       positions[type] = WidgetPosition(
         type: type,
@@ -195,7 +200,7 @@ class DesktopWidgetService {
         height: currentPosition.height,
         isVisible: !currentPosition.isVisible,
       );
-      
+
       await saveWidgetPositions(positions);
     }
   }
@@ -209,31 +214,35 @@ class DesktopWidgetService {
   static Size getDefaultSize(WidgetType type) {
     final defaultPositions = getDefaultPositions();
     final position = defaultPositions[type];
-    return position != null 
+    return position != null
         ? Size(position.width, position.height)
         : const Size(280, 80); // 默认尺寸
   }
 
   /// 检查位置是否在屏幕边界内
-  static bool isPositionValid(double x, double y, double width, double height, Size screenSize) {
-    return x >= 0 && 
-           y >= 0 && 
-           x + width <= screenSize.width && 
-           y + height <= screenSize.height;
+  static bool isPositionValid(
+      double x, double y, double width, double height, Size screenSize) {
+    return x >= 0 &&
+        y >= 0 &&
+        x + width <= screenSize.width &&
+        y + height <= screenSize.height;
   }
 
   /// 调整位置到屏幕边界内（使用增强布局引擎）
-  static Offset adjustPositionToScreen(double x, double y, double width, double height, Size screenSize) {
+  static Offset adjustPositionToScreen(
+      double x, double y, double width, double height, Size screenSize) {
     final containerSize = Size(screenSize.width / 4, screenSize.height);
     final positionCalculator = PositionCalculator();
-    return positionCalculator.adjustPositionToScreen(x, y, width, height, containerSize);
+    return positionCalculator.adjustPositionToScreen(
+        x, y, width, height, containerSize);
   }
-  
+
   /// 检测布局碰撞
-  static List<WidgetType> detectCollisions(Map<WidgetType, WidgetPosition> layout) {
+  static List<WidgetType> detectCollisions(
+      Map<WidgetType, WidgetPosition> layout) {
     return _layoutEngine.detectCollisions(layout);
   }
-  
+
   /// 调整布局以适应新屏幕尺寸
   static Map<WidgetType, WidgetPosition> adjustLayoutForScreenSize(
     Map<WidgetType, WidgetPosition> currentLayout,

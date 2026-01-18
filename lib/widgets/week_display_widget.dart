@@ -5,7 +5,6 @@ import 'package:time_widgets/services/week_service.dart';
 
 /// 周数显示组件 - MD3紧凑版
 class WeekDisplayWidget extends StatefulWidget {
-
   const WeekDisplayWidget({
     super.key,
     this.isCompact = false,
@@ -67,11 +66,11 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
     final colorScheme = theme.colorScheme;
 
     // MD3: 使用 primaryContainer/secondaryContainer 作为强调背景
-    final containerColor = _isOddWeek 
-        ? colorScheme.primaryContainer 
+    final containerColor = _isOddWeek
+        ? colorScheme.primaryContainer
         : colorScheme.secondaryContainer;
-    final onContainerColor = _isOddWeek 
-        ? colorScheme.onPrimaryContainer 
+    final onContainerColor = _isOddWeek
+        ? colorScheme.onPrimaryContainer
         : colorScheme.onSecondaryContainer;
 
     return Card(

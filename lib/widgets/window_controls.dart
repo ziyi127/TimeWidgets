@@ -5,18 +5,18 @@ import 'package:time_widgets/services/enhanced_window_manager.dart';
 /// 窗口控制组件
 /// 包含最小化、最大化和关闭按钮
 class WindowControls extends StatelessWidget {
-  
   const WindowControls({
     super.key,
     this.restoreMainWindowOnClose = false,
   });
+
   /// 是否在关闭时恢复主窗口
   final bool restoreMainWindowOnClose;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Row(
       children: [
         // 最小化按钮
@@ -28,7 +28,7 @@ class WindowControls extends StatelessWidget {
           hoverColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
           iconSize: 20,
         ),
-        
+
         // 最大化/恢复按钮
         IconButton(
           icon: const Icon(Icons.fullscreen),
@@ -38,7 +38,7 @@ class WindowControls extends StatelessWidget {
           hoverColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
           iconSize: 20,
         ),
-        
+
         // 关闭按钮
         IconButton(
           icon: const Icon(Icons.close),

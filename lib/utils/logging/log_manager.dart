@@ -27,10 +27,10 @@ class LogManager {
       if (!await dir.exists()) {
         await dir.create(recursive: true);
       }
-      
+
       // 清理过期日志
       await _cleanOldLogs();
-      
+
       // 启动定时刷新
       _startFlushTimer();
     } catch (e) {
@@ -95,9 +95,9 @@ class LogManager {
     final now = DateTime.now();
     final fileName = 'app_${now.year}${_pad(now.month)}${_pad(now.day)}.log';
     final filePath = path.join(config.logDirectory, fileName);
-    
+
     _currentLogFile = File(filePath);
-    
+
     if (await _currentLogFile!.exists()) {
       _currentFileSize = await _currentLogFile!.length();
     } else {
@@ -115,13 +115,13 @@ class LogManager {
       final now = DateTime.now();
       final timestamp = '${now.year}${_pad(now.month)}${_pad(now.day)}_'
           '${_pad(now.hour)}${_pad(now.minute)}${_pad(now.second)}';
-      
+
       final baseName = path.basenameWithoutExtension(_currentLogFile!.path);
       final newName = '${baseName}_$timestamp.log';
       final newPath = path.join(config.logDirectory, newName);
 
       await _currentLogFile!.rename(newPath);
-      
+
       _currentLogFile = null;
       _currentFileSize = 0;
     } catch (e) {
@@ -181,7 +181,7 @@ class LogManager {
 
       for (final file in files) {
         final lines = await file.readAsLines();
-        
+
         for (final line in lines) {
           if (line.trim().isEmpty) continue;
 
@@ -208,8 +208,10 @@ class LogManager {
             if (category != null && entry.category != category) {
               continue;
             }
-            if (searchText != null && 
-                !entry.message.toLowerCase().contains(searchText.toLowerCase())) {
+            if (searchText != null &&
+                !entry.message
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase())) {
               continue;
             }
 

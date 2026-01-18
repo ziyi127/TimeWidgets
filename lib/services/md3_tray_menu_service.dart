@@ -8,10 +8,10 @@ import 'package:time_widgets/utils/logger.dart';
 /// MD3风格的系统托盘菜单服务
 /// 使用C++实现基础托盘，右键时显示Flutter MD3悬浮菜单
 class MD3TrayMenuService {
-  
   MD3TrayMenuService._();
   static MD3TrayMenuService? _instance;
-  static MD3TrayMenuService get instance => _instance ??= MD3TrayMenuService._();
+  static MD3TrayMenuService get instance =>
+      _instance ??= MD3TrayMenuService._();
 
   SystemTray? _systemTray;
   bool _isInitialized = false;
@@ -22,8 +22,8 @@ class MD3TrayMenuService {
   VoidCallback? onToggleWindow;
   VoidCallback? onToggleEditMode;
   VoidCallback? onExit;
-  VoidCallback? onTempScheduleChange;  // 新增：临时调课回调
-  
+  VoidCallback? onTempScheduleChange; // 新增：临时调课回调
+
   // MD3菜单显示回调 - 由main.dart设置
   VoidCallback? onShowMD3Menu;
 
@@ -35,9 +35,11 @@ class MD3TrayMenuService {
       _systemTray = SystemTray();
 
       // 系统托盘初始化 - 使用system_tray 2.0.3版本兼容的API
-      final String iconPath = Platform.isWindows ? 'assets/icons/tray_icon.ico' : 'assets/icons/app_icon.png';
+      final String iconPath = Platform.isWindows
+          ? 'assets/icons/tray_icon.ico'
+          : 'assets/icons/app_icon.png';
       Logger.d('使用图标路径: $iconPath');
-      
+
       await _systemTray!.initSystemTray(
         title: '智慧课程表',
         iconPath: iconPath,
@@ -48,9 +50,9 @@ class MD3TrayMenuService {
 
       // 创建菜单（使用system_tray 2.0.3版本兼容的API）
       final Menu menu = Menu();
-      
+
       Logger.d('开始构建菜单');
-      
+
       // 先创建菜单项
       final showHideItem = MenuItemLabel(
         label: '显示/隐藏窗口',
@@ -59,7 +61,7 @@ class MD3TrayMenuService {
           onToggleWindow?.call();
         },
       );
-      
+
       final editTimetableItem = MenuItemLabel(
         label: '编辑课表',
         onClicked: (menuItem) {
@@ -67,7 +69,7 @@ class MD3TrayMenuService {
           onShowTimetableEdit?.call();
         },
       );
-      
+
       final editLayoutItem = MenuItemLabel(
         label: '编辑布局',
         onClicked: (menuItem) {
@@ -75,7 +77,7 @@ class MD3TrayMenuService {
           onToggleEditMode?.call();
         },
       );
-      
+
       final tempScheduleItem = MenuItemLabel(
         label: '临时调课',
         onClicked: (menuItem) {
@@ -83,7 +85,7 @@ class MD3TrayMenuService {
           onTempScheduleChange?.call();
         },
       );
-      
+
       final settingsItem = MenuItemLabel(
         label: '设置',
         onClicked: (menuItem) {
@@ -91,7 +93,7 @@ class MD3TrayMenuService {
           onShowSettings?.call();
         },
       );
-      
+
       final exitItem = MenuItemLabel(
         label: '退出程序',
         onClicked: (menuItem) {
@@ -99,7 +101,7 @@ class MD3TrayMenuService {
           onExit?.call();
         },
       );
-      
+
       // 构建菜单
       await menu.buildFrom([
         showHideItem,
@@ -110,7 +112,7 @@ class MD3TrayMenuService {
         MenuSeparator(),
         exitItem,
       ]);
-      
+
       Logger.d('菜单构建完成');
 
       // 设置菜单
@@ -161,7 +163,6 @@ class MD3TrayMenuService {
 /// MD3风格的托盘悬浮菜单
 /// 显示在屏幕右下角，靠近系统托盘位置
 class MD3TrayPopupMenu extends StatefulWidget {
-
   const MD3TrayPopupMenu({
     super.key,
     this.onShowSettings,
@@ -170,7 +171,7 @@ class MD3TrayPopupMenu extends StatefulWidget {
     this.onToggleEditMode,
     this.onExit,
     // this.onImportExport,
-    this.onTempScheduleChange,  // 新增
+    this.onTempScheduleChange, // 新增
     this.onDismiss,
   });
   final VoidCallback? onShowSettings;
@@ -179,14 +180,15 @@ class MD3TrayPopupMenu extends StatefulWidget {
   final VoidCallback? onToggleEditMode;
   final VoidCallback? onExit;
   // final VoidCallback? onImportExport;
-  final VoidCallback? onTempScheduleChange;  // 新增
+  final VoidCallback? onTempScheduleChange; // 新增
   final VoidCallback? onDismiss;
 
   @override
   State<MD3TrayPopupMenu> createState() => _MD3TrayPopupMenuState();
 }
 
-class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerProviderStateMixin {
+class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;
@@ -194,28 +196,29 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    
+
     // 使用全局动画服务初始化动画控制器
-    _animationController = GlobalAnimationService.instance.getAnimationController(
+    _animationController =
+        GlobalAnimationService.instance.getAnimationController(
       key: 'tray_menu_animation',
       vsync: this,
       duration: GlobalAnimationService.defaultDuration,
     );
-    
+
     // 使用全局动画服务创建淡入动画
     _opacityAnimation = GlobalAnimationService.instance.createFadeAnimation(
       key: 'tray_menu',
       controller: _animationController,
       curve: GlobalAnimationService.defaultCurve,
     );
-    
+
     // 使用全局动画服务创建缩放动画
     _scaleAnimation = GlobalAnimationService.instance.createScaleAnimation(
       key: 'tray_menu',
       controller: _animationController,
       curve: GlobalAnimationService.popCurve,
     );
-    
+
     // 开始动画
     GlobalAnimationService.instance.smartAnimate(
       controller: _animationController,
@@ -291,7 +294,8 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                           children: [
                             // 标题
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 16, 16, 12),
                               child: Row(
                                 children: [
                                   Container(
@@ -310,18 +314,21 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '智慧课程表',
-                                          style: theme.textTheme.titleSmall?.copyWith(
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
                                             color: colorScheme.onSurface,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         Text(
                                           '桌面小组件',
-                                          style: theme.textTheme.bodySmall?.copyWith(
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
                                             color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
@@ -331,8 +338,9 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                 ],
                               ),
                             ),
-                            
-                            Divider(height: 1, color: colorScheme.outlineVariant),
+
+                            Divider(
+                                height: 1, color: colorScheme.outlineVariant),
 
                             // 菜单项 - 按功能分组
                             // 窗口控制
@@ -344,7 +352,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                 _safeCloseMenu(widget.onToggleWindow);
                               },
                             ),
-                            
+
                             // 功能设置
                             _buildMenuItem(
                               context: context,
@@ -354,7 +362,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                 _safeCloseMenu(widget.onShowTimetableEdit);
                               },
                             ),
-                            
+
                             _buildMenuItem(
                               context: context,
                               icon: Icons.dashboard_customize_rounded,
@@ -363,7 +371,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                 _safeCloseMenu(widget.onToggleEditMode);
                               },
                             ),
-                            
+
                             _buildMenuItem(
                               context: context,
                               icon: Icons.swap_horiz_rounded,
@@ -372,7 +380,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                 _safeCloseMenu(widget.onTempScheduleChange);
                               },
                             ),
-                            
+
                             _buildMenuItem(
                               context: context,
                               icon: Icons.settings_rounded,
@@ -381,7 +389,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
                                 _safeCloseMenu(widget.onShowSettings);
                               },
                             ),
-                            
+
                             // 分隔线
                             Divider(
                               height: 1,
@@ -425,9 +433,11 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final color = isDestructive ? colorScheme.error : colorScheme.onSurface;
-    final hoverColor = isDestructive ? colorScheme.errorContainer.withValues(alpha: 0.2) : colorScheme.surfaceContainerHighest;
+    final hoverColor = isDestructive
+        ? colorScheme.errorContainer.withValues(alpha: 0.2)
+        : colorScheme.surfaceContainerHighest;
     final focusColor = colorScheme.onSurface.withValues(alpha: 0.1);
 
     return InkWell(
@@ -446,7 +456,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu> with SingleTickerPr
           child: Row(
             children: [
               Icon(
-                icon, 
+                icon,
                 color: color,
                 size: 22,
               ),

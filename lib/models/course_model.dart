@@ -1,5 +1,4 @@
 class Course {
-
   const Course({
     required this.subject,
     required this.teacher,
@@ -15,7 +14,6 @@ class Course {
 }
 
 class Timetable {
-
   const Timetable({
     required this.courses,
     required this.date,

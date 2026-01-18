@@ -4,7 +4,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 天气组件 - MD3紧凑版
 class WeatherWidget extends StatelessWidget {
-
   const WeatherWidget({
     super.key,
     this.weatherData,
@@ -48,51 +47,53 @@ class WeatherWidget extends StatelessWidget {
         ),
       ),
       child: Padding(
-          padding: EdgeInsets.all(ResponsiveUtils.value(16)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 头部
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _getWeatherIcon(description),
-                          size: ResponsiveUtils.getIconSize(width, baseSize: 20),
-                          color: colorScheme.primary,
-                        ),
-                        SizedBox(width: ResponsiveUtils.value(12)),
-                        // 限制文本宽度，避免溢出
-                        Flexible(
-                          child: Text(
-                            '天气 · $cityName',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (weatherData == null)
-                    SizedBox(
-                      width: ResponsiveUtils.value(16),
-                      height: ResponsiveUtils.value(16),
-                      child: CircularProgressIndicator(
-                        strokeWidth: ResponsiveUtils.value(2),
+        padding: EdgeInsets.all(ResponsiveUtils.value(16)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 头部
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _getWeatherIcon(description),
+                        size: ResponsiveUtils.getIconSize(width, baseSize: 20),
                         color: colorScheme.primary,
                       ),
+                      SizedBox(width: ResponsiveUtils.value(12)),
+                      // 限制文本宽度，避免溢出
+                      Flexible(
+                        child: Text(
+                          '天气 · $cityName',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize:
+                                (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                                    fontMultiplier,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (weatherData == null)
+                  SizedBox(
+                    width: ResponsiveUtils.value(16),
+                    height: ResponsiveUtils.value(16),
+                    child: CircularProgressIndicator(
+                      strokeWidth: ResponsiveUtils.value(2),
+                      color: colorScheme.primary,
                     ),
-                ],
-              ),
+                  ),
+              ],
+            ),
             SizedBox(height: ResponsiveUtils.value(12)),
             // 温度和详情
             Row(
@@ -104,7 +105,8 @@ class WeatherWidget extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                     color: colorScheme.onSurface,
                     height: 1,
-                    fontSize: (theme.textTheme.displaySmall?.fontSize ?? 36) * fontMultiplier,
+                    fontSize: (theme.textTheme.displaySmall?.fontSize ?? 36) *
+                        fontMultiplier,
                   ),
                 ),
                 SizedBox(width: ResponsiveUtils.value(12)),
@@ -114,7 +116,8 @@ class WeatherWidget extends StatelessWidget {
                     description,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: (theme.textTheme.bodyLarge?.fontSize ?? 16) * fontMultiplier,
+                      fontSize: (theme.textTheme.bodyLarge?.fontSize ?? 16) *
+                          fontMultiplier,
                     ),
                   ),
                 ),
@@ -123,7 +126,8 @@ class WeatherWidget extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    _buildMiniDetail(context, Icons.water_drop_outlined, '$humidity%', width),
+                    _buildMiniDetail(context, Icons.water_drop_outlined,
+                        '$humidity%', width),
                     SizedBox(height: ResponsiveUtils.value(4)),
                     _buildMiniDetail(context, Icons.air_rounded, wind, width),
                   ],
@@ -136,31 +140,35 @@ class WeatherWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMiniDetail(BuildContext context, IconData icon, String value, double width) {
+  Widget _buildMiniDetail(
+      BuildContext context, IconData icon, String value, double width) {
     final colorScheme = Theme.of(context).colorScheme;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
-    
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          icon, 
-          size: ResponsiveUtils.getIconSize(width, baseSize: 14), 
+          icon,
+          size: ResponsiveUtils.getIconSize(width, baseSize: 14),
           color: colorScheme.onSurfaceVariant,
         ),
         SizedBox(width: ResponsiveUtils.value(4)),
         Text(
           value,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontSize: (Theme.of(context).textTheme.labelMedium?.fontSize ?? 12) * fontMultiplier,
-          ),
+                color: colorScheme.onSurfaceVariant,
+                fontSize:
+                    (Theme.of(context).textTheme.labelMedium?.fontSize ?? 12) *
+                        fontMultiplier,
+              ),
         ),
       ],
     );
   }
 
-  Widget _buildLoadingCard(BuildContext context, ThemeData theme, ColorScheme colorScheme, double width) {
+  Widget _buildLoadingCard(BuildContext context, ThemeData theme,
+      ColorScheme colorScheme, double width) {
     return Card(
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
@@ -195,9 +203,10 @@ class WeatherWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorCard(BuildContext context, ColorScheme colorScheme, double width) {
+  Widget _buildErrorCard(
+      BuildContext context, ColorScheme colorScheme, double width) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
-    
+
     return Card(
       elevation: 0,
       color: colorScheme.errorContainer,
@@ -211,8 +220,8 @@ class WeatherWidget extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.cloud_off_rounded, 
-              color: colorScheme.onErrorContainer, 
+              Icons.cloud_off_rounded,
+              color: colorScheme.onErrorContainer,
               size: ResponsiveUtils.getIconSize(width, baseSize: 20),
             ),
             SizedBox(width: ResponsiveUtils.value(12)),
@@ -220,9 +229,12 @@ class WeatherWidget extends StatelessWidget {
               child: Text(
                 '天气加载失败',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onErrorContainer,
-                  fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * fontMultiplier,
-                ),
+                      color: colorScheme.onErrorContainer,
+                      fontSize:
+                          (Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                                  14) *
+                              fontMultiplier,
+                    ),
               ),
             ),
             if (onRetry != null)

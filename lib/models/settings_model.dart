@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/models/theme_settings_model.dart';
 
 class AppSettings {
-
   const AppSettings({
     required this.themeSettings,
     this.apiBaseUrl = 'http://localhost:3000/api',
@@ -19,7 +18,7 @@ class AppSettings {
     this.ntpServer = 'ntp.aliyun.com',
     this.uiScale = 1.0,
     this.followSystemColor = true,
-    
+
     // Widget display settings
     this.showTimeDisplayWidget = true,
     this.showDateDisplayWidget = true,
@@ -27,21 +26,21 @@ class AppSettings {
     this.showWeatherWidget = true,
     this.showCountdownWidget = true,
     this.showCurrentClassWidget = true,
-    
+
     // Desktop widget settings
     this.enableDesktopWidgets = true,
-    
+
     // Notification settings
     this.enableCourseReminder = true,
     this.enableTtsForReminder = false,
     this.showNotificationOnClassStart = true,
     this.showNotificationOnClassEnd = false,
     this.showNotificationForCountdown = true,
-    
+
     // Startup settings
     this.startWithWindows = false,
     this.minimizeToTray = true,
-    
+
     // Advanced settings
     this.enableDebugMode = false,
     this.enablePerformanceMonitoring = false,
@@ -55,7 +54,7 @@ class AppSettings {
       longitude: 116.4074,
       cityName: 'Beijing',
       enableNtpSync: false,
-      
+
       // Widget display settings
       showTimeDisplayWidget: false,
       showDateDisplayWidget: false,
@@ -63,7 +62,7 @@ class AppSettings {
       showWeatherWidget: false,
       showCountdownWidget: false,
       showCurrentClassWidget: false,
-      
+
       // Notification settings
       enableCourseReminder: false,
       showNotificationOnClassStart: false,
@@ -75,7 +74,8 @@ class AppSettings {
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
       themeSettings: json['themeSettings'] != null
-          ? ThemeSettings.fromJson(json['themeSettings'] as Map<String, dynamic>)
+          ? ThemeSettings.fromJson(
+              json['themeSettings'] as Map<String, dynamic>)
           : ThemeSettings.defaultSettings(),
       apiBaseUrl: json['apiBaseUrl'] as String? ?? 'http://localhost:3000/api',
       enableNotifications: json['enableNotifications'] as bool? ?? true,
@@ -93,7 +93,7 @@ class AppSettings {
       ntpServer: json['ntpServer'] as String? ?? 'ntp.aliyun.com',
       uiScale: (json['uiScale'] as num?)?.toDouble() ?? 1.0,
       followSystemColor: json['followSystemColor'] as bool? ?? true,
-      
+
       // Widget display settings
       showTimeDisplayWidget: json['showTimeDisplayWidget'] as bool? ?? true,
       showDateDisplayWidget: json['showDateDisplayWidget'] as bool? ?? true,
@@ -101,24 +101,28 @@ class AppSettings {
       showWeatherWidget: json['showWeatherWidget'] as bool? ?? true,
       showCountdownWidget: json['showCountdownWidget'] as bool? ?? true,
       showCurrentClassWidget: json['showCurrentClassWidget'] as bool? ?? true,
-      
+
       // Desktop widget settings
       enableDesktopWidgets: json['enableDesktopWidgets'] as bool? ?? false,
-      
+
       // Notification settings
       enableCourseReminder: json['enableCourseReminder'] as bool? ?? true,
       enableTtsForReminder: json['enableTtsForReminder'] as bool? ?? false,
-      showNotificationOnClassStart: json['showNotificationOnClassStart'] as bool? ?? true,
-      showNotificationOnClassEnd: json['showNotificationOnClassEnd'] as bool? ?? false,
-      showNotificationForCountdown: json['showNotificationForCountdown'] as bool? ?? true,
-      
+      showNotificationOnClassStart:
+          json['showNotificationOnClassStart'] as bool? ?? true,
+      showNotificationOnClassEnd:
+          json['showNotificationOnClassEnd'] as bool? ?? false,
+      showNotificationForCountdown:
+          json['showNotificationForCountdown'] as bool? ?? true,
+
       // Startup settings
       startWithWindows: json['startWithWindows'] as bool? ?? false,
       minimizeToTray: json['minimizeToTray'] as bool? ?? true,
-      
+
       // Advanced settings
       enableDebugMode: json['enableDebugMode'] as bool? ?? false,
-      enablePerformanceMonitoring: json['enablePerformanceMonitoring'] as bool? ?? false,
+      enablePerformanceMonitoring:
+          json['enablePerformanceMonitoring'] as bool? ?? false,
     );
   }
   final ThemeSettings themeSettings;
@@ -136,7 +140,7 @@ class AppSettings {
   final String ntpServer;
   final double uiScale;
   final bool followSystemColor;
-  
+
   // Widget display settings
   final bool showTimeDisplayWidget;
   final bool showDateDisplayWidget;
@@ -144,21 +148,21 @@ class AppSettings {
   final bool showWeatherWidget;
   final bool showCountdownWidget;
   final bool showCurrentClassWidget;
-  
+
   // Desktop widget settings
   final bool enableDesktopWidgets;
-  
+
   // Notification settings
   final bool enableCourseReminder;
   final bool enableTtsForReminder;
   final bool showNotificationOnClassStart;
   final bool showNotificationOnClassEnd;
   final bool showNotificationForCountdown;
-  
+
   // Startup settings
   final bool startWithWindows;
   final bool minimizeToTray;
-  
+
   // Advanced settings
   final bool enableDebugMode;
   final bool enablePerformanceMonitoring;
@@ -180,7 +184,7 @@ class AppSettings {
       'ntpServer': ntpServer,
       'uiScale': uiScale,
       'followSystemColor': followSystemColor,
-      
+
       // Widget display settings
       'showTimeDisplayWidget': showTimeDisplayWidget,
       'showDateDisplayWidget': showDateDisplayWidget,
@@ -188,21 +192,21 @@ class AppSettings {
       'showWeatherWidget': showWeatherWidget,
       'showCountdownWidget': showCountdownWidget,
       'showCurrentClassWidget': showCurrentClassWidget,
-      
+
       // Desktop widget settings
       'enableDesktopWidgets': enableDesktopWidgets,
-      
+
       // Notification settings
       'enableCourseReminder': enableCourseReminder,
       'enableTtsForReminder': enableTtsForReminder,
       'showNotificationOnClassStart': showNotificationOnClassStart,
       'showNotificationOnClassEnd': showNotificationOnClassEnd,
       'showNotificationForCountdown': showNotificationForCountdown,
-      
+
       // Startup settings
       'startWithWindows': startWithWindows,
       'minimizeToTray': minimizeToTray,
-      
+
       // Advanced settings
       'enableDebugMode': enableDebugMode,
       'enablePerformanceMonitoring': enablePerformanceMonitoring,
@@ -225,7 +229,7 @@ class AppSettings {
     String? ntpServer,
     double? uiScale,
     bool? followSystemColor,
-    
+
     // Widget display settings
     bool? showTimeDisplayWidget,
     bool? showDateDisplayWidget,
@@ -233,21 +237,21 @@ class AppSettings {
     bool? showWeatherWidget,
     bool? showCountdownWidget,
     bool? showCurrentClassWidget,
-    
+
     // Desktop widget settings
     bool? enableDesktopWidgets,
-    
+
     // Notification settings
     bool? enableCourseReminder,
     bool? enableTtsForReminder,
     bool? showNotificationOnClassStart,
     bool? showNotificationOnClassEnd,
     bool? showNotificationForCountdown,
-    
+
     // Startup settings
     bool? startWithWindows,
     bool? minimizeToTray,
-    
+
     // Advanced settings
     bool? enableDebugMode,
     bool? enablePerformanceMonitoring,
@@ -258,8 +262,10 @@ class AppSettings {
       enableNotifications: enableNotifications ?? this.enableNotifications,
       semesterStartDate: semesterStartDate ?? this.semesterStartDate,
       language: language ?? this.language,
-      weatherRefreshInterval: weatherRefreshInterval ?? this.weatherRefreshInterval,
-      countdownRefreshInterval: countdownRefreshInterval ?? this.countdownRefreshInterval,
+      weatherRefreshInterval:
+          weatherRefreshInterval ?? this.weatherRefreshInterval,
+      countdownRefreshInterval:
+          countdownRefreshInterval ?? this.countdownRefreshInterval,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       cityName: cityName ?? this.cityName,
@@ -268,32 +274,40 @@ class AppSettings {
       ntpServer: ntpServer ?? this.ntpServer,
       uiScale: uiScale ?? this.uiScale,
       followSystemColor: followSystemColor ?? this.followSystemColor,
-      
+
       // Widget display settings
-      showTimeDisplayWidget: showTimeDisplayWidget ?? this.showTimeDisplayWidget,
-      showDateDisplayWidget: showDateDisplayWidget ?? this.showDateDisplayWidget,
-      showWeekDisplayWidget: showWeekDisplayWidget ?? this.showWeekDisplayWidget,
+      showTimeDisplayWidget:
+          showTimeDisplayWidget ?? this.showTimeDisplayWidget,
+      showDateDisplayWidget:
+          showDateDisplayWidget ?? this.showDateDisplayWidget,
+      showWeekDisplayWidget:
+          showWeekDisplayWidget ?? this.showWeekDisplayWidget,
       showWeatherWidget: showWeatherWidget ?? this.showWeatherWidget,
       showCountdownWidget: showCountdownWidget ?? this.showCountdownWidget,
-      showCurrentClassWidget: showCurrentClassWidget ?? this.showCurrentClassWidget,
-      
+      showCurrentClassWidget:
+          showCurrentClassWidget ?? this.showCurrentClassWidget,
+
       // Desktop widget settings
       enableDesktopWidgets: enableDesktopWidgets ?? this.enableDesktopWidgets,
-      
+
       // Notification settings
       enableCourseReminder: enableCourseReminder ?? this.enableCourseReminder,
       enableTtsForReminder: enableTtsForReminder ?? this.enableTtsForReminder,
-      showNotificationOnClassStart: showNotificationOnClassStart ?? this.showNotificationOnClassStart,
-      showNotificationOnClassEnd: showNotificationOnClassEnd ?? this.showNotificationOnClassEnd,
-      showNotificationForCountdown: showNotificationForCountdown ?? this.showNotificationForCountdown,
-      
+      showNotificationOnClassStart:
+          showNotificationOnClassStart ?? this.showNotificationOnClassStart,
+      showNotificationOnClassEnd:
+          showNotificationOnClassEnd ?? this.showNotificationOnClassEnd,
+      showNotificationForCountdown:
+          showNotificationForCountdown ?? this.showNotificationForCountdown,
+
       // Startup settings
       startWithWindows: startWithWindows ?? this.startWithWindows,
       minimizeToTray: minimizeToTray ?? this.minimizeToTray,
-      
+
       // Advanced settings
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
-      enablePerformanceMonitoring: enablePerformanceMonitoring ?? this.enablePerformanceMonitoring,
+      enablePerformanceMonitoring:
+          enablePerformanceMonitoring ?? this.enablePerformanceMonitoring,
     );
   }
 

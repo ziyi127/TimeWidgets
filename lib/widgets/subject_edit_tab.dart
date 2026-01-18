@@ -26,7 +26,7 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
     return Consumer<TimetableEditService>(
       builder: (context, service, child) {
         final subjects = service.courses;
-        
+
         return Row(
           children: [
             // 左侧: 科目列表
@@ -45,9 +45,10 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
     );
   }
 
-  Widget _buildSubjectList(BuildContext context, List<CourseInfo> subjects, TimetableEditService service) {
+  Widget _buildSubjectList(BuildContext context, List<CourseInfo> subjects,
+      TimetableEditService service) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       children: [
         // 列表头部
@@ -76,9 +77,10 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
                   itemBuilder: (context, index) {
                     final subject = subjects[index];
                     final isSelected = subject.id == _selectedSubjectId;
-                    final subjectColor = ColorUtils.parseHexColor(subject.color) ?? 
-                        ColorUtils.generateColorFromName(subject.name);
-                    
+                    final subjectColor =
+                        ColorUtils.parseHexColor(subject.color) ??
+                            ColorUtils.generateColorFromName(subject.name);
+
                     return ListTile(
                       leading: Container(
                         width: 40,
@@ -89,19 +91,20 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
                         ),
                         child: Center(
                           child: Text(
-                            subject.displayName.isNotEmpty 
-                                ? subject.displayName[0] 
+                            subject.displayName.isNotEmpty
+                                ? subject.displayName[0]
                                 : subject.name[0],
                             style: TextStyle(
-                              color: ColorUtils.getContrastTextColor(subjectColor),
+                              color:
+                                  ColorUtils.getContrastTextColor(subjectColor),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
                       title: Text(subject.name),
-                      subtitle: subject.teacher.isNotEmpty 
-                          ? Text(subject.teacher) 
+                      subtitle: subject.teacher.isNotEmpty
+                          ? Text(subject.teacher)
                           : null,
                       selected: isSelected,
                       selectedTileColor: colorScheme.secondaryContainer,
@@ -157,12 +160,12 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
     if (_selectedSubjectId == null) {
       return _buildNoSelectionState(context);
     }
-    
+
     final subject = service.getCourseById(_selectedSubjectId!);
     if (subject == null) {
       return _buildNoSelectionState(context);
     }
-    
+
     return _SubjectDetailEditor(
       subject: subject,
       service: service,
@@ -196,12 +199,14 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
     );
   }
 
-  Future<void> _showAddSubjectDialog(BuildContext context, TimetableEditService service) async {
+  Future<void> _showAddSubjectDialog(
+      BuildContext context, TimetableEditService service) async {
     final nameController = TextEditingController();
     final abbreviationController = TextEditingController();
     final teacherController = TextEditingController();
-    Color selectedColor = ColorUtils.subjectColors[service.courses.length % ColorUtils.subjectColors.length];
-    
+    Color selectedColor = ColorUtils.subjectColors[
+        service.courses.length % ColorUtils.subjectColors.length];
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -260,7 +265,7 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
         ),
       ),
     );
-    
+
     if ((result ?? false) && nameController.text.isNotEmpty) {
       final newSubject = CourseInfo(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -277,10 +282,8 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
   }
 }
 
-
 /// 科目详情编辑页
 class _SubjectDetailEditor extends StatefulWidget {
-
   const _SubjectDetailEditor({
     required this.subject,
     required this.service,
@@ -318,10 +321,12 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
 
   void _initControllers() {
     _nameController = TextEditingController(text: widget.subject.name);
-    _abbreviationController = TextEditingController(text: widget.subject.abbreviation);
+    _abbreviationController =
+        TextEditingController(text: widget.subject.abbreviation);
     _teacherController = TextEditingController(text: widget.subject.teacher);
-    _classroomController = TextEditingController(text: widget.subject.classroom);
-    _selectedColor = ColorUtils.parseHexColor(widget.subject.color) ?? 
+    _classroomController =
+        TextEditingController(text: widget.subject.classroom);
+    _selectedColor = ColorUtils.parseHexColor(widget.subject.color) ??
         ColorUtils.generateColorFromName(widget.subject.name);
     _isOutdoor = widget.subject.isOutdoor;
   }
@@ -379,12 +384,12 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
       );
       return;
     }
-    
+
     final confirmed = await MD3DialogStyles.showDeleteConfirmDialog(
       context: context,
       itemName: widget.subject.name,
     );
-    
+
     if (confirmed ?? false) {
       widget.service.deleteCourse(widget.subject.id);
       widget.onDelete();
@@ -410,8 +415,8 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
                 ),
                 child: Center(
                   child: Text(
-                    widget.subject.displayName.isNotEmpty 
-                        ? widget.subject.displayName[0] 
+                    widget.subject.displayName.isNotEmpty
+                        ? widget.subject.displayName[0]
                         : widget.subject.name[0],
                     style: TextStyle(
                       color: ColorUtils.getContrastTextColor(_selectedColor),
@@ -449,7 +454,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
             ],
           ),
           const SizedBox(height: 32),
-          
+
           // 编辑表单
           MD3CardStyles.surfaceContainer(
             context: context,
@@ -486,7 +491,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // 外观设置
           MD3CardStyles.surfaceContainer(
             context: context,
@@ -522,7 +527,7 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           // 保存按钮
           SizedBox(
             width: double.infinity,

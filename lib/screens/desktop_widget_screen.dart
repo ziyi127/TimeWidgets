@@ -24,7 +24,6 @@ import 'package:time_widgets/widgets/week_display_widget.dart';
 
 /// 桌面小组件屏幕 - 自适应布局版
 class DesktopWidgetScreen extends StatefulWidget {
-  
   const DesktopWidgetScreen({
     super.key,
     this.isEditMode = false,
@@ -38,7 +37,7 @@ class DesktopWidgetScreen extends StatefulWidget {
 class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   final ApiService _apiService = ApiService();
   final SettingsService _settingsService = SettingsService();
-  
+
   // 数据状态
   WeatherData? _weatherData;
   bool _isLoadingWeather = true;
@@ -46,7 +45,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   CountdownData? _countdownData;
   bool _isLoadingCountdown = true;
   String? _countdownError;
-  
+
   // 课表数据
   Timetable? _timetable;
   bool _isLoadingTimetable = true;
@@ -54,10 +53,10 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   // 布局状态
   Map<WidgetType, WidgetPosition>? _layout;
   bool _isLayoutLoaded = false;
-  
+
   // 添加防抖相关变量
   Timer? _layoutTimer;
-  StreamSubscription? _countdownSubscription;
+  StreamSubscription<dynamic>? _countdownSubscription;
 
   @override
   void initState() {
@@ -66,7 +65,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
     _countdownSubscription = CountdownStorageService().onChange.listen((_) {
       _loadCountdownData();
     });
-    
+
     // 延迟到下一帧执行，避免在构建过程中调用 setState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
@@ -78,7 +77,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
     final settings = _settingsService.currentSettings;
     if (settings.showWeatherWidget) _loadWeatherData();
     if (settings.showCountdownWidget) _loadCountdownData();
-    
+
     if (settings.showCurrentClassWidget || settings.enableDesktopWidgets) {
       _loadTimetableData();
     } else {
@@ -196,7 +195,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         if (!settings.showTimeDisplayWidget) return const SizedBox.shrink();
         return const EnhancedWidgetWrapper(
           padding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent, // Time widget has its own card style
+          backgroundColor:
+              Colors.transparent, // Time widget has its own card style
           child: TimeDisplayWidget(isCompact: true),
         );
       case WidgetType.date:
@@ -232,13 +232,13 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         Course? currentCourse;
         final timetable = _timetable;
         if (timetable != null && timetable.courses.isNotEmpty) {
-           try {
-             currentCourse = timetable.courses.firstWhere((c) => c.isCurrent);
-           } catch (e) {
-             // No current course
-           }
+          try {
+            currentCourse = timetable.courses.firstWhere((c) => c.isCurrent);
+          } catch (e) {
+            // No current course
+          }
         }
-        
+
         return EnhancedWidgetWrapper(
           padding: EdgeInsets.zero,
           backgroundColor: Colors.transparent,
@@ -274,7 +274,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         );
       case WidgetType.settings:
         // 设置按钮通常由托盘管理，但在布局中预留位置
-        return const SizedBox.shrink(); 
+        return const SizedBox.shrink();
     }
   }
 
@@ -292,7 +292,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           // 如果禁用了桌面小组件且不在编辑模式，显示提示信息
-          if (!_settingsService.currentSettings.enableDesktopWidgets && !widget.isEditMode) {
+          if (!_settingsService.currentSettings.enableDesktopWidgets &&
+              !widget.isEditMode) {
             return Center(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -309,7 +310,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.widgets_outlined, size: 48, color: Theme.of(context).colorScheme.primary),
+                    Icon(Icons.widgets_outlined,
+                        size: 48, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 16),
                     Text(
                       '桌面小组件已禁用',
@@ -333,14 +335,14 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
 
           // 如果布局为空，使用默认布局
           if (_layout == null) {
-             return const Center(child: Text('无法加载布局'));
+            return const Center(child: Text('无法加载布局'));
           }
 
           final layout = _layout!;
           return Stack(
             children: layout.entries.map((entry) {
               if (!entry.value.isVisible) return const SizedBox.shrink();
-              
+
               return Positioned(
                 left: entry.value.x,
                 top: entry.value.y,
@@ -353,9 +355,9 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                       maxWidth: entry.value.width,
                       // 移除 maxHeight 限制，让组件根据内容自适应高度
                     ),
-                    child: widget.isEditMode 
-                      ? GestureDetector(
-                          onPanUpdate: (details) {
+                    child: widget.isEditMode
+                        ? GestureDetector(
+                            onPanUpdate: (details) {
                               setState(() {
                                 final currentPos = layout[entry.key];
                                 if (currentPos != null) {
@@ -366,33 +368,39 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                                 }
                               });
                             },
-                          onPanEnd: (details) {
-                            // 直接保存当前布局
-                            final currentLayout = _layout;
-                            if (currentLayout != null) {
-                              // 保存位置
-                              DesktopWidgetService.saveWidgetPositions(currentLayout);
-                              Logger.i('Widget positions saved after drag');
-                            }
-                          },
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.move,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: ResponsiveUtils.value(2),
+                            onPanEnd: (details) {
+                              // 直接保存当前布局
+                              final currentLayout = _layout;
+                              if (currentLayout != null) {
+                                // 保存位置
+                                DesktopWidgetService.saveWidgetPositions(
+                                    currentLayout);
+                                Logger.i('Widget positions saved after drag');
+                              }
+                            },
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.move,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    width: ResponsiveUtils.value(2),
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      ResponsiveUtils.value(16)),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surface
+                                      .withValues(alpha: 0.5),
                                 ),
-                                borderRadius: BorderRadius.circular(ResponsiveUtils.value(16)),
-                                color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-                              ),
-                              child: IgnorePointer(
-                                child: _buildWidget(entry.key),
+                                child: IgnorePointer(
+                                  child: _buildWidget(entry.key),
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      : _buildWidget(entry.key),
+                          )
+                        : _buildWidget(entry.key),
                   ),
                 ),
               );

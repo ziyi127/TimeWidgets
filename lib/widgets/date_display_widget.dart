@@ -3,7 +3,6 @@ import 'package:time_widgets/services/ntp_service.dart';
 
 /// 日期显示组件 - MD3紧凑版
 class DateDisplayWidget extends StatelessWidget {
-
   const DateDisplayWidget({
     super.key,
     this.isCompact = false,

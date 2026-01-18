@@ -11,43 +11,44 @@ class ApiService {
   final WeatherService _weatherService = WeatherService();
   final SettingsService _settingsService = SettingsService();
   final CountdownStorageService _countdownStorage = CountdownStorageService();
-  
+
   // 获取课程表数据
   // Note: Since we are using local storage, this method is primarily for API sync if we had a server.
   // For now, we throw to indicate no remote source.
   Future<Timetable> getTimetable(DateTime date) async {
     throw Exception('No API server available');
   }
-  
+
   // 获取当前课程
   Future<Course?> getCurrentCourse() async {
-     throw Exception('No API server available');
+    throw Exception('No API server available');
   }
-  
+
   // 获取天气信息 - Real Implementation
   Future<WeatherData> getWeather() async {
     try {
       await _settingsService.loadSettings();
       final settings = _settingsService.currentSettings;
-      
+
       if (settings.latitude != null && settings.longitude != null) {
         final weather = await _weatherService.getWeather(
-          settings.latitude!, 
+          settings.latitude!,
           settings.longitude!,
           cityName: settings.cityName,
         );
         if (weather != null) return weather;
       }
-      
+
       // Fallback to Beijing if no settings
-      final defaultWeather = await _weatherService.getWeather(39.9042, 116.4074, cityName: 'Beijing');
+      final defaultWeather = await _weatherService.getWeather(39.9042, 116.4074,
+          cityName: 'Beijing');
       if (defaultWeather != null) return defaultWeather;
-      
+
       throw Exception('Failed to fetch weather');
     } catch (e) {
       final appError = ErrorHandler.handleNetworkError(e);
       Logger.e('Failed to fetch weather from API: ${appError.message}');
-       return WeatherData(
+      return WeatherData(
         cityName: 'Beijing',
         description: 'Unknown',
         temperature: 0,
@@ -67,7 +68,7 @@ class ApiService {
       );
     }
   }
-  
+
   // 获取倒计时信息 - Real Implementation (Local Storage)
   Future<CountdownData> getCountdown() async {
     try {
@@ -75,7 +76,7 @@ class ApiService {
       if (next != null) {
         return next;
       }
-      
+
       // Return a default "No Countdown" placeholder
       return CountdownData(
         id: 'default',

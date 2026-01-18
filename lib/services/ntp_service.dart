@@ -33,7 +33,7 @@ class NtpService {
       // But simple restart is fine
       _restartSync();
     });
-    
+
     // Initial sync if enabled
     if (_settingsService.currentSettings.enableNtpSync) {
       await syncTime();
@@ -54,24 +54,24 @@ class NtpService {
     final intervalMinutes = _settingsService.currentSettings.ntpSyncInterval;
     // Ensure minimum interval of 1 minute
     final safeInterval = intervalMinutes < 1 ? 1 : intervalMinutes;
-    
+
     Logger.i('Starting NTP sync timer with interval: $safeInterval minutes');
     _syncTimer = Timer.periodic(Duration(minutes: safeInterval), (timer) {
       syncTime();
     });
   }
-  
+
   void _restartSync() {
     _syncTimer?.cancel();
     if (_settingsService.currentSettings.enableNtpSync) {
-        _startTimer();
-        // Also sync immediately if we just enabled it or changed server
-        // But maybe we should debounce this if it's called frequently
-        // For now, let's just sync.
-        syncTime(); 
+      _startTimer();
+      // Also sync immediately if we just enabled it or changed server
+      // But maybe we should debounce this if it's called frequently
+      // For now, let's just sync.
+      syncTime();
     } else {
-        _ntpOffset = 0; // Reset offset if disabled
-        Logger.i('NTP Sync disabled, resetting offset');
+      _ntpOffset = 0; // Reset offset if disabled
+      Logger.i('NTP Sync disabled, resetting offset');
     }
   }
 
@@ -83,14 +83,15 @@ class NtpService {
     try {
       final server = _settingsService.currentSettings.ntpServer;
       Logger.i('Syncing time with NTP server: $server');
-      
+
       final offset = await NTP.getNtpOffset(
         lookUpAddress: server,
         timeout: const Duration(seconds: 10),
       );
-      
+
       _ntpOffset = offset;
-      Logger.i('NTP Sync successful. Offset: $_ntpOffset ms. Corrected time: $now');
+      Logger.i(
+          'NTP Sync successful. Offset: $_ntpOffset ms. Corrected time: $now');
     } catch (e) {
       Logger.e('NTP Sync failed: $e');
     } finally {

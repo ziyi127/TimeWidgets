@@ -64,17 +64,17 @@ class ErrorReport {
 
   String toTextReport() {
     final buffer = StringBuffer();
-    
+
     buffer.writeln('=' * 80);
     buffer.writeln('ERROR REPORT');
     buffer.writeln('=' * 80);
     buffer.writeln();
-    
+
     buffer.writeln('Report ID: $reportId');
     buffer.writeln('Timestamp: ${timestamp.toIso8601String()}');
     buffer.writeln('App Version: $appVersion');
     buffer.writeln();
-    
+
     buffer.writeln('-' * 80);
     buffer.writeln('ERROR DETAILS');
     buffer.writeln('-' * 80);
@@ -82,7 +82,7 @@ class ErrorReport {
       buffer.writeln('$key: $value');
     });
     buffer.writeln();
-    
+
     buffer.writeln('-' * 80);
     buffer.writeln('SYSTEM INFORMATION');
     buffer.writeln('-' * 80);
@@ -90,7 +90,7 @@ class ErrorReport {
       buffer.writeln('$key: $value');
     });
     buffer.writeln();
-    
+
     if (additionalInfo != null && additionalInfo!.isNotEmpty) {
       buffer.writeln('-' * 80);
       buffer.writeln('ADDITIONAL INFORMATION');
@@ -100,22 +100,23 @@ class ErrorReport {
       });
       buffer.writeln();
     }
-    
+
     buffer.writeln('-' * 80);
     buffer.writeln('RECENT LOGS (${recentLogs.length} entries)');
     buffer.writeln('-' * 80);
     for (final log in recentLogs) {
-      buffer.writeln('[${log['level']}] ${log['timestamp']} - ${log['message']}');
+      buffer
+          .writeln('[${log['level']}] ${log['timestamp']} - ${log['message']}');
       if (log['metadata'] != null) {
         buffer.writeln('  Metadata: ${log['metadata']}');
       }
     }
     buffer.writeln();
-    
+
     buffer.writeln('=' * 80);
     buffer.writeln('END OF REPORT');
     buffer.writeln('=' * 80);
-    
+
     return buffer.toString();
   }
 }
@@ -138,20 +139,20 @@ class ErrorReporter {
     int recentLogsCount = 50,
   }) async {
     final reportId = _generateReportId();
-    
+
     // 收集系统信息
     final systemInfo = ErrorContext.collectSystemInfo();
-    
+
     // 获取最近的日志
     final recentLogs = await _getRecentLogs(recentLogsCount);
-    
+
     // 过滤敏感数据
     final filteredError = SensitiveDataFilter.filterMap(error.toJson());
     final filteredSystemInfo = SensitiveDataFilter.filterMap(systemInfo);
     final filteredAdditionalInfo = additionalInfo != null
         ? SensitiveDataFilter.filterMap(additionalInfo)
         : null;
-    
+
     return ErrorReport(
       reportId: reportId,
       timestamp: DateTime.now(),
@@ -166,13 +167,13 @@ class ErrorReporter {
   /// 导出报告为 JSON 文件
   Future<File> exportAsJson(ErrorReport report, {bool pretty = true}) async {
     await _ensureReportsDirectory();
-    
+
     final fileName = 'error_report_${report.reportId}.json';
     final filePath = path.join(reportsDirectory, fileName);
     final file = File(filePath);
-    
+
     await file.writeAsString(report.toJsonString(pretty: pretty));
-    
+
     _logger.info(
       'Error report exported as JSON',
       metadata: {
@@ -180,20 +181,20 @@ class ErrorReporter {
         'filePath': filePath,
       },
     );
-    
+
     return file;
   }
 
   /// 导出报告为文本文件
   Future<File> exportAsText(ErrorReport report) async {
     await _ensureReportsDirectory();
-    
+
     final fileName = 'error_report_${report.reportId}.txt';
     final filePath = path.join(reportsDirectory, fileName);
     final file = File(filePath);
-    
+
     await file.writeAsString(report.toTextReport());
-    
+
     _logger.info(
       'Error report exported as text',
       metadata: {
@@ -201,7 +202,7 @@ class ErrorReporter {
         'filePath': filePath,
       },
     );
-    
+
     return file;
   }
 
@@ -216,7 +217,7 @@ class ErrorReporter {
       error: error,
       additionalInfo: additionalInfo,
     );
-    
+
     if (asJson) {
       return exportAsJson(report, pretty: pretty);
     } else {
@@ -255,18 +256,18 @@ class ErrorReporter {
   /// 列出所有错误报告
   Future<List<File>> listReports() async {
     final reports = <File>[];
-    
+
     try {
       final dir = Directory(reportsDirectory);
       if (!await dir.exists()) return reports;
-      
+
       await for (final entity in dir.list()) {
-        if (entity is File && 
+        if (entity is File &&
             (entity.path.endsWith('.json') || entity.path.endsWith('.txt'))) {
           reports.add(entity);
         }
       }
-      
+
       // 按修改时间排序
       reports.sort((a, b) => b.path.compareTo(a.path));
     } catch (e) {
@@ -275,7 +276,7 @@ class ErrorReporter {
         error: e,
       );
     }
-    
+
     return reports;
   }
 
@@ -284,10 +285,10 @@ class ErrorReporter {
     try {
       final dir = Directory(reportsDirectory);
       if (!await dir.exists()) return;
-      
+
       final cutoffDate = DateTime.now().subtract(Duration(days: maxAgeDays));
       var deletedCount = 0;
-      
+
       await for (final entity in dir.list()) {
         if (entity is File) {
           final stat = await entity.stat();
@@ -297,7 +298,7 @@ class ErrorReporter {
           }
         }
       }
-      
+
       _logger.info(
         'Cleaned old error reports',
         metadata: {

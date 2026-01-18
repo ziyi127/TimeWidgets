@@ -11,14 +11,14 @@ import 'package:time_widgets/utils/theme_utils.dart';
 /// 支持 Material You 动态取色
 class ThemeService {
   factory ThemeService() => _instance;
-  
+
   ThemeService._internal();
   static const String _themeSettingsKey = 'theme_settings';
 
   // 单例模式实现
   static final ThemeService _instance = ThemeService._internal();
 
-  final StreamController<ThemeSettings> _themeController = 
+  final StreamController<ThemeSettings> _themeController =
       StreamController<ThemeSettings>.broadcast();
 
   ThemeSettings _currentSettings = ThemeSettings.defaultSettings();
@@ -47,7 +47,7 @@ class ThemeService {
     if (_isInitialized) {
       return _currentSettings;
     }
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_themeSettingsKey);
@@ -97,7 +97,7 @@ class ThemeService {
   ThemeData generateLightTheme(Color seedColor, [ThemeSettings? settings]) {
     final colorScheme = generateColorScheme(seedColor, Brightness.light);
     final effectiveSettings = settings ?? _currentSettings;
-    
+
     // 应用字体缩放
     var textTheme = ThemeUtils.buildTextTheme(colorScheme);
     if (effectiveSettings.fontSizeScale != 1.0) {
@@ -241,21 +241,36 @@ class ThemeService {
   /// 缩放文本主题
   TextTheme _scaleTextTheme(TextTheme textTheme, double scale) {
     return textTheme.copyWith(
-      displayLarge: textTheme.displayLarge?.copyWith(fontSize: (textTheme.displayLarge?.fontSize ?? 57) * scale),
-      displayMedium: textTheme.displayMedium?.copyWith(fontSize: (textTheme.displayMedium?.fontSize ?? 45) * scale),
-      displaySmall: textTheme.displaySmall?.copyWith(fontSize: (textTheme.displaySmall?.fontSize ?? 36) * scale),
-      headlineLarge: textTheme.headlineLarge?.copyWith(fontSize: (textTheme.headlineLarge?.fontSize ?? 32) * scale),
-      headlineMedium: textTheme.headlineMedium?.copyWith(fontSize: (textTheme.headlineMedium?.fontSize ?? 28) * scale),
-      headlineSmall: textTheme.headlineSmall?.copyWith(fontSize: (textTheme.headlineSmall?.fontSize ?? 24) * scale),
-      titleLarge: textTheme.titleLarge?.copyWith(fontSize: (textTheme.titleLarge?.fontSize ?? 22) * scale),
-      titleMedium: textTheme.titleMedium?.copyWith(fontSize: (textTheme.titleMedium?.fontSize ?? 16) * scale),
-      titleSmall: textTheme.titleSmall?.copyWith(fontSize: (textTheme.titleSmall?.fontSize ?? 14) * scale),
-      labelLarge: textTheme.labelLarge?.copyWith(fontSize: (textTheme.labelLarge?.fontSize ?? 14) * scale),
-      labelMedium: textTheme.labelMedium?.copyWith(fontSize: (textTheme.labelMedium?.fontSize ?? 12) * scale),
-      labelSmall: textTheme.labelSmall?.copyWith(fontSize: (textTheme.labelSmall?.fontSize ?? 11) * scale),
-      bodyLarge: textTheme.bodyLarge?.copyWith(fontSize: (textTheme.bodyLarge?.fontSize ?? 16) * scale),
-      bodyMedium: textTheme.bodyMedium?.copyWith(fontSize: (textTheme.bodyMedium?.fontSize ?? 14) * scale),
-      bodySmall: textTheme.bodySmall?.copyWith(fontSize: (textTheme.bodySmall?.fontSize ?? 12) * scale),
+      displayLarge: textTheme.displayLarge?.copyWith(
+          fontSize: (textTheme.displayLarge?.fontSize ?? 57) * scale),
+      displayMedium: textTheme.displayMedium?.copyWith(
+          fontSize: (textTheme.displayMedium?.fontSize ?? 45) * scale),
+      displaySmall: textTheme.displaySmall?.copyWith(
+          fontSize: (textTheme.displaySmall?.fontSize ?? 36) * scale),
+      headlineLarge: textTheme.headlineLarge?.copyWith(
+          fontSize: (textTheme.headlineLarge?.fontSize ?? 32) * scale),
+      headlineMedium: textTheme.headlineMedium?.copyWith(
+          fontSize: (textTheme.headlineMedium?.fontSize ?? 28) * scale),
+      headlineSmall: textTheme.headlineSmall?.copyWith(
+          fontSize: (textTheme.headlineSmall?.fontSize ?? 24) * scale),
+      titleLarge: textTheme.titleLarge
+          ?.copyWith(fontSize: (textTheme.titleLarge?.fontSize ?? 22) * scale),
+      titleMedium: textTheme.titleMedium
+          ?.copyWith(fontSize: (textTheme.titleMedium?.fontSize ?? 16) * scale),
+      titleSmall: textTheme.titleSmall
+          ?.copyWith(fontSize: (textTheme.titleSmall?.fontSize ?? 14) * scale),
+      labelLarge: textTheme.labelLarge
+          ?.copyWith(fontSize: (textTheme.labelLarge?.fontSize ?? 14) * scale),
+      labelMedium: textTheme.labelMedium
+          ?.copyWith(fontSize: (textTheme.labelMedium?.fontSize ?? 12) * scale),
+      labelSmall: textTheme.labelSmall
+          ?.copyWith(fontSize: (textTheme.labelSmall?.fontSize ?? 11) * scale),
+      bodyLarge: textTheme.bodyLarge
+          ?.copyWith(fontSize: (textTheme.bodyLarge?.fontSize ?? 16) * scale),
+      bodyMedium: textTheme.bodyMedium
+          ?.copyWith(fontSize: (textTheme.bodyMedium?.fontSize ?? 14) * scale),
+      bodySmall: textTheme.bodySmall
+          ?.copyWith(fontSize: (textTheme.bodySmall?.fontSize ?? 12) * scale),
     );
   }
 
@@ -270,5 +285,4 @@ class ThemeService {
       // Flutter 3.16+ 会自动处理 MD3 颜色角色映射
     );
   }
-
 }

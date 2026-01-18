@@ -248,14 +248,13 @@ enum MD3CardVariant {
 /// MD3 Card Builder
 /// 提供更灵活的 Card 构建方式
 class MD3CardBuilder {
-
   MD3CardBuilder({
     required this.context,
     required this.child,
   });
   final BuildContext context;
   final Widget child;
-  
+
   MD3CardVariant _variant = MD3CardVariant.surfaceContainer;
   EdgeInsetsGeometry? _padding;
   VoidCallback? _onTap;

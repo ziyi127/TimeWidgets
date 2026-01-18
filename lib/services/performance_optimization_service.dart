@@ -24,7 +24,7 @@ class PerformanceOptimizationService {
   /// 设置缓存结果
   static void setCachedResult<T>(String key, T result, {Duration? ttl}) {
     _cache[key] = result;
-    
+
     // 设置过期时间
     if (ttl != null) {
       Timer(ttl, () => _cache.remove(key));
@@ -44,7 +44,7 @@ class PerformanceOptimizationService {
   static void debounce(String key, VoidCallback callback) {
     // 取消之前的定时器
     _debounceTimers[key]?.cancel();
-    
+
     // 设置新的定时�?
     _debounceTimers[key] = Timer(_debounceDelay, () {
       callback();
@@ -75,10 +75,10 @@ class PerformanceOptimizationService {
 
     // 执行计算
     final result = await calculation();
-    
+
     // 缓存结果
     setCachedResult(cacheKey, result, ttl: cacheTtl);
-    
+
     return result;
   }
 
@@ -88,7 +88,7 @@ class PerformanceOptimizationService {
     _memoryMonitorTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       // 清理过期缓存
       _cleanupExpiredCache();
-      
+
       // 如果缓存过大，清理一些旧条目
       if (_cache.length > 50) {
         final keysToRemove = _cache.keys.take(20).toList();
@@ -174,13 +174,13 @@ class PerformanceOptimizationService {
   static void _onFrameTimings(List<FrameTiming> timings) {
     for (final timing in timings) {
       final frameDuration = timing.totalSpan.inMicroseconds;
-      
+
       // 存储帧时间样本
       _frameDurations.add(frameDuration);
       if (_frameDurations.length > _maxFrameSamples) {
         _frameDurations.removeAt(0);
       }
-      
+
       // 如果帧时间超�?6.67ms�?0fps），记录性能问题
       if (frameDuration > 16670) {
         Logger.w('Performance warning: Frame took ${frameDuration / 1000}ms');
@@ -195,7 +195,10 @@ class PerformanceOptimizationService {
       _apiCallCounts.remove(_apiCallCounts.keys.first);
     }
     _apiCallCounts[endpoint] = (_apiCallCounts[endpoint] ?? 0) + 1;
-    return {'startTime': DateTime.now().millisecondsSinceEpoch, 'endpoint': endpoint};
+    return {
+      'startTime': DateTime.now().millisecondsSinceEpoch,
+      'endpoint': endpoint
+    };
   }
 
   /// 记录API调用结束
@@ -203,15 +206,15 @@ class PerformanceOptimizationService {
     final endpoint = callContext['endpoint'] as String;
     final startTime = callContext['startTime'] as int;
     final duration = DateTime.now().millisecondsSinceEpoch - startTime;
-    
+
     _apiCallDurations.putIfAbsent(endpoint, () => []);
     _apiCallDurations[endpoint]!.add(duration);
-    
+
     // 限制每个端点的样本数量
     if (_apiCallDurations[endpoint]!.length > 20) {
       _apiCallDurations[endpoint]!.removeAt(0);
     }
-    
+
     // 如果API调用时间超过1秒，记录警告
     if (duration > 1000) {
       Logger.w('Slow API call: $endpoint took ${duration}ms');
@@ -224,17 +227,17 @@ class PerformanceOptimizationService {
     final avgFrameTime = _frameDurations.isNotEmpty
         ? _frameDurations.reduce((a, b) => a + b) / _frameDurations.length
         : 0;
-    
+
     // 计算帧率
     final fps = avgFrameTime > 0 ? (1000000 / avgFrameTime).floor() : 0;
-    
+
     // 计算API调用统计
     final apiStats = <String, dynamic>{};
     for (final endpoint in _apiCallDurations.keys) {
       final durations = _apiCallDurations[endpoint]!;
       final avgDuration = durations.reduce((a, b) => a + b) / durations.length;
       final maxDuration = durations.reduce((a, b) => a > b ? a : b);
-      
+
       apiStats[endpoint] = {
         'count': _apiCallCounts[endpoint] ?? 0,
         'avg_duration': avgDuration,
@@ -242,7 +245,7 @@ class PerformanceOptimizationService {
         'samples': durations.length,
       };
     }
-    
+
     return {
       'cache_size': _cache.length,
       'active_debounce_timers': _debounceTimers.length,
@@ -271,14 +274,15 @@ class PerformanceOptimizationService {
     Logger.i('Memory Pressure: ${stats['memory_pressure']}');
     Logger.i('FPS: ${stats['fps']}');
     Logger.i('Average Frame Time: ${stats['avg_frame_time']}ms');
-    
+
     if (stats['api_calls'] != null && (stats['api_calls'] as Map).isNotEmpty) {
       Logger.i('\nAPI Call Statistics:');
       final apiStats = stats['api_stats'] as Map;
       for (final entry in apiStats.entries) {
         final endpoint = entry.key;
         final endpointStats = entry.value as Map;
-        Logger.i('$endpoint: ${endpointStats['count']} calls, ${endpointStats['avg_duration']}ms avg, ${endpointStats['max_duration']}ms max');
+        Logger.i(
+            '$endpoint: ${endpointStats['count']} calls, ${endpointStats['avg_duration']}ms avg, ${endpointStats['max_duration']}ms max');
       }
     }
     Logger.i('=========================');
@@ -291,9 +295,8 @@ abstract class OptimizedStatefulWidget extends StatefulWidget {
 }
 
 /// 性能优化的State基类
-abstract class OptimizedState<T extends OptimizedStatefulWidget> extends State<T>
-    with AutomaticKeepAliveClientMixin {
-  
+abstract class OptimizedState<T extends OptimizedStatefulWidget>
+    extends State<T> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -333,7 +336,6 @@ abstract class OptimizedState<T extends OptimizedStatefulWidget> extends State<T
 
 /// 性能优化的布局构建�?
 class OptimizedLayoutBuilder extends StatelessWidget {
-
   const OptimizedLayoutBuilder({
     super.key,
     required this.builder,
@@ -346,24 +348,26 @@ class OptimizedLayoutBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final key = cacheKey ?? '${constraints.maxWidth}x${constraints.maxHeight}';
-        
+        final key =
+            cacheKey ?? '${constraints.maxWidth}x${constraints.maxHeight}';
+
         // 尝试从缓存获�?
-        final cached = PerformanceOptimizationService.getCachedResult<Widget>(key);
+        final cached =
+            PerformanceOptimizationService.getCachedResult<Widget>(key);
         if (cached != null) {
           return cached;
         }
 
         // 构建新的widget
         final widget = builder(context, constraints);
-        
+
         // 缓存结果
         PerformanceOptimizationService.setCachedResult(
-          key, 
-          widget, 
+          key,
+          widget,
           ttl: const Duration(seconds: 30),
         );
-        
+
         return widget;
       },
     );
@@ -385,11 +389,12 @@ class OptimizedAnimationController extends AnimationController {
   }) {
     final stats = PerformanceOptimizationService.getPerformanceStats();
     final isHighMemoryPressure = stats['memory_pressure'] == 'high';
-    final cpuUsage = double.tryParse(stats['cpu_usage']?.toString() ?? '0') ?? 0;
-    
+    final cpuUsage =
+        double.tryParse(stats['cpu_usage']?.toString() ?? '0') ?? 0;
+
     // 根据内存压力和CPU使用率调整动画时长
     double scaleFactor = 1;
-    
+
     if (isHighMemoryPressure) {
       scaleFactor = 0.6; // 高内存压力下减少40%
     } else if (cpuUsage > 80) {
@@ -397,10 +402,11 @@ class OptimizedAnimationController extends AnimationController {
     } else if (cpuUsage > 60) {
       scaleFactor = 0.85; // 中等CPU使用率下减少15%
     }
-    
-    final originalDuration = duration ?? this.duration ?? const Duration(milliseconds: 300);
+
+    final originalDuration =
+        duration ?? this.duration ?? const Duration(milliseconds: 300);
     final adjustedDuration = originalDuration * scaleFactor;
-    
+
     animateTo(target, duration: adjustedDuration);
   }
 }
@@ -409,46 +415,46 @@ class OptimizedAnimationController extends AnimationController {
 class AnimationPerformanceMonitor {
   /// 记录动画开始时间
   static final Map<String, int> _animationStartTimes = {};
-  
+
   /// 记录动画帧时间
   static final Map<String, List<int>> _animationFrameTimes = {};
-  
+
   /// 开始监控动画性能
   static void startMonitoring(String animationId) {
     _animationStartTimes[animationId] = DateTime.now().millisecondsSinceEpoch;
     _animationFrameTimes[animationId] = [];
   }
-  
+
   /// 记录动画帧时间
   static void recordFrame(String animationId, int frameTime) {
     if (_animationFrameTimes.containsKey(animationId)) {
       _animationFrameTimes[animationId]!.add(frameTime);
     }
   }
-  
+
   /// 结束监控并获取动画性能统计
   static Map<String, dynamic> stopMonitoring(String animationId) {
     if (!_animationStartTimes.containsKey(animationId)) {
       return {};
     }
-    
+
     final startTime = _animationStartTimes[animationId]!;
     final endTime = DateTime.now().millisecondsSinceEpoch;
     final totalDuration = endTime - startTime;
-    
+
     final frameTimes = _animationFrameTimes[animationId] ?? [];
     double avgFrameTime = 0;
     if (frameTimes.isNotEmpty) {
       final sum = frameTimes.reduce((a, b) => a + b);
       avgFrameTime = sum / frameTimes.length;
     }
-    
+
     final fps = frameTimes.isNotEmpty ? (1000 / avgFrameTime).round() : 0;
-    
+
     // 清理临时数据
     _animationStartTimes.remove(animationId);
     _animationFrameTimes.remove(animationId);
-    
+
     return {
       'total_duration': totalDuration,
       'frame_count': frameTimes.length,

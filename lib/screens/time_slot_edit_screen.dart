@@ -25,10 +25,11 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
   Future<void> _selectTime({required bool isStart}) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: isStart ? _startTime ?? const TimeOfDay(hour: 8, minute: 0) 
-                           : _endTime ?? const TimeOfDay(hour: 9, minute: 0),
+      initialTime: isStart
+          ? _startTime ?? const TimeOfDay(hour: 8, minute: 0)
+          : _endTime ?? const TimeOfDay(hour: 9, minute: 0),
     );
-    
+
     if (picked != null) {
       setState(() {
         if (isStart) {
@@ -81,7 +82,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                               border: OutlineInputBorder(),
                             ),
                             child: Text(
-                              _startTime != null 
+                              _startTime != null
                                   ? '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}'
                                   : '选择开始时间',
                             ),
@@ -98,7 +99,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                               border: OutlineInputBorder(),
                             ),
                             child: Text(
-                              _endTime != null 
+                              _endTime != null
                                   ? '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}'
                                   : '选择结束时间',
                             ),
@@ -119,32 +120,34 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (_formKey.currentState!.validate() && 
-                  _startTime != null && 
+              if (_formKey.currentState!.validate() &&
+                  _startTime != null &&
                   _endTime != null) {
-                
                 // Convert TimeOfDay to string format "HH:MM"
-                final startTime = '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}';
-                final endTime = '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}';
-                
-                if (_endTime!.hour < _startTime!.hour || 
-                    (_endTime!.hour == _startTime!.hour && _endTime!.minute <= _startTime!.minute)) {
+                final startTime =
+                    '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}';
+                final endTime =
+                    '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}';
+
+                if (_endTime!.hour < _startTime!.hour ||
+                    (_endTime!.hour == _startTime!.hour &&
+                        _endTime!.minute <= _startTime!.minute)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('结束时间必须晚于开始时间')),
                   );
                   return;
                 }
-                
+
                 final timeSlot = TimeSlot(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
                   name: _nameController.text,
                   startTime: startTime,
                   endTime: endTime,
                 );
-                
+
                 Provider.of<TimetableEditService>(context, listen: false)
                     .addTimeSlot(timeSlot);
-                
+
                 Navigator.of(context).pop();
               } else if (_startTime == null || _endTime == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -161,11 +164,11 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
 
   void _showEditTimeSlotDialog(TimeSlot timeSlot) {
     _nameController.text = timeSlot.name;
-    
+
     // Parse time strings to TimeOfDay
     final startParts = timeSlot.startTime.split(':');
     final endParts = timeSlot.endTime.split(':');
-    
+
     _startTime = TimeOfDay(
       hour: int.parse(startParts[0]),
       minute: int.parse(startParts[1]),
@@ -207,9 +210,10 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                           onTap: () async {
                             final TimeOfDay? picked = await showTimePicker(
                               context: context,
-                              initialTime: _startTime ?? const TimeOfDay(hour: 8, minute: 0),
+                              initialTime: _startTime ??
+                                  const TimeOfDay(hour: 8, minute: 0),
                             );
-                            
+
                             if (picked != null) {
                               setState(() {
                                 _startTime = picked;
@@ -222,7 +226,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                               border: OutlineInputBorder(),
                             ),
                             child: Text(
-                              _startTime != null 
+                              _startTime != null
                                   ? '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}'
                                   : '选择开始时间',
                             ),
@@ -235,9 +239,10 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                           onTap: () async {
                             final TimeOfDay? picked = await showTimePicker(
                               context: context,
-                              initialTime: _endTime ?? const TimeOfDay(hour: 9, minute: 0),
+                              initialTime: _endTime ??
+                                  const TimeOfDay(hour: 9, minute: 0),
                             );
-                            
+
                             if (picked != null) {
                               setState(() {
                                 _endTime = picked;
@@ -250,7 +255,7 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                               border: OutlineInputBorder(),
                             ),
                             child: Text(
-                              _endTime != null 
+                              _endTime != null
                                   ? '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}'
                                   : '选择结束时间',
                             ),
@@ -271,32 +276,34 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (_formKey.currentState!.validate() && 
-                  _startTime != null && 
+              if (_formKey.currentState!.validate() &&
+                  _startTime != null &&
                   _endTime != null) {
-                
                 // Convert TimeOfDay to string format "HH:MM"
-                final startTime = '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}';
-                final endTime = '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}';
-                
-                if (_endTime!.hour < _startTime!.hour || 
-                    (_endTime!.hour == _startTime!.hour && _endTime!.minute <= _startTime!.minute)) {
+                final startTime =
+                    '${_startTime!.hour.toString().padLeft(2, '0')}:${_startTime!.minute.toString().padLeft(2, '0')}';
+                final endTime =
+                    '${_endTime!.hour.toString().padLeft(2, '0')}:${_endTime!.minute.toString().padLeft(2, '0')}';
+
+                if (_endTime!.hour < _startTime!.hour ||
+                    (_endTime!.hour == _startTime!.hour &&
+                        _endTime!.minute <= _startTime!.minute)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('结束时间必须晚于开始时间')),
                   );
                   return;
                 }
-                
+
                 final updatedTimeSlot = TimeSlot(
                   id: timeSlot.id,
                   name: _nameController.text,
                   startTime: startTime,
                   endTime: endTime,
                 );
-                
+
                 Provider.of<TimetableEditService>(context, listen: false)
                     .updateTimeSlot(updatedTimeSlot);
-                
+
                 Navigator.of(context).pop();
               } else if (_startTime == null || _endTime == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -321,25 +328,25 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
     return Consumer<TimetableEditService>(
       builder: (context, service, child) {
         final timeSlots = service.timeSlots;
-        
+
         // Sort time slots by start time
         final sortedTimeSlots = List<TimeSlot>.from(timeSlots)
           ..sort((a, b) {
             // Parse time strings "HH:MM" and compare
             final aParts = a.startTime.split(':');
             final bParts = b.startTime.split(':');
-            
+
             final aHour = int.parse(aParts[0]);
             final aMinute = int.parse(aParts[1]);
             final bHour = int.parse(bParts[0]);
             final bMinute = int.parse(bParts[1]);
-            
+
             final aTotalMinutes = aHour * 60 + aMinute;
             final bTotalMinutes = bHour * 60 + bMinute;
-            
+
             return aTotalMinutes.compareTo(bTotalMinutes);
           });
-        
+
         return Column(
           children: [
             Padding(
@@ -383,7 +390,8 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.edit),
-                                  onPressed: () => _showEditTimeSlotDialog(timeSlot),
+                                  onPressed: () =>
+                                      _showEditTimeSlotDialog(timeSlot),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete),
@@ -393,7 +401,8 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                                       builder: (context) => AlertDialog(
                                         title: const Text('确认删除'),
                                         content: Text(
-                                            '确定要删除时间段"${timeSlot.name}"吗？',),
+                                          '确定要删除时间段"${timeSlot.name}"吗？',
+                                        ),
                                         actions: [
                                           TextButton(
                                             onPressed: () =>
@@ -402,7 +411,8 @@ class _TimeSlotEditScreenState extends State<TimeSlotEditScreen> {
                                           ),
                                           ElevatedButton(
                                             onPressed: () {
-                                              service.deleteTimeSlot(timeSlot.id);
+                                              service
+                                                  .deleteTimeSlot(timeSlot.id);
                                               Navigator.of(context).pop();
                                             },
                                             child: const Text('删除'),

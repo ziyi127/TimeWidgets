@@ -7,10 +7,9 @@ import 'package:time_widgets/utils/md3_form_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class TimeSlotTab extends StatelessWidget {
-
   const TimeSlotTab({super.key, required this.service});
   final TimetableEditService service;
-  
+
   /// Generate a simple unique ID using timestamp and random numbers
   String _generateId() {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -34,11 +33,14 @@ class TimeSlotTab extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.access_time, size: 64, color: theme.colorScheme.outline),
+                  Icon(Icons.access_time,
+                      size: 64, color: theme.colorScheme.outline),
                   const SizedBox(height: 16),
-                  Text('暂无作息时间', style: MD3TypographyStyles.titleMedium(context)),
+                  Text('暂无作息时间',
+                      style: MD3TypographyStyles.titleMedium(context)),
                   const SizedBox(height: 8),
-                  Text('点击下方按钮添加时间段', style: MD3TypographyStyles.bodyMedium(context)),
+                  Text('点击下方按钮添加时间段',
+                      style: MD3TypographyStyles.bodyMedium(context)),
                 ],
               ),
             )
@@ -56,7 +58,8 @@ class TimeSlotTab extends StatelessWidget {
                         _getIconForType(slot.type),
                         color: theme.colorScheme.primary,
                       ),
-                      title: Text(slot.name, style: MD3TypographyStyles.titleMedium(context)),
+                      title: Text(slot.name,
+                          style: MD3TypographyStyles.titleMedium(context)),
                       subtitle: Text(
                         '${slot.startTime} - ${slot.endTime}',
                         style: MD3TypographyStyles.bodySmall(context),
@@ -94,19 +97,23 @@ class TimeSlotTab extends StatelessWidget {
     final isEditing = slot != null;
     final nameController = TextEditingController(text: slot?.name);
     TimePointType selectedType = slot?.type ?? TimePointType.classTime;
-    
+
     // TimeOfDay parsing/formatting helper
     TimeOfDay parseTime(String time) {
       final parts = time.split(':');
       return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
     }
-    
+
     String formatTime(TimeOfDay time) {
       return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     }
 
-    TimeOfDay startTime = slot != null ? parseTime(slot.startTime) : const TimeOfDay(hour: 8, minute: 0);
-    TimeOfDay endTime = slot != null ? parseTime(slot.endTime) : const TimeOfDay(hour: 8, minute: 45);
+    TimeOfDay startTime = slot != null
+        ? parseTime(slot.startTime)
+        : const TimeOfDay(hour: 8, minute: 0);
+    TimeOfDay endTime = slot != null
+        ? parseTime(slot.endTime)
+        : const TimeOfDay(hour: 8, minute: 45);
 
     await showDialog<void>(
       context: context,
@@ -132,9 +139,12 @@ class TimeSlotTab extends StatelessWidget {
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: TimePointType.classTime, child: Text('上课')),
-                      DropdownMenuItem(value: TimePointType.breakTime, child: Text('休息')),
-                      DropdownMenuItem(value: TimePointType.divider, child: Text('分割线')),
+                      DropdownMenuItem(
+                          value: TimePointType.classTime, child: Text('上课')),
+                      DropdownMenuItem(
+                          value: TimePointType.breakTime, child: Text('休息')),
+                      DropdownMenuItem(
+                          value: TimePointType.divider, child: Text('分割线')),
                     ],
                     onChanged: (value) {
                       if (value != null) setState(() => selectedType = value);

@@ -9,10 +9,12 @@ class WeatherService {
   static const String _geocodingUrl = 'https://geocoding-api.open-meteo.com/v1';
 
   // Get weather by coordinates
-  Future<WeatherData?> getWeather(double lat, double lon, {String? cityName}) async {
+  Future<WeatherData?> getWeather(double lat, double lon,
+      {String? cityName}) async {
     try {
       final url = Uri.parse(
-          '$_baseUrl/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto',);
+        '$_baseUrl/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto',
+      );
 
       final response = await http.get(url);
 
@@ -32,7 +34,8 @@ class WeatherService {
   // Search city
   Future<List<Map<String, dynamic>>> searchCity(String query) async {
     try {
-      final url = Uri.parse('$_geocodingUrl/search?name=$query&count=5&language=zh&format=json');
+      final url = Uri.parse(
+          '$_geocodingUrl/search?name=$query&count=5&language=zh&format=json');
       final response = await http.get(url).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
@@ -44,7 +47,8 @@ class WeatherService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['results'] != null) {
-          return List<Map<String, dynamic>>.from(data['results'] as Iterable);
+          final results = data['results'] as List<dynamic>;
+          return results.cast<Map<String, dynamic>>();
         }
       } else {
         Logger.e('Failed to search city: ${response.statusCode}');
@@ -64,22 +68,39 @@ class WeatherService {
     final weatherCode = current['weather_code'] as int;
     final weatherInfo = _getWeatherInfo(weatherCode);
 
+    // Helper to safely get daily values
+    dynamic getDailyValue(String key, int index) {
+      final list = daily[key] as List<dynamic>?;
+      if (list != null && list.length > index) {
+        return list[index];
+      }
+      return null;
+    }
+
+    final tempMin = getDailyValue('temperature_2m_min', 0);
+    final tempMax = getDailyValue('temperature_2m_max', 0);
+    final sunrise = getDailyValue('sunrise', 0);
+    final sunset = getDailyValue('sunset', 0);
+    final uvIndexMax = getDailyValue('uv_index_max', 0);
+
     return WeatherData(
       cityName: cityName,
       description: weatherInfo['description'] as String,
       temperature: (current['temperature_2m'] as num).toInt(),
-      temperatureRange: '${(daily['temperature_2m_min'][0] as num).toInt()}°C~${(daily['temperature_2m_max'][0] as num).toInt()}°C',
+      temperatureRange:
+          '${(tempMin as num?)?.toInt() ?? 0}°C~${(tempMax as num?)?.toInt() ?? 0}°C',
       aqiLevel: 0, // OpenMeteo free tier doesn't support AQI easily
       humidity: (current['relative_humidity_2m'] as num).toInt(),
       wind: '${current['wind_speed_10m']} km/h',
       pressure: (current['pressure_msl'] as num).toDouble(),
-      sunrise: daily['sunrise'][0].toString().split('T').last,
-      sunset: daily['sunset'][0].toString().split('T').last,
+      sunrise: sunrise?.toString().split('T').last ?? '00:00',
+      sunset: sunset?.toString().split('T').last ?? '00:00',
       weatherType: weatherCode,
-      weatherIcon: weatherInfo['iconPath'] as String? ?? 'assets/icons/weather_0.png',
+      weatherIcon:
+          weatherInfo['iconPath'] as String? ?? 'assets/icons/weather_0.png',
       feelsLike: (current['temperature_2m'] as num).toInt(), // Approximation
       visibility: 'N/A',
-      uvIndex: daily['uv_index_max'][0].toString(),
+      uvIndex: uvIndexMax?.toString() ?? '0',
       pubTime: DateTime.now().toIso8601String(),
     );
   }
@@ -101,35 +122,48 @@ class WeatherService {
     // 96, 99 *: Thunderstorm with slight and heavy hail
 
     switch (code) {
-      case 0: return {'description': '晴', 'iconPath': 'assets/icons/weather_0.png'};
-      case 1: 
-      case 2: 
-      case 3: return {'description': '多云', 'iconPath': 'assets/icons/weather_1.png'};
-      case 45: 
-      case 48: return {'description': '雾', 'iconPath': 'assets/icons/weather_18.png'};
-      case 51: 
-      case 53: 
-      case 55: return {'description': '小雨', 'iconPath': 'assets/icons/weather_7.png'};
+      case 0:
+        return {'description': '晴', 'iconPath': 'assets/icons/weather_0.png'};
+      case 1:
+      case 2:
+      case 3:
+        return {'description': '多云', 'iconPath': 'assets/icons/weather_1.png'};
+      case 45:
+      case 48:
+        return {'description': '雾', 'iconPath': 'assets/icons/weather_18.png'};
+      case 51:
+      case 53:
+      case 55:
+        return {'description': '小雨', 'iconPath': 'assets/icons/weather_7.png'};
       case 56:
-      case 57: return {'description': '冻雨', 'iconPath': 'assets/icons/weather_10.png'};
-      case 61: 
-      case 63: 
-      case 65: return {'description': '雨', 'iconPath': 'assets/icons/weather_8.png'};
+      case 57:
+        return {'description': '冻雨', 'iconPath': 'assets/icons/weather_10.png'};
+      case 61:
+      case 63:
+      case 65:
+        return {'description': '雨', 'iconPath': 'assets/icons/weather_8.png'};
       case 66:
-      case 67: return {'description': '雨夹雪', 'iconPath': 'assets/icons/weather_6.png'};
-      case 71: 
-      case 73: 
-      case 75: return {'description': '雪', 'iconPath': 'assets/icons/weather_14.png'};
-      case 77: return {'description': '小雪', 'iconPath': 'assets/icons/weather_14.png'};
-      case 80: 
-      case 81: 
-      case 82: return {'description': '阵雨', 'iconPath': 'assets/icons/weather_3.png'};
-      case 85: 
-      case 86: return {'description': '阵雪', 'iconPath': 'assets/icons/weather_13.png'};
-      case 95: 
-      case 96: 
-      case 99: return {'description': '雷雨', 'iconPath': 'assets/icons/weather_4.png'};
-      default: return {'description': '未知', 'iconPath': 'assets/icons/weather_0.png'};
+      case 67:
+        return {'description': '雨夹雪', 'iconPath': 'assets/icons/weather_6.png'};
+      case 71:
+      case 73:
+      case 75:
+        return {'description': '雪', 'iconPath': 'assets/icons/weather_14.png'};
+      case 77:
+        return {'description': '小雪', 'iconPath': 'assets/icons/weather_14.png'};
+      case 80:
+      case 81:
+      case 82:
+        return {'description': '阵雨', 'iconPath': 'assets/icons/weather_3.png'};
+      case 85:
+      case 86:
+        return {'description': '阵雪', 'iconPath': 'assets/icons/weather_13.png'};
+      case 95:
+      case 96:
+      case 99:
+        return {'description': '雷雨', 'iconPath': 'assets/icons/weather_4.png'};
+      default:
+        return {'description': '未知', 'iconPath': 'assets/icons/weather_0.png'};
     }
   }
 }

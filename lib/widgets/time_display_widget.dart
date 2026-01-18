@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 /// 时间显示组件 - MD3紧凑版
 class TimeDisplayWidget extends StatefulWidget {
-
   const TimeDisplayWidget({
     super.key,
     this.isCompact = false,
@@ -37,11 +36,11 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
 
   void _updateTime() {
     if (!mounted) return;
-    
+
     final now = DateTime.now();
     final newTime = DateFormat('HH:mm').format(now);
     final newSeconds = DateFormat('ss').format(now);
-    
+
     // 只有当时间真正改变时才调用 setState
     if (_currentTime != newTime || _currentSeconds != newSeconds) {
       if (mounted) {

@@ -10,7 +10,7 @@ class TimetableStorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_prefsKey);
-      
+
       if (jsonString != null) {
         final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
         return TimetableData.fromJson(jsonData);

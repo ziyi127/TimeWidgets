@@ -3,7 +3,6 @@ import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
 class CountdownEditDialog extends StatefulWidget {
-
   const CountdownEditDialog({super.key, this.countdown});
   final CountdownData? countdown;
 
@@ -25,9 +24,12 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.countdown?.title ?? '');
-    _descriptionController = TextEditingController(text: widget.countdown?.description ?? '');
-    _targetDate = widget.countdown?.targetDate ?? DateTime.now().add(const Duration(days: 7));
+    _titleController =
+        TextEditingController(text: widget.countdown?.title ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.countdown?.description ?? '');
+    _targetDate = widget.countdown?.targetDate ??
+        DateTime.now().add(const Duration(days: 7));
     _type = widget.countdown?.type ?? 'event';
     _category = widget.countdown?.category;
   }
@@ -72,9 +74,12 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
   void _save() {
     if (_formKey.currentState?.validate() ?? false) {
       final countdown = CountdownData(
-        id: widget.countdown?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        id: widget.countdown?.id ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
         title: _titleController.text,
-        description: _descriptionController.text.isEmpty ? '' : _descriptionController.text,
+        description: _descriptionController.text.isEmpty
+            ? ''
+            : _descriptionController.text,
         targetDate: _targetDate,
         type: _type,
         progress: widget.countdown?.progress ?? 0.0,
@@ -97,7 +102,8 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
       title: Text(
         isEditing ? '编辑倒计时' : '添加倒计时',
         style: TextStyle(
-          fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
+          fontSize:
+              (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
         ),
       ),
       content: SizedBox(
@@ -157,7 +163,8 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                             onPressed: _selectDate,
                             icon: Icon(
                               Icons.calendar_today,
-                              size: ResponsiveUtils.getIconSize(width, baseSize: 18),
+                              size: ResponsiveUtils.getIconSize(width,
+                                  baseSize: 18),
                             ),
                             label: Text(
                               '${_targetDate.year}-${_targetDate.month.toString().padLeft(2, '0')}-${_targetDate.day.toString().padLeft(2, '0')} ${_targetDate.hour.toString().padLeft(2, '0')}:${_targetDate.minute.toString().padLeft(2, '0')}',
@@ -165,7 +172,9 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainer,
                               padding: EdgeInsets.symmetric(
                                 horizontal: ResponsiveUtils.value(16),
                                 vertical: ResponsiveUtils.value(12),
@@ -191,12 +200,17 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                           labelText: '类型',
                           labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                           border: const OutlineInputBorder(),
-                          contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
+                          contentPadding:
+                              EdgeInsets.all(ResponsiveUtils.value(16)),
                         ),
-                        items: _types.map((type) => DropdownMenuItem(
-                          value: type,
-                          child: Text(type),
-                        ),).toList(),
+                        items: _types
+                            .map(
+                              (type) => DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (value) {
                           if (value != null) {
                             setState(() {
@@ -218,14 +232,17 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                           labelText: '分类',
                           labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                           border: const OutlineInputBorder(),
-                          contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
+                          contentPadding:
+                              EdgeInsets.all(ResponsiveUtils.value(16)),
                         ),
                         items: [
                           const DropdownMenuItem(child: Text('无分类')),
-                          ..._categories.map((category) => DropdownMenuItem(
-                            value: category,
-                            child: Text(category),
-                          ),),
+                          ..._categories.map(
+                            (category) => DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            ),
+                          ),
                         ],
                         onChanged: (value) {
                           setState(() {

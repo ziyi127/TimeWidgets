@@ -3,7 +3,6 @@ import 'package:time_widgets/utils/error_handler.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
 class CustomErrorWidget extends StatelessWidget {
-
   const CustomErrorWidget({
     super.key,
     required this.message,
@@ -49,12 +48,13 @@ class CustomErrorWidget extends StatelessWidget {
     final effectiveFontSize = (fontSize ?? 14.0) * fontMultiplier;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Container(
       padding: EdgeInsets.all(effectiveFontSize * 1.5),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer.withAlpha(229),
-        borderRadius: BorderRadius.circular(ResponsiveUtils.getBorderRadius(width)),
+        borderRadius:
+            BorderRadius.circular(ResponsiveUtils.getBorderRadius(width)),
         border: Border.all(
           color: colorScheme.error.withAlpha(128),
           width: ResponsiveUtils.value(1),
@@ -145,7 +145,8 @@ class CustomErrorWidget extends StatelessWidget {
                       vertical: effectiveFontSize * 0.5,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
+                      borderRadius:
+                          BorderRadius.circular(ResponsiveUtils.value(8)),
                     ),
                   ),
                   child: Row(
@@ -173,7 +174,8 @@ class CustomErrorWidget extends StatelessWidget {
                       vertical: effectiveFontSize * 0.5,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ResponsiveUtils.value(8)),
+                      borderRadius:
+                          BorderRadius.circular(ResponsiveUtils.value(8)),
                     ),
                   ),
                   child: Row(
@@ -198,7 +200,6 @@ class CustomErrorWidget extends StatelessWidget {
 
 /// 轻量级错误提示组件，用于非阻塞场景
 class ErrorToast extends StatelessWidget {
-  
   const ErrorToast({
     super.key,
     required this.message,
@@ -208,14 +209,14 @@ class ErrorToast extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
   final Duration duration;
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final width = MediaQuery.sizeOf(context).width;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
-    
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: ResponsiveUtils.value(16),
@@ -223,7 +224,8 @@ class ErrorToast extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(ResponsiveUtils.getBorderRadius(width, baseRadius: 12)),
+        borderRadius: BorderRadius.circular(
+            ResponsiveUtils.getBorderRadius(width, baseRadius: 12)),
         border: Border.all(
           color: colorScheme.error.withAlpha(128),
           width: ResponsiveUtils.value(1),
@@ -283,7 +285,6 @@ class ErrorToast extends StatelessWidget {
 
 /// 错误详情对话框组件，用于显示详细错误信息和日志
 class ErrorDetailsDialog extends StatelessWidget {
-  
   const ErrorDetailsDialog({
     super.key,
     this.error,
@@ -293,20 +294,25 @@ class ErrorDetailsDialog extends StatelessWidget {
   final AppError? error;
   final String? title;
   final String? description;
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final width = MediaQuery.sizeOf(context).width;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
-    
+
     return AlertDialog(
       title: Row(
         children: [
-          Icon(Icons.error_outline, color: colorScheme.error, size: ResponsiveUtils.getIconSize(width)),
+          Icon(Icons.error_outline,
+              color: colorScheme.error,
+              size: ResponsiveUtils.getIconSize(width)),
           SizedBox(width: ResponsiveUtils.value(12)),
-          Text(title ?? '错误详情', style: TextStyle(fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier)),
+          Text(title ?? '错误详情',
+              style: TextStyle(
+                  fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) *
+                      fontMultiplier)),
         ],
       ),
       content: SingleChildScrollView(
@@ -314,51 +320,78 @@ class ErrorDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (description != null) ...[
-              Text(description!, style: TextStyle(fontSize: 16 * fontMultiplier)),
+              Text(description!,
+                  style: TextStyle(fontSize: 16 * fontMultiplier)),
               SizedBox(height: ResponsiveUtils.value(16)),
             ],
             if (error != null) ...[
-              Text('错误消息:', style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-              ),),
-              SizedBox(height: ResponsiveUtils.value(4)),
-              Text(error!.message, style: TextStyle(fontSize: 14 * fontMultiplier)),
-              SizedBox(height: ResponsiveUtils.value(16)),
-              if (error!.userMessage != null && error!.userMessage != error!.message) ...[
-                Text('用户提示:', style: theme.textTheme.titleSmall?.copyWith(
+              Text(
+                '错误消息:',
+                style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-                ),),
+                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                      fontMultiplier,
+                ),
+              ),
+              SizedBox(height: ResponsiveUtils.value(4)),
+              Text(error!.message,
+                  style: TextStyle(fontSize: 14 * fontMultiplier)),
+              SizedBox(height: ResponsiveUtils.value(16)),
+              if (error!.userMessage != null &&
+                  error!.userMessage != error!.message) ...[
+                Text(
+                  '用户提示:',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                        fontMultiplier,
+                  ),
+                ),
                 SizedBox(height: ResponsiveUtils.value(4)),
-                Text(error!.userMessage!, style: TextStyle(fontSize: 14 * fontMultiplier)),
+                Text(error!.userMessage!,
+                    style: TextStyle(fontSize: 14 * fontMultiplier)),
                 SizedBox(height: ResponsiveUtils.value(16)),
               ],
               if (error!.resolution != null) ...[
-                Text('解决建议:', style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-                ),),
+                Text(
+                  '解决建议:',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                        fontMultiplier,
+                  ),
+                ),
                 SizedBox(height: ResponsiveUtils.value(4)),
-                Text(error!.resolution!, style: TextStyle(fontSize: 14 * fontMultiplier)),
+                Text(error!.resolution!,
+                    style: TextStyle(fontSize: 14 * fontMultiplier)),
                 SizedBox(height: ResponsiveUtils.value(16)),
               ],
               if (error!.code.isNotEmpty) ...[
-                Text('错误代码:', style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-                ),),
+                Text(
+                  '错误代码:',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                        fontMultiplier,
+                  ),
+                ),
                 SizedBox(height: ResponsiveUtils.value(4)),
-                Text(error!.code, style: TextStyle(fontSize: 14 * fontMultiplier)),
+                Text(error!.code,
+                    style: TextStyle(fontSize: 14 * fontMultiplier)),
                 SizedBox(height: ResponsiveUtils.value(16)),
               ],
             ],
-            Text('错误类型:', style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
-            ),),
+            Text(
+              '错误类型:',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                    fontMultiplier,
+              ),
+            ),
             SizedBox(height: ResponsiveUtils.value(4)),
-            Text(error?.code ?? '未知', style: TextStyle(fontSize: 14 * fontMultiplier)),
+            Text(error?.code ?? '未知',
+                style: TextStyle(fontSize: 14 * fontMultiplier)),
           ],
         ),
       ),

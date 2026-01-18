@@ -28,14 +28,15 @@ class MD3TypographyStyles {
   static TextStyle displayLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.displayLarge?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 57,
-      fontWeight: FontWeight.w400,
-      letterSpacing: -0.25,
-      height: 1.12,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 57,
+          fontWeight: FontWeight.w400,
+          letterSpacing: -0.25,
+          height: 1.12,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Display Medium - 用于大型标题文本
@@ -43,14 +44,15 @@ class MD3TypographyStyles {
   static TextStyle displayMedium(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.displayMedium?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 45,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.16,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 45,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.16,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Display Small - 用于中等大小的标题文本
@@ -58,14 +60,15 @@ class MD3TypographyStyles {
   static TextStyle displaySmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.displaySmall?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 36,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.22,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 36,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.22,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Headline Large - 用于大型标题
@@ -73,14 +76,15 @@ class MD3TypographyStyles {
   static TextStyle headlineLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.headlineLarge?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 32,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.25,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.25,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Headline Medium - 用于中等标题
@@ -88,14 +92,15 @@ class MD3TypographyStyles {
   static TextStyle headlineMedium(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.headlineMedium?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 28,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.29,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.29,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Headline Small - 用于小型标题
@@ -103,14 +108,15 @@ class MD3TypographyStyles {
   static TextStyle headlineSmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.headlineSmall?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.33,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.33,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Title Large - 用于大型标题文本
@@ -118,14 +124,15 @@ class MD3TypographyStyles {
   static TextStyle titleLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.titleLarge?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.27,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.27,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Title Medium - 用于中等标题文本
@@ -133,14 +140,15 @@ class MD3TypographyStyles {
   static TextStyle titleMedium(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.titleMedium?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.15,
-      height: 1.50,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.15,
+          height: 1.50,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Title Small - 用于小型标题文本
@@ -148,14 +156,15 @@ class MD3TypographyStyles {
   static TextStyle titleSmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.titleSmall?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.1,
-      height: 1.43,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.1,
+          height: 1.43,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Body Large - 用于大型正文文本
@@ -163,14 +172,15 @@ class MD3TypographyStyles {
   static TextStyle bodyLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.bodyLarge?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0.5,
-      height: 1.50,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.5,
+          height: 1.50,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Body Medium - 用于中等正文文本
@@ -178,14 +188,15 @@ class MD3TypographyStyles {
   static TextStyle bodyMedium(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.bodyMedium?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0.25,
-      height: 1.43,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.25,
+          height: 1.43,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Body Small - 用于小型正文文本
@@ -193,14 +204,15 @@ class MD3TypographyStyles {
   static TextStyle bodySmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.bodySmall?.copyWith(
-      color: color ?? theme.colorScheme.onSurfaceVariant,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0.4,
-      height: 1.33,
-      color: color ?? theme.colorScheme.onSurfaceVariant,
-    );
+          color: color ?? theme.colorScheme.onSurfaceVariant,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.4,
+          height: 1.33,
+          color: color ?? theme.colorScheme.onSurfaceVariant,
+        );
   }
 
   /// Label Large - 用于大型标签文本
@@ -208,14 +220,15 @@ class MD3TypographyStyles {
   static TextStyle labelLarge(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.labelLarge?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.1,
-      height: 1.43,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.1,
+          height: 1.43,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Label Medium - 用于中等标签文本
@@ -223,14 +236,15 @@ class MD3TypographyStyles {
   static TextStyle labelMedium(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.labelMedium?.copyWith(
-      color: color ?? theme.colorScheme.onSurface,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.5,
-      height: 1.33,
-      color: color ?? theme.colorScheme.onSurface,
-    );
+          color: color ?? theme.colorScheme.onSurface,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
+          height: 1.33,
+          color: color ?? theme.colorScheme.onSurface,
+        );
   }
 
   /// Label Small - 用于小型标签文本
@@ -238,14 +252,15 @@ class MD3TypographyStyles {
   static TextStyle labelSmall(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
     return theme.textTheme.labelSmall?.copyWith(
-      color: color ?? theme.colorScheme.onSurfaceVariant,
-    ) ?? _getFallbackTextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.5,
-      height: 1.45,
-      color: color ?? theme.colorScheme.onSurfaceVariant,
-    );
+          color: color ?? theme.colorScheme.onSurfaceVariant,
+        ) ??
+        _getFallbackTextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
+          height: 1.45,
+          color: color ?? theme.colorScheme.onSurfaceVariant,
+        );
   }
 
   // 特殊用途的文本样式
@@ -331,14 +346,13 @@ enum MD3TypographyVariant {
 /// MD3 Typography Builder
 /// 提供更灵活的文本样式构建方式
 class MD3TypographyBuilder {
-
   MD3TypographyBuilder({
     required this.context,
     required this.text,
   });
   final BuildContext context;
   final String text;
-  
+
   MD3TypographyVariant _variant = MD3TypographyVariant.bodyMedium;
   Color? _color;
   TextAlign? _textAlign;
@@ -378,7 +392,7 @@ class MD3TypographyBuilder {
 
   Widget build() {
     final style = _getStyleForVariant();
-    
+
     if (_selectable) {
       return SelectableText(
         text,

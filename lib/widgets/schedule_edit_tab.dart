@@ -66,7 +66,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   Future<void> _importFromJson(TimetableEditService service) async {
     final result = await _exportService.importFromFileWithStats();
     if (!mounted) return;
-    
+
     if (result.success && result.data != null) {
       service.loadTimetableData(result.data!);
       _showSuccessSnackBar('已导入: ${result.stats}');
@@ -78,7 +78,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   Future<void> _importFromClassIsland(TimetableEditService service) async {
     final result = await ClassislandImportService.importFromFileWithStats();
     if (!mounted) return;
-    
+
     if (result.success && result.data != null) {
       service.loadTimetableData(result.data!);
       _showSuccessSnackBar('已导入: ${result.stats}');
@@ -104,7 +104,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     return Consumer<TimetableEditService>(
       builder: (context, service, child) {
         final schedules = service.schedules;
-        
+
         return Row(
           children: [
             // 左侧: 课表列表
@@ -123,9 +123,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildScheduleList(BuildContext context, List<Schedule> schedules, TimetableEditService service) {
+  Widget _buildScheduleList(BuildContext context, List<Schedule> schedules,
+      TimetableEditService service) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       children: [
         // 列表头部
@@ -201,9 +202,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   itemBuilder: (context, index) {
                     final schedule = schedules[index];
                     final isSelected = schedule.id == _selectedScheduleId;
-                    final isActive = schedule.isAutoEnabled && 
+                    final isActive = schedule.isAutoEnabled &&
                         schedule.triggerRule.matches(DateTime.now());
-                    
+
                     return ListTile(
                       leading: Icon(
                         isActive ? Icons.check_circle : Icons.calendar_today,
@@ -218,14 +219,16 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                         children: [
                           if (isActive)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: colorScheme.primaryContainer,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 '当前',
-                                style: MD3TypographyStyles.labelSmall(context).copyWith(
+                                style: MD3TypographyStyles.labelSmall(context)
+                                    .copyWith(
                                   color: colorScheme.onPrimaryContainer,
                                 ),
                               ),
@@ -245,7 +248,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildEmptyScheduleList(BuildContext context, TimetableEditService service) {
+  Widget _buildEmptyScheduleList(
+      BuildContext context, TimetableEditService service) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -280,17 +284,18 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildScheduleGrid(BuildContext context, TimetableEditService service) {
+  Widget _buildScheduleGrid(
+      BuildContext context, TimetableEditService service) {
     if (_selectedScheduleId == null) {
       // Show daily courses grid (legacy mode)
       return _buildDailyCoursesGrid(context, service);
     }
-    
+
     final schedule = service.getScheduleById(_selectedScheduleId!);
     if (schedule == null) {
       return _buildDailyCoursesGrid(context, service);
     }
-    
+
     return _ScheduleGridEditor(
       schedule: schedule,
       service: service,
@@ -308,12 +313,13 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildDailyCoursesGrid(BuildContext context, TimetableEditService service) {
+  Widget _buildDailyCoursesGrid(
+      BuildContext context, TimetableEditService service) {
     final colorScheme = Theme.of(context).colorScheme;
     final timeSlots = service.timeSlots;
     final courses = service.courses;
     final dailyCourses = service.dailyCourses;
-    
+
     if (timeSlots.isEmpty) {
       return Center(
         child: Column(
@@ -335,7 +341,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         ),
       );
     }
-    
+
     return Column(
       children: [
         // 头部
@@ -369,7 +375,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SingleChildScrollView(
-              child: _buildCourseGrid(context, service, timeSlots, courses, dailyCourses),
+              child: _buildCourseGrid(
+                  context, service, timeSlots, courses, dailyCourses),
             ),
           ),
         ),
@@ -386,9 +393,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    
+
     return DataTable(
-      headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest),
+      headingRowColor:
+          WidgetStateProperty.all(colorScheme.surfaceContainerHighest),
       columns: [
         const DataColumn(label: Text('时间')),
         ...days.map((day) => DataColumn(label: Text(day))),
@@ -401,7 +409,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(slot.name, style: MD3TypographyStyles.labelMedium(context)),
+                  Text(slot.name,
+                      style: MD3TypographyStyles.labelMedium(context)),
                   Text(
                     '${slot.startTime}-${slot.endTime}',
                     style: MD3TypographyStyles.bodySmall(context).copyWith(
@@ -412,21 +421,27 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               ),
             ),
             ...DayOfWeek.values.map((day) {
-              final dailyCourse = dailyCourses.where((dc) =>
-                dc.dayOfWeek == day &&
-                dc.timeSlotId == slot.id &&
-                (_filterWeekType == WeekType.both || dc.weekType == _filterWeekType || dc.weekType == WeekType.both),
-              ).firstOrNull;
-              
-              final course = dailyCourse != null 
+              final dailyCourse = dailyCourses
+                  .where(
+                    (dc) =>
+                        dc.dayOfWeek == day &&
+                        dc.timeSlotId == slot.id &&
+                        (_filterWeekType == WeekType.both ||
+                            dc.weekType == _filterWeekType ||
+                            dc.weekType == WeekType.both),
+                  )
+                  .firstOrNull;
+
+              final course = dailyCourse != null
                   ? service.getCourseById(dailyCourse.courseId)
                   : null;
-              
+
               return DataCell(
                 _CourseCell(
                   course: course,
                   dailyCourse: dailyCourse,
-                  onTap: () => _showCoursePickerDialog(context, service, slot, day),
+                  onTap: () =>
+                      _showCoursePickerDialog(context, service, slot, day),
                 ),
               );
             }),
@@ -436,11 +451,12 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Future<void> _showAddScheduleDialog(BuildContext context, TimetableEditService service) async {
+  Future<void> _showAddScheduleDialog(
+      BuildContext context, TimetableEditService service) async {
     final nameController = TextEditingController();
     int weekDay = DateTime.now().weekday == 7 ? 0 : DateTime.now().weekday;
     WeekType weekType = WeekType.both;
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -513,7 +529,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         ),
       ),
     );
-    
+
     if ((result ?? false) && nameController.text.isNotEmpty) {
       final newSchedule = Schedule(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -538,8 +554,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     DayOfWeek day,
   ) async {
     final courses = service.courses;
-    
-    final selectedCourse = await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
+
+    final selectedCourse =
+        await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
       context: context,
       title: '选择课程',
       items: [
@@ -549,7 +566,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           icon: Icon(Icons.remove_circle_outline),
         ),
         ...courses.map((course) {
-          final color = ColorUtils.parseHexColor(course.color) ?? 
+          final color = ColorUtils.parseHexColor(course.color) ??
               ColorUtils.generateColorFromName(course.name);
           return SelectionDialogItem(
             value: course,
@@ -567,12 +584,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         }),
       ],
     );
-    
+
     if (selectedCourse == null) {
       // 删除现有课程
-      final existing = service.dailyCourses.where((dc) =>
-        dc.dayOfWeek == day && dc.timeSlotId == slot.id,
-      ).firstOrNull;
+      final existing = service.dailyCourses
+          .where(
+            (dc) => dc.dayOfWeek == day && dc.timeSlotId == slot.id,
+          )
+          .firstOrNull;
       if (existing != null) {
         service.deleteDailyCourse(existing.id);
       }
@@ -603,7 +622,6 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 
 /// 课程单元格
 class _CourseCell extends StatefulWidget {
-
   const _CourseCell({
     this.course,
     this.dailyCourse,
@@ -623,7 +641,7 @@ class _CourseCellState extends State<_CourseCell> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     if (widget.course == null) {
       return MouseRegion(
         onEnter: (_) => setState(() => _isHovering = true),
@@ -636,12 +654,13 @@ class _CourseCellState extends State<_CourseCell> {
             width: 100,
             height: 64,
             decoration: BoxDecoration(
-              color: _isHovering 
-                  ? colorScheme.surfaceContainerHighest.withAlpha((255 * 0.5).round())
+              color: _isHovering
+                  ? colorScheme.surfaceContainerHighest
+                      .withAlpha((255 * 0.5).round())
                   : Colors.transparent,
               border: Border.all(
-                color: _isHovering 
-                    ? colorScheme.outline 
+                color: _isHovering
+                    ? colorScheme.outline
                     : colorScheme.outlineVariant.withAlpha((255 * 0.5).round()),
               ),
               borderRadius: BorderRadius.circular(12),
@@ -657,11 +676,11 @@ class _CourseCellState extends State<_CourseCell> {
         ),
       );
     }
-    
-    final color = ColorUtils.parseHexColor(widget.course!.color) ?? 
+
+    final color = ColorUtils.parseHexColor(widget.course!.color) ??
         ColorUtils.generateColorFromName(widget.course!.name);
     final textColor = ColorUtils.getContrastTextColor(color);
-    
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
@@ -676,7 +695,7 @@ class _CourseCellState extends State<_CourseCell> {
           decoration: BoxDecoration(
             color: color.withAlpha(_isHovering ? 255 : (255 * 0.9).round()),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: _isHovering 
+            boxShadow: _isHovering
                 ? [
                     BoxShadow(
                       color: color.withAlpha((255 * 0.3).round()),
@@ -712,16 +731,20 @@ class _CourseCellState extends State<_CourseCell> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-              if (widget.dailyCourse != null && widget.dailyCourse!.weekType != WeekType.both) ...[
+              if (widget.dailyCourse != null &&
+                  widget.dailyCourse!.weekType != WeekType.both) ...[
                 const SizedBox(height: 2),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                   decoration: BoxDecoration(
                     color: Colors.black26,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    widget.dailyCourse!.weekType == WeekType.single ? '单周' : '双周',
+                    widget.dailyCourse!.weekType == WeekType.single
+                        ? '单周'
+                        : '双周',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 9,
@@ -740,7 +763,6 @@ class _CourseCellState extends State<_CourseCell> {
 
 /// 课表网格编辑器
 class _ScheduleGridEditor extends StatelessWidget {
-
   const _ScheduleGridEditor({
     required this.schedule,
     required this.service,
@@ -758,11 +780,11 @@ class _ScheduleGridEditor extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final timeSlots = schedule.timeLayoutId != null
-        ? service.getTimeLayoutById(schedule.timeLayoutId!)
-            ?.timeSlots ?? service.timeSlots
+        ? service.getTimeLayoutById(schedule.timeLayoutId!)?.timeSlots ??
+            service.timeSlots
         : service.timeSlots;
     final courses = service.courses;
-    
+
     return Column(
       children: [
         // 头部
@@ -770,7 +792,8 @@ class _ScheduleGridEditor extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text(schedule.name, style: MD3TypographyStyles.titleMedium(context)),
+              Text(schedule.name,
+                  style: MD3TypographyStyles.titleMedium(context)),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -793,7 +816,8 @@ class _ScheduleGridEditor extends StatelessWidget {
                   ButtonSegment(value: WeekType.double, label: Text('双周')),
                 ],
                 selected: {filterWeekType},
-                onSelectionChanged: (selected) => onFilterChanged(selected.first),
+                onSelectionChanged: (selected) =>
+                    onFilterChanged(selected.first),
               ),
               const SizedBox(width: 8),
               MD3ButtonStyles.iconOutlined(
@@ -823,7 +847,7 @@ class _ScheduleGridEditor extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -859,9 +883,10 @@ class _ScheduleGridEditor extends StatelessWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    
+
     return DataTable(
-      headingRowColor: WidgetStateProperty.all(colorScheme.surfaceContainerHighest),
+      headingRowColor:
+          WidgetStateProperty.all(colorScheme.surfaceContainerHighest),
       columns: [
         const DataColumn(label: Text('时间')),
         ...days.map((day) => DataColumn(label: Text(day))),
@@ -874,7 +899,8 @@ class _ScheduleGridEditor extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(slot.name, style: MD3TypographyStyles.labelMedium(context)),
+                  Text(slot.name,
+                      style: MD3TypographyStyles.labelMedium(context)),
                   Text(
                     '${slot.startTime}-${slot.endTime}',
                     style: MD3TypographyStyles.bodySmall(context).copyWith(
@@ -885,16 +911,21 @@ class _ScheduleGridEditor extends StatelessWidget {
               ),
             ),
             ...DayOfWeek.values.map((day) {
-              final dailyCourse = schedule.courses.where((dc) =>
-                dc.dayOfWeek == day &&
-                dc.timeSlotId == slot.id &&
-                (filterWeekType == WeekType.both || dc.weekType == filterWeekType || dc.weekType == WeekType.both),
-              ).firstOrNull;
-              
-              final course = dailyCourse != null 
+              final dailyCourse = schedule.courses
+                  .where(
+                    (dc) =>
+                        dc.dayOfWeek == day &&
+                        dc.timeSlotId == slot.id &&
+                        (filterWeekType == WeekType.both ||
+                            dc.weekType == filterWeekType ||
+                            dc.weekType == WeekType.both),
+                  )
+                  .firstOrNull;
+
+              final course = dailyCourse != null
                   ? service.getCourseById(dailyCourse.courseId)
                   : null;
-              
+
               return DataCell(
                 _CourseCell(
                   course: course,
@@ -915,8 +946,9 @@ class _ScheduleGridEditor extends StatelessWidget {
     DayOfWeek day,
   ) async {
     final courses = service.courses;
-    
-    final selectedCourse = await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
+
+    final selectedCourse =
+        await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
       context: context,
       title: '选择课程',
       items: [
@@ -926,7 +958,7 @@ class _ScheduleGridEditor extends StatelessWidget {
           icon: Icon(Icons.remove_circle_outline),
         ),
         ...courses.map((course) {
-          final color = ColorUtils.parseHexColor(course.color) ?? 
+          final color = ColorUtils.parseHexColor(course.color) ??
               ColorUtils.generateColorFromName(course.name);
           return SelectionDialogItem(
             value: course,
@@ -944,17 +976,18 @@ class _ScheduleGridEditor extends StatelessWidget {
         }),
       ],
     );
-    
+
     // 更新课程列表
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
-    
+
     // 查找现有课程索引
-    final existingIndex = updatedCourses.indexWhere((dc) =>
-      dc.dayOfWeek == day &&
-      dc.timeSlotId == slot.id &&
-      dc.weekType == filterWeekType,
+    final existingIndex = updatedCourses.indexWhere(
+      (dc) =>
+          dc.dayOfWeek == day &&
+          dc.timeSlotId == slot.id &&
+          dc.weekType == filterWeekType,
     );
-    
+
     if (selectedCourse == null) {
       // 删除现有课程
       if (existingIndex != -1) {
@@ -969,7 +1002,7 @@ class _ScheduleGridEditor extends StatelessWidget {
         courseId: selectedCourse.id,
         weekType: filterWeekType,
       );
-      
+
       // 添加或更新课程
       if (existingIndex != -1) {
         updatedCourses[existingIndex] = newDailyCourse;
@@ -977,7 +1010,7 @@ class _ScheduleGridEditor extends StatelessWidget {
         updatedCourses.add(newDailyCourse);
       }
     }
-    
+
     // 更新课表
     final updatedSchedule = schedule.copyWith(courses: updatedCourses);
     service.updateSchedule(updatedSchedule);
@@ -988,7 +1021,7 @@ class _ScheduleGridEditor extends StatelessWidget {
       context: context,
       itemName: schedule.name,
     );
-    
+
     if (confirmed ?? false) {
       service.deleteSchedule(schedule.id);
       onDelete();

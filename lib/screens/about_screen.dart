@@ -82,10 +82,12 @@ class AboutScreen extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.code),
                     title: const Text('GitHub项目'),
-                    subtitle: const Text('https://github.com/ziyi127/TimeWidgets'),
+                    subtitle:
+                        const Text('https://github.com/ziyi127/TimeWidgets'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () async {
-                      final url = Uri.parse('https://github.com/ziyi127/TimeWidgets');
+                      final url =
+                          Uri.parse('https://github.com/ziyi127/TimeWidgets');
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url);
                       }

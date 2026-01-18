@@ -7,10 +7,10 @@ class ThemeUtils {
 
   /// MD3 seed color
   static const Color _seedColor = Color(0xFF6750A4);
-  
+
   /// Global Font Family
   static const String fontFamily = 'Google Sans';
-  
+
   /// Global Font Family Fallback
   static const List<String> fontFamilyFallback = ['Noto Sans SC'];
 
@@ -40,7 +40,7 @@ class ThemeUtils {
       colorScheme: colorScheme,
       fontFamily: fontFamily,
       fontFamilyFallback: fontFamilyFallback,
-      
+
       // AppBar theme
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -119,7 +119,8 @@ class ThemeUtils {
             width: 2,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         labelStyle: const TextStyle(
           fontFamily: fontFamily,
           fontFamilyFallback: fontFamilyFallback,

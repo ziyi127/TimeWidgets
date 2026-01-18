@@ -1,18 +1,25 @@
 enum WeekType { single, double, both }
 
 enum DayOfWeek {
-  monday, tuesday, wednesday, thursday, friday, saturday, sunday
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday
 }
 
 /// 时间点类型 (兼容 ClassIsland TimeType)
 enum TimePointType {
-  classTime,    // 上课 (TimeType == 0)
-  breakTime,    // 课间休息 (TimeType == 1)
-  divider,      // 分割线 (TimeType == 2)
+  classTime, // 上课 (TimeType == 0)
+  breakTime, // 课间休息 (TimeType == 1)
+  divider, // 分割线 (TimeType == 2)
 }
 
 /// 科目/课程信息 (兼容 ClassIsland Subject)
-class CourseInfo {  // 是否户外课
+class CourseInfo {
+  // 是否户外课
 
   const CourseInfo({
     required this.id,
@@ -37,7 +44,7 @@ class CourseInfo {  // 是否户外课
   }
   final String id;
   final String name;
-  final String abbreviation;  // 简称
+  final String abbreviation; // 简称
   final String teacher;
   final String classroom;
   final String color;
@@ -79,9 +86,9 @@ class CourseInfo {  // 是否户外课
   }
 }
 
-
 /// 时间段/时间点 (兼容 ClassIsland TimeLayout)
-class TimeSlot {  // 默认隐藏
+class TimeSlot {
+  // 默认隐藏
 
   const TimeSlot({
     required this.id,
@@ -99,26 +106,27 @@ class TimeSlot {  // 默认隐藏
       startTime: json['startTime'] as String,
       endTime: json['endTime'] as String,
       name: json['name'] as String,
-      type: json['type'] != null 
-          ? TimePointType.values[json['type'] as int] 
+      type: json['type'] != null
+          ? TimePointType.values[json['type'] as int]
           : TimePointType.classTime,
       defaultSubjectId: json['defaultSubjectId'] as String?,
       isHiddenByDefault: json['isHiddenByDefault'] as bool? ?? false,
     );
   }
   final String id;
-  final String startTime;  // "HH:MM"
-  final String endTime;    // "HH:MM"
+  final String startTime; // "HH:MM"
+  final String endTime; // "HH:MM"
   final String name;
-  final TimePointType type;  // 时间点类型
-  final String? defaultSubjectId;  // 默认科目ID
+  final TimePointType type; // 时间点类型
+  final String? defaultSubjectId; // 默认科目ID
   final bool isHiddenByDefault;
 
   /// 获取时长 (分钟)
   int get durationMinutes {
     final startParts = startTime.split(':');
     final endParts = endTime.split(':');
-    final startMinutes = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
+    final startMinutes =
+        int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
     final endMinutes = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
     return endMinutes - startMinutes;
   }
@@ -157,7 +165,8 @@ class TimeSlot {  // 默认隐藏
 }
 
 /// 日课程安排
-class DailyCourse {  // 是否为换课课程
+class DailyCourse {
+  // 是否为换课课程
 
   const DailyCourse({
     required this.id,
@@ -215,10 +224,8 @@ class DailyCourse {  // 是否为换课课程
   }
 }
 
-
 /// 课表触发规则 (兼容 ClassIsland TimeRule)
 class ScheduleTriggerRule {
-
   const ScheduleTriggerRule({
     required this.weekDay,
     this.weekType = WeekType.both,
@@ -232,42 +239,42 @@ class ScheduleTriggerRule {
       isEnabled: json['isEnabled'] as bool? ?? true,
     );
   }
-  final int weekDay;  // 0-6, 0=周日
+  final int weekDay; // 0-6, 0=周日
   final WeekType weekType;
   final bool isEnabled;
 
   /// 检查是否匹配指定日期
   bool matches(DateTime date, {int? currentWeekNumber}) {
     if (!isEnabled) return false;
-    
+
     // 检查星期几 (DateTime: 1=周一...7=周日, 我们: 0=周日, 1=周一...)
     final dateWeekDay = date.weekday == 7 ? 0 : date.weekday;
     if (dateWeekDay != weekDay) return false;
-    
+
     // 检查周类型
     if (weekType == WeekType.both) return true;
-    
+
     // 计算周数 (如果未提供)
     final weekNum = currentWeekNumber ?? _calculateWeekNumber(date);
-    
+
     final isOddWeek = weekNum % 2 == 1;
     if (weekType == WeekType.single && isOddWeek) return true;
     if (weekType == WeekType.double && !isOddWeek) return true;
-    
+
     return false;
   }
-  
+
   /// 计算周数 (1-based)
   int _calculateWeekNumber(DateTime date) {
     final firstDayOfYear = DateTime(date.year);
-    final firstMonday = firstDayOfYear.weekday > DateTime.monday 
+    final firstMonday = firstDayOfYear.weekday > DateTime.monday
         ? firstDayOfYear.add(Duration(days: 8 - firstDayOfYear.weekday))
         : firstDayOfYear;
-    
+
     if (date.isBefore(firstMonday)) {
       return _calculateWeekNumber(date.subtract(const Duration(days: 7)));
     }
-    
+
     return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
   }
 
@@ -293,7 +300,8 @@ class ScheduleTriggerRule {
 }
 
 /// 课表 (兼容 ClassIsland ClassPlan)
-class Schedule {  // 临时层来源课表ID
+class Schedule {
+  // 临时层来源课表ID
 
   const Schedule({
     required this.id,
@@ -312,10 +320,12 @@ class Schedule {  // 临时层来源课表ID
       id: json['id'] as String,
       name: json['name'] as String,
       timeLayoutId: json['timeLayoutId'] as String?,
-      triggerRule: ScheduleTriggerRule.fromJson(json['triggerRule'] as Map<String, dynamic>),
+      triggerRule: ScheduleTriggerRule.fromJson(
+          json['triggerRule'] as Map<String, dynamic>),
       courses: (json['courses'] as List?)
-          ?.map((c) => DailyCourse.fromJson(c as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((c) => DailyCourse.fromJson(c as Map<String, dynamic>))
+              .toList() ??
+          [],
       isAutoEnabled: json['isAutoEnabled'] as bool? ?? true,
       priority: json['priority'] as int? ?? 0,
       isOverlay: json['isOverlay'] as bool? ?? false,
@@ -324,12 +334,12 @@ class Schedule {  // 临时层来源课表ID
   }
   final String id;
   final String name;
-  final String? timeLayoutId;  // 关联的时间表ID
+  final String? timeLayoutId; // 关联的时间表ID
   final ScheduleTriggerRule triggerRule;
   final List<DailyCourse> courses;
   final bool isAutoEnabled;
-  final int priority;  // 优先级 (数字越小优先级越高)
-  final bool isOverlay;  // 是否为临时层课表
+  final int priority; // 优先级 (数字越小优先级越高)
+  final bool isOverlay; // 是否为临时层课表
   final String? overlaySourceId;
 
   Schedule copyWith({
@@ -371,10 +381,8 @@ class Schedule {  // 临时层来源课表ID
   }
 }
 
-
 /// 时间表/时间布局 (兼容 ClassIsland TimeLayout)
 class TimeLayout {
-
   const TimeLayout({
     required this.id,
     required this.name,
@@ -386,8 +394,9 @@ class TimeLayout {
       id: json['id'] as String,
       name: json['name'] as String,
       timeSlots: (json['timeSlots'] as List?)
-          ?.map((t) => TimeSlot.fromJson(t as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((t) => TimeSlot.fromJson(t as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
   final String id;
@@ -416,7 +425,8 @@ class TimeLayout {
 }
 
 /// 课表数据 (包含所有数据)
-class TimetableData {  // 课表列表
+class TimetableData {
+  // 课表列表
 
   const TimetableData({
     required this.courses,
@@ -429,26 +439,31 @@ class TimetableData {  // 课表列表
   factory TimetableData.fromJson(Map<String, dynamic> json) {
     return TimetableData(
       courses: (json['courses'] as List?)
-          ?.map((c) => CourseInfo.fromJson(c as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((c) => CourseInfo.fromJson(c as Map<String, dynamic>))
+              .toList() ??
+          [],
       timeSlots: (json['timeSlots'] as List?)
-          ?.map((t) => TimeSlot.fromJson(t as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((t) => TimeSlot.fromJson(t as Map<String, dynamic>))
+              .toList() ??
+          [],
       dailyCourses: (json['dailyCourses'] as List?)
-          ?.map((d) => DailyCourse.fromJson(d as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((d) => DailyCourse.fromJson(d as Map<String, dynamic>))
+              .toList() ??
+          [],
       timeLayouts: (json['timeLayouts'] as List?)
-          ?.map((t) => TimeLayout.fromJson(t as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((t) => TimeLayout.fromJson(t as Map<String, dynamic>))
+              .toList() ??
+          [],
       schedules: (json['schedules'] as List?)
-          ?.map((s) => Schedule.fromJson(s as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((s) => Schedule.fromJson(s as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
-  final List<CourseInfo> courses;  // 科目列表
-  final List<TimeSlot> timeSlots;  // 时间段列表 (向后兼容)
-  final List<DailyCourse> dailyCourses;  // 日课程安排 (向后兼容)
-  final List<TimeLayout> timeLayouts;  // 时间表列表
+  final List<CourseInfo> courses; // 科目列表
+  final List<TimeSlot> timeSlots; // 时间段列表 (向后兼容)
+  final List<DailyCourse> dailyCourses; // 日课程安排 (向后兼容)
+  final List<TimeLayout> timeLayouts; // 时间表列表
   final List<Schedule> schedules;
 
   TimetableData copyWith({

@@ -6,19 +6,19 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 /// 颜色选择器组件
 /// 提供预设颜色和自定义颜色选择功能
 class ColorPickerWidget extends StatefulWidget {
-
   const ColorPickerWidget({
     super.key,
     required this.selectedColor,
     required this.onColorChanged,
     this.showPreview = true,
   });
+
   /// 当前选中的颜色
   final Color selectedColor;
-  
+
   /// 颜色改变回调
   final ValueChanged<Color> onColorChanged;
-  
+
   /// 是否显示预览
   final bool showPreview;
 
@@ -87,16 +87,23 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
                     children: [
                       Text(
                         '当前种子颜色',
-                        style: MD3TypographyStyles.titleMedium(context).copyWith(
-                          fontSize: MD3TypographyStyles.titleMedium(context).fontSize! * fontMultiplier,
+                        style:
+                            MD3TypographyStyles.titleMedium(context).copyWith(
+                          fontSize: MD3TypographyStyles.titleMedium(context)
+                                  .fontSize! *
+                              fontMultiplier,
                         ),
                       ),
                       SizedBox(height: ResponsiveUtils.value(4)),
                       Text(
                         '#${widget.selectedColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                        style: MD3TypographyStyles.bodyMedium(context, 
-                          color: colorScheme.onSurfaceVariant,).copyWith(
-                          fontSize: MD3TypographyStyles.bodyMedium(context).fontSize! * fontMultiplier,
+                        style: MD3TypographyStyles.bodyMedium(
+                          context,
+                          color: colorScheme.onSurfaceVariant,
+                        ).copyWith(
+                          fontSize: MD3TypographyStyles.bodyMedium(context)
+                                  .fontSize! *
+                              fontMultiplier,
                         ),
                       ),
                     ],
@@ -111,7 +118,8 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
         Text(
           '预设颜色',
           style: MD3TypographyStyles.titleSmall(context).copyWith(
-            fontSize: MD3TypographyStyles.titleSmall(context).fontSize! * fontMultiplier,
+            fontSize: MD3TypographyStyles.titleSmall(context).fontSize! *
+                fontMultiplier,
           ),
         ),
         SizedBox(height: ResponsiveUtils.value(8)),
@@ -126,8 +134,9 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
           itemCount: _presetColors.length,
           itemBuilder: (context, index) {
             final color = _presetColors[index];
-            final isSelected = color.toARGB32() == widget.selectedColor.toARGB32();
-            
+            final isSelected =
+                color.toARGB32() == widget.selectedColor.toARGB32();
+
             return InkWell(
               onTap: () => widget.onColorChanged(color),
               borderRadius: BorderRadius.circular(ResponsiveUtils.value(24)),

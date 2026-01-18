@@ -66,19 +66,19 @@ class LogEntry {
       buffer.write('[$operationId] ');
     }
     buffer.write(message);
-    
+
     if (metadata != null && metadata!.isNotEmpty) {
       buffer.write(' | Metadata: ${jsonEncode(metadata)}');
     }
-    
+
     if (context != null && context!.isNotEmpty) {
       buffer.write(' | Context: ${jsonEncode(context)}');
     }
-    
+
     if (stackTrace != null) {
       buffer.write('\nStack Trace:\n$stackTrace');
     }
-    
+
     return buffer.toString();
   }
 

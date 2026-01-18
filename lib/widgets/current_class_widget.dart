@@ -4,7 +4,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 当前课程组件 - MD3紧凑版
 class CurrentClassWidget extends StatelessWidget {
-
   const CurrentClassWidget({
     super.key,
     this.isCompact = false,
@@ -79,7 +78,8 @@ class CurrentClassWidget extends StatelessWidget {
                 '当前无课',
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.secondary,
-                  fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
+                  fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
+                      fontMultiplier,
                 ),
               ),
             ],
@@ -116,7 +116,8 @@ class CurrentClassWidget extends StatelessWidget {
                   '当前课程',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                        fontMultiplier,
                   ),
                 ),
                 SizedBox(width: ResponsiveUtils.value(16)),
@@ -127,14 +128,16 @@ class CurrentClassWidget extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: colorScheme.tertiaryContainer,
-                    borderRadius: BorderRadius.circular(ResponsiveUtils.value(12)),
+                    borderRadius:
+                        BorderRadius.circular(ResponsiveUtils.value(12)),
                   ),
                   child: Text(
                     '进行中',
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onTertiaryContainer,
                       fontWeight: FontWeight.w600,
-                      fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) * fontMultiplier,
+                      fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) *
+                          fontMultiplier,
                     ),
                   ),
                 ),
@@ -150,7 +153,8 @@ class CurrentClassWidget extends StatelessWidget {
                   height: ResponsiveUtils.value(44),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(ResponsiveUtils.value(12)),
+                    borderRadius:
+                        BorderRadius.circular(ResponsiveUtils.value(12)),
                   ),
                   child: Icon(
                     Icons.menu_book_rounded,
@@ -169,7 +173,9 @@ class CurrentClassWidget extends StatelessWidget {
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
-                          fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
+                          fontSize:
+                              (theme.textTheme.titleMedium?.fontSize ?? 16) *
+                                  fontMultiplier,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -179,7 +185,9 @@ class CurrentClassWidget extends StatelessWidget {
                         '${course!.time} · ${course!.classroom}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: (theme.textTheme.bodySmall?.fontSize ?? 12) * fontMultiplier,
+                          fontSize:
+                              (theme.textTheme.bodySmall?.fontSize ?? 12) *
+                                  fontMultiplier,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

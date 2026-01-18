@@ -7,7 +7,6 @@ import 'package:time_widgets/utils/logger.dart';
 /// 渲染同步服务
 /// 确保所有渲染操作与屏幕刷新率同步，消除撕裂现象
 class RenderSyncService {
-  
   RenderSyncService._();
   static RenderSyncService? _instance;
   static RenderSyncService get instance => _instance ??= RenderSyncService._();
@@ -15,7 +14,7 @@ class RenderSyncService {
   bool _isInitialized = false;
   final List<VoidCallback> _pendingUpdates = [];
   final Map<String, Timer> _scheduledUpdates = {};
-  
+
   // 性能监控
   final List<Duration> _frameTimes = [];
   double _averageFrameTime = 16.67; // 60fps baseline
@@ -24,13 +23,13 @@ class RenderSyncService {
   /// 初始化渲染同步服务
   void initialize() {
     if (_isInitialized) return;
-    
+
     // 不启动帧时间监控以减少CPU占用
     // SchedulerBinding.instance.addTimingsCallback(_onFrameTimings);
-    
+
     // 设置帧回调
     // SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
-    
+
     _isInitialized = true;
     Logger.i('RenderSyncService initialized (lightweight mode)');
   }
@@ -38,14 +37,14 @@ class RenderSyncService {
   /// 销毁服务
   void dispose() {
     if (!_isInitialized) return;
-    
+
     // SchedulerBinding.instance.removeTimingsCallback(_onFrameTimings);
     _pendingUpdates.clear();
     for (final timer in _scheduledUpdates.values) {
       timer.cancel();
     }
     _scheduledUpdates.clear();
-    
+
     _isInitialized = false;
   }
 
@@ -65,7 +64,7 @@ class RenderSyncService {
     }
 
     _pendingUpdates.addAll(updates);
-    
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _processPendingUpdates();
     });
@@ -80,7 +79,7 @@ class RenderSyncService {
 
     // 根据当前性能决定延迟时间
     final delay = _calculateOptimalDelay();
-    
+
     if (key != null) {
       _scheduledUpdates[key]?.cancel();
     }
@@ -101,7 +100,7 @@ class RenderSyncService {
     if (_pendingUpdates.isNotEmpty) {
       _processPendingUpdates();
     }
-    
+
     // 继续监听下一帧
     SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
   }
@@ -116,7 +115,7 @@ class RenderSyncService {
     // 分批执行更新，避免单帧过载
     const maxUpdatesPerFrame = 5;
     final batches = <List<VoidCallback>>[];
-    
+
     for (int i = 0; i < updates.length; i += maxUpdatesPerFrame) {
       final end = (i + maxUpdatesPerFrame).clamp(0, updates.length);
       batches.add(updates.sublist(i, end));
@@ -125,7 +124,7 @@ class RenderSyncService {
     // 执行第一批次
     if (batches.isNotEmpty) {
       _executeBatch(batches.first);
-      
+
       // 如果有更多批次，在下一帧执行
       if (batches.length > 1) {
         for (int i = 1; i < batches.length; i++) {
@@ -154,18 +153,19 @@ class RenderSyncService {
     for (final timing in timings) {
       final frameDuration = timing.totalSpan;
       _frameTimes.add(frameDuration);
-      
+
       // 保持最近100帧的数据
       if (_frameTimes.length > 100) {
         _frameTimes.removeAt(0);
       }
-      
+
       // 检测掉帧
-      if (frameDuration.inMicroseconds > 16670) { // 超过16.67ms
+      if (frameDuration.inMicroseconds > 16670) {
+        // 超过16.67ms
         _droppedFrames++;
       }
     }
-    
+
     // 更新平均帧时间
     _updateAverageFrameTime();
   }
@@ -173,12 +173,13 @@ class RenderSyncService {
   /// 更新平均帧时间
   void _updateAverageFrameTime() {
     if (_frameTimes.isEmpty) return;
-    
+
     final totalMicroseconds = _frameTimes
         .map((duration) => duration.inMicroseconds)
         .reduce((a, b) => a + b);
-    
-    _averageFrameTime = totalMicroseconds / _frameTimes.length / 1000.0; // 转换为毫秒
+
+    _averageFrameTime =
+        totalMicroseconds / _frameTimes.length / 1000.0; // 转换为毫秒
   }
 
   /// 计算最优延迟时间
@@ -229,19 +230,19 @@ class RenderSyncService {
   /// 获取建议的优化措施
   List<String> getOptimizationSuggestions() {
     final suggestions = <String>[];
-    
+
     if (_averageFrameTime > 20.0) {
       suggestions.add('减少同时更新的组件数量');
     }
-    
+
     if (_droppedFrames > 20) {
       suggestions.add('启用更激进的缓存策略');
     }
-    
+
     if (_pendingUpdates.length > 10) {
       suggestions.add('增加更新批次大小');
     }
-    
+
     return suggestions;
   }
 }
@@ -250,24 +251,34 @@ class RenderSyncService {
 mixin RenderSyncMixin<T extends StatefulWidget> on State<T> {
   /// 同步setState
   void syncSetState(VoidCallback fn, {String? key}) {
-    RenderSyncService.instance.syncUpdate(() {
-      if (mounted) setState(fn);
-    }, key: key,);
+    RenderSyncService.instance.syncUpdate(
+      () {
+        if (mounted) setState(fn);
+      },
+      key: key,
+    );
   }
 
   /// 智能延迟setState
   void smartSetState(VoidCallback fn, {String? key}) {
-    RenderSyncService.instance.smartDelayedUpdate(() {
-      if (mounted) setState(fn);
-    }, key: key,);
+    RenderSyncService.instance.smartDelayedUpdate(
+      () {
+        if (mounted) setState(fn);
+      },
+      key: key,
+    );
   }
 
   /// 批量setState
   void batchSetState(List<VoidCallback> updates) {
     RenderSyncService.instance.batchSyncUpdate(
-      updates.map((update) => () {
-        if (mounted) setState(update);
-      },).toList(),
+      updates
+          .map(
+            (update) => () {
+              if (mounted) setState(update);
+            },
+          )
+          .toList(),
     );
   }
 }

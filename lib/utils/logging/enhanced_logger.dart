@@ -140,9 +140,10 @@ class EnhancedLogger {
         ? SensitiveDataFilter.filterUrl(url)
         : url;
 
-    final filteredHeaders = _config.enableSensitiveDataFiltering && headers != null
-        ? SensitiveDataFilter.filterMap(headers.cast<String, dynamic>())
-        : headers;
+    final filteredHeaders =
+        _config.enableSensitiveDataFiltering && headers != null
+            ? SensitiveDataFilter.filterMap(headers.cast<String, dynamic>())
+            : headers;
 
     _log(
       level: LogLevel.info,
@@ -174,7 +175,8 @@ class EnhancedLogger {
     _log(
       level: statusCode >= 400 ? LogLevel.error : LogLevel.info,
       category: LogCategory.network,
-      message: 'Network response: $method $filteredUrl - $statusCode (${duration.inMilliseconds}ms)',
+      message:
+          'Network response: $method $filteredUrl - $statusCode (${duration.inMilliseconds}ms)',
       metadata: {
         'url': filteredUrl,
         'method': method,
@@ -256,7 +258,8 @@ class EnhancedLogger {
     _log(
       level: LogLevel.info,
       category: LogCategory.performance,
-      message: 'Performance: ${description ?? operationId} completed in ${duration.inMilliseconds}ms',
+      message:
+          'Performance: ${description ?? operationId} completed in ${duration.inMilliseconds}ms',
       metadata: {
         'operationId': operationId,
         'duration': duration.inMilliseconds,
@@ -295,7 +298,8 @@ class EnhancedLogger {
     _log(
       level: success ? LogLevel.debug : LogLevel.error,
       category: LogCategory.general,
-      message: 'Async operation ${success ? "completed" : "failed"}: $operationType',
+      message:
+          'Async operation ${success ? "completed" : "failed"}: $operationType',
       metadata: {
         'operationType': operationType,
         'success': success,
@@ -319,13 +323,15 @@ class EnhancedLogger {
     if (level < _config.minLevel) return;
 
     // 过滤敏感数据
-    final filteredMetadata = _config.enableSensitiveDataFiltering && metadata != null
-        ? SensitiveDataFilter.filterMap(metadata)
-        : metadata;
+    final filteredMetadata =
+        _config.enableSensitiveDataFiltering && metadata != null
+            ? SensitiveDataFilter.filterMap(metadata)
+            : metadata;
 
-    final filteredContext = _config.enableSensitiveDataFiltering && context != null
-        ? SensitiveDataFilter.filterMap(context)
-        : context;
+    final filteredContext =
+        _config.enableSensitiveDataFiltering && context != null
+            ? SensitiveDataFilter.filterMap(context)
+            : context;
 
     final filteredMessage = _config.enableSensitiveDataFiltering
         ? SensitiveDataFilter.filterString(message)

@@ -18,7 +18,7 @@ class PerformanceLogger {
   void startScreenLoad(String screenName) {
     final operationId = 'screen_load_$screenName';
     _startTimes[operationId] = DateTime.now();
-    
+
     _logger.debug(
       'Screen load started: $screenName',
       category: LogCategory.performance,
@@ -33,7 +33,7 @@ class PerformanceLogger {
   void endScreenLoad(String screenName) {
     final operationId = 'screen_load_$screenName';
     final startTime = _startTimes.remove(operationId);
-    
+
     if (startTime == null) {
       _logger.warning(
         'Screen load end called without start: $screenName',
@@ -43,7 +43,7 @@ class PerformanceLogger {
     }
 
     final duration = DateTime.now().difference(startTime);
-    
+
     _logger.info(
       'Screen loaded: $screenName (${duration.inMilliseconds}ms)',
       category: LogCategory.performance,
@@ -77,9 +77,8 @@ class PerformanceLogger {
     int? requestSize,
     int? responseSize,
   }) {
-    final level = duration.inMilliseconds > 3000 
-        ? LogLevel.warning 
-        : LogLevel.info;
+    final level =
+        duration.inMilliseconds > 3000 ? LogLevel.warning : LogLevel.info;
 
     _logger.info(
       'Network request completed: $method $url (${duration.inMilliseconds}ms)',
@@ -143,14 +142,14 @@ class PerformanceLogger {
   void logWidgetRebuild(String widgetName) {
     final now = DateTime.now();
     final lastRebuild = _lastRebuildTimes[widgetName];
-    
+
     _rebuildCounts[widgetName] = (_rebuildCounts[widgetName] ?? 0) + 1;
     _lastRebuildTimes[widgetName] = now;
 
     // 检测过度重建
     if (lastRebuild != null) {
       final timeSinceLastRebuild = now.difference(lastRebuild);
-      
+
       // 如果在1秒内重建超过10次，记录警告
       if (timeSinceLastRebuild.inSeconds <= 1) {
         final count = _rebuildCounts[widgetName]!;
@@ -164,7 +163,7 @@ class PerformanceLogger {
               'timeWindow': '1 second',
             },
           );
-          
+
           // 重置计数器
           _rebuildCounts[widgetName] = 0;
         }
@@ -213,10 +212,8 @@ class PerformanceLogger {
     required int totalMemoryMB,
   }) {
     final usagePercent = (usedMemoryMB / totalMemoryMB * 100).toInt();
-    
-    final level = usagePercent > 80 
-        ? LogLevel.warning 
-        : LogLevel.info;
+
+    final level = usagePercent > 80 ? LogLevel.warning : LogLevel.info;
 
     _logger.info(
       'Memory usage: ${usedMemoryMB}MB / ${totalMemoryMB}MB ($usagePercent%)',
@@ -244,7 +241,7 @@ class PerformanceLogger {
   void startTrace(String traceId, {Map<String, dynamic>? metadata}) {
     _startTimes[traceId] = DateTime.now();
     _logger.startPerformanceTrace(traceId);
-    
+
     _logger.debug(
       'Performance trace started: $traceId',
       category: LogCategory.performance,
@@ -255,7 +252,7 @@ class PerformanceLogger {
   /// 结束自定义性能追踪
   void endTrace(String traceId, {Map<String, dynamic>? metadata}) {
     final startTime = _startTimes.remove(traceId);
-    
+
     if (startTime == null) {
       _logger.warning(
         'Performance trace end called without start: $traceId',
@@ -265,7 +262,7 @@ class PerformanceLogger {
     }
 
     final duration = DateTime.now().difference(startTime);
-    
+
     _logger.endPerformanceTrace(
       traceId,
       description: traceId,

@@ -32,7 +32,7 @@ class SensitiveDataFilter {
   /// 过滤敏感数据
   static Map<String, dynamic> filterMap(Map<String, dynamic> data) {
     final filtered = <String, dynamic>{};
-    
+
     data.forEach((key, value) {
       if (_isSensitiveField(key)) {
         filtered[key] = _maskValue(value);
@@ -44,7 +44,7 @@ class SensitiveDataFilter {
         filtered[key] = value;
       }
     });
-    
+
     return filtered;
   }
 
@@ -81,45 +81,45 @@ class SensitiveDataFilter {
       RegExp('/Users/[^/]+/', caseSensitive: false),
       RegExp('/home/[^/]+/', caseSensitive: false),
     ];
-    
+
     var filtered = path;
     for (final pattern in patterns) {
       filtered = filtered.replaceAll(pattern, '<USER_HOME>/');
     }
-    
+
     return filtered;
   }
 
   /// 过滤字符串中的敏感信息
   static String filterString(String text) {
     var filtered = text;
-    
+
     // 过滤邮箱
     filtered = filtered.replaceAll(
       RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),
       '***@***.***',
     );
-    
+
     // 过滤电话号码
     filtered = filtered.replaceAll(
       RegExp(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b'),
       '***-***-****',
     );
-    
+
     // 过滤信用卡号
     filtered = filtered.replaceAll(
       RegExp(r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b'),
       '****-****-****-****',
     );
-    
+
     return filtered;
   }
 
   /// 判断是否为敏感字段
   static bool _isSensitiveField(String fieldName) {
     final lowerField = fieldName.toLowerCase();
-    return _sensitiveFields.any((sensitive) => 
-      lowerField.contains(sensitive.toLowerCase()),
+    return _sensitiveFields.any(
+      (sensitive) => lowerField.contains(sensitive.toLowerCase()),
     );
   }
 

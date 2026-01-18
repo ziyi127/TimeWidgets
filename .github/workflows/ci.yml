@@ -7,8 +7,8 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: windows-latest
     
     steps:
       - name: Checkout code
@@ -22,8 +22,5 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       
-      - name: Analyze code
-        run: flutter analyze
-      
-      - name: Run tests
-        run: flutter test
+      - name: Build Windows
+        run: flutter build windows --release

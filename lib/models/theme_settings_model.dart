@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 /// 主题设置模型
 /// 用于存储和管理应用的主题配置，包括种子颜色、主题模式等
 class ThemeSettings {
-
   const ThemeSettings({
     required this.seedColor,
     required this.themeMode,
@@ -45,6 +44,7 @@ class ThemeSettings {
       enableGradients: json['enableGradients'] as bool? ?? true,
     );
   }
+
   /// 种子颜色 - 用于生成 Material You 动态配色方案
   final Color seedColor;
 
@@ -145,10 +145,10 @@ class ThemeSettings {
 
   @override
   String toString() {
-    return 'ThemeSettings(seedColor: ${seedColor.toARGB32().toRadixString(16)}, ' 
-        'themeMode: $themeMode, useDynamicColor: $useDynamicColor, ' 
-        'useSystemColor: $useSystemColor, fontSizeScale: $fontSizeScale, ' 
-        'borderRadiusScale: $borderRadiusScale, componentOpacity: $componentOpacity, ' 
+    return 'ThemeSettings(seedColor: ${seedColor.toARGB32().toRadixString(16)}, '
+        'themeMode: $themeMode, useDynamicColor: $useDynamicColor, '
+        'useSystemColor: $useSystemColor, fontSizeScale: $fontSizeScale, '
+        'borderRadiusScale: $borderRadiusScale, componentOpacity: $componentOpacity, '
         'shadowStrength: $shadowStrength, enableGradients: $enableGradients)';
   }
 }

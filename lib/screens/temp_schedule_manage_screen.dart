@@ -9,13 +9,14 @@ class TempScheduleManageScreen extends StatefulWidget {
   const TempScheduleManageScreen({super.key});
 
   @override
-  State<TempScheduleManageScreen> createState() => _TempScheduleManageScreenState();
+  State<TempScheduleManageScreen> createState() =>
+      _TempScheduleManageScreenState();
 }
 
 class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
   final TempScheduleChangeService _tempService = TempScheduleChangeService();
   final TimetableStorageService _storageService = TimetableStorageService();
-  
+
   List<TempScheduleChange> _changes = [];
   TimetableData? _timetableData;
   bool _isLoading = true;
@@ -34,10 +35,10 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
     try {
       final changes = await _tempService.loadChanges();
       final timetableData = await _storageService.loadTimetableData();
-      
+
       // 按日期排序
       changes.sort((a, b) => a.date.compareTo(b.date));
-      
+
       setState(() {
         _changes = changes;
         _timetableData = timetableData;
@@ -47,7 +48,7 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -63,7 +64,7 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
     try {
       await _tempService.removeChange(id);
       await _loadData();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('已删除临时调课记录')),
@@ -85,7 +86,7 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
     try {
       await _tempService.cleanupOldChanges();
       await _loadData();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('已清理过期记录')),
@@ -105,7 +106,7 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
 
   String _getChangeDescription(TempScheduleChange change) {
     if (_timetableData == null) return '';
-    
+
     if (change.type == TempChangeType.day) {
       // 按天调课
       final schedule = _timetableData!.schedules
@@ -120,10 +121,10 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
       final course = _timetableData!.courses
           .where((c) => c.id == change.newCourseId)
           .firstOrNull;
-      
+
       final slotName = timeSlot?.name ?? '未知节次';
       final courseName = course?.name ?? '未知课程';
-      
+
       return '$slotName → $courseName';
     }
   }
@@ -188,7 +189,7 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
                   itemBuilder: (context, index) {
                     final change = _changes[index];
                     final isPast = change.date.isBefore(DateTime.now());
-                    
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       child: ListTile(
@@ -242,7 +243,8 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
                                 content: const Text('确定要删除这条临时调课记录吗？'),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.pop(dialogContext),
+                                    onPressed: () =>
+                                        Navigator.pop(dialogContext),
                                     child: const Text('取消'),
                                   ),
                                   FilledButton(

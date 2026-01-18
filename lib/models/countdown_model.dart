@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CountdownData {
-
   CountdownData({
     required this.id,
     required this.title,
@@ -19,7 +18,8 @@ class CountdownData {
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      targetDate: DateTime.parse(json['targetDate'] as String? ?? DateTime.now().toIso8601String()),
+      targetDate: DateTime.parse(
+          json['targetDate'] as String? ?? DateTime.now().toIso8601String()),
       type: json['type'] as String? ?? 'event',
       progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
       category: json['category'] as String?,
@@ -85,7 +85,7 @@ class CountdownData {
   // 获取类型颜色
   Color get typeColor {
     if (color != null) return color!;
-    
+
     switch (type.toLowerCase()) {
       case 'exam':
         return const Color(0xFFF44336); // 红色
@@ -145,27 +145,27 @@ class CountdownData {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is CountdownData &&
-      other.id == id &&
-      other.title == title &&
-      other.description == description &&
-      other.targetDate == targetDate &&
-      other.type == type &&
-      other.progress == progress &&
-      other.category == category &&
-      other.color == color;
+        other.id == id &&
+        other.title == title &&
+        other.description == description &&
+        other.targetDate == targetDate &&
+        other.type == type &&
+        other.progress == progress &&
+        other.category == category &&
+        other.color == color;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      title.hashCode ^
-      description.hashCode ^
-      targetDate.hashCode ^
-      type.hashCode ^
-      progress.hashCode ^
-      category.hashCode ^
-      color.hashCode;
+        title.hashCode ^
+        description.hashCode ^
+        targetDate.hashCode ^
+        type.hashCode ^
+        progress.hashCode ^
+        category.hashCode ^
+        color.hashCode;
   }
 }

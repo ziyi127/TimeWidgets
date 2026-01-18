@@ -13,7 +13,7 @@ class MD3ButtonStyles {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    
+
     return ElevatedButton(
       onPressed: enabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
@@ -50,7 +50,7 @@ class MD3ButtonStyles {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    
+
     return ElevatedButton(
       onPressed: enabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
@@ -87,13 +87,14 @@ class MD3ButtonStyles {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    
+
     return OutlinedButton(
       onPressed: enabled ? onPressed : null,
       style: OutlinedButton.styleFrom(
         foregroundColor: colorScheme.primary,
         disabledForegroundColor: colorScheme.onSurfaceVariant,
-        side: BorderSide(color: enabled ? colorScheme.outline : colorScheme.outlineVariant),
+        side: BorderSide(
+            color: enabled ? colorScheme.outline : colorScheme.outlineVariant),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
@@ -123,7 +124,7 @@ class MD3ButtonStyles {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    
+
     return TextButton(
       onPressed: enabled ? onPressed : null,
       style: TextButton.styleFrom(
@@ -157,15 +158,18 @@ class MD3ButtonStyles {
     bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return IconButton(
       onPressed: enabled ? onPressed : null,
       icon: icon,
       tooltip: tooltip,
       color: enabled ? colorScheme.primary : colorScheme.onSurfaceVariant,
-      hoverColor: enabled ? colorScheme.primary.withAlpha((255 * 0.08).round()) : null,
-      highlightColor: enabled ? colorScheme.primary.withAlpha((255 * 0.12).round()) : null,
-      splashColor: enabled ? colorScheme.primary.withAlpha((255 * 0.16).round()) : null,
+      hoverColor:
+          enabled ? colorScheme.primary.withAlpha((255 * 0.08).round()) : null,
+      highlightColor:
+          enabled ? colorScheme.primary.withAlpha((255 * 0.12).round()) : null,
+      splashColor:
+          enabled ? colorScheme.primary.withAlpha((255 * 0.16).round()) : null,
       padding: const EdgeInsets.all(12),
     );
   }
@@ -196,19 +200,21 @@ class MD3ButtonStyles {
     bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     final button = FilledButton.icon(
       onPressed: enabled ? onPressed : null,
       icon: icon,
       label: const SizedBox.shrink(),
       style: FilledButton.styleFrom(
-        backgroundColor: enabled ? colorScheme.primary : colorScheme.surfaceContainerHighest,
-        foregroundColor: enabled ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+        backgroundColor:
+            enabled ? colorScheme.primary : colorScheme.surfaceContainerHighest,
+        foregroundColor:
+            enabled ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(12),
       ),
     );
-    
+
     return tooltip != null ? Tooltip(message: tooltip, child: button) : button;
   }
 
@@ -221,19 +227,23 @@ class MD3ButtonStyles {
     bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     final button = FilledButton.tonalIcon(
       onPressed: enabled ? onPressed : null,
       icon: icon,
       label: const SizedBox.shrink(),
       style: FilledButton.styleFrom(
-        backgroundColor: enabled ? colorScheme.secondaryContainer : colorScheme.surfaceContainerHighest,
-        foregroundColor: enabled ? colorScheme.onSecondaryContainer : colorScheme.onSurfaceVariant,
+        backgroundColor: enabled
+            ? colorScheme.secondaryContainer
+            : colorScheme.surfaceContainerHighest,
+        foregroundColor: enabled
+            ? colorScheme.onSecondaryContainer
+            : colorScheme.onSurfaceVariant,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(12),
       ),
     );
-    
+
     return tooltip != null ? Tooltip(message: tooltip, child: button) : button;
   }
 
@@ -246,19 +256,21 @@ class MD3ButtonStyles {
     bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     final button = OutlinedButton.icon(
       onPressed: enabled ? onPressed : null,
       icon: icon,
       label: const SizedBox.shrink(),
       style: OutlinedButton.styleFrom(
-        foregroundColor: enabled ? colorScheme.primary : colorScheme.onSurfaceVariant,
-        side: BorderSide(color: enabled ? colorScheme.outline : colorScheme.outlineVariant),
+        foregroundColor:
+            enabled ? colorScheme.primary : colorScheme.onSurfaceVariant,
+        side: BorderSide(
+            color: enabled ? colorScheme.outline : colorScheme.outlineVariant),
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(12),
       ),
     );
-    
+
     return tooltip != null ? Tooltip(message: tooltip, child: button) : button;
   }
 }

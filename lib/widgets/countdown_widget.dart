@@ -5,7 +5,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 倒计时组件- MD3紧凑版
 class CountdownWidget extends StatelessWidget {
-
   const CountdownWidget({
     super.key,
     this.countdownData,
@@ -55,7 +54,8 @@ class CountdownWidget extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute<void>(builder: (context) => const CountdownListScreen()),
+            MaterialPageRoute<void>(
+                builder: (context) => const CountdownListScreen()),
           );
         },
         borderRadius: BorderRadius.circular(
@@ -71,7 +71,8 @@ class CountdownWidget extends StatelessWidget {
                 height: ResponsiveUtils.value(44),
                 decoration: BoxDecoration(
                   color: typeColor.withAlpha(38),
-                  borderRadius: BorderRadius.circular(ResponsiveUtils.value(12)),
+                  borderRadius:
+                      BorderRadius.circular(ResponsiveUtils.value(12)),
                 ),
                 child: Icon(
                   _getEventTypeIcon(eventType),
@@ -95,7 +96,9 @@ class CountdownWidget extends StatelessWidget {
                             '倒计时',
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
-                              fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+                              fontSize:
+                                  (theme.textTheme.titleSmall?.fontSize ?? 14) *
+                                      fontMultiplier,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -108,14 +111,17 @@ class CountdownWidget extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: typeColor.withAlpha(38),
-                            borderRadius: BorderRadius.circular(ResponsiveUtils.value(6)),
+                            borderRadius:
+                                BorderRadius.circular(ResponsiveUtils.value(6)),
                           ),
                           child: Text(
                             _getEventTypeLabel(eventType),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: typeColor,
                               fontWeight: FontWeight.w600,
-                              fontSize: (theme.textTheme.labelSmall?.fontSize ?? 11) * fontMultiplier,
+                              fontSize:
+                                  (theme.textTheme.labelSmall?.fontSize ?? 11) *
+                                      fontMultiplier,
                             ),
                           ),
                         ),
@@ -127,7 +133,9 @@ class CountdownWidget extends StatelessWidget {
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
-                        fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
+                        fontSize:
+                            (theme.textTheme.titleMedium?.fontSize ?? 16) *
+                                fontMultiplier,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -145,14 +153,17 @@ class CountdownWidget extends StatelessWidget {
                       color: typeColor,
                       fontWeight: FontWeight.w500,
                       height: 1,
-                      fontSize: (theme.textTheme.headlineMedium?.fontSize ?? 28) * fontMultiplier,
+                      fontSize:
+                          (theme.textTheme.headlineMedium?.fontSize ?? 28) *
+                              fontMultiplier,
                     ),
                   ),
                   Text(
                     '天',
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) * fontMultiplier,
+                      fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) *
+                          fontMultiplier,
                     ),
                   ),
                 ],
@@ -170,7 +181,8 @@ class CountdownWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyCard(BuildContext context, ThemeData theme, ColorScheme colorScheme, double width) {
+  Widget _buildEmptyCard(BuildContext context, ThemeData theme,
+      ColorScheme colorScheme, double width) {
     return Card(
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
@@ -181,11 +193,12 @@ class CountdownWidget extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-           Navigator.push(
-             context,
-             MaterialPageRoute<void>(builder: (context) => const CountdownListScreen()),
-           );
-         },
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+                builder: (context) => const CountdownListScreen()),
+          );
+        },
         borderRadius: BorderRadius.circular(
           ResponsiveUtils.getBorderRadius(width),
         ),
@@ -198,7 +211,8 @@ class CountdownWidget extends StatelessWidget {
                 height: ResponsiveUtils.value(44),
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer.withAlpha(38),
-                  borderRadius: BorderRadius.circular(ResponsiveUtils.value(12)),
+                  borderRadius:
+                      BorderRadius.circular(ResponsiveUtils.value(12)),
                 ),
                 child: Icon(
                   Icons.add_alarm,
@@ -234,9 +248,10 @@ class CountdownWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorCard(BuildContext context, ColorScheme colorScheme, double width) {
+  Widget _buildErrorCard(
+      BuildContext context, ColorScheme colorScheme, double width) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
-    
+
     return Card(
       elevation: 0,
       color: colorScheme.errorContainer,
@@ -250,8 +265,8 @@ class CountdownWidget extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.event_busy_rounded, 
-              color: colorScheme.onErrorContainer, 
+              Icons.event_busy_rounded,
+              color: colorScheme.onErrorContainer,
               size: ResponsiveUtils.getIconSize(width, baseSize: 20),
             ),
             SizedBox(width: ResponsiveUtils.value(12)),
@@ -259,9 +274,12 @@ class CountdownWidget extends StatelessWidget {
               child: Text(
                 '倒计时加载失败',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onErrorContainer,
-                  fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * fontMultiplier,
-                ),
+                      color: colorScheme.onErrorContainer,
+                      fontSize:
+                          (Theme.of(context).textTheme.bodyMedium?.fontSize ??
+                                  14) *
+                              fontMultiplier,
+                    ),
               ),
             ),
             if (onRetry != null)

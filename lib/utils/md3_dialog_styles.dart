@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 class MD3DialogStyles {
   /// MD3 标准圆角半径
   static const double _cornerRadius = 28;
-  
+
   /// MD3 标准内边距
   static const EdgeInsets _contentPadding = EdgeInsets.fromLTRB(24, 16, 24, 0);
   static const EdgeInsets _actionsPadding = EdgeInsets.fromLTRB(24, 16, 24, 24);
-  
+
   /// 标准 MD3 对话框
   static Widget dialog({
     required BuildContext context,
@@ -20,7 +20,7 @@ class MD3DialogStyles {
     bool scrollable = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(_cornerRadius),
@@ -32,9 +32,7 @@ class MD3DialogStyles {
         title,
         style: _headlineSmall(context),
       ),
-      content: scrollable
-          ? SingleChildScrollView(child: content)
-          : content,
+      content: scrollable ? SingleChildScrollView(child: content) : content,
       contentPadding: _contentPadding,
       actionsPadding: _actionsPadding,
       actionsAlignment: MainAxisAlignment.end,
@@ -53,7 +51,7 @@ class MD3DialogStyles {
     Widget? icon,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -152,12 +150,12 @@ class MD3DialogStyles {
   }) {
     final controller = TextEditingController(text: initialValue);
     final formKey = GlobalKey<FormState>();
-    
+
     return showDialog<String>(
       context: context,
       builder: (context) {
         final colorScheme = Theme.of(context).colorScheme;
-        
+
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_cornerRadius),
@@ -216,7 +214,7 @@ class MD3DialogStyles {
       context: context,
       builder: (context) {
         final colorScheme = Theme.of(context).colorScheme;
-        
+
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_cornerRadius),
@@ -236,7 +234,7 @@ class MD3DialogStyles {
               itemBuilder: (context, index) {
                 final item = items[index];
                 final isSelected = item.value == selectedValue;
-                
+
                 return ListTile(
                   leading: item.icon,
                   title: Text(item.title),
@@ -259,7 +257,7 @@ class MD3DialogStyles {
   /// 构建带间距的操作按钮列表
   static List<Widget> _buildActionsWithSpacing(List<Widget> actions) {
     if (actions.isEmpty) return actions;
-    
+
     final result = <Widget>[];
     for (var i = 0; i < actions.length; i++) {
       result.add(actions[i]);
@@ -272,36 +270,38 @@ class MD3DialogStyles {
 
   // 内部文本样式辅助方法
   static TextStyle _headlineSmall(BuildContext context) {
-    return Theme.of(context).textTheme.headlineSmall ?? const TextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.33,
-    );
+    return Theme.of(context).textTheme.headlineSmall ??
+        const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.33,
+        );
   }
 
   static TextStyle _bodyMedium(BuildContext context) {
-    return Theme.of(context).textTheme.bodyMedium ?? const TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0.25,
-      height: 1.43,
-    );
+    return Theme.of(context).textTheme.bodyMedium ??
+        const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.25,
+          height: 1.43,
+        );
   }
 
   static TextStyle _titleLarge(BuildContext context) {
-    return Theme.of(context).textTheme.titleLarge ?? const TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0,
-      height: 1.27,
-    );
+    return Theme.of(context).textTheme.titleLarge ??
+        const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0,
+          height: 1.27,
+        );
   }
 }
 
 /// 全屏对话框组件
 class _FullScreenDialog extends StatelessWidget {
-
   const _FullScreenDialog({
     required this.title,
     required this.content,
@@ -318,7 +318,7 @@ class _FullScreenDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Dialog.fullscreen(
       backgroundColor: colorScheme.surface,
       child: Scaffold(
@@ -353,7 +353,6 @@ class _FullScreenDialog extends StatelessWidget {
 
 /// 选择对话框项
 class SelectionDialogItem<T> {
-
   const SelectionDialogItem({
     required this.value,
     required this.title,

@@ -10,7 +10,8 @@ class EnhancedErrorHandler {
 
   EnhancedErrorHandler._internal();
 
-  static final EnhancedErrorHandler _instance = EnhancedErrorHandler._internal();
+  static final EnhancedErrorHandler _instance =
+      EnhancedErrorHandler._internal();
 
   final EnhancedLogger _logger = EnhancedLogger();
   final Map<String, EnhancedAppError> _errorHistory = {};
@@ -194,7 +195,7 @@ class EnhancedErrorHandler {
       'severity': severity.name,
       'recoveryAttempts': error.recoveryAttempts,
       'isRecoverable': error.isRecoverable,
-      if (error.originalError != null) 
+      if (error.originalError != null)
         'originalError': error.originalError.toString(),
     };
 

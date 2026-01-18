@@ -31,14 +31,14 @@ import 'package:window_manager/window_manager.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   if (args.firstOrNull == 'multi_window') {
     try {
       final windowId = args[1]; // desktop_multi_window 0.3.0+ uses String IDs
 
       // 在runApp之前初始化子窗口属性
       await windowManager.ensureInitialized();
-      
+
       // 设置窗口属性
       const WindowOptions windowOptions = WindowOptions(
         size: Size(450, 100),
@@ -47,7 +47,7 @@ void main(List<String> args) async {
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.hidden,
       );
-      
+
       await windowManager.waitUntilReadyToShow(windowOptions, () async {
         await windowManager.setAsFrameless();
         await windowManager.setBackgroundColor(Colors.transparent);
@@ -55,41 +55,45 @@ void main(List<String> args) async {
         await windowManager.setHasShadow(false);
         await windowManager.show();
       });
-      
+
       runApp(DynamicIslandApp(windowId: windowId));
     } catch (e) {
       debugPrint('Error starting dynamic island: $e');
-      runApp(MaterialApp(
-        home: Scaffold(
-          backgroundColor: Colors.white,
-          body: SingleChildScrollView(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Error: $e', style: const TextStyle(color: Colors.red)),
-                    const SizedBox(height: 16),
-                    Text('Args: $args', style: const TextStyle(color: Colors.black87)),
-                  ],
+      runApp(
+        MaterialApp(
+          home: Scaffold(
+            backgroundColor: Colors.white,
+            body: SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Error: $e',
+                          style: const TextStyle(color: Colors.red)),
+                      const SizedBox(height: 16),
+                      Text('Args: $args',
+                          style: const TextStyle(color: Colors.black87)),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),);
+      );
     }
   } else {
     // 禁用调试信息以减少内存和CPU
     debugPrint = (message, {wrapWidth}) {};
-    
+
     // 设置极限内存限制
     AggressiveOptimizer.setExtremeLimits();
-    
+
     // 启动激进优化
     AggressiveOptimizer.startAggressiveOptimization();
-    
+
     runApp(const TimeWidgetsApp());
   }
 }
@@ -139,30 +143,32 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   bool _showTrayMenu = false;
   bool _isEditMode = false;
   // bool _isDynamicIslandMode = false; // 已废弃，使用多窗口
-  
+
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
-    
+
     // 加载设置并初始化UI缩放
     _settingsService.loadSettings().then((settings) async {
       ResponsiveUtils.setScaleFactor(settings.uiScale);
-      
+
       // 初始化开机自启服务
       await StartupService().initialize();
-      
-      if (mounted) setState(() {});
+
+      if (mounted) {
+        setState(() {});
+      }
       // Initialize NTP Service after settings are potentially loaded
-      NtpService().initialize();
+      unawaited(NtpService().initialize());
       // Initialize Course Reminder Service
-      _courseReminderService.initialize();
+      unawaited(_courseReminderService.initialize());
     });
 
     // 监听设置变化
     _settingsSubscription = _settingsService.settingsStream.listen((settings) {
       bool shouldRebuild = false;
-      
+
       if (ResponsiveUtils.scaleFactor != settings.uiScale) {
         ResponsiveUtils.setScaleFactor(settings.uiScale);
         shouldRebuild = true;
@@ -170,7 +176,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
         // 其他设置改变也应该触发重绘
         shouldRebuild = true;
       }
-      
+
       // 根据设置更新窗口可见性
       if (!settings.enableDesktopWidgets && !_showTrayMenu && !_isEditMode) {
         if (_isWindowVisible) {
@@ -181,13 +187,15 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
           _showMainWindow();
         }
       }
-      
-      if (shouldRebuild && mounted) setState(() {});
+
+      if (shouldRebuild && mounted) {
+        setState(() {});
+      }
     });
-    
+
     // 加载主题设置
     _themeService.loadSettings();
-    
+
     // 初始化窗口
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWindow();
@@ -198,31 +206,36 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
 
   /// 初始化窗口配置
   Future<void> _initializeWindow() async {
-    if (_isWindowInitialized) return;
-    
+    if (_isWindowInitialized) {
+      return;
+    }
+
     try {
       final success = await EnhancedWindowManager.initializeWindow(
         onScreenSizeChanged: () {
           // 处理屏幕尺寸变化，可能需要重新布局
           // 延迟执行，避免在构建过程中触发重建
-          unawaited(Future.delayed(const Duration(milliseconds: 100), () {
-            if (mounted) {
-              setState(() {
-                // 触发重建
-              });
-            }
-          }),);
+          unawaited(
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (mounted) {
+                setState(() {
+                  // 触发重建
+                });
+              }
+            }),
+          );
         },
       );
-      
+
       if (!success) {
-        Logger.w('Enhanced window initialization failed, falling back to default');
+        Logger.w(
+            'Enhanced window initialization failed, falling back to default');
       }
-      
+
       setState(() {
         _isWindowInitialized = true;
       });
-      
+
       Logger.i('窗口初始化成功');
     } catch (e) {
       Logger.e('窗口初始化失败: $e');
@@ -236,7 +249,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   Future<void> _initializeSystemTray() async {
     try {
       final trayService = MD3TrayMenuService.instance;
-      
+
       // 设置回调
       trayService.onShowSettings = _navigateToSettings;
       trayService.onShowTimetableEdit = _navigateToTimetableEdit;
@@ -244,14 +257,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       trayService.onToggleEditMode = _toggleEditMode;
       trayService.onExit = _exitApplication;
       // trayService.onImportExport = _showImportExportMenu;  // 已移除
-      trayService.onTempScheduleChange = _showTempScheduleChangeMenu;  // 新增
-      
+      trayService.onTempScheduleChange = _showTempScheduleChangeMenu; // 新增
+
       // 设置MD3菜单显示回调
       trayService.onShowMD3Menu = _showMD3TrayMenu;
-      
+
       // 初始化托盘
       await trayService.initialize();
-      
+
       Logger.i('系统托盘初始化成功');
     } catch (e) {
       Logger.e('系统托盘初始化失败: $e');
@@ -264,7 +277,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     if (!_isWindowVisible) {
       _showMainWindow();
     }
-    
+
     setState(() {
       _showTrayMenu = true;
     });
@@ -275,48 +288,49 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     setState(() {
       _showTrayMenu = false;
     });
-    
+
     // 如果没有开启桌面挂件且不在编辑模式，隐藏窗口
-    if (!_settingsService.currentSettings.enableDesktopWidgets && !_isEditMode) {
+    if (!_settingsService.currentSettings.enableDesktopWidgets &&
+        !_isEditMode) {
       _hideMainWindow();
     }
   }
 
-
-
   /// 导航到设置页面
   void _navigateToSettings() {
     _hideMD3TrayMenu();
-    
+
     final context = navigatorKey.currentContext;
-    if (context == null) return;
-    
+    if (context == null) {
+      return;
+    }
+
     // 使用全屏对话框而不是创建新窗口，避免影响桌面小组件位置
-    showDialog<void>(
+    unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) => const Dialog.fullscreen(
         child: SettingsScreen(),
       ),
-    );
+    ));
   }
 
   /// 导航到课表编辑页面
   Future<void> _navigateToTimetableEdit() async {
     _hideMD3TrayMenu();
-    
+
     // 创建独立的16:9窗口
     await EnhancedWindowManager.createEditWindow('课表编辑');
-    
+
     // 打开课表编辑页面时，禁用指针穿透，确保可以交互
     await EnhancedWindowManager.setIgnoreMouseEvents(false);
-    
+
     if (navigatorKey.currentState != null) {
       await navigatorKey.currentState!.push(
         MaterialPageRoute<void>(
           builder: (context) => const TimetableEditScreen(),
         ),
       );
-      
+
       // 页面关闭后恢复主窗口状态
       await EnhancedWindowManager.restoreMainWindow();
     }
@@ -325,18 +339,20 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   /// 显示临时调课菜单
   void _showTempScheduleChangeMenu() {
     _hideMD3TrayMenu();
-    
+
     // 确保窗口可见
     if (!_isWindowVisible) {
       _showMainWindow();
     }
-    
+
     // 使用navigatorKey来显示对话框
     final context = navigatorKey.currentContext;
-    if (context == null) return;
-    
+    if (context == null) {
+      return;
+    }
+
     // 显示临时调课选项对话框
-    showDialog<void>(
+    unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('临时调课'),
@@ -381,32 +397,36 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
           ),
         ],
       ),
-    );
+    ));
   }
-  
+
   /// 导航到临时调课管理页面
   void _navigateToTempScheduleManage() {
     final context = navigatorKey.currentContext;
-    if (context == null) return;
-    
+    if (context == null) {
+      return;
+    }
+
     // 使用全屏对话框而不是创建新窗口，避免影响桌面小组件位置
-    showDialog<void>(
+    unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) => const Dialog.fullscreen(
         child: TempScheduleManageScreen(),
       ),
-    );
+    ));
   }
 
   /// 按天调课
   Future<void> _showDayScheduleChange() async {
     final context = navigatorKey.currentContext;
-    if (context == null) return;
-    
+    if (context == null) {
+      return;
+    }
+
     // 加载课表数据
     final storageService = TimetableStorageService();
     final timetableData = await storageService.loadTimetableData();
-    
+
     if (timetableData.schedules.isEmpty) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -418,13 +438,15 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       }
       return;
     }
-    
+
     DateTime selectedDate = DateTime.now();
     String? selectedScheduleId;
-    
-    if (!context.mounted) return;
-    
-    showDialog(
+
+    if (!context.mounted) {
+      return;
+    }
+
+    unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
@@ -505,9 +527,9 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
           ],
         ),
       ),
-    );
+    ));
   }
-  
+
   /// 获取课表描述
   String _getScheduleDescription(Schedule schedule) {
     final weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -519,18 +541,18 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
             : '每周';
     return '$weekType$weekDay • ${schedule.courses.length}节课';
   }
-  
+
   /// 保存按天调课记录
   Future<void> _saveDayScheduleChange(DateTime date, String scheduleId) async {
     try {
       final tempService = TempScheduleChangeService();
-      
+
       // 检查是否已有该日期的调课记录
       final existingChange = await tempService.getDayChangeForDate(date);
       if (existingChange != null) {
         await tempService.removeChange(existingChange.id);
       }
-      
+
       // 创建新的调课记录
       final change = TempScheduleChange(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -539,9 +561,9 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
         newScheduleId: scheduleId,
         createdAt: DateTime.now(),
       );
-      
+
       await tempService.addChange(change);
-      
+
       final context = navigatorKey.currentContext;
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -568,12 +590,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   /// 按节调课
   Future<void> _showPeriodScheduleChange() async {
     final context = navigatorKey.currentContext;
-    if (context == null) return;
-    
+    if (context == null) {
+      return;
+    }
+
     // 加载课表数据
     final storageService = TimetableStorageService();
     final timetableData = await storageService.loadTimetableData();
-    
+
     if (timetableData.courses.isEmpty) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -585,18 +609,18 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       }
       return;
     }
-    
+
     DateTime selectedDate = DateTime.now();
     String? selectedTimeSlotId;
     String? selectedCourseId;
-    
+
     // 获取时间段列表
     final timeSlots = timetableData.timeSlots.isNotEmpty
         ? timetableData.timeSlots
         : timetableData.timeLayouts.isNotEmpty
             ? timetableData.timeLayouts.first.timeSlots
             : <TimeSlot>[];
-    
+
     if (timeSlots.isEmpty) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -608,9 +632,11 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       }
       return;
     }
-    
-    if (!context.mounted) return;
-    
+
+    if (!context.mounted) {
+      return;
+    }
+
     unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -655,7 +681,8 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
                         children: timeSlots.map((slot) {
                           return RadioListTile<String>(
                             title: Text(slot.name),
-                            subtitle: Text('${slot.startTime} - ${slot.endTime}'),
+                            subtitle:
+                                Text('${slot.startTime} - ${slot.endTime}'),
                             value: slot.id,
                             groupValue: selectedTimeSlotId,
                             onChanged: (value) {
@@ -720,7 +747,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       ),
     ));
   }
-  
+
   /// 保存按节调课记录
   Future<void> _savePeriodScheduleChange(
     DateTime date,
@@ -729,13 +756,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   ) async {
     try {
       final tempService = TempScheduleChangeService();
-      
+
       // 检查是否已有该日期和节次的调课记录
-      final existingChange = await tempService.getChangeForPeriod(date, timeSlotId);
+      final existingChange =
+          await tempService.getChangeForPeriod(date, timeSlotId);
       if (existingChange != null) {
         await tempService.removeChange(existingChange.id);
       }
-      
+
       // 创建新的调课记录
       final change = TempScheduleChange(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -745,9 +773,9 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
         newCourseId: courseId,
         createdAt: DateTime.now(),
       );
-      
+
       await tempService.addChange(change);
-      
+
       final context = navigatorKey.currentContext;
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -774,7 +802,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   /// 切换主窗口可见性
   void _toggleMainWindow() {
     _hideMD3TrayMenu();
-    
+
     if (_isWindowVisible) {
       _hideMainWindow();
     } else {
@@ -785,7 +813,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   /// 切换编辑模式
   void _toggleEditMode() {
     _hideMD3TrayMenu();
-    
+
     if (!_isWindowVisible) {
       _showMainWindow();
     }
@@ -809,7 +837,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
           duration: Duration(seconds: 2),
         ),
       );
-      
+
       // 如果没有开启桌面挂件且不在编辑模式，隐藏窗口
       if (!_settingsService.currentSettings.enableDesktopWidgets) {
         _hideMainWindow();
@@ -848,7 +876,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       setState(() {
         _isWindowVisible = false;
       });
-      
+
       // 显示提示（可选）
       // if (mounted) {
       //   ScaffoldMessenger.of(context).showSnackBar(
@@ -869,14 +897,14 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     _settingsService.dispose();
     NtpService().dispose();
     MD3TrayMenuService.instance.destroy();
-    
+
     // 清理新增的需要手动释放的服务
     GlobalAnimationService.instance.dispose();
     EnhancedWindowManager.dispose();
     PerformanceOptimizationService.stopMemoryMonitoring();
     PerformanceOptimizationService.stopPerformanceMonitoring();
     CountdownStorageService().dispose();
-    
+
     MemoryOptimizer.stopAggressiveGC();
     MemoryOptimizer.clearImageCache();
     AggressiveOptimizer.stopAggressiveOptimization();
@@ -892,8 +920,9 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
         return StreamBuilder(
           stream: _themeService.themeStream,
           builder: (context, snapshot) {
-            final themeSettings = snapshot.data ?? _themeService.currentSettings;
-            
+            final themeSettings =
+                snapshot.data ?? _themeService.currentSettings;
+
             return MaterialApp(
               navigatorKey: navigatorKey,
               title: '智慧课程表',
@@ -912,7 +941,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
                   DesktopWidgetScreen(
                     isEditMode: _isEditMode,
                   ),
-                  
+
                   // MD3托盘菜单覆盖层
                   if (_showTrayMenu)
                     MD3TrayPopupMenu(
@@ -921,7 +950,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
                       onToggleWindow: _toggleMainWindow,
                       onToggleEditMode: _toggleEditMode,
                       onExit: _exitApplication,
-                      onTempScheduleChange: _showTempScheduleChangeMenu,  // 新增
+                      onTempScheduleChange: _showTempScheduleChangeMenu, // 新增
                       onDismiss: _hideMD3TrayMenu,
                     ),
                 ],
