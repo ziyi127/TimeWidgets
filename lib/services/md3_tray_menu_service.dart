@@ -283,7 +283,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: colorScheme.shadow.withAlpha(51),
+                              color: colorScheme.shadow.withValues(alpha: 0.2),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             ),
@@ -292,126 +292,12 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // 标题
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.primaryContainer,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(
-                                      Icons.schedule_rounded,
-                                      color: colorScheme.onPrimaryContainer,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '智慧课程表',
-                                          style: theme.textTheme.titleSmall
-                                              ?.copyWith(
-                                            color: colorScheme.onSurface,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        Text(
-                                          '桌面小组件',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
+                            _buildMenuHeader(theme, colorScheme),
                             Divider(
                               height: 1,
                               color: colorScheme.outlineVariant,
                             ),
-
-                            // 菜单项 - 按功能分组
-                            // 窗口控制
-                            _buildMenuItem(
-                              context: context,
-                              icon: Icons.visibility_rounded,
-                              label: '显示/隐藏窗口',
-                              onTap: () {
-                                _safeCloseMenu(widget.onToggleWindow);
-                              },
-                            ),
-
-                            // 功能设置
-                            _buildMenuItem(
-                              context: context,
-                              icon: Icons.edit_calendar_rounded,
-                              label: '编辑课表',
-                              onTap: () {
-                                _safeCloseMenu(widget.onShowTimetableEdit);
-                              },
-                            ),
-
-                            _buildMenuItem(
-                              context: context,
-                              icon: Icons.dashboard_customize_rounded,
-                              label: '编辑布局',
-                              onTap: () {
-                                _safeCloseMenu(widget.onToggleEditMode);
-                              },
-                            ),
-
-                            _buildMenuItem(
-                              context: context,
-                              icon: Icons.swap_horiz_rounded,
-                              label: '临时调课',
-                              onTap: () {
-                                _safeCloseMenu(widget.onTempScheduleChange);
-                              },
-                            ),
-
-                            _buildMenuItem(
-                              context: context,
-                              icon: Icons.settings_rounded,
-                              label: '设置',
-                              onTap: () {
-                                _safeCloseMenu(widget.onShowSettings);
-                              },
-                            ),
-
-                            // 分隔线
-                            Divider(
-                              height: 1,
-                              indent: 16,
-                              endIndent: 16,
-                              color: colorScheme.outlineVariant,
-                            ),
-
-                            // 程序控制
-                            _buildMenuItem(
-                              context: context,
-                              icon: Icons.exit_to_app_rounded,
-                              label: '退出程序',
-                              isDestructive: true,
-                              onTap: () {
-                                _safeCloseMenu(widget.onExit);
-                              },
-                            ),
-
-                            const SizedBox(height: 8),
+                            _buildMenuItems(context),
                           ],
                         ),
                       ),
@@ -423,6 +309,127 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMenuHeader(ThemeData theme, ColorScheme colorScheme) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              Icons.schedule_rounded,
+              color: colorScheme.onPrimaryContainer,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '智慧课程表',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '桌面小组件',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItems(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 菜单项 - 按功能分组
+        // 窗口控制
+        _buildMenuItem(
+          context: context,
+          icon: Icons.visibility_rounded,
+          label: '显示/隐藏窗口',
+          onTap: () {
+            _safeCloseMenu(widget.onToggleWindow);
+          },
+        ),
+
+        // 功能设置
+        _buildMenuItem(
+          context: context,
+          icon: Icons.edit_calendar_rounded,
+          label: '编辑课表',
+          onTap: () {
+            _safeCloseMenu(widget.onShowTimetableEdit);
+          },
+        ),
+
+        _buildMenuItem(
+          context: context,
+          icon: Icons.dashboard_customize_rounded,
+          label: '编辑布局',
+          onTap: () {
+            _safeCloseMenu(widget.onToggleEditMode);
+          },
+        ),
+
+        _buildMenuItem(
+          context: context,
+          icon: Icons.swap_horiz_rounded,
+          label: '临时调课',
+          onTap: () {
+            _safeCloseMenu(widget.onTempScheduleChange);
+          },
+        ),
+
+        _buildMenuItem(
+          context: context,
+          icon: Icons.settings_rounded,
+          label: '设置',
+          onTap: () {
+            _safeCloseMenu(widget.onShowSettings);
+          },
+        ),
+
+        // 分隔线
+        Divider(
+          height: 1,
+          indent: 16,
+          endIndent: 16,
+          color: colorScheme.outlineVariant,
+        ),
+
+        // 程序控制
+        _buildMenuItem(
+          context: context,
+          icon: Icons.exit_to_app_rounded,
+          label: '退出程序',
+          isDestructive: true,
+          onTap: () {
+            _safeCloseMenu(widget.onExit);
+          },
+        ),
+
+        const SizedBox(height: 8),
+      ],
     );
   }
 

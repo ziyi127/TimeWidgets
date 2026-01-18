@@ -16,9 +16,9 @@ class RenderSyncService {
   final Map<String, Timer> _scheduledUpdates = {};
 
   // 性能监控
-  final List<Duration> _frameTimes = [];
-  double _averageFrameTime = 16.67; // 60fps baseline
-  int _droppedFrames = 0;
+  // final List<Duration> _frameTimes = [];
+  // final double _averageFrameTime = 16.67; // 60fps baseline
+  // final int _droppedFrames = 0;
 
   /// 初始化渲染同步服务
   void initialize() {
@@ -95,15 +95,14 @@ class RenderSyncService {
   }
 
   /// 处理帧更新
-  // ignore: unused_element
-  void _processFrameUpdates(Duration timeStamp) {
-    if (_pendingUpdates.isNotEmpty) {
-      _processPendingUpdates();
-    }
-
-    // 继续监听下一帧
-    SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
-  }
+  // void _processFrameUpdates(Duration timeStamp) {
+  //   if (_pendingUpdates.isNotEmpty) {
+  //     _processPendingUpdates();
+  //   }
+  //
+  //   // 继续监听下一帧
+  //   SchedulerBinding.instance.addPostFrameCallback(_processFrameUpdates);
+  // }
 
   /// 处理待处理的更新
   void _processPendingUpdates() {

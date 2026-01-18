@@ -100,9 +100,7 @@ class DesktopWidgetService {
   static Map<WidgetType, WidgetPosition> getDefaultPositions([
     Size? screenSize,
   ]) {
-    final containerSize = screenSize != null
-        ? Size(screenSize.width / 4, screenSize.height)
-        : const Size(480, 1080);
+    final containerSize = screenSize ?? const Size(1920, 1080);
 
     return _layoutEngine.calculateOptimalLayout(containerSize, null);
   }
@@ -125,9 +123,7 @@ class DesktopWidgetService {
     final prefs = await SharedPreferences.getInstance();
     final positionsString = prefs.getString(_positionsKey);
 
-    final containerSize = screenSize != null
-        ? Size(screenSize.width / 4, screenSize.height)
-        : const Size(480, 1080);
+    final containerSize = screenSize ?? const Size(1920, 1080);
 
     if (positionsString == null) {
       return _layoutEngine.calculateOptimalLayout(containerSize, null);
@@ -209,8 +205,8 @@ class DesktopWidgetService {
   }
 
   /// 重置所有小组件位置
-  static Future<void> resetWidgetPositions() async {
-    await saveWidgetPositions(getDefaultPositions());
+  static Future<void> resetWidgetPositions([Size? screenSize]) async {
+    await saveWidgetPositions(getDefaultPositions(screenSize));
   }
 
   /// 获取小组件的默认尺寸
@@ -244,7 +240,7 @@ class DesktopWidgetService {
     double height,
     Size screenSize,
   ) {
-    final containerSize = Size(screenSize.width / 4, screenSize.height);
+    final containerSize = screenSize;
     final positionCalculator = PositionCalculator();
     return positionCalculator.adjustPositionToScreen(
       x,

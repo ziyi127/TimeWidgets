@@ -38,7 +38,8 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
   }
 
   Future<void> _resetPositions() async {
-    await DesktopWidgetService.resetWidgetPositions();
+    final screenSize = MediaQuery.of(context).size;
+    await DesktopWidgetService.resetWidgetPositions(screenSize);
     await _loadWidgetPositions();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

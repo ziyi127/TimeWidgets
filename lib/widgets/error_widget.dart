@@ -304,23 +304,7 @@ class ErrorDetailsDialog extends StatelessWidget {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
     return AlertDialog(
-      title: Row(
-        children: [
-          Icon(
-            Icons.error_outline,
-            color: colorScheme.error,
-            size: ResponsiveUtils.getIconSize(width),
-          ),
-          SizedBox(width: ResponsiveUtils.value(12)),
-          Text(
-            title ?? '错误详情',
-            style: TextStyle(
-              fontSize:
-                  (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
-            ),
-          ),
-        ],
-      ),
+      title: _buildTitle(colorScheme, width, fontMultiplier, theme),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,102 +316,115 @@ class ErrorDetailsDialog extends StatelessWidget {
               ),
               SizedBox(height: ResponsiveUtils.value(16)),
             ],
-            if (error != null) ...[
-              Text(
-                '错误消息:',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
-                      fontMultiplier,
-                ),
-              ),
-              SizedBox(height: ResponsiveUtils.value(4)),
-              Text(
-                error!.message,
-                style: TextStyle(fontSize: 14 * fontMultiplier),
-              ),
-              SizedBox(height: ResponsiveUtils.value(16)),
-              if (error!.userMessage != null &&
-                  error!.userMessage != error!.message) ...[
-                Text(
-                  '用户提示:',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
-                        fontMultiplier,
-                  ),
-                ),
-                SizedBox(height: ResponsiveUtils.value(4)),
-                Text(
-                  error!.userMessage!,
-                  style: TextStyle(fontSize: 14 * fontMultiplier),
-                ),
-                SizedBox(height: ResponsiveUtils.value(16)),
-              ],
-              if (error!.resolution != null) ...[
-                Text(
-                  '解决建议:',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
-                        fontMultiplier,
-                  ),
-                ),
-                SizedBox(height: ResponsiveUtils.value(4)),
-                Text(
-                  error!.resolution!,
-                  style: TextStyle(fontSize: 14 * fontMultiplier),
-                ),
-                SizedBox(height: ResponsiveUtils.value(16)),
-              ],
-              if (error!.code.isNotEmpty) ...[
-                Text(
-                  '错误代码:',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
-                        fontMultiplier,
-                  ),
-                ),
-                SizedBox(height: ResponsiveUtils.value(4)),
-                Text(
-                  error!.code,
-                  style: TextStyle(fontSize: 14 * fontMultiplier),
-                ),
-                SizedBox(height: ResponsiveUtils.value(16)),
-              ],
-            ],
-            Text(
-              '错误类型:',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
-                    fontMultiplier,
-              ),
-            ),
-            SizedBox(height: ResponsiveUtils.value(4)),
-            Text(
-              error?.code ?? '未知',
-              style: TextStyle(fontSize: 14 * fontMultiplier),
-            ),
+            if (error != null) _buildErrorContent(theme, fontMultiplier),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('关闭', style: TextStyle(fontSize: 14 * fontMultiplier)),
+      actions: _buildActions(context, fontMultiplier),
+    );
+  }
+
+  Widget _buildTitle(ColorScheme colorScheme, double width, double fontMultiplier,
+      ThemeData theme,) {
+    return Row(
+      children: [
+        Icon(
+          Icons.error_outline,
+          color: colorScheme.error,
+          size: ResponsiveUtils.getIconSize(width),
         ),
-        ElevatedButton(
-          onPressed: () {
-            // 可以添加复制日志或分享错误信息的功能
-            Navigator.of(context).pop();
-          },
-          child: Text('复制日志', style: TextStyle(fontSize: 14 * fontMultiplier)),
+        SizedBox(width: ResponsiveUtils.value(12)),
+        Text(
+          title ?? '错误详情',
+          style: TextStyle(
+            fontSize:
+                (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
+          ),
         ),
       ],
     );
+  }
+
+  Widget _buildErrorContent(ThemeData theme, double fontMultiplier) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSection(
+          theme,
+          fontMultiplier,
+          '错误消息:',
+          error!.message,
+        ),
+        if (error!.userMessage != null &&
+            error!.userMessage != error!.message)
+          _buildSection(
+            theme,
+            fontMultiplier,
+            '用户提示:',
+            error!.userMessage!,
+          ),
+        if (error!.resolution != null)
+          _buildSection(
+            theme,
+            fontMultiplier,
+            '解决建议:',
+            error!.resolution!,
+          ),
+        if (error!.code.isNotEmpty)
+          _buildSection(
+            theme,
+            fontMultiplier,
+            '错误代码:',
+            error!.code,
+          ),
+        _buildSection(
+          theme,
+          fontMultiplier,
+          '错误类型:',
+          error?.code ?? '未知',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSection(
+      ThemeData theme, double fontMultiplier, String title, String content,) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize:
+                (theme.textTheme.titleSmall?.fontSize ?? 14) * fontMultiplier,
+          ),
+        ),
+        SizedBox(height: ResponsiveUtils.value(4)),
+        Text(
+          content,
+          style: TextStyle(fontSize: 14 * fontMultiplier),
+        ),
+        SizedBox(height: ResponsiveUtils.value(16)),
+      ],
+    );
+  }
+
+  List<Widget> _buildActions(BuildContext context, double fontMultiplier) {
+    return [
+      TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text('关闭', style: TextStyle(fontSize: 14 * fontMultiplier)),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          // 可以添加复制日志或分享错误信息的功能
+          Navigator.of(context).pop();
+        },
+        child: Text('复制日志', style: TextStyle(fontSize: 14 * fontMultiplier)),
+      ),
+    ];
   }
 }

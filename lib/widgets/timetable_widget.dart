@@ -217,7 +217,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
           ),
           child: Icon(
             Icons.calendar_month_rounded,
-            size: ResponsiveUtils.getIconSize(width, baseSize: 24),
+            size: ResponsiveUtils.getIconSize(width),
             color: colorScheme.onPrimaryContainer,
           ),
         ),
@@ -298,11 +298,11 @@ class _TimetableWidgetState extends State<TimetableWidget> {
           tooltip: _viewMode == TimetableViewMode.day ? '切换至周视图' : '切换至日视图',
         ),
         SizedBox(width: ResponsiveUtils.value(12)),
-        IconButton.filled(
-          onPressed: _navigateToAddCourse,
-          icon: const Icon(Icons.add_rounded, size: 24),
-          tooltip: '添加课程',
-        ),
+        // IconButton.filled(
+        //   onPressed: _navigateToAddCourse,
+        //   icon: const Icon(Icons.add_rounded, size: 24),
+        //   tooltip: '添加课程',
+        // ),
       ],
     );
   }
@@ -393,22 +393,17 @@ class _TimetableWidgetState extends State<TimetableWidget> {
        }
     }
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: ResponsiveUtils.value(400),
-      ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const BouncingScrollPhysics(),
-        itemCount: courses.length,
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(12)),
-        itemBuilder: (context, index) {
-          final course = courses[index];
-          final isNext = index == nextCourseIndex;
-          return _buildCourseCard(context, course, width, isNext: isNext);
-        },
-      ),
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: courses.length,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(12)),
+      itemBuilder: (context, index) {
+        final course = courses[index];
+        final isNext = index == nextCourseIndex;
+        return _buildCourseCard(context, course, width, isNext: isNext);
+      },
     );
   }
 
@@ -422,7 +417,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
 
     // Calculate progress
     bool isCompleted = false;
-    double progress = 0.0;
+    double progress = 0;
     
     // ... (Keep existing progress logic or simplify)
     // Reusing logic from before for consistency
@@ -473,10 +468,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          // Show details or edit
-          _navigateToAddCourse();
-        },
+        onTap: _navigateToAddCourse,
         child: Stack(
           children: [
             if (isCurrent)
@@ -531,7 +523,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                                 color: subjectColor.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
-                              )
+                              ),
                             ],
                           ),
                           child: Row(
@@ -642,7 +634,6 @@ class _TimetableWidgetState extends State<TimetableWidget> {
     // 或者我们总是高亮 "Today" (Real time)
     final now = NtpService().now;
     final todayWeekday = now.weekday - 1; // 0-6
-    final isCurrentWeek = _selectedDate.difference(now.subtract(Duration(days: now.weekday-1))).inDays.abs() < 7; 
     // 简化的判断：如果选中的日期的周和现在的周一样。
     // 比较周一的日期
     final selectedMonday = _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
@@ -726,7 +717,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                         
                         return InkWell(
                           onTap: () {
-                             showDialog(
+                             showDialog<void>(
                                context: context,
                                builder: (context) => AlertDialog(
                                  title: Text(course.subject),
@@ -762,7 +753,6 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: color.withValues(alpha: 0.3),
-                                width: 1,
                               ),
                             ),
                             child: Column(

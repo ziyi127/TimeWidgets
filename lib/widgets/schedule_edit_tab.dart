@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/timetable_edit_model.dart';
 import '../services/classisland_import_service.dart';
+import '../services/general_import_service.dart';
 import '../services/timetable_edit_service.dart';
 import '../services/timetable_export_service.dart';
 import '../utils/color_utils.dart';
@@ -87,6 +88,18 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     }
   }
 
+  Future<void> _importGeneral(TimetableEditService service) async {
+    final result = await GeneralImportService.importFromFile();
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      service.loadTimetableData(result.data!);
+      _showSuccessSnackBar('已导入: ${result.stats}');
+    } else {
+      _showErrorSnackBar(result.errorMessage ?? '导入失败');
+    }
+  }
+
   Future<void> _exportTimetable(TimetableEditService service) async {
     try {
       final data = service.getTimetableData();
@@ -153,6 +166,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                         _importFromJson(service);
                       } else if (result == 'import_classisland') {
                         _importFromClassIsland(service);
+                      } else if (result == 'import_general') {
+                        _importGeneral(service);
                       }
                     },
                     itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -178,6 +193,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                         child: ListTile(
                           leading: Icon(Icons.sync_alt),
                           title: Text('从ClassIsland导入'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'import_general',
+                        child: ListTile(
+                          leading: Icon(Icons.auto_awesome),
+                          title: Text('通用导入 (实验性)'),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
@@ -1010,11 +1033,13 @@ class _ScheduleGridEditor extends StatelessWidget {
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
 
     // 查找现有课程索引
+    // 如果是 Both 视图，匹配任何 WeekType 的课程
+    // 如果是 Single/Double 视图，严格匹配
     final existingIndex = updatedCourses.indexWhere(
       (dc) =>
           dc.dayOfWeek == day &&
           dc.timeSlotId == slot.id &&
-          dc.weekType == filterWeekType,
+          (filterWeekType == WeekType.both || dc.weekType == filterWeekType),
     );
 
     if (selectedCourse == null) {
@@ -1024,19 +1049,43 @@ class _ScheduleGridEditor extends StatelessWidget {
       }
     } else {
       // 创建新课程
+      // 如果是在 Both 视图下编辑，默认创建 Both 类型的课程
+      // 如果是在 Single/Double 视图下编辑，创建对应类型的课程
+      final newWeekType = filterWeekType;
+      
       final newDailyCourse = DailyCourse(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         dayOfWeek: day,
         timeSlotId: slot.id,
         courseId: selectedCourse.id,
-        weekType: filterWeekType,
+        weekType: newWeekType,
       );
 
-      // 添加或更新课程
-      if (existingIndex != -1) {
-        updatedCourses[existingIndex] = newDailyCourse;
-      } else {
+      // 处理冲突并添加/更新
+      if (newWeekType == WeekType.both) {
+        // 如果是 Both，删除该时间槽的所有其他课程（避免冲突）
+        updatedCourses.removeWhere(
+            (dc) => dc.dayOfWeek == day && dc.timeSlotId == slot.id,);
         updatedCourses.add(newDailyCourse);
+      } else {
+        // 如果是 Single 或 Double
+        // 1. 删除该时间槽的 Both 课程（避免冲突）
+        updatedCourses.removeWhere((dc) =>
+            dc.dayOfWeek == day &&
+            dc.timeSlotId == slot.id &&
+            dc.weekType == WeekType.both,);
+            
+        // 2. 查找是否已有同类型的课程（严格匹配）
+        final exactIndex = updatedCourses.indexWhere((dc) =>
+            dc.dayOfWeek == day &&
+            dc.timeSlotId == slot.id &&
+            dc.weekType == newWeekType,);
+
+        if (exactIndex != -1) {
+          updatedCourses[exactIndex] = newDailyCourse;
+        } else {
+          updatedCourses.add(newDailyCourse);
+        }
       }
     }
 

@@ -104,24 +104,8 @@ class EnhancedLayoutEngine {
 
   /// 计算自适应容器大小
   Size _calculateAdaptiveContainerSize(Size screenSize) {
-    // 根据屏幕尺寸动态调整容器大小
-    // 大屏幕使用更宽的容器，小屏幕使用相对宽度
-    double containerWidth;
-    if (screenSize.width > 1920) {
-      containerWidth = screenSize.width / 3;
-    } else if (screenSize.width > 1440) {
-      containerWidth = screenSize.width / 3.5;
-    } else if (screenSize.width > 1024) {
-      containerWidth = screenSize.width / 4;
-    } else if (screenSize.width > 768) {
-      containerWidth = screenSize.width / 3;
-    } else {
-      containerWidth = screenSize.width / 2;
-    }
-
-    // 确保容器宽度不小于最小安全宽度
-    containerWidth = math.max(containerWidth, 280);
-    return Size(containerWidth, screenSize.height);
+    // 返回全屏尺寸，允许任意位置布局
+    return screenSize;
   }
 
   /// 检测布局中的碰撞
@@ -222,13 +206,17 @@ class PositionCalculator {
   static const double _spacing = 16; // 增加间距
 
   /// 计算默认位置 - 垂直单列布局，确保所有组件可见
+  /// 默认靠右布局
   Map<WidgetType, WidgetPosition> calculateDefaultPositions(
     Size containerSize,
   ) {
     final positions = <WidgetType, WidgetPosition>{};
 
     // 使用更小的卡片宽度，让组件更紧凑
-    final cardWidth = math.min(containerSize.width - 2 * _padding, 300);
+    final cardWidth = math.min(300.0, containerSize.width - 2 * _padding);
+    
+    // 默认靠右对齐
+    final defaultX = containerSize.width - _padding - cardWidth;
 
     double currentY = _padding;
 
@@ -249,14 +237,14 @@ class PositionCalculator {
       // 检查是否还有足够的空间
       final remainingHeight = containerSize.height - currentY - _padding;
       final adjustedHeight =
-          remainingHeight > height ? height : math.max(50, remainingHeight);
+          remainingHeight > height ? height : math.max(50.0, remainingHeight);
 
       positions[type] = WidgetPosition(
         type: type,
-        x: _padding,
+        x: defaultX,
         y: currentY,
-        width: cardWidth.toDouble(),
-        height: adjustedHeight.toDouble(),
+        width: cardWidth,
+        height: adjustedHeight,
         isVisible: remainingHeight >= 50, // 只有在有足够空间时才显示
       );
 
@@ -287,8 +275,11 @@ class PositionCalculator {
     Size containerSize,
   ) {
     final positions = <WidgetType, WidgetPosition>{};
-    final safeWidth = math.min(280, containerSize.width - 32);
+    final safeWidth = math.min(280.0, containerSize.width - 32);
     const safeHeight = 80.0;
+    
+    // 默认靠右
+    final safeX = containerSize.width - 16 - safeWidth;
 
     double currentY = 16;
 
@@ -304,9 +295,9 @@ class PositionCalculator {
       } else {
         positions[type] = WidgetPosition(
           type: type,
-          x: 16,
+          x: safeX,
           y: currentY,
-          width: safeWidth.toDouble(),
+          width: safeWidth,
           height: safeHeight,
         );
         currentY += safeHeight + 8;
@@ -325,10 +316,10 @@ class PositionCalculator {
     Size containerSize,
   ) {
     final adjustedX =
-        x.clamp(0.0, math.max(0.0, containerSize.width - width)).toDouble();
+        x.clamp(0.0, math.max(0.0, containerSize.width - width));
     final adjustedY =
-        y.clamp(0.0, math.max(0.0, containerSize.height - height)).toDouble();
-    return Offset(adjustedX, adjustedY);
+        y.clamp(0.0, math.max(0.0, containerSize.height - height));
+    return Offset(adjustedX.toDouble(), adjustedY.toDouble());
   }
 
   /// 获取组件默认高度
@@ -427,7 +418,10 @@ class CollisionDetector {
     const spacing = 16.0; // 增加间距
 
     // 使用更小的卡片宽度，让组件更紧凑
-    final cardWidth = math.min(containerSize.width - 2 * padding, 300);
+    final cardWidth = math.min(300.0, containerSize.width - 2 * padding);
+    
+    // 默认右对齐
+    final flowX = containerSize.width - padding - cardWidth;
 
     // 按Y坐标排序
     final sortedEntries = layout.entries.toList()
@@ -461,17 +455,17 @@ class CollisionDetector {
       // 如果剩余高度不足，使用剩余空间或最小高度
       final adjustedHeight = remainingHeight > preferredHeight
           ? preferredHeight
-          : math.max(50, remainingHeight);
+          : math.max(50.0, remainingHeight);
 
       // 只有在完全没有空间时才隐藏组件
       final isVisible = remainingHeight >= 50;
 
       flowLayout[entry.key] = WidgetPosition(
         type: position.type,
-        x: padding,
+        x: flowX, // 使用右对齐
         y: currentY,
-        width: cardWidth.toDouble(),
-        height: adjustedHeight.toDouble(),
+        width: cardWidth,
+        height: adjustedHeight,
         isVisible: isVisible,
       );
 
@@ -485,14 +479,14 @@ class CollisionDetector {
     if (settingsKey != null && settingsPosition != null) {
       // 将settings按钮放置在右下角，确保不会溢出
       final settingsX =
-          math.max(0, containerSize.width - padding - settingsPosition.width);
+          math.max(0.0, containerSize.width - padding - settingsPosition.width);
       final settingsY =
-          math.max(0, containerSize.height - padding - settingsPosition.height);
+          math.max(0.0, containerSize.height - padding - settingsPosition.height);
 
       flowLayout[settingsKey] = WidgetPosition(
         type: settingsPosition.type,
-        x: settingsX.toDouble(),
-        y: settingsY.toDouble(),
+        x: settingsX,
+        y: settingsY,
         width: settingsPosition.width,
         height: settingsPosition.height,
         isVisible: settingsPosition.isVisible,

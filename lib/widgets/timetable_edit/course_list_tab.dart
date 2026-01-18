@@ -265,171 +265,12 @@ class _CourseListTabState extends State<CourseListTab> {
       backgroundColor: Colors.transparent,
       body: Column(
         children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: MD3FormStyles.outlinedTextField(
-              context: context,
-              controller: _searchController,
-              label: '搜索科目',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchQuery.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        setState(() {
-                          _searchController.clear();
-                          _searchQuery = '';
-                        });
-                      },
-                    )
-                  : null,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-            ),
-          ),
-          // Search results count and sort controls
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Search results count
-                if (_searchQuery.isNotEmpty)
-                  Text(
-                    '找到 ${courses.length} 个科目',
-                    style: MD3TypographyStyles.bodySmall(context),
-                  ),
-                // Sort controls
-                Row(
-                  children: [
-                    Text(
-                      '排序:',
-                      style: MD3TypographyStyles.bodySmall(context),
-                    ),
-                    const SizedBox(width: 8),
-                    // Sort field dropdown
-                    DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _getSortFieldName(),
-                        onChanged: (value) {
-                          // Find the corresponding SortField
-                          for (final field in SortField.values) {
-                            if (_getSortFieldNameForField(field) == value) {
-                              _changeSortField(field);
-                              break;
-                            }
-                          }
-                        },
-                        items: SortField.values.map((field) {
-                          return DropdownMenuItem<String>(
-                            value: _getSortFieldNameForField(field),
-                            child: Text(
-                              _getSortFieldNameForField(field),
-                              style: MD3TypographyStyles.bodySmall(context),
-                            ),
-                          );
-                        }).toList(),
-                        style: MD3TypographyStyles.bodySmall(context),
-                        icon: const Icon(Icons.arrow_drop_down, size: 16),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Sort order toggle
-                    IconButton(
-                      icon: Icon(
-                        _sortOrder == SortOrder.ascending
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward,
-                        size: 18,
-                      ),
-                      onPressed: _toggleSortOrder,
-                      tooltip: _sortOrder == SortOrder.ascending ? '升序' : '降序',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Course list
+          _buildSearchBar(context),
+          _buildSortControls(context, courses.length),
           Expanded(
             child: courses.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _searchQuery.isNotEmpty
-                              ? Icons.search_off_outlined
-                              : Icons.class_outlined,
-                          size: 64,
-                          color: theme.colorScheme.outline,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _searchQuery.isNotEmpty ? '没有找到匹配的科目' : '暂无科目',
-                          style: MD3TypographyStyles.titleMedium(context),
-                        ),
-                        const SizedBox(height: 8),
-                        if (_searchQuery.isNotEmpty)
-                          Text(
-                            '尝试调整搜索条件',
-                            style: MD3TypographyStyles.bodyMedium(context),
-                          ),
-                        if (!_searchQuery.isNotEmpty)
-                          Text(
-                            '点击下方按钮添加科目',
-                            style: MD3TypographyStyles.bodyMedium(context),
-                          ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: courses.length,
-                    itemBuilder: (context, index) {
-                      final course = courses[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: MD3CardStyles.surfaceContainer(
-                          context: context,
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Color(
-                                int.parse(
-                                  course.color.replaceFirst('#', '0xFF'),
-                                ),
-                              ),
-                              child: Text(
-                                course.name.isNotEmpty ? course.name[0] : '?',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            title: Text(
-                              course.name,
-                              style: MD3TypographyStyles.titleMedium(context),
-                            ),
-                            subtitle: Text(
-                              [
-                                if (course.teacher.isNotEmpty) course.teacher,
-                                if (course.classroom.isNotEmpty)
-                                  course.classroom,
-                              ].join(' · '),
-                              style: MD3TypographyStyles.bodySmall(context),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.edit_outlined),
-                              onPressed: () => _showEditDialog(context, course),
-                            ),
-                            onLongPress: () => _confirmDelete(context, course),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                ? _buildEmptyState(context, theme)
+                : _buildCourseList(context, courses),
           ),
         ],
       ),
@@ -438,6 +279,172 @@ class _CourseListTabState extends State<CourseListTab> {
         icon: const Icon(Icons.add),
         label: const Text('添加科目'),
       ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: MD3FormStyles.outlinedTextField(
+        context: context,
+        controller: _searchController,
+        label: '搜索科目',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: _searchQuery.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  setState(() {
+                    _searchController.clear();
+                    _searchQuery = '';
+                  });
+                },
+              )
+            : null,
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildSortControls(BuildContext context, int count) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if (_searchQuery.isNotEmpty)
+            Text(
+              '找到 $count 个科目',
+              style: MD3TypographyStyles.bodySmall(context),
+            ),
+          Row(
+            children: [
+              Text(
+                '排序:',
+                style: MD3TypographyStyles.bodySmall(context),
+              ),
+              const SizedBox(width: 8),
+              DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _getSortFieldName(),
+                  onChanged: (value) {
+                    for (final field in SortField.values) {
+                      if (_getSortFieldNameForField(field) == value) {
+                        _changeSortField(field);
+                        break;
+                      }
+                    }
+                  },
+                  items: SortField.values.map((field) {
+                    return DropdownMenuItem<String>(
+                      value: _getSortFieldNameForField(field),
+                      child: Text(
+                        _getSortFieldNameForField(field),
+                        style: MD3TypographyStyles.bodySmall(context),
+                      ),
+                    );
+                  }).toList(),
+                  style: MD3TypographyStyles.bodySmall(context),
+                  icon: const Icon(Icons.arrow_drop_down, size: 16),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: Icon(
+                  _sortOrder == SortOrder.ascending
+                      ? Icons.arrow_upward
+                      : Icons.arrow_downward,
+                  size: 18,
+                ),
+                onPressed: _toggleSortOrder,
+                tooltip: _sortOrder == SortOrder.ascending ? '升序' : '降序',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context, ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            _searchQuery.isNotEmpty
+                ? Icons.search_off_outlined
+                : Icons.class_outlined,
+            size: 64,
+            color: theme.colorScheme.outline,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _searchQuery.isNotEmpty ? '没有找到匹配的科目' : '暂无科目',
+            style: MD3TypographyStyles.titleMedium(context),
+          ),
+          const SizedBox(height: 8),
+          if (_searchQuery.isNotEmpty)
+            Text(
+              '尝试调整搜索条件',
+              style: MD3TypographyStyles.bodyMedium(context),
+            ),
+          if (!_searchQuery.isNotEmpty)
+            Text(
+              '点击下方按钮添加科目',
+              style: MD3TypographyStyles.bodyMedium(context),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCourseList(BuildContext context, List<CourseInfo> courses) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: courses.length,
+      itemBuilder: (context, index) {
+        final course = courses[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: MD3CardStyles.surfaceContainer(
+            context: context,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Color(
+                  int.parse(
+                    course.color.replaceFirst('#', '0xFF'),
+                  ),
+                ),
+                child: Text(
+                  course.name.isNotEmpty ? course.name[0] : '?',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              title: Text(
+                course.name,
+                style: MD3TypographyStyles.titleMedium(context),
+              ),
+              subtitle: Text(
+                [
+                  if (course.teacher.isNotEmpty) course.teacher,
+                  if (course.classroom.isNotEmpty) course.classroom,
+                ].join(' · '),
+                style: MD3TypographyStyles.bodySmall(context),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () => _showEditDialog(context, course),
+              ),
+              onLongPress: () => _confirmDelete(context, course),
+            ),
+          ),
+        );
+      },
     );
   }
 

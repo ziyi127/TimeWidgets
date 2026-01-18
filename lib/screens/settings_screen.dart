@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/screens/about_screen.dart';
+import 'package:time_widgets/screens/interconnection_screen.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/startup_service.dart';
@@ -219,6 +220,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildStartupSettings(theme),
           const SizedBox(height: 16),
           _buildAdvancedSettings(theme),
+          const SizedBox(height: 16),
+          _buildInterconnectionSettings(theme),
           const SizedBox(height: 16),
           _buildAboutSettings(theme),
         ],
@@ -1138,6 +1141,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 }
               },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInterconnectionSettings(ThemeData theme) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                const Text(
+                  '设备互联',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.errorContainer,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    '实验性',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.devices_other),
+            title: const Text('设备互联'),
+            subtitle: const Text('连接其他设备以同步课表和设置'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () async {
+              final confirm = await MD3DialogStyles.showConfirmDialog(
+                context: context,
+                title: '安全警告',
+                message:
+                    '设备互联功能使用未加密的局域网广播和传输协议。\n\n开启此功能后，您的设备名称、IP地址以及同步的课表数据可能会被局域网内的其他用户获取。\n\n请确保您仅在受信任的网络环境（如家庭WiFi）中使用此功能。是否继续？',
+                confirmText: '我已知晓，继续',
+                icon: Icon(Icons.warning_amber_rounded,
+                    color: theme.colorScheme.error,),
+              );
+
+              if (confirm ?? false) {
+                if (mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const InterconnectionScreen(),
+                    ),
+                  );
+                }
+              }
+            },
           ),
         ],
       ),

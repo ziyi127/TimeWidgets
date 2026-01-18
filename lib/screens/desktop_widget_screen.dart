@@ -91,7 +91,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
 
   Future<void> _loadLayout() async {
     try {
-      final layout = await DesktopWidgetService.loadWidgetPositions();
+      final screenSize = MediaQuery.of(context).size;
+      final layout = await DesktopWidgetService.loadWidgetPositions(screenSize);
       if (mounted) {
         setState(() {
           _layout = layout;

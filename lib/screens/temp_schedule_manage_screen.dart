@@ -157,112 +157,124 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _changes.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.event_available,
-                        size: 64,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '暂无临时调课记录',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '通过托盘菜单可以添加临时调课',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _changes.length,
-                  itemBuilder: (context, index) {
-                    final change = _changes[index];
-                    final isPast = change.date.isBefore(DateTime.now());
+              ? _buildEmptyState(theme, colorScheme)
+              : _buildChangeList(colorScheme),
+    );
+  }
 
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: isPast
-                              ? colorScheme.surfaceContainerHighest
-                              : change.type == TempChangeType.day
-                                  ? colorScheme.primaryContainer
-                                  : colorScheme.secondaryContainer,
-                          child: Icon(
-                            change.type == TempChangeType.day
-                                ? Icons.today
-                                : Icons.schedule,
-                            color: isPast
-                                ? colorScheme.onSurfaceVariant
-                                : change.type == TempChangeType.day
-                                    ? colorScheme.onPrimaryContainer
-                                    : colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                        title: Text(
-                          '${change.date.year}-${change.date.month.toString().padLeft(2, '0')}-${change.date.day.toString().padLeft(2, '0')}',
-                          style: isPast
-                              ? TextStyle(
-                                  color: colorScheme.onSurfaceVariant,
-                                  decoration: TextDecoration.lineThrough,
-                                )
-                              : null,
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(_getChangeDescription(change)),
-                            if (isPast)
-                              Text(
-                                '已过期',
-                                style: TextStyle(
-                                  color: colorScheme.error,
-                                  fontSize: 12,
-                                ),
-                              ),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            showDialog<void>(
-                              context: context,
-                              builder: (dialogContext) => AlertDialog(
-                                title: const Text('确认删除'),
-                                content: const Text('确定要删除这条临时调课记录吗？'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(dialogContext),
-                                    child: const Text('取消'),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () {
-                                      Navigator.pop(dialogContext);
-                                      _deleteChange(change.id);
-                                    },
-                                    child: const Text('删除'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
+  Widget _buildEmptyState(ThemeData theme, ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.event_available,
+            size: 64,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '暂无临时调课记录',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '通过托盘菜单可以添加临时调课',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChangeList(ColorScheme colorScheme) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _changes.length,
+      itemBuilder: (context, index) {
+        final change = _changes[index];
+        return _buildChangeItem(context, change, colorScheme);
+      },
+    );
+  }
+
+  Widget _buildChangeItem(
+      BuildContext context, TempScheduleChange change, ColorScheme colorScheme,) {
+    final isPast = change.date.isBefore(DateTime.now());
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: isPast
+              ? colorScheme.surfaceContainerHighest
+              : change.type == TempChangeType.day
+                  ? colorScheme.primaryContainer
+                  : colorScheme.secondaryContainer,
+          child: Icon(
+            change.type == TempChangeType.day ? Icons.today : Icons.schedule,
+            color: isPast
+                ? colorScheme.onSurfaceVariant
+                : change.type == TempChangeType.day
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSecondaryContainer,
+          ),
+        ),
+        title: Text(
+          '${change.date.year}-${change.date.month.toString().padLeft(2, '0')}-${change.date.day.toString().padLeft(2, '0')}',
+          style: isPast
+              ? TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  decoration: TextDecoration.lineThrough,
+                )
+              : null,
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_getChangeDescription(change)),
+            if (isPast)
+              Text(
+                '已过期',
+                style: TextStyle(
+                  color: colorScheme.error,
+                  fontSize: 12,
                 ),
+              ),
+          ],
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.delete_outline),
+          onPressed: () => _confirmDelete(context, change.id),
+        ),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, String changeId) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('确认删除'),
+        content: const Text('确定要删除这条临时调课记录吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _deleteChange(changeId);
+            },
+            child: const Text('删除'),
+          ),
+        ],
+      ),
     );
   }
 }

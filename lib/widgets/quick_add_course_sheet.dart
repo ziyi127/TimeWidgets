@@ -14,7 +14,7 @@ class QuickAddCourseSheet extends StatefulWidget {
     this.onCourseAdded,
   });
 
-  final Function(Course)? onCourseAdded;
+  final void Function(Course)? onCourseAdded;
 
   @override
   State<QuickAddCourseSheet> createState() => _QuickAddCourseSheetState();
@@ -66,7 +66,9 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
   }
 
   Future<void> _saveCourse() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     setState(() => _isSaving = true);
 
@@ -75,7 +77,6 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
 
     // 创建课程对象
     final course = Course(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
       subject: _subjectController.text,
       classroom: _classroomController.text,
       teacher: _teacherController.text,
@@ -96,7 +97,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -193,7 +194,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
               borderRadius: BorderRadius.circular(16),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -207,7 +208,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
         const SizedBox(height: 16),
         // 时间段选择
         DropdownButtonFormField<String>(
-          value: _selectedTimeSlot,
+          initialValue: _selectedTimeSlot,
           decoration: InputDecoration(
             labelText: '上课时间',
             prefixIcon: const Icon(Icons.access_time_outlined),
@@ -215,7 +216,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
               borderRadius: BorderRadius.circular(16),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           ),
           items: _commonTimeSlots.map((slot) {
             return DropdownMenuItem(
@@ -241,7 +242,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
               borderRadius: BorderRadius.circular(16),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -272,7 +273,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
                 borderRadius: BorderRadius.circular(16),
               ),
               filled: true,
-              fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             ),
           ),
         ],

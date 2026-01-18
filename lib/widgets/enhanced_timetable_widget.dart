@@ -31,12 +31,11 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
     with SingleTickerProviderStateMixin {
   TimetableViewMode _viewMode = TimetableViewMode.day;
   final TimetableService _timetableService = TimetableService();
-  final PageController _weekPageController = PageController(initialPage: 0);
 
   Map<int, List<Course>> _weekCourses = {};
   bool _isLoadingWeek = false;
   DateTime _selectedDate = DateTime.now();
-  int _currentWeek = 0;
+  final int _currentWeek = 0;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -52,7 +51,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
       vsync: this,
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+    _pulseAnimation = Tween<double>(begin: 1, end: 1.08).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
@@ -60,7 +59,6 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
   @override
   void dispose() {
     _pulseController.dispose();
-    _weekPageController.dispose();
     super.dispose();
   }
 
@@ -159,7 +157,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
       children: [
         Icon(
           Icons.calendar_month_rounded,
-          size: ResponsiveUtils.getIconSize(width, baseSize: 24),
+          size: ResponsiveUtils.getIconSize(width),
           color: colorScheme.primary,
         ),
         SizedBox(width: ResponsiveUtils.value(12)),
@@ -201,10 +199,10 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             ),
           ],
           selected: {_viewMode},
-          onSelectionChanged: (Set<TimetableViewMode> newSelection) {
+          onSelectionChanged: (newSelection) {
             _toggleViewMode();
           },
-          style: ButtonStyle(
+          style: const ButtonStyle(
             visualDensity: VisualDensity.compact,
           ),
         ),
@@ -250,7 +248,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           Icon(
             Icons.free_breakfast_rounded,
             size: 64,
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(
@@ -264,7 +262,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           Text(
             '好好享受自由时光吧 ☕',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -314,7 +312,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
                 ? BorderSide(color: subjectColor, width: 2)
                 : isUpcoming
                     ? BorderSide(
-                        color: colorScheme.tertiary.withOpacity(0.5),
+                        color: colorScheme.tertiary.withValues(alpha: 0.5),
                         width: 1.5,
                       )
                     : BorderSide.none,
@@ -323,8 +321,8 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             onTap: () => _onCourseTap(course),
             onLongPress: () => _showCourseMenu(context, course),
             borderRadius: BorderRadius.circular(16),
-            splashColor: subjectColor.withOpacity(0.12),
-            highlightColor: subjectColor.withOpacity(0.08),
+            splashColor: subjectColor.withValues(alpha: 0.12),
+            highlightColor: subjectColor.withValues(alpha: 0.08),
             child: IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -401,7 +399,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
         painter: DiagonalLinePainter(color: indicatorColor),
       );
     } else {
-      indicatorColor = subjectColor.withOpacity(0.5);
+      indicatorColor = subjectColor.withValues(alpha: 0.5);
     }
 
     return Container(
@@ -441,7 +439,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
                   fontWeight: FontWeight.bold,
                   fontSize: 18 * fontMultiplier,
                   color: isCompleted
-                      ? colorScheme.onSurface.withOpacity(0.5)
+                      ? colorScheme.onSurface.withValues(alpha: 0.5)
                       : colorScheme.onSurface,
                   decoration: isCompleted ? TextDecoration.lineThrough : null,
                 ),
@@ -490,7 +488,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               child: Text(
                 course.classroom,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -507,7 +505,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               Text(
                 course.teacher,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -522,9 +520,9 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
@@ -547,11 +545,11 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
     bool isUpcoming,
   ) {
     if (isCompleted) {
-      return colorScheme.surfaceVariant.withOpacity(0.5);
+      return colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
     } else if (isCurrent) {
-      return subjectColor.withOpacity(0.08);
+      return subjectColor.withValues(alpha: 0.08);
     } else if (isUpcoming) {
-      return colorScheme.tertiaryContainer.withOpacity(0.3);
+      return colorScheme.tertiaryContainer.withValues(alpha: 0.3);
     }
     return colorScheme.surface;
   }
@@ -701,7 +699,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: SingleChildScrollView(
@@ -716,7 +714,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
                       ? Border(
                           right: BorderSide(
                             color: theme.colorScheme.outlineVariant
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                           ),
                         )
                       : null,
@@ -746,11 +744,10 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
                                 horizontal: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: color.withOpacity(0.15),
+                                color: color.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: color.withOpacity(0.4),
-                                  width: 1,
+                                  color: color.withValues(alpha: 0.4),
                                 ),
                               ),
                               child: Column(
@@ -795,7 +792,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
     return Container(
       height: 300,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Center(
@@ -860,7 +857,7 @@ class DiagonalLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.3)
+      ..color = color.withValues(alpha: 0.3)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 

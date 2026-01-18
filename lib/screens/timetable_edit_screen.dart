@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:time_widgets/services/timetable_edit_service.dart';
 import 'package:time_widgets/services/timetable_storage_service.dart';
-// import 'package:time_widgets/services/ical_import_service.dart'; // 文件不存在
 import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_navigation_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
@@ -99,6 +98,7 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
     return ChangeNotifierProvider.value(
       value: _timetableEditService,
       child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: MD3NavigationStyles.appBar(
           context: context,
           automaticallyImplyLeading: false,

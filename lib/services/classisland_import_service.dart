@@ -89,6 +89,11 @@ class ClassislandImportService {
     }
   }
 
+  /// 从JSON Map导入 (用于测试或直接数据导入)
+  static ClassIslandImportResult importFromJson(Map<String, dynamic> json) {
+    return _convertClassislandToTimetable(json);
+  }
+
   /// 将Classisland数据转换为课表数据
   static ClassIslandImportResult _convertClassislandToTimetable(
     Map<String, dynamic> data,
@@ -158,13 +163,19 @@ class ClassislandImportService {
 
           for (var i = 0; i < layouts.length; i++) {
             final layout = layouts[i] as Map<String, dynamic>;
-            final startSecond =
-                layout['StartSecond'] as String? ?? '2024-01-01T08:00:00';
-            final endSecond =
-                layout['EndSecond'] as String? ?? '2024-01-01T08:45:00';
+            // 优先使用 StartTime/EndTime，如果为空则使用 StartSecond/EndSecond (兼容不同版本)
+            var startStr = layout['StartTime'] as String?;
+            if (startStr == null || startStr.isEmpty) {
+              startStr = layout['StartSecond'] as String?;
+            }
 
-            final startTime = _extractTime(startSecond);
-            final endTime = _extractTime(endSecond);
+            var endStr = layout['EndTime'] as String?;
+            if (endStr == null || endStr.isEmpty) {
+              endStr = layout['EndSecond'] as String?;
+            }
+
+            final startTime = _extractTime(startStr ?? '08:00:00');
+            final endTime = _extractTime(endStr ?? '08:45:00');
 
             // 转换时间点类型(ClassIsland: 0=上课, 1=课间, 2=分割线)
             final timeType = layout['TimeType'] as int? ?? 0;
@@ -323,13 +334,17 @@ class ClassislandImportService {
   /// 从日期时间字符串中提取时间部分(HH:MM)
   static String _extractTime(String dateTimeString) {
     try {
-      final parts = dateTimeString.split('T');
-      if (parts.length > 1) {
-        final timePart = parts[1];
-        final timeParts = timePart.split(':');
-        if (timeParts.length >= 2) {
-          return '${timeParts[0]}:${timeParts[1]}';
+      String timePart = dateTimeString;
+      if (dateTimeString.contains('T')) {
+        final parts = dateTimeString.split('T');
+        if (parts.length > 1) {
+          timePart = parts[1];
         }
+      }
+
+      final timeParts = timePart.split(':');
+      if (timeParts.length >= 2) {
+        return '${timeParts[0]}:${timeParts[1]}';
       }
     } catch (e) {
       return '08:00';

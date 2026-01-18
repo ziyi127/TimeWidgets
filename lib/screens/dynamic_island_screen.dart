@@ -130,11 +130,11 @@ class _DynamicIslandScreenState extends State<DynamicIslandScreen> {
         width: 450, // Compact width
         height: 100,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.95),
+          color: Colors.black.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(50),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 15,
               spreadRadius: 2,
             ),

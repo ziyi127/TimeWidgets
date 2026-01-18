@@ -408,141 +408,150 @@ class _SubjectDetailEditorState extends State<_SubjectDetailEditor> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 标题和操作按钮
-          Row(
+          _buildHeader(),
+          const SizedBox(height: 32),
+          _buildBasicInfoForm(),
+          const SizedBox(height: 16),
+          _buildAppearanceSettings(),
+          const SizedBox(height: 24),
+          _buildActionButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: _selectedColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              widget.subject.displayName.isNotEmpty
+                  ? widget.subject.displayName[0]
+                  : widget.subject.name[0],
+              style: TextStyle(
+                color: ColorUtils.getContrastTextColor(_selectedColor),
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: _selectedColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    widget.subject.displayName.isNotEmpty
-                        ? widget.subject.displayName[0]
-                        : widget.subject.name[0],
-                    style: TextStyle(
-                      color: ColorUtils.getContrastTextColor(_selectedColor),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    ),
+              Text(
+                widget.subject.name,
+                style: MD3TypographyStyles.headlineSmall(context),
+              ),
+              if (widget.subject.teacher.isNotEmpty)
+                Text(
+                  widget.subject.teacher,
+                  style: MD3TypographyStyles.bodyMedium(context).copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.subject.name,
-                      style: MD3TypographyStyles.headlineSmall(context),
-                    ),
-                    if (widget.subject.teacher.isNotEmpty)
-                      Text(
-                        widget.subject.teacher,
-                        style: MD3TypographyStyles.bodyMedium(context).copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              MD3ButtonStyles.iconOutlined(
-                context: context,
-                icon: const Icon(Icons.delete_outline),
-                onPressed: _deleteSubject,
-                tooltip: '删除科目',
-              ),
             ],
           ),
-          const SizedBox(height: 32),
+        ),
+        MD3ButtonStyles.iconOutlined(
+          context: context,
+          icon: const Icon(Icons.delete_outline),
+          onPressed: _deleteSubject,
+          tooltip: '删除科目',
+        ),
+      ],
+    );
+  }
 
-          // 编辑表单
-          MD3CardStyles.surfaceContainer(
+  Widget _buildBasicInfoForm() {
+    return MD3CardStyles.surfaceContainer(
+      context: context,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('基本信息', style: MD3TypographyStyles.titleMedium(context)),
+          const SizedBox(height: 16),
+          MD3FormStyles.outlinedTextField(
             context: context,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('基本信息', style: MD3TypographyStyles.titleMedium(context)),
-                const SizedBox(height: 16),
-                MD3FormStyles.outlinedTextField(
-                  context: context,
-                  controller: _nameController,
-                  label: '科目名称',
-                ),
-                const SizedBox(height: 16),
-                MD3FormStyles.outlinedTextField(
-                  context: context,
-                  controller: _abbreviationController,
-                  label: '简称',
-                  hint: '用于在课表中显示',
-                ),
-                const SizedBox(height: 16),
-                MD3FormStyles.outlinedTextField(
-                  context: context,
-                  controller: _teacherController,
-                  label: '教师',
-                ),
-                const SizedBox(height: 16),
-                MD3FormStyles.outlinedTextField(
-                  context: context,
-                  controller: _classroomController,
-                  label: '教室',
-                ),
-              ],
-            ),
+            controller: _nameController,
+            label: '科目名称',
           ),
           const SizedBox(height: 16),
-
-          // 外观设置
-          MD3CardStyles.surfaceContainer(
+          MD3FormStyles.outlinedTextField(
             context: context,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('外观设置', style: MD3TypographyStyles.titleMedium(context)),
-                const SizedBox(height: 16),
-                MD3FormStyles.colorPickerButton(
-                  context: context,
-                  color: _selectedColor,
-                  label: '科目颜色',
-                  onChanged: (color) {
-                    setState(() {
-                      _selectedColor = color;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                MD3FormStyles.switchListTile(
-                  context: context,
-                  value: _isOutdoor,
-                  onChanged: (value) {
-                    setState(() {
-                      _isOutdoor = value;
-                    });
-                  },
-                  title: '户外课程',
-                  subtitle: '标记为户外课程',
-                  secondary: const Icon(Icons.wb_sunny_outlined),
-                ),
-              ],
-            ),
+            controller: _abbreviationController,
+            label: '简称',
+            hint: '用于在课表中显示',
           ),
-          const SizedBox(height: 24),
-
-          // 保存按钮
-          SizedBox(
-            width: double.infinity,
-            child: MD3ButtonStyles.filledButton(
-              context: context,
-              onPressed: _saveChanges,
-              text: '保存更改',
-            ),
+          const SizedBox(height: 16),
+          MD3FormStyles.outlinedTextField(
+            context: context,
+            controller: _teacherController,
+            label: '教师',
+          ),
+          const SizedBox(height: 16),
+          MD3FormStyles.outlinedTextField(
+            context: context,
+            controller: _classroomController,
+            label: '教室',
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAppearanceSettings() {
+    return MD3CardStyles.surfaceContainer(
+      context: context,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('外观设置', style: MD3TypographyStyles.titleMedium(context)),
+          const SizedBox(height: 16),
+          MD3FormStyles.colorPickerButton(
+            context: context,
+            color: _selectedColor,
+            label: '科目颜色',
+            onChanged: (color) {
+              setState(() {
+                _selectedColor = color;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          MD3FormStyles.switchListTile(
+            context: context,
+            value: _isOutdoor,
+            onChanged: (value) {
+              setState(() {
+                _isOutdoor = value;
+              });
+            },
+            title: '户外课程',
+            subtitle: '标记为户外课程',
+            secondary: const Icon(Icons.wb_sunny_outlined),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return SizedBox(
+      width: double.infinity,
+      child: MD3ButtonStyles.filledButton(
+        context: context,
+        onPressed: _saveChanges,
+        text: '保存更改',
       ),
     );
   }
