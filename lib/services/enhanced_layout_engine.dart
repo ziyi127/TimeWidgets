@@ -148,15 +148,15 @@ class EnhancedLayoutEngine {
       final position = entry.value;
       
       // 按比例调整位置和尺寸
-      final scaledWidth = (position.width * scaleX).clamp(_minWidgetSize, _maxWidgetSize).toDouble();
-      final scaledHeight = (position.height * scaleY).clamp(_minWidgetSize, _maxWidgetSize).toDouble();
+      final scaledWidth = (position.width * scaleX).clamp(_minWidgetSize, _maxWidgetSize);
+      final scaledHeight = (position.height * scaleY).clamp(_minWidgetSize, _maxWidgetSize);
       
       // 确保组件不会超出容器边界
-      final maxX = (newContainerSize.width - scaledWidth).toDouble();
-      final maxY = (newContainerSize.height - scaledHeight).toDouble();
+      final maxX = newContainerSize.width - scaledWidth;
+      final maxY = newContainerSize.height - scaledHeight;
       
-      final newX = (position.x * scaleX).clamp(0.0, maxX).toDouble();
-      final newY = (position.y * scaleY).clamp(0.0, maxY).toDouble();
+      final newX = (position.x * scaleX).clamp(0.0, maxX);
+      final newY = (position.y * scaleY).clamp(0.0, maxY);
       
       adjustedLayout[entry.key] = WidgetPosition(
         type: position.type,
@@ -217,7 +217,7 @@ class PositionCalculator {
     final positions = <WidgetType, WidgetPosition>{};
     
     // 使用更小的卡片宽度，让组件更紧凑
-    final cardWidth = math.min(containerSize.width - 2 * _padding, 300.0).toDouble();
+    final cardWidth = math.min(containerSize.width - 2 * _padding, 300);
     
     double currentY = _padding;
     
@@ -237,14 +237,14 @@ class PositionCalculator {
       
       // 检查是否还有足够的空间
       final remainingHeight = containerSize.height - currentY - _padding;
-      final adjustedHeight = remainingHeight > height ? height : math.max(50.0, remainingHeight);
+      final adjustedHeight = remainingHeight > height ? height : math.max(50, remainingHeight);
       
       positions[type] = WidgetPosition(
         type: type,
         x: _padding,
         y: currentY,
-        width: cardWidth,
-        height: adjustedHeight,
+        width: cardWidth.toDouble(),
+        height: adjustedHeight.toDouble(),
         isVisible: remainingHeight >= 50, // 只有在有足够空间时才显示
       );
       
@@ -273,7 +273,7 @@ class PositionCalculator {
   /// 计算安全的默认布局（用于错误恢复）
   Map<WidgetType, WidgetPosition> calculateSafeDefaultLayout(Size containerSize) {
     final positions = <WidgetType, WidgetPosition>{};
-    final safeWidth = math.min(280.0, containerSize.width - 32);
+    final safeWidth = math.min(280, containerSize.width - 32);
     const safeHeight = 80.0;
     
     double currentY = 16;
@@ -292,7 +292,7 @@ class PositionCalculator {
           type: type,
           x: 16,
           y: currentY,
-          width: safeWidth,
+          width: safeWidth.toDouble(),
           height: safeHeight,
         );
         currentY += safeHeight + 8;
@@ -397,8 +397,6 @@ class CollisionDetector {
         return 140;  // 减小高度
       case WidgetType.settings:
         return 48;
-      default:
-        return 50;
     }
   }
   
@@ -412,7 +410,7 @@ class CollisionDetector {
     const spacing = 16.0;  // 增加间距
     
     // 使用更小的卡片宽度，让组件更紧凑
-    final cardWidth = math.min(containerSize.width - 2 * padding, 300.0).toDouble();
+    final cardWidth = math.min(containerSize.width - 2 * padding, 300);
     
     // 按Y坐标排序
     final sortedEntries = layout.entries.toList()
@@ -446,7 +444,7 @@ class CollisionDetector {
       // 如果剩余高度不足，使用剩余空间或最小高度
       final adjustedHeight = remainingHeight > preferredHeight 
           ? preferredHeight 
-          : math.max(50.0, remainingHeight).toDouble();
+          : math.max(50, remainingHeight);
       
       // 只有在完全没有空间时才隐藏组件
       final isVisible = remainingHeight >= 50;
@@ -455,8 +453,8 @@ class CollisionDetector {
         type: position.type,
         x: padding,
         y: currentY,
-        width: cardWidth,
-        height: adjustedHeight,
+        width: cardWidth.toDouble(),
+        height: adjustedHeight.toDouble(),
         isVisible: isVisible,
       );
       
@@ -469,13 +467,13 @@ class CollisionDetector {
     // 最后处理settings按钮，确保不会与其他组件重叠
     if (settingsKey != null && settingsPosition != null) {
       // 将settings按钮放置在右下角，确保不会溢出
-      final settingsX = math.max(0.0, containerSize.width - padding - settingsPosition.width);
-      final settingsY = math.max(0.0, containerSize.height - padding - settingsPosition.height);
+      final settingsX = math.max(0, containerSize.width - padding - settingsPosition.width);
+      final settingsY = math.max(0, containerSize.height - padding - settingsPosition.height);
       
       flowLayout[settingsKey] = WidgetPosition(
         type: settingsPosition.type,
-        x: settingsX,
-        y: settingsY,
+        x: settingsX.toDouble(),
+        y: settingsY.toDouble(),
         width: settingsPosition.width,
         height: settingsPosition.height,
         isVisible: settingsPosition.isVisible,

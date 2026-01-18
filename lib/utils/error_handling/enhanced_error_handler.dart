@@ -1,8 +1,8 @@
 import '../logging/enhanced_logger.dart';
 import '../logging/log_level.dart';
 import 'error_classifier.dart';
-import 'error_types.dart';
 import 'error_context.dart';
+import 'error_types.dart';
 
 /// 增强的错误处理器
 class EnhancedErrorHandler {
@@ -154,7 +154,6 @@ class EnhancedErrorHandler {
   }) {
     _logger.info(
       'Error recovery ${success ? "succeeded" : "failed"}: ${error.code}',
-      category: LogCategory.general,
       metadata: {
         'errorCode': error.code,
         'errorType': error.type.code,
@@ -174,7 +173,6 @@ class EnhancedErrorHandler {
       if (updatedError.recoveryAttempts >= 3) {
         _logger.fatal(
           'Error recovery failed after ${updatedError.recoveryAttempts} attempts',
-          category: LogCategory.general,
           metadata: {
             'errorCode': error.code,
             'errorType': error.type.code,

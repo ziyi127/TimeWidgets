@@ -18,10 +18,8 @@ import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/performance_optimization_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/startup_service.dart';
-// import 'package:time_widgets/services/classisland_import_service.dart'; // 未使用
 import 'package:time_widgets/services/temp_schedule_change_service.dart';
 import 'package:time_widgets/services/theme_service.dart';
-// import 'package:time_widgets/services/timetable_export_service.dart'; // 未使用
 import 'package:time_widgets/services/timetable_storage_service.dart';
 import 'package:time_widgets/utils/aggressive_optimizer.dart';
 import 'package:time_widgets/utils/logger.dart';
@@ -135,7 +133,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
   final ThemeService _themeService = ThemeService();
   final SettingsService _settingsService = SettingsService();
   final CourseReminderService _courseReminderService = CourseReminderService();
-  StreamSubscription? _settingsSubscription;
+  StreamSubscription<dynamic>? _settingsSubscription;
   bool _isWindowVisible = true;
   bool _isWindowInitialized = false;
   bool _showTrayMenu = false;
@@ -175,9 +173,13 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
       
       // 根据设置更新窗口可见性
       if (!settings.enableDesktopWidgets && !_showTrayMenu && !_isEditMode) {
-        if (_isWindowVisible) _hideMainWindow();
+        if (_isWindowVisible) {
+          _hideMainWindow();
+        }
       } else if (settings.enableDesktopWidgets) {
-        if (!_isWindowVisible) _showMainWindow();
+        if (!_isWindowVisible) {
+          _showMainWindow();
+        }
       }
       
       if (shouldRebuild && mounted) setState(() {});
@@ -203,13 +205,13 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
         onScreenSizeChanged: () {
           // 处理屏幕尺寸变化，可能需要重新布局
           // 延迟执行，避免在构建过程中触发重建
-          Future.delayed(const Duration(milliseconds: 100), () {
+          unawaited(Future.delayed(const Duration(milliseconds: 100), () {
             if (mounted) {
               setState(() {
                 // 触发重建
               });
             }
-          });
+          }),);
         },
       );
       
@@ -280,18 +282,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     }
   }
 
-  /// 切换灵动岛模式（多窗口共存）
-  Future<void> _toggleDynamicIslandMode() async {
-    _hideMD3TrayMenu();
-    
-    // 确保主窗口显示（因为现在是共存）
-    if (!_isWindowVisible) {
-      _showMainWindow();
-    }
-    
-    // 调用EnhancedWindowManager创建或关闭灵动岛窗口
-    await EnhancedWindowManager.toggleDynamicIslandWindow();
-  }
+
 
   /// 导航到设置页面
   void _navigateToSettings() {
@@ -301,7 +292,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     if (context == null) return;
     
     // 使用全屏对话框而不是创建新窗口，避免影响桌面小组件位置
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => const Dialog.fullscreen(
         child: SettingsScreen(),
@@ -321,7 +312,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     
     if (navigatorKey.currentState != null) {
       await navigatorKey.currentState!.push(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (context) => const TimetableEditScreen(),
         ),
       );
@@ -345,7 +336,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     if (context == null) return;
     
     // 显示临时调课选项对话框
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('临时调课'),
@@ -399,7 +390,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     if (context == null) return;
     
     // 使用全屏对话框而不是创建新窗口，避免影响桌面小组件位置
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => const Dialog.fullscreen(
         child: TempScheduleManageScreen(),
@@ -620,7 +611,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
     
     if (!context.mounted) return;
     
-    showDialog(
+    unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
@@ -727,7 +718,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> with WindowListener {
           ],
         ),
       ),
-    );
+    ));
   }
   
   /// 保存按节调课记录

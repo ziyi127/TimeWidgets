@@ -275,9 +275,6 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
       case WidgetType.settings:
         // 设置按钮通常由托盘管理，但在布局中预留位置
         return const SizedBox.shrink(); 
-      default:
-        // 默认返回空容器，防止返回null导致错误
-        return const SizedBox.shrink();
     }
   }
 

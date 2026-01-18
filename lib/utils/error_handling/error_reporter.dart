@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+
 import '../logging/enhanced_logger.dart';
-import '../logging/log_entry.dart';
 import '../logging/sensitive_data_filter.dart';
-import 'error_types.dart';
 import 'error_context.dart';
+import 'error_types.dart';
 
 /// 错误报告模型
 class ErrorReport {
