@@ -13,7 +13,7 @@ class MD3DialogStyles {
   /// 标准 MD3 对话框
   static Widget dialog({
     required BuildContext context,
-    required String title,
+    required Widget title,
     required Widget content,
     required List<Widget> actions,
     Widget? icon,
@@ -28,9 +28,9 @@ class MD3DialogStyles {
       backgroundColor: colorScheme.surfaceContainerHigh,
       surfaceTintColor: colorScheme.surfaceTint,
       icon: icon,
-      title: Text(
-        title,
+      title: DefaultTextStyle(
         style: _headlineSmall(context),
+        child: title,
       ),
       content: scrollable ? SingleChildScrollView(child: content) : content,
       contentPadding: _contentPadding,

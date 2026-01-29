@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
+import '../utils/md3_chip_styles.dart';
 
 /// 无障碍设置卡片
 /// 
@@ -79,7 +80,7 @@ class AccessibilitySettingsCard extends StatelessWidget {
             const SizedBox(height: 24),
 
             // 色盲模式
-            _buildColorBlindModeSelector(theme, colorScheme),
+            _buildColorBlindModeSelector(context, theme, colorScheme),
             const SizedBox(height: 16),
 
             // 高对比度模式
@@ -135,7 +136,7 @@ class AccessibilitySettingsCard extends StatelessWidget {
   }
 
   /// 色盲模式选择器
-  Widget _buildColorBlindModeSelector(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildColorBlindModeSelector(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -170,28 +171,15 @@ class AccessibilitySettingsCard extends StatelessWidget {
             runSpacing: 8,
             children: ColorBlindMode.values.map((mode) {
               final isSelected = mode == colorBlindMode;
-              return ChoiceChip(
-                label: Text(_getColorBlindModeLabel(mode)),
+              return MD3ChipStyles.choiceChip(
+                context: context,
+                label: _getColorBlindModeLabel(mode),
                 selected: isSelected,
                 onSelected: (selected) {
                   if (selected) {
                     onColorBlindModeChanged(mode);
                   }
                 },
-                avatar: isSelected
-                    ? Icon(
-                        Icons.check_circle,
-                        size: 18,
-                        color: colorScheme.onPrimaryContainer,
-                      )
-                    : null,
-                selectedColor: colorScheme.primaryContainer,
-                labelStyle: TextStyle(
-                  color: isSelected
-                      ? colorScheme.onPrimaryContainer
-                      : colorScheme.onSurface,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
               );
             }).toList(),
           ),

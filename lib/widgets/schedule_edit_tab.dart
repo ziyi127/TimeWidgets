@@ -9,6 +9,7 @@ import '../services/timetable_edit_service.dart';
 import '../services/timetable_export_service.dart';
 import '../utils/color_utils.dart';
 import '../utils/md3_button_styles.dart';
+import '../utils/md3_card_styles.dart';
 import '../utils/md3_dialog_styles.dart';
 import '../utils/md3_form_styles.dart';
 import '../utils/md3_typography_styles.dart';
@@ -649,16 +650,11 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             ? service.getCourseById(dailyCourse.courseId) 
             : null;
 
-        return Card(
+        return Container(
           margin: const EdgeInsets.only(bottom: 8),
-          elevation: 0,
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
+          child: MD3CardStyles.surfaceContainer(
+            context: context,
             onTap: () => _showCoursePickerDialog(context, service, schedule, slot, dayOfWeek),
-            onLongPress: course != null 
-                ? () => _showCourseContextMenu(context, service, schedule, slot, dayOfWeek, course)
-                : null,
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
@@ -769,7 +765,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
       context: context,
       builder: (context) => MD3DialogStyles.dialog(
         context: context,
-        title: l10n.editCourse,
+        title: Text(l10n.editCourse),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -784,8 +780,13 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-          FilledButton(
+          MD3ButtonStyles.textButton(
+            context: context,
+            onPressed: () => Navigator.pop(context),
+            text: l10n.cancel,
+          ),
+          MD3ButtonStyles.filledButton(
+            context: context,
             onPressed: () {
               final updated = course.copyWith(
                 name: nameController.text,
@@ -795,7 +796,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               service.updateCourse(updated);
               Navigator.pop(context);
             },
-            child: Text(l10n.save),
+            text: l10n.save,
           ),
         ],
       ),
@@ -813,7 +814,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
       context: context,
       builder: (context) => MD3DialogStyles.dialog(
         context: context,
-        title: l10n.addCourse,
+        title: Text(l10n.addCourse),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -828,9 +829,13 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           ],
         ),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-          FilledButton(
+          MD3ButtonStyles.textButton(
+            context: context,
+            onPressed: () => Navigator.pop(context),
+            text: l10n.cancel,
+          ),
+          MD3ButtonStyles.filledButton(
+            context: context,
             onPressed: () {
               if (nameController.text.isNotEmpty) {
                 final newCourse = CourseInfo(
@@ -845,7 +850,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 Navigator.pop(context);
               }
             },
-            child: Text(l10n.create),
+            text: l10n.create,
           ),
         ],
       ),
@@ -864,7 +869,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
       context: context,
       builder: (context) => MD3DialogStyles.dialog(
         context: context,
-        title: l10n.createTimetable,
+        title: Text(l10n.createTimetable),
         content: MD3FormStyles.outlinedTextField(
           context: context,
           controller: nameController,
@@ -914,7 +919,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
       context: context,
       builder: (context) => MD3DialogStyles.dialog(
         context: context,
-        title: l10n.createGroup,
+        title: Text(l10n.createGroup),
         content: MD3FormStyles.outlinedTextField(
           context: context,
           controller: nameController,
@@ -1003,13 +1008,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         }),
       ],
       actions: [
-        TextButton.icon(
+        MD3ButtonStyles.textButton(
+          context: context,
           onPressed: () async {
             Navigator.pop(context);
             await _showAddSubjectDialog(context, service);
           },
+          text: l10n.addCourse,
           icon: const Icon(Icons.add),
-          label: Text(l10n.addCourse),
         ),
       ],
     );

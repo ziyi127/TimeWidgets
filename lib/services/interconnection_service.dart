@@ -94,6 +94,7 @@ class InterconnectionService {
   String? _authToken;
   RawDatagramSocket? _broadcastSocket;
   RawDatagramSocket? _authRecoverySocket;
+  RawDatagramSocket? _broadcastSendSocket; // Socket for sending broadcasts
   ServerSocket? _syncServer;
   Timer? _broadcastTimer;
   Timer? _cleanupTimer;
@@ -209,7 +210,7 @@ class InterconnectionService {
           await _broadcastAuthRecovery(device);
           
           // Wait for potential response and IP update
-          await Future.delayed(const Duration(seconds: 3));
+          await Future<void>.delayed(const Duration(seconds: 3));
           
           // Re-fetch device info from list (it might have been updated by _handleBroadcastPacket)
           // We need to look up in the live _pairedDevices list
@@ -365,9 +366,11 @@ class InterconnectionService {
           _discoveredDevices[index] = device;
         } else {
           _discoveredDevices.add(device);
+          Logger.i('Discovered new device: ${device.name} at ${device.ip}:${device.port}');
         }
         _devicesController.add(List.from(_discoveredDevices));
       } catch (e) {
+        Logger.w('Error processing broadcast packet: $e');
         // Ignore malformed packets
       }
     }
@@ -390,7 +393,7 @@ class InterconnectionService {
             // Handle responses (Ack, Heartbeat)
             // For now just consume to keep buffer clear
           },
-          onError: (e) {
+          onError: (dynamic e) {
             Logger.w('Connection error with ${device.name}: $e');
             _activeConnections.remove(device.ip);
             socket?.destroy();
@@ -429,7 +432,7 @@ class InterconnectionService {
 
       if (retries > 0) {
         Logger.i('Retrying sync with ${device.name} ($retries attempts left)...');
-        await Future.delayed(const Duration(seconds: 1));
+        await Future<void>.delayed(const Duration(seconds: 1));
         await connectAndSync(device, retries: retries - 1);
       } else {
         rethrow;
@@ -452,8 +455,8 @@ class InterconnectionService {
       // Start UDP Broadcast
       // We don't need to bind to a specific port to send, but binding helps receive if we wanted to.
       // Here we just need a socket to send.
-      final socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
-      socket.broadcastEnabled = true;
+      _broadcastSendSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+      _broadcastSendSocket!.broadcastEnabled = true;
 
       // Start Auth Recovery Listener (Slave listens for Master's call)
       _authRecoverySocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, _authRecoveryPort);
@@ -467,7 +470,9 @@ class InterconnectionService {
              if (data['type'] == 'auth_recovery' && data['authToken'] == _authToken) {
                Logger.i('Received auth recovery request from Master. Broadcasting presence...');
                // Trigger immediate broadcast
-               _sendPresenceBroadcast(socket);
+               if (_broadcastSendSocket != null) {
+                 _sendPresenceBroadcast(_broadcastSendSocket!);
+               }
              }
           } catch (e) {
             // Ignore
@@ -479,10 +484,13 @@ class InterconnectionService {
       _broadcastTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
         if (!_isBroadcasting) {
           timer.cancel();
-          socket.close();
+          _broadcastSendSocket?.close();
+          _broadcastSendSocket = null;
           return;
         }
-        _sendPresenceBroadcast(socket);
+        if (_broadcastSendSocket != null) {
+          _sendPresenceBroadcast(_broadcastSendSocket!);
+        }
       });
        Logger.i('Started broadcasting as $_deviceName');
     } catch (e) {
@@ -500,11 +508,17 @@ class InterconnectionService {
         });
         
         try {
-          socket.send(
+          final sentBytes = socket.send(
             utf8.encode(message),
             InternetAddress('255.255.255.255'),
             _broadcastPort,
           );
+          if (sentBytes > 0) {
+            Logger.i('Broadcast sent successfully: $sentBytes bytes');
+            Logger.d('Broadcast message: $message');
+          } else {
+            Logger.w('Failed to send broadcast: 0 bytes sent');
+          }
         } catch (e) {
           Logger.e('Error sending broadcast: $e');
         }
@@ -518,6 +532,8 @@ class InterconnectionService {
     _syncServer = null;
     _authRecoverySocket?.close();
     _authRecoverySocket = null;
+    _broadcastSendSocket?.close();
+    _broadcastSendSocket = null;
      Logger.i('Stopped broadcasting');
   }
 

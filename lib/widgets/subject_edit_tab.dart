@@ -217,7 +217,7 @@ class _SubjectEditTabState extends State<SubjectEditTab> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => MD3DialogStyles.dialog(
           context: context,
-          title: '添加科目',
+          title: const Text('添加科目'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

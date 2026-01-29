@@ -3,6 +3,7 @@ import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/screens/about_screen.dart';
 import 'package:time_widgets/screens/interconnection_screen.dart';
+import 'package:time_widgets/screens/plugin_management_screen.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/startup_service.dart';
@@ -187,6 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.settingsTitle),
         leading: IconButton(
@@ -1203,6 +1205,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute<void>(
                       builder: (context) => const InterconnectionScreen(),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.extension),
+            title: const Text('插件管理'),
+            subtitle: const Text('安装和管理第三方插件'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () async {
+              final confirm = await MD3DialogStyles.showConfirmDialog(
+                context: context,
+                title: AppLocalizations.of(context)!.securityWarning,
+                message: '插件可能会访问您的设备数据，请注意安全。仅安装来自可信来源的插件。',
+                confirmText: AppLocalizations.of(context)!.securityWarningConfirm,
+                icon: Icon(Icons.warning_amber_rounded,
+                    color: theme.colorScheme.error,),
+              );
+
+              if (confirm ?? false) {
+                if (mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const PluginManagementScreen(),
                     ),
                   );
                 }

@@ -73,12 +73,20 @@ class JsonPlugin extends TimeWidgetsPlugin {
 
     return _settingsJson!.map((item) {
       final map = item as Map<String, dynamic>;
+      
+      // 提取额外属性
+      final extra = <String, dynamic>{};
+      if (map.containsKey('multiline')) {
+        extra['multiline'] = map['multiline'];
+      }
+      
       return PluginSettingItem(
         key: map['key'] as String,
         label: map['label'] as String,
         type: _parseSettingType(map['type'] as String?),
         defaultValue: map['defaultValue'],
         options: (map['options'] as List?)?.map((e) => e.toString()).toList(),
+        extra: extra,
       );
     }).toList();
   }

@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/timetable_edit_model.dart';
 import '../services/timetable_edit_service.dart';
 import '../utils/md3_button_styles.dart';
+import '../utils/md3_card_styles.dart';
 import '../utils/md3_dialog_styles.dart';
 import '../utils/md3_form_styles.dart';
 import '../utils/md3_typography_styles.dart';
@@ -297,7 +298,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => MD3DialogStyles.dialog(
           context: context,
-          title: l10n.addTimeSlot,
+          title: Text(l10n.addTimeSlot),
           scrollable: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -419,7 +420,7 @@ class _TimeLayoutEditTabState extends State<TimeLayoutEditTab> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => MD3DialogStyles.dialog(
           context: context,
-          title: l10n.editTimeSlot,
+          title: Text(l10n.editTimeSlot),
           scrollable: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -566,53 +567,143 @@ class _TimeSlotCard extends StatelessWidget {
         break;
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      color: backgroundColor,
-      child: InkWell(
-        onTap: onEdit,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(icon, color: colorScheme.onSurfaceVariant),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: timeSlot.type == TimePointType.classTime
+          ? MD3CardStyles.primaryContainer(
+              context: context,
+              onTap: onEdit,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Text(
-                      timeSlot.name,
-                      style: MD3TypographyStyles.titleSmall(context),
+                    Icon(icon, color: colorScheme.onSurfaceVariant),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            timeSlot.name,
+                            style: MD3TypographyStyles.titleSmall(context),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${timeSlot.startTime} - ${timeSlot.endTime}',
+                            style: MD3TypographyStyles.bodySmall(context).copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
                     Text(
-                      '${timeSlot.startTime} - ${timeSlot.endTime}',
-                      style: MD3TypographyStyles.bodySmall(context).copyWith(
+                      l10n.durationMinutes(timeSlot.durationMinutes),
+                      style: MD3TypographyStyles.labelMedium(context).copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    MD3ButtonStyles.icon(
+                      context: context,
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: onDelete,
+                      tooltip: l10n.delete,
                     ),
                   ],
                 ),
               ),
-              Text(
-                l10n.durationMinutes(timeSlot.durationMinutes),
-                style: MD3TypographyStyles.labelMedium(context).copyWith(
-                  color: colorScheme.onSurfaceVariant,
+            )
+          : timeSlot.type == TimePointType.breakTime
+              ? MD3CardStyles.surfaceContainerHighest(
+                  context: context,
+                  onTap: onEdit,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(icon, color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                timeSlot.name,
+                                style: MD3TypographyStyles.titleSmall(context),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${timeSlot.startTime} - ${timeSlot.endTime}',
+                                style: MD3TypographyStyles.bodySmall(context).copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          l10n.durationMinutes(timeSlot.durationMinutes),
+                          style: MD3TypographyStyles.labelMedium(context).copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        MD3ButtonStyles.icon(
+                          context: context,
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: onDelete,
+                          tooltip: l10n.delete,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : MD3CardStyles.outlined(
+                  context: context,
+                  onTap: onEdit,
+                  borderColor: backgroundColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(icon, color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                timeSlot.name,
+                                style: MD3TypographyStyles.titleSmall(context),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${timeSlot.startTime} - ${timeSlot.endTime}',
+                                style: MD3TypographyStyles.bodySmall(context).copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          l10n.durationMinutes(timeSlot.durationMinutes),
+                          style: MD3TypographyStyles.labelMedium(context).copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        MD3ButtonStyles.icon(
+                          context: context,
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: onDelete,
+                          tooltip: l10n.delete,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              MD3ButtonStyles.icon(
-                context: context,
-                icon: const Icon(Icons.delete_outline),
-                onPressed: onDelete,
-                tooltip: l10n.delete,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

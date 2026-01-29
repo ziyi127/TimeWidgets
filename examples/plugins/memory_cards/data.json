@@ -1,0 +1,40 @@
+{
+  "cards": [
+    {
+      "word": "Hello",
+      "meaning": "你好"
+    },
+    {
+      "word": "World",
+      "meaning": "世界"
+    },
+    {
+      "word": "Flutter",
+      "meaning": "移动应用开发框架"
+    },
+    {
+      "word": "Plugin",
+      "meaning": "插件"
+    },
+    {
+      "word": "Memory",
+      "meaning": "记忆"
+    },
+    {
+      "word": "Card",
+      "meaning": "卡片"
+    },
+    {
+      "word": "Study",
+      "meaning": "学习"
+    },
+    {
+      "word": "Learn",
+      "meaning": "学习"
+    }
+  ],
+  "settings": {
+    "autoPlay": true,
+    "interval": 5
+  }
+}

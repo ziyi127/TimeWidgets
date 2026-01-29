@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/services/timetable_edit_service.dart';
+import 'package:time_widgets/utils/md3_button_styles.dart';
+import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class TimetableGridTab extends StatelessWidget {
@@ -320,7 +322,8 @@ class TimetableGridTab extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
+          return MD3DialogStyles.dialog(
+            context: context,
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -420,9 +423,10 @@ class TimetableGridTab extends StatelessWidget {
               ),
             ),
             actions: [
-              TextButton(
+              MD3ButtonStyles.textButton(
+                context: context,
                 onPressed: () => Navigator.pop(context),
-                child: const Text('取消'),
+                text: '取消',
               ),
             ],
           );

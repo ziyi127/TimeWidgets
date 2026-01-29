@@ -3,6 +3,7 @@ import '../../models/timetable_edit_model.dart';
 import '../../services/timetable_edit_service.dart';
 import '../../utils/color_utils.dart';
 import '../../utils/md3_button_styles.dart';
+import '../../utils/md3_chip_styles.dart';
 import '../../utils/md3_typography_styles.dart';
 
 class QuickSchedulePanel extends StatelessWidget {
@@ -133,16 +134,14 @@ class QuickSchedulePanel extends StatelessWidget {
                       ? course.abbreviation 
                       : (course.name.length > 2 ? course.name.substring(0, 2) : course.name);
                       
-                  return ActionChip(
+                  return MD3ChipStyles.actionChip(
+                    context: context,
                     avatar: CircleAvatar(
                       backgroundColor: color,
                       radius: 8,
                     ),
-                    label: Text(label),
-                    tooltip: course.name,
+                    label: label,
                     onPressed: () => onCourseSelected(course),
-                    backgroundColor: colorScheme.surface,
-                    side: BorderSide(color: colorScheme.outlineVariant),
                   );
                 }).toList(),
               ),

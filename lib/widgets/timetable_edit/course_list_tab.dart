@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/services/timetable_edit_service.dart';
+import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/utils/md3_form_styles.dart';
@@ -165,7 +166,8 @@ class _CourseListTabState extends State<CourseListTab> {
     return showDialog<Color>(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (context, setState) => MD3DialogStyles.dialog(
+          context: context,
           title: const Text('选择科目颜色'),
           content: SizedBox(
             width: 320,
@@ -242,13 +244,15 @@ class _CourseListTabState extends State<CourseListTab> {
             ),
           ),
           actions: [
-            TextButton(
+            MD3ButtonStyles.textButton(
+              context: context,
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('取消'),
+              text: '取消',
             ),
-            FilledButton(
+            MD3ButtonStyles.filledButton(
+              context: context,
               onPressed: () => Navigator.of(context).pop(selectedColor),
-              child: const Text('确定'),
+              text: '确定',
             ),
           ],
         ),
@@ -504,7 +508,8 @@ class _CourseListTabState extends State<CourseListTab> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
+          return MD3DialogStyles.dialog(
+            context: context,
             title: Text(isEditing ? '编辑科目' : '添加科目'),
             content: SingleChildScrollView(
               child: Column(
@@ -597,11 +602,13 @@ class _CourseListTabState extends State<CourseListTab> {
               ),
             ),
             actions: [
-              TextButton(
+              MD3ButtonStyles.textButton(
+                context: context,
                 onPressed: () => Navigator.pop(context),
-                child: const Text('取消'),
+                text: '取消',
               ),
-              FilledButton(
+              MD3ButtonStyles.filledButton(
+                context: context,
                 onPressed: () {
                   // 再次验证确保所有条件都满足
                   validateName(nameController.text);
@@ -628,7 +635,7 @@ class _CourseListTabState extends State<CourseListTab> {
                   }
                   Navigator.pop(context);
                 },
-                child: const Text('保存'),
+                text: '保存',
               ),
             ],
           );

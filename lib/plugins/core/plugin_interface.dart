@@ -52,6 +52,7 @@ class PluginSettingItem {
   final SettingType type;
   final dynamic defaultValue;
   final List<String>? options; // For choice type
+  final Map<String, dynamic> extra; // For extra properties like multiline
 
   PluginSettingItem({
     required this.key,
@@ -59,5 +60,6 @@ class PluginSettingItem {
     required this.type,
     this.defaultValue,
     this.options,
+    this.extra = const {},
   });
 }

@@ -1,0 +1,90 @@
+{
+  "type": "Container",
+  "width": 300,
+  "height": 200,
+  "padding": 20,
+  "decoration": {
+    "color": "#f5f5f5",
+    "borderRadius": 12,
+    "boxShadow": [
+      {
+        "color": "#00000020",
+        "offset": {
+          "x": 0,
+          "y": 2
+        },
+        "blurRadius": 8
+      }
+    ]
+  },
+  "child": {
+    "type": "Column",
+    "mainAxisAlignment": "center",
+    "children": [
+      {
+        "type": "Text",
+        "text": "记忆卡片",
+        "style": {
+          "fontSize": 20,
+          "fontWeight": "bold",
+          "color": "#333333"
+        }
+      },
+      {
+        "type": "SizedBox",
+        "height": 20
+      },
+      {
+        "type": "Text",
+        "id": "word",
+        "text": "Hello",
+        "style": {
+          "fontSize": 32,
+          "fontWeight": "bold",
+          "color": "#2196F3"
+        }
+      },
+      {
+        "type": "SizedBox",
+        "height": 10
+      },
+      {
+        "type": "Text",
+        "id": "meaning",
+        "text": "你好",
+        "style": {
+          "fontSize": 18,
+          "color": "#666666"
+        }
+      },
+      {
+        "type": "SizedBox",
+        "height": 20
+      },
+      {
+        "type": "Row",
+        "mainAxisAlignment": "spaceAround",
+        "children": [
+          {
+            "type": "Icon",
+            "icon": "skip_previous",
+            "color": "#666666",
+            "size": 32
+          },
+          {
+            "type": "Icon",
+            "icon": "play_arrow",
+            "color": "#2196F3",
+            "size": 40
+          },
+          {
+            "type": "Icon",
+            "icon": "skip_next",
+            "color": "#666666",
+            "size": 32
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "key": "autoPlay",
+    "label": "自动播放",
+    "type": "boolean",
+    "defaultValue": true
+  },
+  {
+    "key": "interval",
+    "label": "轮播间隔(秒)",
+    "type": "number",
+    "defaultValue": 5
+  },
+  {
+    "key": "cardStyle",
+    "label": "卡片样式",
+    "type": "choice",
+    "defaultValue": "light",
+    "options": ["light", "dark", "colorful"]
+  },
+  {
+    "key": "fontSize",
+    "label": "字体大小",
+    "type": "number",
+    "defaultValue": 32
+  },
+  {
+    "key": "showMeaning",
+    "label": "显示释义",
+    "type": "boolean",
+    "defaultValue": true
+  },
+  {
+    "key": "carouselContent",
+    "label": "轮播内容",
+    "type": "string",
+    "defaultValue": "Hello\nWorld\nFlutter\nPlugin\nMemory\nCard\nStudy\nLearn",
+    "multiline": true
+  },
+  {
+    "key": "carouselDescription",
+    "label": "轮播描述",
+    "type": "string",
+    "defaultValue": "你好\n世界\n移动应用开发框架\n插件\n记忆\n卡片\n学习\n学习",
+    "multiline": true
+  },
+  {
+    "key": "createDesktopWidget",
+    "label": "自动创建桌面小组件",
+    "type": "boolean",
+    "defaultValue": true
+  }
+]

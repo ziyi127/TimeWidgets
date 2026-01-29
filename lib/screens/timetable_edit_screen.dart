@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:time_widgets/services/timetable_edit_service.dart';
 import 'package:time_widgets/services/timetable_storage_service.dart';
+import 'package:time_widgets/services/timetable_export_service.dart';
+import 'package:time_widgets/services/classisland_import_service.dart';
 import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_navigation_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
@@ -91,7 +93,52 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
     );
   }
 
-  // 移除未使用的导入导出方法
+  Future<void> _importFromThisApp() async {
+    try {
+      final exportService = TimetableExportService();
+      final result = await exportService.importFromFileWithStats();
+      
+      if (result.success && result.data != null) {
+        _timetableEditService.loadTimetableData(result.data!);
+        _showSuccessSnackBar('导入成功: ${result.stats}');
+      } else {
+        _showErrorSnackBar(result.errorMessage ?? '导入失败');
+      }
+    } catch (e) {
+      _showErrorSnackBar('导入失败: $e');
+    }
+  }
+
+  Future<void> _importFromClassIsland() async {
+    try {
+      final result = await ClassislandImportService.importFromFileWithStats();
+      
+      if (result.success && result.data != null) {
+        _timetableEditService.loadTimetableData(result.data!);
+        _showSuccessSnackBar('导入成功: ${result.stats}');
+      } else {
+        _showErrorSnackBar(result.errorMessage ?? '导入失败');
+      }
+    } catch (e) {
+      _showErrorSnackBar('导入失败: $e');
+    }
+  }
+
+  Future<void> _exportToFile() async {
+    try {
+      final exportService = TimetableExportService();
+      final data = _timetableEditService.getTimetableData();
+      final success = await exportService.exportToFile(data);
+      
+      if (success) {
+        _showSuccessSnackBar('导出成功');
+      } else {
+        _showErrorSnackBar('导出失败');
+      }
+    } catch (e) {
+      _showErrorSnackBar('导出失败: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +168,57 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
               icon: const Icon(Icons.save),
               onPressed: _saveTimetableData,
               tooltip: '保存课表',
+            ),
+            const SizedBox(width: 8),
+            PopupMenuButton<void>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: '更多选项',
+              itemBuilder: (context) {
+                final List<PopupMenuEntry<void>> items = [];
+                
+                items.add(
+                  PopupMenuItem<void>(
+                    onTap: () => _importFromThisApp(),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.file_upload, size: 20),
+                        SizedBox(width: 12),
+                        Text('导入本程序课表文件'),
+                      ],
+                    ),
+                  ),
+                );
+                
+                items.add(
+                  PopupMenuItem<void>(
+                    onTap: () => _importFromClassIsland(),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.file_upload, size: 20),
+                        SizedBox(width: 12),
+                        Text('导入 ClassIsland 课表文件'),
+                      ],
+                    ),
+                  ),
+                );
+                
+                items.add(const PopupMenuDivider());
+                
+                items.add(
+                  PopupMenuItem<void>(
+                    onTap: () => _exportToFile(),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.file_download, size: 20),
+                        SizedBox(width: 12),
+                        Text('导出课表数据为 JSON'),
+                      ],
+                    ),
+                  ),
+                );
+                
+                return items;
+              },
             ),
             const SizedBox(width: 8),
             const WindowControls(),

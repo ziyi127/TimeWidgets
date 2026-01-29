@@ -24,6 +24,12 @@ class PluginManager extends ChangeNotifier {
 
   bool _isInitialized = false;
 
+  /// Getter for installed plugin manifests
+  Map<String, PluginManifest> get installedManifests => _installedManifests;
+
+  /// Getter for active plugins
+  List<TimeWidgetsPlugin> get activePlugins => _activePlugins.values.toList();
+
   Future<void> init() async {
     if (_isInitialized) return;
     
@@ -68,6 +74,8 @@ class PluginManager extends ChangeNotifier {
   Future<void> installPlugin(File zipFile, {String signature = ''}) async {
     if (_pluginsDir == null) await init();
 
+    debugPrint('Starting plugin installation from: ${zipFile.path}');
+
     // 1. Security Check
     final isValid = await SignatureVerifier.verify(zipFile, signature);
     if (!isValid) {
@@ -81,39 +89,107 @@ class PluginManager extends ChangeNotifier {
     // 3. Find manifest in zip to get ID
     ArchiveFile? manifestEntry;
     try {
+      // 尝试在根目录查找
       manifestEntry = archive.findFile('plugin.json');
-    } catch (_) {}
+      
+      // 如果根目录没找到，尝试在一级子目录中查找
+      if (manifestEntry == null) {
+        for (final file in archive) {
+          if (file.name.endsWith('/plugin.json')) {
+            manifestEntry = file;
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error finding manifest: $e');
+    }
     
     if (manifestEntry == null) {
-      throw Exception('Invalid plugin: plugin.json not found in root.');
+      // 打印所有文件，帮助调试
+      debugPrint('All files in zip:');
+      for (final file in archive) {
+        debugPrint('  ${file.name}');
+      }
+      throw Exception('Invalid plugin: plugin.json not found in root or first-level directory.');
     }
 
     final manifestContent = utf8.decode(manifestEntry.content as List<int>);
     final tempManifest = PluginManifest.parse(manifestContent);
     final pluginId = tempManifest.id;
+    
+    debugPrint('Found plugin: $pluginId (${tempManifest.name})');
 
     // 4. Extract
     final installPath = path.join(_pluginsDir!, pluginId);
     final installDir = Directory(installPath);
     if (await installDir.exists()) {
+      debugPrint('Plugin already exists, deleting old version: $installPath');
       await installDir.delete(recursive: true);
     }
     await installDir.create(recursive: true);
+    
+    debugPrint('Installing to: $installPath');
 
+    // 确定是否需要处理嵌套目录
+    bool hasNestedDirectory = false;
+    String nestedDirName = '';
+    
+    // 检查是否所有文件都在一个共同的子目录中
     for (final file in archive) {
-      final filename = file.name;
-      if (file.isFile) {
-        final data = file.content as List<int>;
-        File(path.join(installPath, filename))
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(data);
-      } else {
-        Directory(path.join(installPath, filename)).create(recursive: true);
+      if (file.isFile && file.name.contains('/')) {
+        final parts = file.name.split('/');
+        if (parts.length > 1) {
+          hasNestedDirectory = true;
+          nestedDirName = parts[0];
+          break;
+        }
       }
     }
 
-    // 5. Reload
+    for (final file in archive) {
+      final filename = file.name;
+      String targetPath;
+      
+      if (hasNestedDirectory && filename.startsWith('$nestedDirName/')) {
+        // 移除嵌套目录前缀
+        targetPath = path.join(installPath, filename.substring(nestedDirName.length + 1));
+      } else {
+        targetPath = path.join(installPath, filename);
+      }
+      
+      if (file.isFile) {
+        try {
+          final data = file.content as List<int>;
+          final targetFile = File(targetPath);
+          await targetFile.parent.create(recursive: true);
+          await targetFile.writeAsBytes(data);
+          debugPrint('Extracted: $filename -> $targetPath');
+        } catch (e) {
+          debugPrint('Error extracting $filename: $e');
+        }
+      } else {
+        try {
+          final targetDir = Directory(targetPath);
+          await targetDir.create(recursive: true);
+          debugPrint('Created directory: $targetPath');
+        } catch (e) {
+          debugPrint('Error creating directory $filename: $e');
+        }
+      }
+    }
+
+    // 5. Verify installation
+    final installedManifestFile = File(path.join(installPath, 'plugin.json'));
+    if (!await installedManifestFile.exists()) {
+      throw Exception('Installation failed: plugin.json not found in installed directory.');
+    }
+    
+    debugPrint('Installation verified: plugin.json exists');
+
+    // 6. Reload
     await _loadInstalledPlugins();
+    debugPrint('Plugin installation completed successfully');
   }
 
   /// Uninstalls a plugin.
@@ -183,5 +259,4 @@ class PluginManager extends ChangeNotifier {
   }
 
   List<PluginManifest> get installedPlugins => _installedManifests.values.toList();
-  List<TimeWidgetsPlugin> get activePlugins => _activePlugins.values.toList();
 }

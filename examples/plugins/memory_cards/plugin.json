@@ -1,0 +1,9 @@
+{
+  "id": "com.timewidgets.example.memorycards",
+  "name": "记忆卡片",
+  "version": "1.0.0",
+  "description": "自动轮播单词等记忆内容的卡片插件",
+  "author": "TimeWidgets Team",
+  "minAppVersion": "1.0.0",
+  "permissions": []
+}

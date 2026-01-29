@@ -176,7 +176,7 @@ class _TimetableTreeWidgetState extends State<TimetableTreeWidget> {
       context: context,
       builder: (context) => MD3DialogStyles.dialog(
         context: context,
-        title: '重命名分组',
+        title: const Text('重命名分组'),
         content: MD3FormStyles.outlinedTextField(
           context: context,
           controller: nameController,

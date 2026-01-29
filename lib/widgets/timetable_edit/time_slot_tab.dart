@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/services/timetable_edit_service.dart';
+import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/utils/md3_form_styles.dart';
@@ -128,7 +129,8 @@ class TimeSlotTab extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
+          return MD3DialogStyles.dialog(
+            context: context,
             title: Text(isEditing ? '编辑时间段' : '添加时间段'),
             content: SingleChildScrollView(
               child: Column(
@@ -141,12 +143,13 @@ class TimeSlotTab extends StatelessWidget {
                     prefixIcon: const Icon(Icons.label_outline),
                   ),
                   const SizedBox(height: 16),
-                  DropdownButtonFormField<TimePointType>(
-                    initialValue: selectedType,
-                    decoration: const InputDecoration(
-                      labelText: '类型',
-                      border: OutlineInputBorder(),
-                    ),
+                  MD3FormStyles.dropdown<TimePointType>(
+                    context: context,
+                    value: selectedType,
+                    label: '类型',
+                    onChanged: (value) {
+                      if (value != null) setState(() => selectedType = value);
+                    },
                     items: const [
                       DropdownMenuItem(
                         value: TimePointType.classTime,
@@ -161,50 +164,29 @@ class TimeSlotTab extends StatelessWidget {
                         child: Text('分割线'),
                       ),
                     ],
-                    onChanged: (value) {
-                      if (value != null) setState(() => selectedType = value);
-                    },
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final time = await showTimePicker(
-                              context: context,
-                              initialTime: startTime,
-                            );
-                            if (time != null) setState(() => startTime = time);
+                        child: MD3FormStyles.timePickerButton(
+                          context: context,
+                          time: startTime,
+                          label: '开始时间',
+                          onChanged: (time) {
+                            setState(() => startTime = time);
                           },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: '开始时间',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.schedule),
-                            ),
-                            child: Text(formatTime(startTime)),
-                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final time = await showTimePicker(
-                              context: context,
-                              initialTime: endTime,
-                            );
-                            if (time != null) setState(() => endTime = time);
+                        child: MD3FormStyles.timePickerButton(
+                          context: context,
+                          time: endTime,
+                          label: '结束时间',
+                          onChanged: (time) {
+                            setState(() => endTime = time);
                           },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: '结束时间',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.schedule_outlined),
-                            ),
-                            child: Text(formatTime(endTime)),
-                          ),
                         ),
                       ),
                     ],
@@ -213,11 +195,13 @@ class TimeSlotTab extends StatelessWidget {
               ),
             ),
             actions: [
-              TextButton(
+              MD3ButtonStyles.textButton(
+                context: context,
                 onPressed: () => Navigator.pop(context),
-                child: const Text('取消'),
+                text: '取消',
               ),
-              FilledButton(
+              MD3ButtonStyles.filledButton(
+                context: context,
                 onPressed: () {
                   if (nameController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -241,7 +225,7 @@ class TimeSlotTab extends StatelessWidget {
                   }
                   Navigator.pop(context);
                 },
-                child: const Text('保存'),
+                text: '保存',
               ),
             ],
           );
