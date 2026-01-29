@@ -1,0 +1,9 @@
+{
+  "id": "com.timewidgets.example.tray",
+  "name": "Tray Shortcuts",
+  "version": "1.0.0",
+  "description": "Adds useful shortcuts to the system tray",
+  "author": "TimeWidgets Team",
+  "minAppVersion": "1.0.0",
+  "permissions": []
+}

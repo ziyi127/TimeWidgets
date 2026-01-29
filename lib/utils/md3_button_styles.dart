@@ -22,9 +22,6 @@ class MD3ButtonStyles {
         disabledBackgroundColor: colorScheme.surfaceContainerHighest,
         disabledForegroundColor: colorScheme.onSurfaceVariant,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
         textStyle: textTheme.labelLarge,
       ),
       child: icon != null
@@ -59,9 +56,6 @@ class MD3ButtonStyles {
         disabledBackgroundColor: colorScheme.surfaceContainerHighest,
         disabledForegroundColor: colorScheme.onSurfaceVariant,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
         textStyle: textTheme.labelLarge,
       ),
       child: icon != null
@@ -97,9 +91,6 @@ class MD3ButtonStyles {
           color: enabled ? colorScheme.outline : colorScheme.outlineVariant,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
         textStyle: textTheme.labelLarge,
       ),
       child: icon != null
@@ -132,9 +123,6 @@ class MD3ButtonStyles {
         foregroundColor: colorScheme.primary,
         disabledForegroundColor: colorScheme.onSurfaceVariant,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
         textStyle: textTheme.labelLarge,
       ),
       child: icon != null

@@ -1,18 +1,16 @@
 import 'dart:async';
 
+import 'package:provider/provider.dart';
+
 import 'package:flutter/material.dart';
-import 'package:time_widgets/models/countdown_model.dart';
-import 'package:time_widgets/models/course_model.dart';
-import 'package:time_widgets/models/weather_model.dart';
-import 'package:time_widgets/services/api_service.dart';
-import 'package:time_widgets/services/cache_service.dart';
-import 'package:time_widgets/services/countdown_storage_service.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/services/desktop_widget_service.dart';
-import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
-import 'package:time_widgets/services/timetable_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
+import 'package:time_widgets/view_models/countdown_view_model.dart';
+import 'package:time_widgets/view_models/timetable_view_model.dart';
+import 'package:time_widgets/view_models/weather_view_model.dart';
 import 'package:time_widgets/widgets/countdown_widget.dart';
 import 'package:time_widgets/widgets/current_class_widget.dart';
 import 'package:time_widgets/widgets/date_display_widget.dart';
@@ -35,20 +33,12 @@ class DesktopWidgetScreen extends StatefulWidget {
 }
 
 class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
-  final ApiService _apiService = ApiService();
   final SettingsService _settingsService = SettingsService();
 
   // 数据状态
-  WeatherData? _weatherData;
-  bool _isLoadingWeather = true;
-  String? _weatherError;
-  CountdownData? _countdownData;
-  bool _isLoadingCountdown = true;
-  String? _countdownError;
-
-  // 课表数据
-  Timetable? _timetable;
-  bool _isLoadingTimetable = true;
+  // Weather state moved to WeatherViewModel
+  // Countdown state moved to CountdownViewModel
+  // Timetable state moved to TimetableViewModel
 
   // 布局状态
   Map<WidgetType, WidgetPosition>? _layout;
@@ -56,15 +46,11 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
 
   // 添加防抖相关变量
   Timer? _layoutTimer;
-  StreamSubscription<dynamic>? _countdownSubscription;
 
   @override
   void initState() {
     super.initState();
-    // 监听倒计时数据变化
-    _countdownSubscription = CountdownStorageService().onChange.listen((_) {
-      _loadCountdownData();
-    });
+    // Countdown listener removed - handled by ViewModel
 
     // 延迟到下一帧执行，避免在构建过程中调用 setState
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -74,19 +60,9 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   }
 
   void _loadData() {
-    final settings = _settingsService.currentSettings;
-    if (settings.showWeatherWidget) _loadWeatherData();
-    if (settings.showCountdownWidget) _loadCountdownData();
-
-    if (settings.showCurrentClassWidget || settings.enableDesktopWidgets) {
-      _loadTimetableData();
-    } else {
-      if (mounted) {
-        setState(() {
-          _isLoadingTimetable = false;
-        });
-      }
-    }
+    // Weather loading is handled by WeatherViewModel
+    // Countdown loading is handled by CountdownViewModel
+    // Timetable loading is handled by TimetableViewModel
   }
 
   Future<void> _loadLayout() async {
@@ -110,83 +86,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
     }
   }
 
-  Future<void> _loadCountdownData() async {
-    try {
-      final cachedCountdown = await CacheService.getCachedCountdownData();
-      if (cachedCountdown != null && mounted) {
-        setState(() {
-          _countdownData = cachedCountdown;
-          _isLoadingCountdown = false;
-        });
-      }
-
-      final countdownData = await _apiService.getCountdown();
-      if (mounted) {
-        setState(() {
-          _countdownData = countdownData;
-          _isLoadingCountdown = false;
-          _countdownError = null;
-        });
-        await CacheService.cacheCountdownData(countdownData);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _countdownError = e.toString();
-          _isLoadingCountdown = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _loadTimetableData() async {
-    try {
-      final now = NtpService().now;
-      final timetable = await TimetableService().getTimetable(now);
-      if (mounted) {
-        setState(() {
-          _timetable = timetable;
-          _isLoadingTimetable = false;
-        });
-      }
-    } catch (e) {
-      Logger.e('Failed to load timetable: $e');
-      if (mounted) {
-        setState(() {
-          _isLoadingTimetable = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _loadWeatherData() async {
-    try {
-      final cachedWeather = await CacheService.getCachedWeatherData();
-      if (cachedWeather != null && mounted) {
-        setState(() {
-          _weatherData = cachedWeather;
-          _isLoadingWeather = false;
-        });
-      }
-
-      final weatherData = await _apiService.getWeather();
-      if (mounted) {
-        setState(() {
-          _weatherData = weatherData;
-          _isLoadingWeather = false;
-          _weatherError = null;
-        });
-        await CacheService.cacheWeatherData(weatherData);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _weatherError = e.toString();
-          _isLoadingWeather = false;
-        });
-      }
-    }
-  }
+  // Weather loading methods removed - use WeatherViewModel instead
 
   Widget _buildWidget(WidgetType type) {
     final settings = _settingsService.currentSettings;
@@ -216,62 +116,76 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         );
       case WidgetType.weather:
         if (!settings.showWeatherWidget) return const SizedBox.shrink();
-        return EnhancedWidgetWrapper(
-          padding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
-          onTap: _loadWeatherData,
-          child: WeatherWidget(
-            weatherData: _isLoadingWeather ? null : _weatherData,
-            error: _weatherError,
-            onRetry: _loadWeatherData,
-            isCompact: true,
-          ),
+        
+        // Use Consumer to listen to WeatherViewModel updates
+        return Consumer<WeatherViewModel>(
+          builder: (context, weatherVM, child) {
+            return EnhancedWidgetWrapper(
+              padding: EdgeInsets.zero,
+              backgroundColor: Colors.transparent,
+              onTap: weatherVM.refreshWeather,
+              child: WeatherWidget(
+                weatherData: weatherVM.isLoading && weatherVM.weatherData == null 
+                    ? null 
+                    : weatherVM.weatherData,
+                error: weatherVM.error,
+                onRetry: weatherVM.refreshWeather,
+                isCompact: true,
+              ),
+            );
+          },
         );
       case WidgetType.currentClass:
         if (!settings.showCurrentClassWidget) return const SizedBox.shrink();
-        // Find current course
-        Course? currentCourse;
-        final timetable = _timetable;
-        if (timetable != null && timetable.courses.isNotEmpty) {
-          try {
-            currentCourse = timetable.courses.firstWhere((c) => c.isCurrent);
-          } catch (e) {
-            // No current course
-          }
-        }
-
-        return EnhancedWidgetWrapper(
-          padding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
-          onTap: _loadTimetableData,
-          child: CurrentClassWidget(
-            isCompact: true,
-            course: currentCourse,
-            isLoading: _isLoadingTimetable,
-          ),
+        
+        return Consumer<TimetableViewModel>(
+          builder: (context, timetableVM, child) {
+            return EnhancedWidgetWrapper(
+              padding: EdgeInsets.zero,
+              backgroundColor: Colors.transparent,
+              onTap: timetableVM.refreshTimetable,
+              child: CurrentClassWidget(
+                isCompact: true,
+                course: timetableVM.currentCourse,
+                isLoading: timetableVM.isLoading,
+              ),
+            );
+          },
         );
       case WidgetType.countdown:
         if (!settings.showCountdownWidget) return const SizedBox.shrink();
-        return EnhancedWidgetWrapper(
-          padding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
-          onTap: _loadCountdownData,
-          child: CountdownWidget(
-            countdownData: _isLoadingCountdown ? null : _countdownData,
-            error: _countdownError,
-            onRetry: _loadCountdownData,
-            isCompact: true,
-          ),
+        
+        // Use Consumer to listen to CountdownViewModel updates
+        return Consumer<CountdownViewModel>(
+          builder: (context, countdownVM, child) {
+            return EnhancedWidgetWrapper(
+              padding: EdgeInsets.zero,
+              backgroundColor: Colors.transparent,
+              onTap: countdownVM.refreshCountdown,
+              child: CountdownWidget(
+                countdownData: countdownVM.isLoading && countdownVM.countdownData == null
+                    ? null 
+                    : countdownVM.countdownData,
+                error: countdownVM.error,
+                onRetry: countdownVM.refreshCountdown,
+                isCompact: true,
+              ),
+            );
+          },
         );
       case WidgetType.timetable:
-        return EnhancedWidgetWrapper(
-          padding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
-          onTap: _loadTimetableData,
-          child: TimetableWidget(
-            isCompact: true,
-            courses: _timetable?.courses,
-          ),
+        return Consumer<TimetableViewModel>(
+          builder: (context, timetableVM, child) {
+            return EnhancedWidgetWrapper(
+              padding: EdgeInsets.zero,
+              backgroundColor: Colors.transparent,
+              onTap: timetableVM.refreshTimetable,
+              child: TimetableWidget(
+                isCompact: true,
+                courses: timetableVM.timetable?.courses,
+              ),
+            );
+          },
         );
       case WidgetType.settings:
         // 设置按钮通常由托盘管理，但在布局中预留位置
@@ -282,7 +196,6 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   @override
   void dispose() {
     _layoutTimer?.cancel();
-    _countdownSubscription?.cancel();
     super.dispose();
   }
 
@@ -318,12 +231,12 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '桌面小组件已禁用',
+                      AppLocalizations.of(context)!.desktopWidgetDisabled,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '请在设置中启用，或右键托盘图标进行设置',
+                      AppLocalizations.of(context)!.desktopWidgetDisabledHint,
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -339,7 +252,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
 
           // 如果布局为空，使用默认布局
           if (_layout == null) {
-            return const Center(child: Text('无法加载布局'));
+            return Center(child: Text(AppLocalizations.of(context)!.error));
           }
 
           final layout = _layout!;

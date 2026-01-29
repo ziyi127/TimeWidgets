@@ -224,105 +224,148 @@ class DailyCourse {
   }
 }
 
-/// 课表触发规则 (兼容 ClassIsland TimeRule)
-class ScheduleTriggerRule {
-  const ScheduleTriggerRule({
-    required this.weekDay,
-    this.weekType = WeekType.both,
-    this.isEnabled = true,
+/// 触发条件
+class TriggerCondition {
+  const TriggerCondition({
+    required this.id,
+    this.dates,
+    this.weekDays,
+    this.weekNumbers,
+    this.startWeek,
+    this.endWeek,
   });
 
-  factory ScheduleTriggerRule.fromJson(Map<String, dynamic> json) {
-    return ScheduleTriggerRule(
-      weekDay: json['weekDay'] as int,
-      weekType: WeekType.values[json['weekType'] as int? ?? 2],
-      isEnabled: json['isEnabled'] as bool? ?? true,
+  factory TriggerCondition.fromJson(Map<String, dynamic> json) {
+    return TriggerCondition(
+      id: json['id'] as String? ?? DateTime.now().toIso8601String(),
+      dates: (json['dates'] as List?)?.map((e) => DateTime.parse(e as String)).toList(),
+      weekDays: (json['weekDays'] as List?)?.map((e) => e as int).toList(),
+      weekNumbers: (json['weekNumbers'] as List?)?.map((e) => e as int).toList(),
+      startWeek: json['startWeek'] as int?,
+      endWeek: json['endWeek'] as int?,
     );
   }
-  final int weekDay; // 0-6, 0=周日
-  final WeekType weekType;
-  final bool isEnabled;
 
-  /// 检查是否匹配指定日期
-  bool matches(DateTime date, {int? currentWeekNumber}) {
-    if (!isEnabled) return false;
-
-    // 检查星期几 (DateTime: 1=周一...7=周日, 我们: 0=周日, 1=周一...)
-    final dateWeekDay = date.weekday == 7 ? 0 : date.weekday;
-    if (dateWeekDay != weekDay) return false;
-
-    // 检查周类型
-    if (weekType == WeekType.both) return true;
-
-    // 计算周数 (如果未提供)
-    final weekNum = currentWeekNumber ?? _calculateWeekNumber(date);
-
-    final isOddWeek = weekNum % 2 == 1;
-    if (weekType == WeekType.single && isOddWeek) return true;
-    if (weekType == WeekType.double && !isOddWeek) return true;
-
-    return false;
-  }
-
-  /// 计算周数 (1-based)
-  int _calculateWeekNumber(DateTime date) {
-    final firstDayOfYear = DateTime(date.year);
-    final firstMonday = firstDayOfYear.weekday > DateTime.monday
-        ? firstDayOfYear.add(Duration(days: 8 - firstDayOfYear.weekday))
-        : firstDayOfYear;
-
-    if (date.isBefore(firstMonday)) {
-      return _calculateWeekNumber(date.subtract(const Duration(days: 7)));
-    }
-
-    return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
-  }
-
-  ScheduleTriggerRule copyWith({
-    int? weekDay,
-    WeekType? weekType,
-    bool? isEnabled,
-  }) {
-    return ScheduleTriggerRule(
-      weekDay: weekDay ?? this.weekDay,
-      weekType: weekType ?? this.weekType,
-      isEnabled: isEnabled ?? this.isEnabled,
-    );
-  }
+  final String id;
+  final List<DateTime>? dates; // 具体日期
+  final List<int>? weekDays; // 星期几 (0-6)
+  final List<int>? weekNumbers; // 指定周次
+  final int? startWeek; // 开始周
+  final int? endWeek; // 结束周
 
   Map<String, dynamic> toJson() {
     return {
-      'weekDay': weekDay,
-      'weekType': weekType.index,
-      'isEnabled': isEnabled,
+      'id': id,
+      'dates': dates?.map((e) => e.toIso8601String()).toList(),
+      'weekDays': weekDays,
+      'weekNumbers': weekNumbers,
+      'startWeek': startWeek,
+      'endWeek': endWeek,
     };
+  }
+
+  /// 检查是否匹配
+  bool matches(DateTime date, {int? currentWeekNumber}) {
+    // 1. 检查具体日期
+    if (dates != null && dates!.isNotEmpty) {
+      // ignore: unused_local_variable
+      final dateStr = "${date.year}-${date.month}-${date.day}";
+      final matchesDate = dates!.any((d) => 
+        d.year == date.year && d.month == date.month && d.day == date.day
+      );
+      // 如果指定了日期，必须匹配日期 (或者与其他条件是 OR 关系? 用户说是组合条件，通常一个Condition内是AND)
+      // 用户需求： "支持组合条件（如：每月的第一个星期一，或第2、4、6周等）"
+      // "每月的第一个星期一" -> WeekDay=1 AND DayOfMonth <= 7? 
+      // 这里的简单模型可能无法覆盖所有自然语言描述，但 Specific Date, Weekday, Week Number 是基础。
+      // 假设 Condition 内字段是 AND 关系。
+      if (!matchesDate) return false;
+    }
+
+    // 2. 检查星期
+    if (weekDays != null && weekDays!.isNotEmpty) {
+      final dateWeekDay = date.weekday == 7 ? 0 : date.weekday;
+      if (!weekDays!.contains(dateWeekDay)) return false;
+    }
+
+    // 3. 检查周次
+    if (currentWeekNumber != null) {
+      if (weekNumbers != null && weekNumbers!.isNotEmpty) {
+        if (!weekNumbers!.contains(currentWeekNumber)) return false;
+      }
+      if (startWeek != null && currentWeekNumber < startWeek!) return false;
+      if (endWeek != null && currentWeekNumber > endWeek!) return false;
+    }
+
+    return true;
+  }
+  
+  TriggerCondition copyWith({
+    String? id,
+    List<DateTime>? dates,
+    List<int>? weekDays,
+    List<int>? weekNumbers,
+    int? startWeek,
+    int? endWeek,
+  }) {
+    return TriggerCondition(
+      id: id ?? this.id,
+      dates: dates ?? this.dates,
+      weekDays: weekDays ?? this.weekDays,
+      weekNumbers: weekNumbers ?? this.weekNumbers,
+      startWeek: startWeek ?? this.startWeek,
+      endWeek: endWeek ?? this.endWeek,
+    );
   }
 }
 
 /// 课表 (兼容 ClassIsland ClassPlan)
 class Schedule {
-  // 临时层来源课表ID
-
   const Schedule({
     required this.id,
     required this.name,
     this.timeLayoutId,
-    required this.triggerRule,
+    this.groupId,
+    this.triggers = const [],
+    this.dayTimeLayoutIds = const {},
     this.courses = const [],
     this.isAutoEnabled = true,
     this.priority = 0,
     this.isOverlay = false,
     this.overlaySourceId,
+    // Deprecated fields kept for migration if needed, but we will remove them from constructor
+    // to force update.
   });
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
+    // Migration logic for old fields could go here
+    var triggers = (json['triggers'] as List?)
+            ?.map((t) => TriggerCondition.fromJson(t as Map<String, dynamic>))
+            .toList() ?? [];
+            
+    // Migrate old triggerRule if triggers is empty and triggerRule exists
+    if (triggers.isEmpty && json['triggerRule'] != null) {
+        // Simple migration logic...
+        try {
+           final oldRuleMap = json['triggerRule'] as Map<String, dynamic>;
+           final weekDay = oldRuleMap['weekDay'] as int?;
+           if (weekDay != null) {
+             triggers.add(TriggerCondition(
+               id: 'migrated_${DateTime.now().millisecondsSinceEpoch}',
+               weekDays: [weekDay],
+             ));
+           }
+        } catch (_) {}
+    }
+
     return Schedule(
       id: json['id'] as String,
       name: json['name'] as String,
       timeLayoutId: json['timeLayoutId'] as String?,
-      triggerRule: ScheduleTriggerRule.fromJson(
-        json['triggerRule'] as Map<String, dynamic>,
-      ),
+      groupId: json['groupId'] as String?,
+      triggers: triggers,
+      dayTimeLayoutIds: (json['dayTimeLayoutIds'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(int.parse(k), v as String),
+      ) ?? {},
       courses: (json['courses'] as List?)
               ?.map((c) => DailyCourse.fromJson(c as Map<String, dynamic>))
               .toList() ??
@@ -333,21 +376,26 @@ class Schedule {
       overlaySourceId: json['overlaySourceId'] as String?,
     );
   }
+  
   final String id;
   final String name;
-  final String? timeLayoutId; // 关联的时间表ID
-  final ScheduleTriggerRule triggerRule;
+  final String? timeLayoutId; // Default fallback layout ID
+  final String? groupId; // 所属分组ID
+  final List<TriggerCondition> triggers; // 触发条件列表 (OR关系)
+  final Map<int, String> dayTimeLayoutIds; // 每天使用的时间表ID (Key: 0-6)
   final List<DailyCourse> courses;
   final bool isAutoEnabled;
-  final int priority; // 优先级 (数字越小优先级越高)
-  final bool isOverlay; // 是否为临时层课表
+  final int priority;
+  final bool isOverlay;
   final String? overlaySourceId;
 
   Schedule copyWith({
     String? id,
     String? name,
     String? timeLayoutId,
-    ScheduleTriggerRule? triggerRule,
+    String? groupId,
+    List<TriggerCondition>? triggers,
+    Map<int, String>? dayTimeLayoutIds,
     List<DailyCourse>? courses,
     bool? isAutoEnabled,
     int? priority,
@@ -358,7 +406,9 @@ class Schedule {
       id: id ?? this.id,
       name: name ?? this.name,
       timeLayoutId: timeLayoutId ?? this.timeLayoutId,
-      triggerRule: triggerRule ?? this.triggerRule,
+      groupId: groupId ?? this.groupId,
+      triggers: triggers ?? this.triggers,
+      dayTimeLayoutIds: dayTimeLayoutIds ?? this.dayTimeLayoutIds,
       courses: courses ?? this.courses,
       isAutoEnabled: isAutoEnabled ?? this.isAutoEnabled,
       priority: priority ?? this.priority,
@@ -372,12 +422,55 @@ class Schedule {
       'id': id,
       'name': name,
       'timeLayoutId': timeLayoutId,
-      'triggerRule': triggerRule.toJson(),
+      'groupId': groupId,
+      'triggers': triggers.map((t) => t.toJson()).toList(),
+      'dayTimeLayoutIds': dayTimeLayoutIds.map((k, v) => MapEntry(k.toString(), v)),
       'courses': courses.map((c) => c.toJson()).toList(),
       'isAutoEnabled': isAutoEnabled,
       'priority': priority,
       'isOverlay': isOverlay,
       'overlaySourceId': overlaySourceId,
+    };
+  }
+}
+
+/// 课表分组
+class ScheduleGroup {
+  const ScheduleGroup({
+    required this.id,
+    required this.name,
+    this.parentId,
+  });
+
+  factory ScheduleGroup.fromJson(Map<String, dynamic> json) {
+    return ScheduleGroup(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      parentId: json['parentId'] as String?,
+    );
+  }
+
+  final String id;
+  final String name;
+  final String? parentId;
+
+  ScheduleGroup copyWith({
+    String? id,
+    String? name,
+    String? parentId,
+  }) {
+    return ScheduleGroup(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      parentId: parentId ?? this.parentId,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'parentId': parentId,
     };
   }
 }
@@ -435,6 +528,7 @@ class TimetableData {
     required this.dailyCourses,
     this.timeLayouts = const [],
     this.schedules = const [],
+    this.groups = const [],
   });
 
   factory TimetableData.fromJson(Map<String, dynamic> json) {
@@ -459,6 +553,10 @@ class TimetableData {
               ?.map((s) => Schedule.fromJson(s as Map<String, dynamic>))
               .toList() ??
           [],
+      groups: (json['groups'] as List?)
+              ?.map((g) => ScheduleGroup.fromJson(g as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
   final List<CourseInfo> courses; // 科目列表
@@ -466,6 +564,7 @@ class TimetableData {
   final List<DailyCourse> dailyCourses; // 日课程安排 (向后兼容)
   final List<TimeLayout> timeLayouts; // 时间表列表
   final List<Schedule> schedules;
+  final List<ScheduleGroup> groups;
 
   TimetableData copyWith({
     List<CourseInfo>? courses,
@@ -473,6 +572,7 @@ class TimetableData {
     List<DailyCourse>? dailyCourses,
     List<TimeLayout>? timeLayouts,
     List<Schedule>? schedules,
+    List<ScheduleGroup>? groups,
   }) {
     return TimetableData(
       courses: courses ?? this.courses,
@@ -480,6 +580,7 @@ class TimetableData {
       dailyCourses: dailyCourses ?? this.dailyCourses,
       timeLayouts: timeLayouts ?? this.timeLayouts,
       schedules: schedules ?? this.schedules,
+      groups: groups ?? this.groups,
     );
   }
 
@@ -490,6 +591,7 @@ class TimetableData {
       'dailyCourses': dailyCourses.map((d) => d.toJson()).toList(),
       'timeLayouts': timeLayouts.map((t) => t.toJson()).toList(),
       'schedules': schedules.map((s) => s.toJson()).toList(),
+      'groups': groups.map((g) => g.toJson()).toList(),
     };
   }
 }

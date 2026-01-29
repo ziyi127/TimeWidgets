@@ -2,9 +2,10 @@
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
 #include <shellapi.h>
+#include <desktop_multi_window/desktop_multi_window_plugin.h>
+#include <flutter/generated_plugin_registrant.h>
 
 #include "flutter_window.h"
-#include "system_tray_manager.h"
 #include "utils.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
@@ -52,6 +53,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
+
+  DesktopMultiWindowSetWindowCreatedCallback([](void *controller) {
+    auto *flutter_view_controller = reinterpret_cast<flutter::FlutterViewController *>(controller);
+    RegisterPlugins(flutter_view_controller->engine());
+  });
 
   ::MSG msg;
   while (::GetMessage(&msg, nullptr, 0, 0)) {

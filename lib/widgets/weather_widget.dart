@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/weather_model.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
@@ -33,7 +34,7 @@ class WeatherWidget extends StatelessWidget {
 
     final weather = weatherData;
     final temperature = weather?.temperature ?? 20;
-    final description = weather?.description ?? '加载中..';
+    final description = weather?.description ?? AppLocalizations.of(context)!.loading;
     final humidity = weather?.humidity ?? 65;
     final wind = weather?.wind ?? '微风';
     final cityName = weather?.cityName ?? '北京';
@@ -69,7 +70,7 @@ class WeatherWidget extends StatelessWidget {
                       // 限制文本宽度，避免溢出
                       Flexible(
                         child: Text(
-                          '天气 · $cityName',
+                          '${AppLocalizations.of(context)!.weatherTitle} · $cityName',
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize:
@@ -204,7 +205,7 @@ class WeatherWidget extends StatelessWidget {
             ),
             SizedBox(height: ResponsiveUtils.value(12)),
             Text(
-              '获取天气中...',
+              AppLocalizations.of(context)!.weatherLoading,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -242,7 +243,7 @@ class WeatherWidget extends StatelessWidget {
             SizedBox(width: ResponsiveUtils.value(12)),
             Expanded(
               child: Text(
-                '天气加载失败',
+                AppLocalizations.of(context)!.weatherLoadFailed,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onErrorContainer,
                       fontSize:
@@ -256,7 +257,7 @@ class WeatherWidget extends StatelessWidget {
               TextButton(
                 onPressed: onRetry,
                 child: Text(
-                  '重试',
+                  AppLocalizations.of(context)!.retry,
                   style: TextStyle(
                     color: colorScheme.onErrorContainer,
                     fontSize: 14.0 * fontMultiplier,

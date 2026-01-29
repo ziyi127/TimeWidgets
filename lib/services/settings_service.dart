@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
-class SettingsService {
+class SettingsService extends ChangeNotifier {
   factory SettingsService() => _instance;
 
   SettingsService._internal();
@@ -40,11 +41,13 @@ class SettingsService {
 
       _isInitialized = true;
       _settingsController.add(_currentSettings);
+      notifyListeners();
       return _currentSettings;
     } catch (e) {
       Logger.e('Error loading settings: $e');
       _currentSettings = AppSettings.defaultSettings();
       _isInitialized = true;
+      notifyListeners();
       return _currentSettings;
     }
   }
@@ -56,6 +59,7 @@ class SettingsService {
       await prefs.setString(_settingsKey, jsonEncode(jsonData));
       _currentSettings = settings;
       _settingsController.add(_currentSettings);
+      notifyListeners();
     } catch (e) {
       Logger.e('Error saving settings: $e');
       throw Exception('Failed to save settings');
@@ -68,6 +72,7 @@ class SettingsService {
       await prefs.remove(_settingsKey);
       _currentSettings = AppSettings.defaultSettings();
       _settingsController.add(_currentSettings);
+      notifyListeners();
     } catch (e) {
       Logger.e('Error resetting settings: $e');
       throw Exception('Failed to reset settings');
@@ -76,11 +81,13 @@ class SettingsService {
 
   /// 释放资源
   /// 用于测试环境，重置单例状态
+  @override
   void dispose() {
     // 测试环境下重置状态
     _isInitialized = false;
     _currentSettings = AppSettings.defaultSettings();
     _settingsController.close();
     Logger.i('SettingsService disposed');
+    super.dispose();
   }
 }

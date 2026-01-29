@@ -88,6 +88,7 @@ class LogManager {
 
   /// 获取当前日志文件
   Future<File> _getCurrentLogFile() async {
+    // ignore: avoid_slow_async_io
     if (_currentLogFile != null && await _currentLogFile!.exists()) {
       return _currentLogFile!;
     }
@@ -98,6 +99,7 @@ class LogManager {
 
     _currentLogFile = File(filePath);
 
+    // ignore: avoid_slow_async_io
     if (await _currentLogFile!.exists()) {
       _currentFileSize = await _currentLogFile!.length();
     } else {
@@ -134,6 +136,7 @@ class LogManager {
   Future<void> _cleanOldLogs() async {
     try {
       final dir = Directory(config.logDirectory);
+    // ignore: avoid_slow_async_io
       if (!await dir.exists()) return;
 
       final cutoffDate = DateTime.now().subtract(
@@ -142,6 +145,7 @@ class LogManager {
 
       await for (final entity in dir.list()) {
         if (entity is File && entity.path.endsWith('.log')) {
+          // ignore: avoid_slow_async_io
           final stat = await entity.stat();
           if (stat.modified.isBefore(cutoffDate)) {
             await entity.delete();
@@ -167,7 +171,9 @@ class LogManager {
 
     try {
       final dir = Directory(config.logDirectory);
-      if (!dir.existsSync()) return results;
+      if (!dir.existsSync()) {
+        return results;
+      }
 
       final files = <File>[];
       final entities = dir.listSync();

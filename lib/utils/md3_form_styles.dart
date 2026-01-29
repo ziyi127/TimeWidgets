@@ -51,7 +51,7 @@ class MD3FormStyles {
           borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
-        filled: false,
+        // filled: false,
       ),
       maxLines: maxLines,
       keyboardType: keyboardType,
@@ -95,12 +95,24 @@ class MD3FormStyles {
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest,
         border: UnderlineInputBorder(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: UnderlineInputBorder(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: UnderlineInputBorder(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
       ),
@@ -126,27 +138,39 @@ class MD3FormStyles {
     Widget? prefixIcon,
     bool enabled = true,
     FormFieldValidator<T>? validator,
+    bool isExpanded = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return DropdownButtonFormField<T>(
-      initialValue: value,
+      // ignore: deprecated_member_use
+      value: value,
       items: items,
       onChanged: enabled ? onChanged : null,
       validator: validator,
+      isExpanded: isExpanded,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: prefixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
+        border: const UnderlineInputBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
+        enabledBorder: UnderlineInputBorder(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         filled: true,

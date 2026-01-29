@@ -139,8 +139,30 @@ class LocalizationService {
     'localization_error': '本地化资源加载失败',
     'unknown_error': '未知错误',
 
-    // 错误解决建议
-    'check_network_connection': '请检查网络连接后重试',
+    // 临时调课
+    'temp_schedule_change': '临时调课',
+    'change_by_day': '按天调课',
+    'change_by_day_desc': '调整某一天的课程安排',
+    'change_by_period': '按节调课',
+    'change_by_period_desc': '调整某一节课的内容',
+    'manage_temp_changes': '管理临时调课',
+    'manage_temp_changes_desc': '查看和删除已设置的调课',
+    'select_date': '选择日期',
+    'select_date_label': '选择要调整的日期：',
+    'select_schedule_label': '选择要使用的课表：',
+    'select_period_label': '选择节次：',
+    'select_course_label': '选择新课程：',
+    'set_temp_schedule_success': '已设置 {date} 的临时课表',
+    'set_temp_change_success': '已设置 {date} 的临时调课',
+    'save_failed': '保存失败',
+    'no_available_schedule': '没有可用的课表，请先创建课表',
+    'no_available_course': '没有可用的课程，请先创建课程',
+    'no_available_period': '没有可用的时间段，请先创建时间表',
+    
+    // 编辑模式
+    'enter_edit_mode': '已进入布局编辑模式，拖动组件可调整位置',
+    'exit_edit_mode': '已退出布局编辑模式',
+
     'check_network_settings': '请检查网络设置',
     'ensure_valid_json': '请确保文件是有效的JSON 格式',
     'free_storage_space': '请清理存储空间后重试',

@@ -1,0 +1,366 @@
+{
+  "appTitle": "智慧课程表",
+  "loading": "加载中...",
+  "retry": "重试",
+  "error": "错误",
+  
+  "weatherTitle": "天气",
+  "weatherLoading": "获取天气中...",
+  "weatherLoadFailed": "天气加载失败",
+  "weatherUnknown": "未知",
+
+  "countdownTitle": "倒计时",
+  "countdownEmpty": "暂无倒计时",
+  "countdownAddHint": "点击添加重要事件",
+  "countdownLoadFailed": "倒计时加载失败",
+  "deleteSuccess": "已删除",
+  "undo": "撤销",
+  "days": "天",
+  "eventExam": "考试",
+  "eventAssignment": "作业",
+  "eventProject": "项目",
+  "eventHoliday": "假期",
+  "eventDefault": "事件",
+
+  "desktopWidgetDisabled": "桌面小组件已禁用",
+  "desktopWidgetDisabledHint": "请在设置中启用，或右键托盘图标进行设置",
+
+  "currentClassTitle": "当前课程",
+  "currentClassEmpty": "当前无课程",
+  "currentClassNext": "下一节",
+  "currentClassLocation": "地点",
+  "currentClassTime": "时间",
+  "currentClassTeacher": "教师",
+  "currentClassLoading": "加载课程中...",
+  "currentClassLoadFailed": "课程加载失败",
+
+  "settingsTitle": "设置",
+  "settingsSaved": "设置已保存",
+  "settingsResetTitle": "重置设置",
+  "settingsResetMessage": "确定要将所有设置恢复为默认值吗？此操作无法撤销。",
+  "settingsResetConfirm": "重置",
+  "settingsResetSuccess": "设置已重置",
+  "resetToDefault": "重置为默认值",
+  "select": "选择",
+  "cancel": "取消",
+  "confirm": "确定",
+  "change": "更改",
+  "notSet": "未设置",
+  "keepUnchanged": "保持不变",
+
+  "generalSettings": "常规设置",
+  "language": "语言",
+  "languageZh": "简体中文",
+  "languageEn": "English",
+
+  "appearanceSettings": "外观设置",
+  "themeMode": "主题模式",
+  "themeModeSystem": "跟随系统",
+  "themeModeLight": "浅色",
+  "themeModeDark": "深色",
+  "dynamicColor": "动态颜色",
+  "dynamicColorSubtitle": "使用 Material You 动态取色",
+  "followSystemColor": "跟随系统颜色",
+  "followSystemColorSubtitle": "使用系统的强调色",
+  "seedColor": "种子颜色",
+  "seedColorSubtitle": "自定义应用主题颜色",
+  "selectSeedColor": "选择种子颜色",
+  "fontSize": "字体大小",
+  "borderRadius": "圆角大小",
+  "componentOpacity": "组件透明度",
+  "shadowStrength": "阴影强度",
+  "enableGradients": "启用渐变效果",
+  "enableGradientsSubtitle": "为按钮和卡片添加渐变效果",
+  "uiScale": "界面缩放",
+
+  "widgetDisplaySettings": "小部件显示",
+  "timeDisplay": "时间显示",
+  "timeDisplaySubtitle": "在主屏幕显示时间",
+  "dateDisplay": "日期显示",
+  "dateDisplaySubtitle": "在主屏幕显示日期",
+  "weekDisplay": "周数显示",
+  "weekDisplaySubtitle": "在主屏幕显示当前周数",
+  "weatherDisplay": "天气显示",
+  "weatherDisplaySubtitle": "在主屏幕显示天气信息",
+  "weatherLocation": "天气地区",
+  "countdownDisplay": "倒计时显示",
+  "countdownDisplaySubtitle": "在主屏幕显示倒计时",
+  "currentClassDisplay": "当前课程显示",
+  "currentClassDisplaySubtitle": "在主屏幕显示当前课程",
+  "desktopWidgets": "桌面小组件",
+  "enableDesktopWidgets": "启用桌面小组件",
+  "enableDesktopWidgetsSubtitle": "在桌面上显示小组件",
+
+  "semesterSettings": "学期设置",
+  "semesterStartDate": "学期开始日期",
+
+  "refreshSettings": "刷新间隔",
+  "weatherRefreshInterval": "天气刷新间隔",
+  "countdownRefreshInterval": "倒计时刷新间隔",
+
+  "timeSyncSettings": "时间同步",
+  "autoNtpSync": "自动NTP同步",
+  "autoNtpSyncSubtitle": "开启后将自动校准系统时间",
+  "ntpServer": "NTP服务器",
+  "modifyNtpServer": "修改NTP服务器",
+  "serverAddress": "服务器地址",
+  "syncInterval": "同步间隔",
+  "currentStatus": "当前状态",
+  "timeOffset": "时间偏移",
+  "syncNow": "立即同步",
+
+  "notificationSettings": "通知设置",
+  "enableNotifications": "启用通知",
+  "enableNotificationsSubtitle": "接收课程和倒计时提醒",
+  "courseReminder": "课程提醒",
+  "courseReminderSubtitle": "开启后将在课程开始前提醒",
+  "voiceReminder": "语音提醒",
+  "voiceReminderSubtitle": "开启后将使用系统语音播报课程提醒",
+  "classStartNotification": "课程开始通知",
+  "classStartNotificationSubtitle": "在课程开始时发送通知",
+  "classEndNotification": "课程结束通知",
+  "classEndNotificationSubtitle": "在课程结束时发送通知",
+  "countdownNotification": "倒计时通知",
+  "countdownNotificationSubtitle": "在倒计时结束时发送通知",
+
+  "startupSettings": "启动行为",
+  "startWithWindows": "开机自启",
+  "startWithWindowsSubtitle": "随系统启动时自动运行应用",
+  "minimizeToTray": "最小化到托盘",
+  "minimizeToTraySubtitle": "关闭窗口时最小化到系统托盘",
+
+  "advancedSettings": "高级设置",
+  "debugMode": "调试模式",
+  "debugModeSubtitle": "显示调试信息和日志",
+  "performanceMonitoring": "性能监控",
+  "performanceMonitoringSubtitle": "监控应用性能指标",
+  "apiBaseUrl": "API基础地址",
+  "modifyApiBaseUrl": "修改API基础地址",
+  "apiUrl": "API地址",
+
+  "interconnectionSettings": "设备互联",
+  "experimental": "实验性",
+  "interconnectionSubtitle": "连接其他设备以同步课表和设置",
+  "securityWarning": "安全警告",
+  "securityWarningMessage": "设备互联功能使用未加密的局域网广播和传输协议。\n\n开启此功能后，您的设备名称、IP地址以及同步的课表数据可能会被局域网内的其他用户获取。\n\n请确保您仅在受信任的网络环境（如家庭WiFi）中使用此功能。是否继续？",
+  "securityWarningConfirm": "我已知晓，继续",
+
+  "aboutSettings": "关于",
+  "aboutApp": "关于应用",
+  "aboutAppSubtitle": "查看应用版本、开发者信息等",
+
+  "minutes": "分钟",
+  "seconds": "秒",
+  "ntpServerHint": "例如: ntp.aliyun.com",
+  "apiUrlHint": "例如: http://localhost:3000/api",
+  
+  "timetableEditTitle": "课表编辑",
+  "tabSchedule": "课表",
+  "tabTimeLayout": "时间表",
+  "tabSubjects": "科目",
+  "saveTimetable": "保存课表",
+  "timetableSaved": "课表数据已保存",
+  "saveFailed": "保存失败: {error}",
+  "@saveFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "courseListTitle": "课程列表 ({count})",
+  "@courseListTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "addCourse": "添加课程",
+  "editCourse": "编辑课程",
+  "noCourses": "暂无课程，请添加课程",
+  "courseName": "课程名称",
+  "pleaseEnterCourseName": "请输入课程名称",
+  "teacherName": "授课教师",
+  "pleaseEnterTeacherName": "请输入教师姓名",
+  "classroom": "教室",
+  "pleaseEnterClassroom": "请输入教室位置",
+  "deleteCourseConfirm": "确定要删除课程\"{courseName}\"吗？",
+  "@deleteCourseConfirm": {
+    "placeholders": {
+      "courseName": { "type": "String" }
+    }
+  },
+  "confirmDelete": "确认删除",
+  "delete": "删除",
+  "save": "保存",
+  "add": "添加",
+  "teacherPrefix": "教师: {name}",
+  "@teacherPrefix": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "classroomPrefix": "教室: {name}",
+  "@classroomPrefix": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+
+  "importSuccess": "已导入: {stats}",
+  "@importSuccess": {
+    "placeholders": {
+      "stats": { "type": "String" }
+    }
+  },
+  "importFailed": "导入失败: {error}",
+  "@importFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "exportSuccess": "课表数据已导出",
+  "exportFailed": "导出失败: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "createTimetable": "创建课表",
+  "selectOrCreateTimetable": "选择或创建一个课表开始编辑",
+  "timetableSettings": "课表设置",
+  "quickSchedule": "快速排课",
+  "deleteTimetable": "删除课表",
+  "timetableName": "课表名称",
+  "copyScheduleTo": "复制课程到...",
+  "copyTo": "复制到 {day}",
+  "@copyTo": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "scheduleCopied": "已复制课程到 {day}",
+  "@scheduleCopied": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "noCourse": "无课程",
+  "clearCourse": "清除课程",
+  "editCourseInfo": "编辑 \"{courseName}\" 信息",
+  "@editCourseInfo": {
+    "placeholders": {
+      "courseName": { "type": "String" }
+    }
+  },
+  "removeFromSlot": "从此时间段移除",
+  "createGroup": "创建分组",
+  "groupName": "分组名称",
+  "enterQuickEditMode": "已进入快速排课模式",
+  "quickEditDoneNextDay": "已完成 {day} 排课，切换至下一天",
+  "@quickEditDoneNextDay": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "quickEditAllDone": "本周排课已完成！",
+  "monday": "周一",
+  "tuesday": "周二",
+  "wednesday": "周三",
+  "thursday": "周四",
+  "friday": "周五",
+  "saturday": "周六",
+  "sunday": "周日",
+
+  "defaultTimeLayout": "默认时间表",
+  "customTimeLayouts": "自定义时间表列表",
+  "noCustomLayouts": "暂无自定义时间表",
+  "addTimeLayout": "添加时间表",
+  "timeLayoutName": "时间表名称",
+  "addTimeSlot": "添加时间段",
+  "editTimeSlot": "编辑时间点",
+  "noTimeSlots": "暂无时间点",
+  "addTimeSlotHint": "添加时间点来定义课程时间",
+  "startTime": "开始时间",
+  "endTime": "结束时间",
+  "timePointType": "类型",
+  "typeClass": "上课",
+  "typeBreak": "课间休息",
+  "typeDivider": "分割线",
+  "durationMinutes": "{minutes}分钟",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "exampleTimeLayoutName": "例如: 周末时间表",
+  "exampleScheduleName": "例如: 夏季作息",
+  "exampleTimeSlotName": "例如: 第一节",
+  "name": "名称",
+  "create": "创建",
+  "exampleGroupName": "例如: 第一学期",
+  "timePointsCount": "{count} 个时间点",
+  "@timePointsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "refresh": "刷新",
+  "addFirstCountdown": "点击右下角按钮添加第一个倒计时",
+  "deleteCountdownConfirm": "确定要删除\"{title}\"吗？",
+  "@deleteCountdownConfirm": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "editCountdown": "编辑倒计时",
+  "addCountdown": "添加倒计时",
+  "title": "标题",
+  "enterTitle": "请输入倒计时标题",
+  "pleaseEnterTitle": "请输入标题",
+  "description": "描述",
+  "optionalDescription": "（可选）请输入倒计时描述",
+  "targetDate": "目标日期",
+  "category": "分类",
+  "noCategory": "无分类",
+  "type": "类型",
+  "appName": "时间小组件",
+  "developerInfo": "开发者信息",
+  "developer": "开发者",
+  "email": "联系邮箱",
+  "githubProject": "GitHub项目",
+  "copyright": "© 2025 ziyi127. 保留所有权利。",
+  "license": "基于 Apache License 2.0 开源",
+  "desktopWidgetConfigTitle": "桌面小组件配置",
+  "resetPositions": "重置位置",
+  "usageGuide": "使用说明",
+  "usageGuideContent": "• 切换开关控制小组件的显示隐藏\n• 在桌面小组件界面点击\"编辑布局\"可拖拽调整位置\n• 点击\"重置位置\"恢复默认布局",
+  "widgetManagement": "小组件管理",
+  "positionInfo": "位置: ({x}, {y}) • 尺寸: {width}×{height}",
+  "@positionInfo": {
+    "placeholders": {
+      "x": { "type": "int" },
+      "y": { "type": "int" },
+      "width": { "type": "int" },
+      "height": { "type": "int" }
+    }
+  },
+
+  "todayCourses": "今日课程",
+  "weekSchedule": "本周课表",
+  "weekNumber": "第 {week} 周",
+  "@weekNumber": {
+    "placeholders": {
+      "week": { "type": "int" }
+    }
+  },
+  "dayView": "日",
+  "weekView": "周",
+  "noCourseToday": "今天没有课程",
+  "enjoyFreeTime": "好好享受自由时光吧 ☕",
+  "statusOngoing": "进行中",
+  "statusUpcoming": "即将开始",
+  "statusEnded": "已结束",
+  "loadingWeekSchedule": "正在加载周课表...",
+  "copyToOtherTime": "复制到其他时间",
+  "setReminder": "设置提醒"
+}

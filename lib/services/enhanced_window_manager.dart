@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
+import 'package:screen_retriever/screen_retriever.dart';
 import 'package:time_widgets/utils/logger.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -27,9 +25,6 @@ class EnhancedWindowManager {
     try {
       // 确保窗口管理器已初始化
       await windowManager.ensureInitialized();
-
-      // 等待一帧以确保Flutter完全初始化
-      await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // 获取屏幕信息
       final screenInfo = await _getScreenInfo();
@@ -150,13 +145,10 @@ class EnhancedWindowManager {
   /// 获取屏幕信息
   static Future<Size?> _getScreenInfo() async {
     try {
-      // 优先使用系统调用获取准确的屏幕尺寸（Windows）
-      if (Platform.isWindows) {
-        return await _getWindowsScreenSize();
-      }
-
-      // 其他平台暂时返回null，触发默认尺寸回退
-      return null;
+      // 使用 screen_retriever 获取主屏幕信息 (跨平台)
+      final primaryDisplay = await screenRetriever.getPrimaryDisplay();
+      // primaryDisplay.size is not nullable in newer versions or logic
+      return Size(primaryDisplay.size.width, primaryDisplay.size.height);
     } catch (e) {
       Logger.e('Error getting screen info: $e');
       return null;
@@ -164,37 +156,10 @@ class EnhancedWindowManager {
   }
 
   /// 获取Windows屏幕尺寸
-  static Future<Size?> _getWindowsScreenSize() async {
-    try {
-      // 使用PowerShell获取屏幕分辨率
-      final result = await Process.run('powershell', [
-        '-Command',
-        'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen.Bounds',
-      ]);
-
-      if (result.exitCode == 0) {
-        final output = result.stdout.toString();
-        final regex = RegExp(r'Width=(\d+).*Height=(\d+)');
-        final match = regex.firstMatch(output);
-
-        if (match != null) {
-          final widthStr = match.group(1);
-          final heightStr = match.group(2);
-          if (widthStr != null && heightStr != null) {
-            final width = double.tryParse(widthStr);
-            final height = double.tryParse(heightStr);
-            if (width != null && height != null) {
-              return Size(width, height);
-            }
-          }
-        }
-      }
-    } catch (e) {
-      Logger.e('Failed to get Windows screen size: $e');
-    }
-
-    return null;
-  }
+  // static Future<Size?> _getWindowsScreenSize() async {
+  //   // Deprecated: replaced by screen_retriever
+  //   return null;
+  // }
 
   /// 计算窗口边界
   static Rect _calculateWindowBounds(Size screenSize) {
@@ -387,71 +352,6 @@ class EnhancedWindowManager {
 
   /// 获取最后记录的屏幕尺寸
   static Size? get lastScreenSize => _lastScreenSize;
-
-  static String? _dynamicIslandWindowId;
-
-  /// 切换灵动岛窗口（多窗口共存）
-  static Future<void> toggleDynamicIslandWindow() async {
-    try {
-      if (_dynamicIslandWindowId != null) {
-        // 尝试关闭
-        try {
-          // WindowController.fromWindowId 接收 String 类型的 ID
-          // 且没有 close 方法，我们需要发送消息通知窗口关闭
-          await WindowController.fromWindowId(_dynamicIslandWindowId!)
-              .invokeMethod('close');
-        } catch (e) {
-          Logger.w('Failed to close window: $e');
-        }
-        _dynamicIslandWindowId = null;
-        Logger.i('Closed Dynamic Island window');
-      } else {
-        // Create new
-        try {
-          final controller = await WindowController.create(
-            WindowConfiguration(
-              arguments: jsonEncode({'type': 'dynamic_island'}),
-            ),
-          );
-
-          // Ensure we have a string ID. desktop_multi_window 0.3.0 usually has int ID,
-          // but WindowController uses String?
-          // If controller.windowId is int, toString() handles it.
-          // If it is String, toString() is safe.
-          _dynamicIslandWindowId = controller.windowId;
-
-          final screenSize = await _getScreenInfo() ?? const Size(1920, 1080);
-          const islandWidth = 500.0;
-          const islandHeight = 150.0;
-          final islandX = (screenSize.width - islandWidth) / 2;
-          const islandY = 20.0;
-
-          // Show the window
-          await controller.show();
-
-          // Position the window via method call
-          await controller.invokeMethod('setFrame', {
-            'x': islandX,
-            'y': islandY,
-            'width': islandWidth,
-            'height': islandHeight,
-          });
-
-          Logger.i('Created Dynamic Island window: $_dynamicIslandWindowId');
-        } catch (e) {
-          Logger.e('Failed to create Dynamic Island window: $e');
-          _dynamicIslandWindowId = null;
-        }
-      }
-    } catch (e) {
-      Logger.e('Error toggling Dynamic Island window: $e');
-      _dynamicIslandWindowId = null;
-    }
-  }
-
-  // 废弃的旧方法，保留为空实现以防调用报错，或直接删除
-  static Future<void> switchToDynamicIslandMode() async {}
-  static Future<void> exitDynamicIslandMode() async {}
 
   /// 释放资源
   static void dispose() {

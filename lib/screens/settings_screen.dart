@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/settings_model.dart';
 import 'package:time_widgets/screens/about_screen.dart';
 import 'package:time_widgets/screens/interconnection_screen.dart';
@@ -43,7 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('设置已保存')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
       );
     }
   }
@@ -51,9 +52,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _resetSettings() async {
     final confirmed = await MD3DialogStyles.showConfirmDialog(
       context: context,
-      title: '重置设置',
-      message: '确定要将所有设置恢复为默认值吗？此操作无法撤销。',
-      confirmText: '重置',
+      title: AppLocalizations.of(context)!.settingsResetTitle,
+      message: AppLocalizations.of(context)!.settingsResetMessage,
+      confirmText: AppLocalizations.of(context)!.settingsResetConfirm,
       isDestructive: true,
       icon: const Icon(Icons.restore),
     );
@@ -63,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await _loadSettings();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('设置已重置')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.settingsResetSuccess)),
         );
       }
     }
@@ -102,7 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final selectedColor = await showDialog<Color>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('选择种子颜色'),
+        title: Text(AppLocalizations.of(context)!.selectSeedColor),
         content: SizedBox(
           width: 300,
           child: SingleChildScrollView(
@@ -144,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ElevatedButton(
                   onPressed: () => Navigator.of(dialogContext)
                       .pop(_settings.themeSettings.seedColor),
-                  child: const Text('保持不变'),
+                  child: Text(AppLocalizations.of(context)!.keepUnchanged),
                 ),
               ],
             ),
@@ -153,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('取消'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
         ],
       ),
@@ -180,14 +181,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('设置')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('设置'),
+        title: Text(AppLocalizations.of(context)!.settingsTitle),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
@@ -196,7 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           IconButton(
             icon: const Icon(Icons.restore),
             onPressed: _resetSettings,
-            tooltip: '重置为默认值',
+            tooltip: AppLocalizations.of(context)!.resetToDefault,
           ),
         ],
       ),
@@ -234,17 +235,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '常规设置',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.generalSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.language_outlined),
-            title: const Text('语言'),
-            subtitle: Text(_settings.language == 'zh' ? '简体中文' : 'English'),
+            title: Text(AppLocalizations.of(context)!.language),
+            subtitle: Text(_settings.language == 'zh' 
+              ? AppLocalizations.of(context)!.languageZh 
+              : AppLocalizations.of(context)!.languageEn),
             trailing: DropdownButton<String>(
               value: _settings.language,
               underline: const SizedBox(),
@@ -253,14 +256,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _saveSettings(_settings.copyWith(language: newValue));
                 }
               },
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'zh',
-                  child: Text('简体中文'),
+                  child: Text(AppLocalizations.of(context)!.languageZh),
                 ),
                 DropdownMenuItem(
                   value: 'en',
-                  child: Text('English'),
+                  child: Text(AppLocalizations.of(context)!.languageEn),
                 ),
               ],
             ),
@@ -275,21 +278,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '外观设置',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.appearanceSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: DropdownButtonFormField<ThemeMode>(
               initialValue: _settings.themeSettings.themeMode,
-              decoration: const InputDecoration(
-                labelText: '主题模式',
-                prefixIcon: Icon(Icons.brightness_6_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.themeMode,
+                prefixIcon: const Icon(Icons.brightness_6_outlined),
+                border: const OutlineInputBorder(),
               ),
               onChanged: (value) async {
                 if (value != null) {
@@ -303,26 +306,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   await _themeService.saveSettings(newThemeSettings);
                 }
               },
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: ThemeMode.system,
-                  child: Text('跟随系统'),
+                  child: Text(AppLocalizations.of(context)!.themeModeSystem),
                 ),
                 DropdownMenuItem(
                   value: ThemeMode.light,
-                  child: Text('浅色'),
+                  child: Text(AppLocalizations.of(context)!.themeModeLight),
                 ),
                 DropdownMenuItem(
                   value: ThemeMode.dark,
-                  child: Text('深色'),
+                  child: Text(AppLocalizations.of(context)!.themeModeDark),
                 ),
               ],
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.auto_awesome_outlined),
-            title: const Text('动态颜色'),
-            subtitle: const Text('使用 Material You 动态取色'),
+            title: Text(AppLocalizations.of(context)!.dynamicColor),
+            subtitle: Text(AppLocalizations.of(context)!.dynamicColorSubtitle),
             value: _settings.themeSettings.useDynamicColor,
             onChanged: (value) async {
               final newThemeSettings =
@@ -335,8 +338,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.wallpaper),
-            title: const Text('跟随系统颜色'),
-            subtitle: const Text('使用系统的强调色'),
+            title: Text(AppLocalizations.of(context)!.followSystemColor),
+            subtitle: Text(AppLocalizations.of(context)!.followSystemColorSubtitle),
             value: _settings.themeSettings.useSystemColor,
             onChanged: (value) async {
               final newThemeSettings =
@@ -352,8 +355,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.palette_outlined),
-            title: const Text('种子颜色'),
-            subtitle: const Text('自定义应用主题颜色'),
+            title: Text(AppLocalizations.of(context)!.seedColor),
+            subtitle: Text(AppLocalizations.of(context)!.seedColorSubtitle),
             enabled: !_settings.themeSettings.useSystemColor,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -374,7 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: _settings.themeSettings.useSystemColor
                       ? null
                       : _showColorPicker,
-                  child: const Text('选择'),
+                  child: Text(AppLocalizations.of(context)!.select),
                 ),
               ],
             ),
@@ -393,7 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Icon(Icons.text_fields_outlined),
                     const SizedBox(width: 16),
                     Text(
-                      '字体大小: ${_settings.themeSettings.fontSizeScale.toStringAsFixed(1)}x',
+                      '${AppLocalizations.of(context)!.fontSize}: ${_settings.themeSettings.fontSizeScale.toStringAsFixed(1)}x',
                       style: theme.textTheme.titleMedium,
                     ),
                   ],
@@ -429,7 +432,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Icon(Icons.rounded_corner_outlined),
                     const SizedBox(width: 16),
                     Text(
-                      '圆角大小: ${_settings.themeSettings.borderRadiusScale.toStringAsFixed(1)}x',
+                      '${AppLocalizations.of(context)!.borderRadius}: ${_settings.themeSettings.borderRadiusScale.toStringAsFixed(1)}x',
                       style: theme.textTheme.titleMedium,
                     ),
                   ],
@@ -466,7 +469,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Icon(Icons.opacity_outlined),
                     const SizedBox(width: 16),
                     Text(
-                      '组件透明度: ${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
+                      '${AppLocalizations.of(context)!.componentOpacity}: ${(_settings.themeSettings.componentOpacity * 100).toStringAsFixed(0)}%',
                       style: theme.textTheme.titleMedium,
                     ),
                   ],
@@ -502,7 +505,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Icon(Icons.light_mode_outlined),
                     const SizedBox(width: 16),
                     Text(
-                      '阴影强度: ${_settings.themeSettings.shadowStrength.toStringAsFixed(1)}x',
+                      '${AppLocalizations.of(context)!.shadowStrength}: ${_settings.themeSettings.shadowStrength.toStringAsFixed(1)}x',
                       style: theme.textTheme.titleMedium,
                     ),
                   ],
@@ -530,8 +533,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.gradient_outlined),
-            title: const Text('启用渐变效果'),
-            subtitle: const Text('为按钮和卡片添加渐变效果'),
+            title: Text(AppLocalizations.of(context)!.enableGradients),
+            subtitle: Text(AppLocalizations.of(context)!.enableGradientsSubtitle),
             value: _settings.themeSettings.enableGradients,
             onChanged: (value) async {
               final newThemeSettings = _settings.themeSettings
@@ -552,7 +555,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Icon(Icons.display_settings_outlined),
                     const SizedBox(width: 16),
                     Text(
-                      '界面缩放: ${_settings.uiScale.toStringAsFixed(1)}x',
+                      '${AppLocalizations.of(context)!.uiScale}: ${_settings.uiScale.toStringAsFixed(1)}x',
                       style: theme.textTheme.titleMedium,
                     ),
                   ],
@@ -582,17 +585,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '小部件显示',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.widgetDisplaySettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.access_time_outlined),
-            title: const Text('时间显示'),
-            subtitle: const Text('在主屏幕显示时间'),
+            title: Text(AppLocalizations.of(context)!.timeDisplay),
+            subtitle: Text(AppLocalizations.of(context)!.timeDisplaySubtitle),
             value: _settings.showTimeDisplayWidget,
             onChanged: (value) {
               _saveSettings(
@@ -602,8 +605,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.calendar_today_outlined),
-            title: const Text('日期显示'),
-            subtitle: const Text('在主屏幕显示日期'),
+            title: Text(AppLocalizations.of(context)!.dateDisplay),
+            subtitle: Text(AppLocalizations.of(context)!.dateDisplaySubtitle),
             value: _settings.showDateDisplayWidget,
             onChanged: (value) {
               _saveSettings(
@@ -613,8 +616,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.calendar_view_week_outlined),
-            title: const Text('周数显示'),
-            subtitle: const Text('在主屏幕显示当前周数'),
+            title: Text(AppLocalizations.of(context)!.weekDisplay),
+            subtitle: Text(AppLocalizations.of(context)!.weekDisplaySubtitle),
             value: _settings.showWeekDisplayWidget,
             onChanged: (value) {
               _saveSettings(
@@ -624,8 +627,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.cloud_outlined),
-            title: const Text('天气显示'),
-            subtitle: const Text('在主屏幕显示天气信息'),
+            title: Text(AppLocalizations.of(context)!.weatherDisplay),
+            subtitle: Text(AppLocalizations.of(context)!.weatherDisplaySubtitle),
             value: _settings.showWeatherWidget,
             onChanged: (value) {
               _saveSettings(_settings.copyWith(showWeatherWidget: value));
@@ -633,8 +636,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.location_on_outlined),
-            title: const Text('天气地区'),
-            subtitle: Text(_settings.cityName ?? '未设置'),
+            title: Text(AppLocalizations.of(context)!.weatherLocation),
+            subtitle: Text(_settings.cityName ?? AppLocalizations.of(context)!.notSet),
             trailing: ElevatedButton(
               onPressed: () async {
                 final city = await showDialog<Map<String, dynamic>>(
@@ -651,13 +654,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                 }
               },
-              child: const Text('更改'),
+              child: Text(AppLocalizations.of(context)!.change),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.timer_outlined),
-            title: const Text('倒计时显示'),
-            subtitle: const Text('在主屏幕显示倒计时'),
+            title: Text(AppLocalizations.of(context)!.countdownDisplay),
+            subtitle: Text(AppLocalizations.of(context)!.countdownDisplaySubtitle),
             value: _settings.showCountdownWidget,
             onChanged: (value) {
               _saveSettings(
@@ -667,8 +670,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.school_outlined),
-            title: const Text('当前课程显示'),
-            subtitle: const Text('在主屏幕显示当前课程'),
+            title: Text(AppLocalizations.of(context)!.currentClassDisplay),
+            subtitle: Text(AppLocalizations.of(context)!.currentClassDisplaySubtitle),
             value: _settings.showCurrentClassWidget,
             onChanged: (value) {
               _saveSettings(
@@ -676,17 +679,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               );
             },
           ),
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '桌面小组件',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.desktopWidgets,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.desktop_windows_outlined),
-            title: const Text('启用桌面小组件'),
-            subtitle: const Text('在桌面上显示小组件'),
+            title: Text(AppLocalizations.of(context)!.enableDesktopWidgets),
+            subtitle: Text(AppLocalizations.of(context)!.enableDesktopWidgetsSubtitle),
             value: _settings.enableDesktopWidgets,
             onChanged: (value) {
               _saveSettings(
@@ -704,27 +707,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '学期设置',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.semesterSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.calendar_today),
-            title: const Text('学期开始日期'),
+            title: Text(AppLocalizations.of(context)!.semesterStartDate),
             subtitle: Text(
               () {
                 final date = _settings.semesterStartDate;
                 return date != null
                     ? '${date.year}年${date.month}月${date.day}日'
-                    : '未设置';
+                    : AppLocalizations.of(context)!.notSet;
               }(),
             ),
             trailing: ElevatedButton(
               onPressed: _selectSemesterStartDate,
-              child: const Text('选择'),
+              child: Text(AppLocalizations.of(context)!.select),
             ),
           ),
         ],
@@ -737,17 +740,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '刷新间隔',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.refreshSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.cloud_sync_outlined),
-            title: const Text('天气刷新间隔'),
-            subtitle: Text('${_settings.weatherRefreshInterval} 分钟'),
+            title: Text(AppLocalizations.of(context)!.weatherRefreshInterval),
+            subtitle: Text('${_settings.weatherRefreshInterval} ${AppLocalizations.of(context)!.minutes}'),
             trailing: SizedBox(
               width: 120,
               child: Row(
@@ -781,8 +784,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.timer_outlined),
-            title: const Text('倒计时刷新间隔'),
-            subtitle: Text('${_settings.countdownRefreshInterval} 秒'),
+            title: Text(AppLocalizations.of(context)!.countdownRefreshInterval),
+            subtitle: Text('${_settings.countdownRefreshInterval} ${AppLocalizations.of(context)!.seconds}'),
             trailing: SizedBox(
               width: 120,
               child: Row(
@@ -824,17 +827,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '时间同步',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.timeSyncSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.sync_rounded),
-            title: const Text('自动NTP同步'),
-            subtitle: const Text('开启后将自动校准系统时间'),
+            title: Text(AppLocalizations.of(context)!.autoNtpSync),
+            subtitle: Text(AppLocalizations.of(context)!.autoNtpSyncSubtitle),
             value: _settings.enableNtpSync,
             onChanged: (value) {
               _saveSettings(_settings.copyWith(enableNtpSync: value));
@@ -843,7 +846,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (_settings.enableNtpSync) ...[
             ListTile(
               leading: const Icon(Icons.dns_outlined),
-              title: const Text('NTP服务器'),
+              title: Text(AppLocalizations.of(context)!.ntpServer),
               subtitle: Text(_settings.ntpServer),
               trailing: IconButton(
                 icon: const Icon(Icons.edit_outlined),
@@ -853,23 +856,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final result = await showDialog<String>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('修改NTP服务器'),
+                      title: Text(AppLocalizations.of(context)!.modifyNtpServer),
                       content: TextField(
                         controller: controller,
-                        decoration: const InputDecoration(
-                          labelText: '服务器地址',
-                          hintText: '例如: ntp.aliyun.com',
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.serverAddress,
+                          hintText: AppLocalizations.of(context)!.ntpServerHint,
                         ),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('取消'),
+                          child: Text(AppLocalizations.of(context)!.cancel),
                         ),
                         TextButton(
                           onPressed: () =>
                               Navigator.pop(context, controller.text),
-                          child: const Text('确定'),
+                          child: Text(AppLocalizations.of(context)!.confirm),
                         ),
                       ],
                     ),
@@ -886,8 +889,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.timer_outlined),
-              title: const Text('同步间隔'),
-              subtitle: Text('${_settings.ntpSyncInterval} 分钟'),
+              title: Text(AppLocalizations.of(context)!.syncInterval),
+              subtitle: Text('${_settings.ntpSyncInterval} ${AppLocalizations.of(context)!.minutes}'),
               trailing: SizedBox(
                 width: 120,
                 child: Row(
@@ -921,14 +924,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('当前状态'),
-              subtitle: Text('时间偏移: ${NtpService().offset}ms'),
+              title: Text(AppLocalizations.of(context)!.currentStatus),
+              subtitle: Text('${AppLocalizations.of(context)!.timeOffset}: ${NtpService().offset}ms'),
               trailing: TextButton(
                 onPressed: () async {
                   await NtpService().syncTime();
                   setState(() {});
                 },
-                child: const Text('立即同步'),
+                child: Text(AppLocalizations.of(context)!.syncNow),
               ),
             ),
           ],
@@ -943,17 +946,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '通知设置',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.notificationSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.notifications_outlined),
-            title: const Text('启用通知'),
-            subtitle: const Text('接收课程和倒计时提醒'),
+            title: Text(AppLocalizations.of(context)!.enableNotifications),
+            subtitle: Text(AppLocalizations.of(context)!.enableNotificationsSubtitle),
             value: _settings.enableNotifications,
             onChanged: (value) {
               _saveSettings(
@@ -964,8 +967,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (_settings.enableNotifications) ...[
             SwitchListTile(
               secondary: const Icon(Icons.access_time_outlined),
-              title: const Text('课程提醒'),
-              subtitle: const Text('开启后将在课程开始前提醒'),
+              title: Text(AppLocalizations.of(context)!.courseReminder),
+              subtitle: Text(AppLocalizations.of(context)!.courseReminderSubtitle),
               value: _settings.enableCourseReminder,
               onChanged: (value) {
                 _saveSettings(
@@ -975,8 +978,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchListTile(
               secondary: const Icon(Icons.volume_up_outlined),
-              title: const Text('语音提醒'),
-              subtitle: const Text('开启后将使用系统语音播报课程提醒'),
+              title: Text(AppLocalizations.of(context)!.voiceReminder),
+              subtitle: Text(AppLocalizations.of(context)!.voiceReminderSubtitle),
               value: _settings.enableTtsForReminder,
               onChanged: (value) {
                 _saveSettings(
@@ -986,8 +989,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchListTile(
               secondary: const Icon(Icons.class_outlined),
-              title: const Text('课程开始通知'),
-              subtitle: const Text('在课程开始时发送通知'),
+              title: Text(AppLocalizations.of(context)!.classStartNotification),
+              subtitle: Text(AppLocalizations.of(context)!.classStartNotificationSubtitle),
               value: _settings.showNotificationOnClassStart,
               onChanged: (value) {
                 _saveSettings(
@@ -999,8 +1002,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchListTile(
               secondary: const Icon(Icons.class_outlined),
-              title: const Text('课程结束通知'),
-              subtitle: const Text('在课程结束时发送通知'),
+              title: Text(AppLocalizations.of(context)!.classEndNotification),
+              subtitle: Text(AppLocalizations.of(context)!.classEndNotificationSubtitle),
               value: _settings.showNotificationOnClassEnd,
               onChanged: (value) {
                 _saveSettings(
@@ -1012,8 +1015,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchListTile(
               secondary: const Icon(Icons.timer_outlined),
-              title: const Text('倒计时通知'),
-              subtitle: const Text('在倒计时结束时发送通知'),
+              title: Text(AppLocalizations.of(context)!.countdownNotification),
+              subtitle: Text(AppLocalizations.of(context)!.countdownNotificationSubtitle),
               value: _settings.showNotificationForCountdown,
               onChanged: (value) {
                 _saveSettings(
@@ -1034,17 +1037,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '启动行为',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.startupSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.start_outlined),
-            title: const Text('开机自启'),
-            subtitle: const Text('随系统启动时自动运行应用'),
+            title: Text(AppLocalizations.of(context)!.startWithWindows),
+            subtitle: Text(AppLocalizations.of(context)!.startWithWindowsSubtitle),
             value: _settings.startWithWindows,
             onChanged: (value) async {
               if (value) {
@@ -1057,8 +1060,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.minimize_outlined),
-            title: const Text('最小化到托盘'),
-            subtitle: const Text('关闭窗口时最小化到系统托盘'),
+            title: Text(AppLocalizations.of(context)!.minimizeToTray),
+            subtitle: Text(AppLocalizations.of(context)!.minimizeToTraySubtitle),
             value: _settings.minimizeToTray,
             onChanged: (value) {
               _saveSettings(_settings.copyWith(minimizeToTray: value));
@@ -1074,17 +1077,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '高级设置',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.advancedSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.developer_mode_outlined),
-            title: const Text('调试模式'),
-            subtitle: const Text('显示调试信息和日志'),
+            title: Text(AppLocalizations.of(context)!.debugMode),
+            subtitle: Text(AppLocalizations.of(context)!.debugModeSubtitle),
             value: _settings.enableDebugMode,
             onChanged: (value) {
               _saveSettings(_settings.copyWith(enableDebugMode: value));
@@ -1092,8 +1095,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.speed_outlined),
-            title: const Text('性能监控'),
-            subtitle: const Text('监控应用性能指标'),
+            title: Text(AppLocalizations.of(context)!.performanceMonitoring),
+            subtitle: Text(AppLocalizations.of(context)!.performanceMonitoringSubtitle),
             value: _settings.enablePerformanceMonitoring,
             onChanged: (value) {
               _saveSettings(
@@ -1103,7 +1106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.api_outlined),
-            title: const Text('API基础地址'),
+            title: Text(AppLocalizations.of(context)!.apiBaseUrl),
             subtitle: Text(_settings.apiBaseUrl),
             trailing: IconButton(
               icon: const Icon(Icons.edit_outlined),
@@ -1113,23 +1116,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final result = await showDialog<String>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('修改API基础地址'),
+                    title: Text(AppLocalizations.of(context)!.modifyApiBaseUrl),
                     content: TextField(
                       controller: controller,
-                      decoration: const InputDecoration(
-                        labelText: 'API地址',
-                        hintText: '例如: http://localhost:3000/api',
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.apiUrl,
+                        hintText: AppLocalizations.of(context)!.apiUrlHint,
                       ),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('取消'),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                       TextButton(
                         onPressed: () =>
                             Navigator.pop(context, controller.text),
-                        child: const Text('确定'),
+                        child: Text(AppLocalizations.of(context)!.confirm),
                       ),
                     ],
                   ),
@@ -1156,9 +1159,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const Text(
-                  '设备互联',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Text(
+                  AppLocalizations.of(context)!.interconnectionSettings,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
                 Container(
@@ -1169,7 +1172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    '实验性',
+                    AppLocalizations.of(context)!.experimental,
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onErrorContainer,
@@ -1181,16 +1184,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.devices_other),
-            title: const Text('设备互联'),
-            subtitle: const Text('连接其他设备以同步课表和设置'),
+            title: Text(AppLocalizations.of(context)!.interconnectionSettings),
+            subtitle: Text(AppLocalizations.of(context)!.interconnectionSubtitle),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () async {
               final confirm = await MD3DialogStyles.showConfirmDialog(
                 context: context,
-                title: '安全警告',
-                message:
-                    '设备互联功能使用未加密的局域网广播和传输协议。\n\n开启此功能后，您的设备名称、IP地址以及同步的课表数据可能会被局域网内的其他用户获取。\n\n请确保您仅在受信任的网络环境（如家庭WiFi）中使用此功能。是否继续？',
-                confirmText: '我已知晓，继续',
+                title: AppLocalizations.of(context)!.securityWarning,
+                message: AppLocalizations.of(context)!.securityWarningMessage,
+                confirmText: AppLocalizations.of(context)!.securityWarningConfirm,
                 icon: Icon(Icons.warning_amber_rounded,
                     color: theme.colorScheme.error,),
               );
@@ -1199,7 +1201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (mounted) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    MaterialPageRoute<void>(
                       builder: (context) => const InterconnectionScreen(),
                     ),
                   );
@@ -1217,17 +1219,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              '关于',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.aboutSettings,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: const Text('关于应用'),
-            subtitle: const Text('查看应用版本、开发者信息等'),
+            title: Text(AppLocalizations.of(context)!.aboutApp),
+            subtitle: Text(AppLocalizations.of(context)!.aboutAppSubtitle),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               Navigator.push(
@@ -1264,7 +1266,7 @@ class ThemePreview extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          isDark ? '深色模式' : '浅色模式',
+          isDark ? AppLocalizations.of(context)!.themeModeDark : AppLocalizations.of(context)!.themeModeLight,
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.bold,

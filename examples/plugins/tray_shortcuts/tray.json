@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Open Calculator",
+    "action": "launch_calc"
+  },
+  {
+    "label": "Open Notepad",
+    "action": "launch_notepad"
+  }
+]

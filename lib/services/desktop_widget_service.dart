@@ -38,7 +38,7 @@ class WidgetPosition {
       y: _parseDouble(json['y']) ?? 0.0,
       width: (_parseDouble(json['width']) ?? 280.0).clamp(50.0, 2000.0),
       height: (_parseDouble(json['height']) ?? 120.0).clamp(50.0, 1500.0),
-      isVisible: json['isVisible'] is bool ? (json['isVisible'] as bool) : true,
+      isVisible: json['isVisible'] as bool? ?? true,
     );
   }
   final WidgetType type;

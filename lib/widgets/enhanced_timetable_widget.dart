@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/timetable_service.dart';
@@ -63,7 +64,9 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
   }
 
   Future<void> _loadWeekData() async {
-    if (_weekCourses.isNotEmpty) return;
+    if (_weekCourses.isNotEmpty) {
+      return;
+    }
 
     setState(() => _isLoadingWeek = true);
 
@@ -86,7 +89,9 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoadingWeek = false);
+      if (mounted) {
+        setState(() => _isLoadingWeek = false);
+      }
     }
   }
 
@@ -95,7 +100,9 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
       _viewMode = _viewMode == TimetableViewMode.day
           ? TimetableViewMode.week
           : TimetableViewMode.day;
-      if (_viewMode == TimetableViewMode.week) _loadWeekData();
+      if (_viewMode == TimetableViewMode.week) {
+        _loadWeekData();
+      }
     });
   }
 
@@ -152,6 +159,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
     double width,
   ) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
+    final l10n = AppLocalizations.of(context)!;
 
     return Row(
       children: [
@@ -166,7 +174,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _viewMode == TimetableViewMode.day ? '今日课程' : '本周课表',
+                _viewMode == TimetableViewMode.day ? l10n.todayCourses : l10n.weekSchedule,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
@@ -176,7 +184,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               ),
               if (_viewMode == TimetableViewMode.week)
                 Text(
-                  '第 $_currentWeek 周',
+                  l10n.weekNumber(_currentWeek),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -186,16 +194,16 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
         ),
         // 视图切换 SegmentedButton
         SegmentedButton<TimetableViewMode>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: TimetableViewMode.day,
-              icon: Icon(Icons.view_day_outlined, size: 18),
-              label: Text('日'),
+              icon: const Icon(Icons.view_day_outlined, size: 18),
+              label: Text(l10n.dayView),
             ),
             ButtonSegment(
               value: TimetableViewMode.week,
-              icon: Icon(Icons.view_week_outlined, size: 18),
-              label: Text('周'),
+              icon: const Icon(Icons.view_week_outlined, size: 18),
+              label: Text(l10n.weekView),
             ),
           ],
           selected: {_viewMode},
@@ -239,6 +247,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
 
   /// 空状态优化 - 情感化设计
   Widget _buildEmptyState(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: ResponsiveUtils.value(200),
       alignment: Alignment.center,
@@ -252,7 +261,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           ),
           const SizedBox(height: 16),
           Text(
-            '今天没有课程',
+            l10n.noCourseToday,
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
@@ -260,7 +269,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           ),
           const SizedBox(height: 8),
           Text(
-            '好好享受自由时光吧 ☕',
+            l10n.enjoyFreeTime,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
@@ -296,9 +305,10 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             child: child,
           );
         },
-        child: Card(
-          elevation: isCurrent ? 4 : 0,
-          margin: EdgeInsets.zero,
+        child: RepaintBoundary(
+          child: Card(
+            elevation: isCurrent ? 4 : 0,
+            margin: EdgeInsets.zero,
           color: _getCardBackgroundColor(
             colorScheme,
             subjectColor,
@@ -356,7 +366,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           ),
         ),
       ),
-    );
+    ));
   }
 
   /// 状态指示条 - 颜色 + 图案纹理（色盲友好）
@@ -573,10 +583,14 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
   /// 判断课程是否即将开始（15分钟内）
   bool _isCourseUpcoming(Course course) {
     final parts = course.time.split('~');
-    if (parts.length != 2) return false;
+    if (parts.length != 2) {
+      return false;
+    }
 
     final startParts = parts[0].trim().split(':');
-    if (startParts.length != 2) return false;
+    if (startParts.length != 2) {
+      return false;
+    }
 
     final now = NtpService().now;
     final startHour = int.tryParse(startParts[0]) ?? 0;
@@ -595,7 +609,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
 
   /// 长按显示菜单
   void _showCourseMenu(BuildContext context, Course course) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
         child: Column(
@@ -789,6 +803,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
 
   /// 周视图骨架屏
   Widget _buildWeekSkeleton(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 300,
       decoration: BoxDecoration(
@@ -804,7 +819,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             ),
             const SizedBox(height: 16),
             Text(
-              '正在加载周课表...',
+              l10n.loadingWeekSchedule,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

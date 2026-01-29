@@ -291,16 +291,25 @@ class ClassislandImportService {
             }
           }
 
+          List<int>? weekNumbers;
+          if (weekType == WeekType.single) {
+            weekNumbers = List.generate(15, (i) => i * 2 + 1); // 1, 3...29
+          } else if (weekType == WeekType.double) {
+            weekNumbers = List.generate(15, (i) => (i + 1) * 2); // 2, 4...30
+          }
+
           schedules.add(
             Schedule(
               id: scheduleIdCounter.toString(),
               name: (planMap['Name'] ?? '课表 $scheduleIdCounter').toString(),
               timeLayoutId: mappedTimeLayoutId,
-              triggerRule: ScheduleTriggerRule(
-                weekDay: weekDay,
-                weekType: weekType,
-                isEnabled: planMap['IsEnabled'] as bool? ?? true,
-              ),
+              triggers: [
+                TriggerCondition(
+                  id: 'imported_trigger_$scheduleIdCounter',
+                  weekDays: [weekDay],
+                  weekNumbers: weekNumbers,
+                ),
+              ],
               courses: scheduleCourses,
               isAutoEnabled: planMap['IsEnabled'] as bool? ?? true,
               priority: scheduleIdCounter,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
@@ -44,7 +45,7 @@ class CurrentClassWidget extends StatelessWidget {
               ),
               SizedBox(height: ResponsiveUtils.value(12)),
               Text(
-                '正在获取课程...',
+                AppLocalizations.of(context)!.currentClassLoading,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -75,7 +76,7 @@ class CurrentClassWidget extends StatelessWidget {
               ),
               SizedBox(height: ResponsiveUtils.value(8)),
               Text(
-                '当前无课',
+                AppLocalizations.of(context)!.currentClassEmpty,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.secondary,
                   fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
@@ -88,9 +89,10 @@ class CurrentClassWidget extends StatelessWidget {
       );
     }
 
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainerLow,
+    return RepaintBoundary(
+      child: Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
           ResponsiveUtils.getBorderRadius(width),
@@ -113,7 +115,7 @@ class CurrentClassWidget extends StatelessWidget {
                 ),
                 SizedBox(width: ResponsiveUtils.value(12)),
                 Text(
-                  '当前课程',
+                  AppLocalizations.of(context)!.currentClassTitle,
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
@@ -200,6 +202,6 @@ class CurrentClassWidget extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }

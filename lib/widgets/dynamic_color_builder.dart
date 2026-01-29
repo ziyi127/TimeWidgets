@@ -1,14 +1,12 @@
-import 'dart:async';
-
 import 'package:dynamic_color/dynamic_color.dart' as plugin;
 import 'package:flutter/material.dart';
-import 'package:time_widgets/models/theme_settings_model.dart';
+import 'package:provider/provider.dart';
 import 'package:time_widgets/services/theme_service.dart';
 
 /// 动态颜色构建器
 /// 根据当前的主题设置动态生成浅色和深色主题
 /// 支持实时主题更新和系统动态取色
-class DynamicColorBuilder extends StatefulWidget {
+class DynamicColorBuilder extends StatelessWidget {
   const DynamicColorBuilder({
     super.key,
     required this.builder,
@@ -22,64 +20,14 @@ class DynamicColorBuilder extends StatefulWidget {
   /// 默认种子颜色，当无法获取设置时使用
   final Color? defaultSeedColor;
 
-  /// 主题服务实例，用于获取主题设置
+  /// 主题服务实例 (Optional, if not provided, uses Provider)
   final ThemeService? themeService;
 
   @override
-  State<DynamicColorBuilder> createState() => _DynamicColorBuilderState();
-}
-
-class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
-  late ThemeService _themeService;
-  ThemeSettings? _themeSettings;
-  StreamSubscription<ThemeSettings>? _themeSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _themeService = widget.themeService ?? ThemeService();
-    _initializeSettings();
-  }
-
-  /// 初始化设置
-  Future<void> _initializeSettings() async {
-    try {
-      final settings = await _themeService.loadSettings();
-      if (mounted) {
-        setState(() {
-          _themeSettings = settings;
-        });
-      }
-
-      _themeSubscription = _themeService.themeStream.listen((settings) {
-        if (mounted) {
-          setState(() {
-            _themeSettings = settings;
-          });
-        }
-      });
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _themeSettings = ThemeSettings.defaultSettings();
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _themeSubscription?.cancel();
-    if (widget.themeService == null) {
-      _themeService.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // 使用当前设置或默认设置
-    final themeSettings = _themeSettings ?? ThemeSettings.defaultSettings();
+    // Get ThemeService from provider if not explicitly passed
+    final effectiveThemeService = themeService ?? context.watch<ThemeService>();
+    final themeSettings = effectiveThemeService.currentSettings;
 
     return plugin.DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
@@ -90,10 +38,10 @@ class _DynamicColorBuilderState extends State<DynamicColorBuilder> {
           seedColor = lightDynamic.primary;
         }
 
-        final lightTheme = _themeService.generateLightTheme(seedColor);
-        final darkTheme = _themeService.generateDarkTheme(seedColor);
+        final lightTheme = effectiveThemeService.generateLightTheme(seedColor);
+        final darkTheme = effectiveThemeService.generateDarkTheme(seedColor);
 
-        return widget.builder(lightTheme, darkTheme);
+        return builder(lightTheme, darkTheme);
       },
     );
   }

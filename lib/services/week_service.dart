@@ -29,7 +29,7 @@ class WeekService {
   /// [weekNumber] 周数
   /// 返回 true 表示单周，false 表示双周
   bool isOddWeek(int weekNumber) {
-    return weekNumber % 2 == 1;
+    return weekNumber.isOdd;
   }
 
   /// 获取周类型文本

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
@@ -50,14 +51,18 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
     );
 
     if (picked != null) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       final pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_targetDate),
       );
 
       if (pickedTime != null) {
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
         setState(() {
           _targetDate = DateTime(
             picked.year,
@@ -97,10 +102,11 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
     final width = MediaQuery.sizeOf(context).width;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
       title: Text(
-        isEditing ? '编辑倒计时' : '添加倒计时',
+        isEditing ? l10n.editCountdown : l10n.addCountdown,
         style: TextStyle(
           fontSize:
               (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
@@ -118,16 +124,16 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                   controller: _titleController,
                   style: TextStyle(fontSize: 16 * fontMultiplier),
                   decoration: InputDecoration(
-                    labelText: '标题',
+                    labelText: l10n.title,
                     labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
-                    hintText: '请输入倒计时标题',
+                    hintText: l10n.enterTitle,
                     hintStyle: TextStyle(fontSize: 14 * fontMultiplier),
                     border: const OutlineInputBorder(),
                     contentPadding: EdgeInsets.all(ResponsiveUtils.value(16)),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入标题';
+                      return l10n.pleaseEnterTitle;
                     }
                     return null;
                   },
@@ -137,9 +143,9 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                   controller: _descriptionController,
                   style: TextStyle(fontSize: 16 * fontMultiplier),
                   decoration: InputDecoration(
-                    labelText: '描述',
+                    labelText: l10n.description,
                     labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
-                    hintText: '（可选）请输入倒计时描述',
+                    hintText: l10n.optionalDescription,
                     hintStyle: TextStyle(fontSize: 14 * fontMultiplier),
                     border: const OutlineInputBorder(),
                     alignLabelWithHint: true,
@@ -155,7 +161,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '目标日期',
+                            l10n.targetDate,
                             style: TextStyle(fontSize: 14 * fontMultiplier),
                           ),
                           SizedBox(height: ResponsiveUtils.value(8)),
@@ -199,7 +205,7 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                           color: theme.colorScheme.onSurface,
                         ),
                         decoration: InputDecoration(
-                          labelText: '类型',
+                          labelText: l10n.type,
                           labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                           border: const OutlineInputBorder(),
                           contentPadding:
@@ -231,14 +237,14 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
                           color: theme.colorScheme.onSurface,
                         ),
                         decoration: InputDecoration(
-                          labelText: '分类',
+                          labelText: l10n.category,
                           labelStyle: TextStyle(fontSize: 16 * fontMultiplier),
                           border: const OutlineInputBorder(),
                           contentPadding:
                               EdgeInsets.all(ResponsiveUtils.value(16)),
                         ),
                         items: [
-                          const DropdownMenuItem(child: Text('无分类')),
+                          DropdownMenuItem(child: Text(l10n.noCategory)),
                           ..._categories.map(
                             (category) => DropdownMenuItem(
                               value: category,
@@ -264,14 +270,14 @@ class _CountdownEditDialogState extends State<CountdownEditDialog> {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(
-            '取消',
+            l10n.cancel,
             style: TextStyle(fontSize: 14 * fontMultiplier),
           ),
         ),
         FilledButton(
           onPressed: _save,
           child: Text(
-            isEditing ? '保存' : '添加',
+            isEditing ? l10n.save : l10n.add,
             style: TextStyle(fontSize: 14 * fontMultiplier),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_widgets/models/settings_model.dart';
@@ -9,15 +10,9 @@ import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/timetable_storage_service.dart';
 import 'package:time_widgets/utils/device_name_generator.dart';
 import 'package:time_widgets/utils/logger.dart';
+import 'package:time_widgets/services/interconnection/transfer_protocol.dart';
 
 class DiscoveredDevice {
-
-  final String name;
-  final String ip;
-  final int port;
-  final DateTime lastSeen;
-  final String? authToken;
-
   DiscoveredDevice({
     required this.name,
     required this.ip,
@@ -35,6 +30,12 @@ class DiscoveredDevice {
       authToken: json['authToken'] as String?,
     );
   }
+
+  final String name;
+  final String ip;
+  final int port;
+  final DateTime lastSeen;
+  final String? authToken;
 
   @override
   bool operator ==(Object other) =>
@@ -76,10 +77,10 @@ class DiscoveredDevice {
 }
 
 class InterconnectionService {
+  InterconnectionService._internal();
 
   factory InterconnectionService() => _instance;
 
-  InterconnectionService._internal();
   static final InterconnectionService _instance = InterconnectionService._internal();
 
   static const int _broadcastPort = 8899;
@@ -96,10 +97,12 @@ class InterconnectionService {
   ServerSocket? _syncServer;
   Timer? _broadcastTimer;
   Timer? _cleanupTimer;
+  Timer? _heartbeatTimer;
 
   // Master mode state
   final List<DiscoveredDevice> _discoveredDevices = [];
   final List<DiscoveredDevice> _pairedDevices = [];
+  final Map<String, Socket> _activeConnections = {};
   final StreamController<List<DiscoveredDevice>> _devicesController =
       StreamController<List<DiscoveredDevice>>.broadcast();
   final StreamController<List<DiscoveredDevice>> _pairedDevicesController =
@@ -182,19 +185,52 @@ class InterconnectionService {
   Future<void> reconnectPairedDevices() async {
     if (_pairedDevices.isEmpty) return;
     
+    // Ensure discovery/listening is active to receive IP updates
+    bool temporaryDiscovery = false;
+    if (_broadcastSocket == null) {
+      await startDiscovery();
+      temporaryDiscovery = true;
+    }
+    
     Logger.i('Attempting to reconnect to ${_pairedDevices.length} paired devices...');
-    for (int i = 0; i < _pairedDevices.length; i++) {
-      final device = _pairedDevices[i];
+    // Create a copy to iterate safely
+    final devicesToSync = List<DiscoveredDevice>.from(_pairedDevices);
+
+    for (final device in devicesToSync) {
       try {
-        await connectAndSync(device);
+        // Initial try without internal retries to fail fast if IP is wrong
+        await connectAndSync(device, retries: 0);
       } catch (e) {
         Logger.w('Failed to auto-sync with paired device ${device.name} (${device.ip}): $e');
+        
         // Try to recover IP via Auth Token Broadcast
         if (device.authToken != null) {
           Logger.i('Attempting IP recovery for ${device.name} via Auth Token...');
           await _broadcastAuthRecovery(device);
+          
+          // Wait for potential response and IP update
+          await Future.delayed(const Duration(seconds: 3));
+          
+          // Re-fetch device info from list (it might have been updated by _handleBroadcastPacket)
+          // We need to look up in the live _pairedDevices list
+          final updatedIndex = _pairedDevices.indexWhere((d) => d.name == device.name && d.authToken == device.authToken);
+          
+          if (updatedIndex != -1) {
+             final updatedDevice = _pairedDevices[updatedIndex];
+             // Even if IP is same, maybe the device just came online, so retry anyway
+             Logger.i('Retrying sync with ${updatedDevice.name} at ${updatedDevice.ip} after recovery window...');
+             try {
+               await connectAndSync(updatedDevice);
+             } catch (retryError) {
+                Logger.e('Retry failed after recovery attempt: $retryError');
+             }
+          }
         }
       }
+    }
+    
+    if (temporaryDiscovery) {
+      stopDiscovery();
     }
   }
 
@@ -216,7 +252,7 @@ class InterconnectionService {
           InternetAddress('255.255.255.255'),
           _authRecoveryPort,
         );
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
       }
       socket.close();
     } catch (e) {
@@ -239,35 +275,22 @@ class InterconnectionService {
       _broadcastSocket!.broadcastEnabled = true;
       _broadcastSocket!.listen(_handleBroadcastPacket);
       
-      // Start Auth Recovery Listener (Master listens for replies from Slave? No, Slave listens for Master's call)
-      // Actually, Master broadcasts "Where are you (AuthToken)?", Slave replies "I am here (New IP)".
-      // So Master needs to listen for recovery replies.
-      // Wait, let's keep it simple:
-      // Master broadcasts on _authRecoveryPort.
-      // Slave listens on _authRecoveryPort.
-      // Slave replies to Master (direct UDP or Broadcast).
-      // Master needs a listener for the reply.
-      // Let's use the same _broadcastSocket for receiving discovery info, or a new one.
-      // Ideally, the Slave should reply by broadcasting its presence again on _broadcastPort?
-      // Yes, if Slave sees the auth recovery request, it can just trigger a standard broadcast immediately.
-      // Then Master's existing discovery logic will pick it up (with new IP).
-      // But we need to update the paired device IP automatically.
-      
-      // Let's refine:
-      // 1. Master sends Auth Recovery Request (UDP Broadcast to 8901).
-      // 2. Slave receives request on 8901.
-      // 3. Slave checks token. If match, Slave sends standard Presence Broadcast (UDP to 8899).
-      // 4. Master receives Presence Broadcast on 8899.
-      // 5. Master checks if this "new" device matches a paired device (by name/auth token).
-      // 6. If match but IP different, update paired device IP and sync.
-
-      // So Master logic here is fine. Just need to ensure _handleBroadcastPacket handles updates.
-      
       _cleanupTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
         final now = DateTime.now();
         _discoveredDevices.removeWhere(
             (device) => now.difference(device.lastSeen).inSeconds > 10,);
         _devicesController.add(List.from(_discoveredDevices));
+      });
+
+      // Start Heartbeat
+      _heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        _activeConnections.forEach((ip, socket) {
+           try {
+             socket.add(TransferProtocol.createPacket(PacketType.heartbeat, {}));
+           } catch (e) {
+             // Ignore, will be cleaned up by socket listener
+           }
+        });
       });
       
       Logger.i('Started discovery on port $_broadcastPort');
@@ -281,13 +304,24 @@ class InterconnectionService {
     _broadcastSocket = null;
     _cleanupTimer?.cancel();
     _cleanupTimer = null;
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+    
+    // Close all active connections
+    for (final socket in _activeConnections.values) {
+      socket.destroy();
+    }
+    _activeConnections.clear();
+    
     Logger.i('Stopped discovery');
   }
 
   void _handleBroadcastPacket(RawSocketEvent event) async {
     if (event == RawSocketEvent.read) {
       final datagram = _broadcastSocket?.receive();
-      if (datagram == null) return;
+      if (datagram == null) {
+        return;
+      }
 
       try {
         final message = utf8.decode(datagram.data);
@@ -296,19 +330,21 @@ class InterconnectionService {
         // Filter out self if running on same network/machine logic could be added here
         // but since we don't know our own IP easily without checking interfaces, 
         // we'll rely on the user not to pick themselves if they see it (or filter by name).
-        if (data['name'] == _deviceName) return; 
+        if (data['name'] == _deviceName) {
+          return;
+        } 
 
         final device = DiscoveredDevice(
-          name: data['name'],
+          name: data['name'] as String,
           ip: datagram.address.address, // Use the sender's IP
-          port: data['port'],
+          port: data['port'] as int,
           lastSeen: DateTime.now(),
-          authToken: data['authToken'], // Capture auth token from broadcast if present
+          authToken: data['authToken'] as String?, // Capture auth token from broadcast if present
         );
 
         // Check if this matches a paired device but with different IP
         final pairedIndex = _pairedDevices.indexWhere((d) => 
-            d.name == device.name && d.authToken == device.authToken);
+            d.name == device.name && d.authToken == device.authToken,);
             
         if (pairedIndex != -1) {
           final pairedDevice = _pairedDevices[pairedIndex];
@@ -337,29 +373,67 @@ class InterconnectionService {
     }
   }
 
-  Future<void> connectAndSync(DiscoveredDevice device) async {
+  Future<void> connectAndSync(DiscoveredDevice device, {int retries = 2}) async {
     Socket? socket;
     try {
-      socket = await Socket.connect(device.ip, device.port, timeout: const Duration(seconds: 5));
+      // Check existing connection
+      if (_activeConnections.containsKey(device.ip)) {
+        socket = _activeConnections[device.ip];
+      }
+
+      if (socket == null) {
+        socket = await Socket.connect(device.ip, device.port, timeout: const Duration(seconds: 5));
+        _activeConnections[device.ip] = socket;
+        
+        socket.listen(
+          (data) {
+            // Handle responses (Ack, Heartbeat)
+            // For now just consume to keep buffer clear
+          },
+          onError: (e) {
+            Logger.w('Connection error with ${device.name}: $e');
+            _activeConnections.remove(device.ip);
+            socket?.destroy();
+          },
+          onDone: () {
+            Logger.i('Connection closed by ${device.name}');
+            _activeConnections.remove(device.ip);
+            socket?.destroy();
+          },
+        );
+
+        // Send Handshake
+        final handshakePayload = {
+          'deviceName': _deviceName,
+          'authToken': _authToken,
+        };
+        socket.add(TransferProtocol.createPacket(PacketType.handshake, handshakePayload));
+      }
       
       // Prepare data
       final settings = SettingsService().currentSettings;
       final timetableData = await TimetableStorageService().loadTimetableData();
       
       final payload = {
-        'type': 'sync',
         'settings': settings.toJson(),
         'timetable': timetableData.toJson(),
       };
       
-      socket.write(jsonEncode(payload));
+      socket.add(TransferProtocol.createPacket(PacketType.syncData, payload));
       await socket.flush();
       Logger.i('Synced data to ${device.name}');
     } catch (e) {
-      Logger.e('Failed to sync with ${device.name}: $e');
-      rethrow;
-    } finally {
+      Logger.w('Failed to sync with ${device.name}: $e');
+      _activeConnections.remove(device.ip);
       socket?.destroy();
+
+      if (retries > 0) {
+        Logger.i('Retrying sync with ${device.name} ($retries attempts left)...');
+        await Future.delayed(const Duration(seconds: 1));
+        await connectAndSync(device, retries: retries - 1);
+      } else {
+        rethrow;
+      }
     }
   }
 
@@ -447,34 +521,64 @@ class InterconnectionService {
      Logger.i('Stopped broadcasting');
   }
 
-  void _handleSyncConnection(Socket socket) {
+  Future<void> _handleSyncConnection(Socket socket) async {
+    final List<int> buffer = [];
+
     socket.listen(
       (data) async {
-        try {
-          final message = utf8.decode(data);
-          final payload = jsonDecode(message) as Map<String, dynamic>;
-
-          if (payload['type'] == 'sync') {
-             Logger.i('Received sync data from master');
-            if (payload['settings'] != null) {
-              final settings = AppSettings.fromJson(payload['settings'] as Map<String, dynamic>);
-              await SettingsService().saveSettings(settings);
-            }
-
-            if (payload['timetable'] != null) {
-              final timetableData = TimetableData.fromJson(payload['timetable'] as Map<String, dynamic>);
-              await TimetableStorageService().saveTimetableData(timetableData);
-            }
-          }
-        } catch (e) {
-          Logger.e('Error handling sync data: $e');
-        } finally {
-          socket.destroy();
+        buffer.addAll(data);
+        
+        while (true) {
+           if (buffer.length < TransferProtocol.headerLength) break;
+           
+           final headerView = ByteData.view(Uint8List.fromList(buffer.sublist(0, TransferProtocol.headerLength)).buffer);
+           
+           if (headerView.getUint8(0) != TransferProtocol.magicByte1 || 
+               headerView.getUint8(1) != TransferProtocol.magicByte2) {
+             Logger.e('Invalid Magic Bytes from ${socket.remoteAddress}');
+             socket.destroy();
+             return;
+           }
+           
+           final length = headerView.getUint32(4);
+           final totalPacketSize = TransferProtocol.headerLength + length;
+           
+           if (buffer.length < totalPacketSize) break;
+           
+           final packetData = buffer.sublist(0, totalPacketSize);
+           buffer.removeRange(0, totalPacketSize);
+           
+           final packet = await TransferProtocol.parsePacket(packetData);
+           if (packet != null) {
+             await _processPacket(socket, packet);
+           }
         }
       },
-      onError: (e) => Logger.e('Sync socket error: $e'),
-      onDone: () => socket.destroy(),
+      onError: (Object e) => Logger.e('Sync socket error: $e'),
+      onDone: () {
+        socket.destroy();
+      },
     );
+  }
+
+  Future<void> _processPacket(Socket socket, Map<String, dynamic> packet) async {
+    final typeStr = packet['type'];
+    final data = packet['data'] as Map<String, dynamic>;
+
+    if (typeStr == 'handshake') {
+       Logger.i('Handshake from ${data['deviceName']}');
+    } else if (typeStr == 'syncData') {
+        Logger.i('Received sync data');
+        if (data['settings'] != null) {
+          final settings = AppSettings.fromJson(data['settings'] as Map<String, dynamic>);
+          await SettingsService().saveSettings(settings);
+        }
+
+        if (data['timetable'] != null) {
+          final timetableData = TimetableData.fromJson(data['timetable'] as Map<String, dynamic>);
+          await TimetableStorageService().saveTimetableData(timetableData);
+        }
+    }
   }
   
   void dispose() {

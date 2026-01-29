@@ -1,0 +1,43 @@
+{
+  "type": "Container",
+  "params": {
+    "padding": 16,
+    "color": "#E3F2FD",
+    "width": 200,
+    "height": 100
+  },
+  "children": [
+    {
+      "type": "Column",
+      "params": {
+        "mainAxisAlignment": "center",
+        "crossAxisAlignment": "center"
+      },
+      "children": [
+        {
+          "type": "Icon",
+          "params": {
+            "icon": "access_time",
+            "size": 32,
+            "color": "#1565C0"
+          }
+        },
+        {
+          "type": "SizedBox",
+          "params": {
+            "height": 8
+          }
+        },
+        {
+          "type": "Text",
+          "params": {
+            "text": "Plugin Clock",
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "color": "#0D47A1"
+          }
+        }
+      ]
+    }
+  ]
+}

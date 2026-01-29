@@ -12,6 +12,9 @@ class TimetableService {
   final ApiService _apiService = ApiService();
   final TimetableStorageService _storageService = TimetableStorageService();
   final EnhancedErrorHandler _errorHandler = EnhancedErrorHandler();
+  
+  // Memory cache
+  TimetableData? _cachedData;
 
   // Calculate week number (1-based) from a given date
   // Assuming week 1 starts from the first Monday of the year
@@ -28,15 +31,30 @@ class TimetableService {
     return ((date.difference(firstMonday).inDays / 7).floor()) + 1;
   }
 
+  // 清除缓存
+  void clearCache() {
+    _cachedData = null;
+  }
+
   // 确定周数
   Schedule? _getActiveSchedule(TimetableData timetableData, DateTime date) {
     final currentWeekNumber = _calculateWeekNumber(date);
 
     // 获取所有自动启用的课表
     final matchingSchedules = timetableData.schedules.where((schedule) {
-      if (!schedule.isAutoEnabled) return false;
-      return schedule.triggerRule
-          .matches(date, currentWeekNumber: currentWeekNumber);
+      if (!schedule.isAutoEnabled) {
+        return false;
+      }
+
+      // Check if triggers list is empty, if so skip (or handle legacy logic if needed)
+      if (schedule.triggers.isEmpty) {
+        return false;
+      }
+
+      return schedule.triggers.any(
+        (trigger) =>
+            trigger.matches(date, currentWeekNumber: currentWeekNumber),
+      );
     }).toList();
 
     if (matchingSchedules.isEmpty) {
@@ -52,7 +70,14 @@ class TimetableService {
   Future<Timetable> getTimetable(DateTime date) async {
     try {
       // 优先从本地存储获取
-      final timetableData = await _storageService.loadTimetableData();
+      TimetableData timetableData;
+      
+      if (_cachedData != null) {
+        timetableData = _cachedData!;
+      } else {
+        timetableData = await _storageService.loadTimetableData();
+        _cachedData = timetableData;
+      }
 
       // 1. 确定星期几 (0-6, 0=Monday in our model, DateTime.weekday 1=Mon...7=Sun)
       final weekday = date.weekday - 1;
@@ -104,14 +129,16 @@ class TimetableService {
             matchesWeekType = true;
             break;
           case WeekType.single:
-            matchesWeekType = currentWeekNumber % 2 == 1;
+            matchesWeekType = currentWeekNumber.isOdd;
             break;
           case WeekType.double:
-            matchesWeekType = currentWeekNumber % 2 == 0;
+            matchesWeekType = currentWeekNumber.isEven;
             break;
         }
 
-        if (!matchesWeekType) continue;
+        if (!matchesWeekType) {
+          continue;
+        }
 
         final slot = timeSlots.firstWhere(
           (t) => t.id == daily.timeSlotId,
@@ -119,7 +146,9 @@ class TimetableService {
               const TimeSlot(id: '', startTime: '', endTime: '', name: ''),
         );
 
-        if (slot.id.isEmpty) continue;
+        if (slot.id.isEmpty) {
+          continue;
+        }
 
         final info = timetableData.courses.firstWhere(
           (c) => c.id == daily.courseId,
@@ -148,7 +177,9 @@ class TimetableService {
       courses.sort((a, b) {
         final aRange = TimeUtils.parseTimeRange(a.time, date);
         final bRange = TimeUtils.parseTimeRange(b.time, date);
-        if (aRange == null || bRange == null) return 0;
+        if (aRange == null || bRange == null) {
+          return 0;
+        }
         return aRange.start.compareTo(bRange.start);
       });
 

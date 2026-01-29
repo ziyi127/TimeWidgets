@@ -65,7 +65,9 @@ class TimeSlotUtils {
     DateTime currentTime,
   ) {
     final nextSlot = getNextTimeSlot(timeSlots, currentTime);
-    if (nextSlot == null) return null;
+    if (nextSlot == null) {
+      return null;
+    }
 
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
     final nextStartMinutes = _parseTimeToMinutes(nextSlot.startTime);
@@ -78,7 +80,9 @@ class TimeSlotUtils {
     DateTime currentTime,
   ) {
     final currentSlot = getCurrentTimeSlot(timeSlots, currentTime);
-    if (currentSlot == null) return null;
+    if (currentSlot == null) {
+      return null;
+    }
 
     final currentMinutes = currentTime.hour * 60 + currentTime.minute;
     final endMinutes = _parseTimeToMinutes(currentSlot.endTime);

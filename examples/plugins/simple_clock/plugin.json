@@ -1,0 +1,9 @@
+{
+  "id": "com.timewidgets.example.clock",
+  "name": "Simple Digital Clock",
+  "version": "1.0.0",
+  "description": "A simple clock widget plugin",
+  "author": "TimeWidgets Team",
+  "minAppVersion": "1.0.0",
+  "permissions": []
+}

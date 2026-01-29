@@ -238,7 +238,9 @@ class EnhancedLogger {
 
   /// 开始性能追踪
   void startPerformanceTrace(String operationId) {
-    if (!_config.enablePerformanceLogging) return;
+    if (!_config.enablePerformanceLogging) {
+      return;
+    }
     _operationStartTimes[operationId] = DateTime.now();
   }
 
@@ -248,10 +250,14 @@ class EnhancedLogger {
     String? description,
     Map<String, dynamic>? metadata,
   }) {
-    if (!_config.enablePerformanceLogging) return;
+    if (!_config.enablePerformanceLogging) {
+      return;
+    }
 
     final startTime = _operationStartTimes.remove(operationId);
-    if (startTime == null) return;
+    if (startTime == null) {
+      return;
+    }
 
     final duration = DateTime.now().difference(startTime);
 
@@ -388,7 +394,9 @@ class EnhancedLogger {
 
   /// 获取最近的日志
   Future<List<LogEntry>> getRecentLogs(int count) async {
-    if (_logManager == null) return [];
+    if (_logManager == null) {
+      return [];
+    }
     return _logManager!.getRecentLogs(count);
   }
 

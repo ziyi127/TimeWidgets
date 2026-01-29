@@ -30,20 +30,38 @@ class TimetableWidget extends StatefulWidget {
   State<TimetableWidget> createState() => _TimetableWidgetState();
 }
 
+class CourseViewModel {
+  final Course course;
+  final double progress;
+  final bool isCompleted;
+  final bool isNext;
+
+  CourseViewModel({
+    required this.course,
+    this.progress = 0,
+    this.isCompleted = false,
+    this.isNext = false,
+  });
+}
+
 class _TimetableWidgetState extends State<TimetableWidget> {
   TimetableViewMode _viewMode = TimetableViewMode.day;
   final TimetableService _timetableService = TimetableService();
 
   // Data State
   DateTime _selectedDate = DateTime.now();
-  List<Course> _dayCourses = [];
-  Map<int, List<Course>> _weekCourses = {};
+  List<CourseViewModel> _dayCourses = [];
+  List<CourseViewModel>? _externalCourses;
+  Map<int, List<CourseViewModel>> _weekCourses = {};
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+    if (widget.courses != null) {
+      _externalCourses = _processCourses(widget.courses!, DateTime.now());
+    }
     _loadData();
   }
 
@@ -54,15 +72,83 @@ class _TimetableWidgetState extends State<TimetableWidget> {
     // 但如果外部传入 null，我们需要自己加载
     if (widget.courses != oldWidget.courses) {
       if (widget.courses == null) {
+        _externalCourses = null;
         _loadData();
       } else {
-        // 如果有外部数据，且当前是日视图，直接使用外部数据（不需要 setState，build 会直接用）
-        // 但如果切换了日期，我们还是需要自己加载，除非父组件也根据日期更新了 widget.courses
-        // 这里假设 widget.courses 仅对应 "今天" 或父组件控制的日期。
-        // 为了支持内部日期切换，我们优先使用内部加载的数据 _dayCourses，
-        // 除非 _selectedDate 是今天且 widget.courses 不为空。
+        _externalCourses = _processCourses(widget.courses!, DateTime.now());
       }
     }
+  }
+
+  List<CourseViewModel> _processCourses(List<Course> courses, DateTime date) {
+    final now = NtpService().now;
+    final viewModels = <CourseViewModel>[];
+    
+    // Find next course index logic
+    int nextCourseIndex = -1;
+    final hasCurrent = courses.any((c) => c.isCurrent);
+    // Use the provided date for comparison if needed, or just assume 'date' is the date of courses
+    final isToday = date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
+
+    if (!hasCurrent && isToday) {
+       for(int i=0; i<courses.length; i++) {
+         final parts = courses[i].time.split('~');
+         if(parts.length == 2) {
+            final endParts = parts[1].split(':');
+            if(endParts.length == 2) {
+               final endHour = int.tryParse(endParts[0]) ?? 0;
+               final endMinute = int.tryParse(endParts[1]) ?? 0;
+               final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
+               if(endTime.isAfter(now)) {
+                 nextCourseIndex = i;
+                 break;
+               }
+            }
+         }
+       }
+    }
+
+    for (int i = 0; i < courses.length; i++) {
+      final course = courses[i];
+      double progress = 0;
+      bool isCompleted = false;
+      
+      if (course.isCurrent) {
+         // Calculate progress
+         final parts = course.time.split('~');
+         if (parts.length == 2) {
+            final startParts = parts[0].split(':');
+            final endParts = parts[1].split(':');
+            if (startParts.length == 2 && endParts.length == 2) {
+              final startHour = int.tryParse(startParts[0]) ?? 0;
+              final startMinute = int.tryParse(startParts[1]) ?? 0;
+              final startTime = DateTime(now.year, now.month, now.day, startHour, startMinute);
+              final endHour = int.tryParse(endParts[0]) ?? 0;
+              final endMinute = int.tryParse(endParts[1]) ?? 0;
+              final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
+              
+              if (now.isAfter(endTime)) {
+                isCompleted = true;
+                progress = 1.0;
+              } else if (now.isAfter(startTime)) {
+                final total = endTime.difference(startTime).inMinutes;
+                final current = now.difference(startTime).inMinutes;
+                progress = total > 0 ? current / total : 0.0;
+              }
+            }
+         }
+      }
+      
+      viewModels.add(CourseViewModel(
+        course: course,
+        progress: progress,
+        isCompleted: isCompleted,
+        isNext: i == nextCourseIndex,
+      ));
+    }
+    return viewModels;
   }
 
   Future<void> _loadData() async {
@@ -72,9 +158,10 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       if (_viewMode == TimetableViewMode.day) {
         // 日视图加载
         final timetable = await _timetableService.getTimetable(_selectedDate);
+        final viewModels = _processCourses(timetable.courses, _selectedDate);
         if (mounted) {
           setState(() {
-            _dayCourses = timetable.courses;
+            _dayCourses = viewModels;
           });
         }
       } else {
@@ -85,7 +172,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
 
         final futures = List.generate(7, (i) {
           final date = monday.add(Duration(days: i));
-          return _timetableService.getTimetable(date).then((t) => MapEntry(i, t.courses));
+          return _timetableService.getTimetable(date).then((t) => MapEntry(i, _processCourses(t.courses, date)));
         });
 
         final results = await Future.wait(futures);
@@ -309,18 +396,14 @@ class _TimetableWidgetState extends State<TimetableWidget> {
 
   Widget _buildDayView(BuildContext context, ThemeData theme, double width) {
     // 优先使用 widget.courses (如果它是今天的)，否则使用内部加载的 _dayCourses
-    // 简单起见，如果 widget.courses 存在且 selectedDate 是今天，混合使用？
-    // 更好的逻辑：
-    // 如果 widget.courses 不为空且 selectedDate == today，使用 widget.courses
-    // 否则使用 _dayCourses
     
     final now = NtpService().now;
     final isToday = _selectedDate.year == now.year &&
         _selectedDate.month == now.month &&
         _selectedDate.day == now.day;
     
-    final courses = (isToday && widget.courses != null && widget.courses!.isNotEmpty)
-        ? widget.courses!
+    final courses = (isToday && _externalCourses != null && _externalCourses!.isNotEmpty)
+        ? _externalCourses!
         : _dayCourses;
 
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
@@ -372,27 +455,6 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       );
     }
 
-    // Identify next course
-    int nextCourseIndex = -1;
-    final hasCurrent = courses.any((c) => c.isCurrent);
-    if (!hasCurrent && isToday) { // 只有今天是今天才计算 Next
-       for(int i=0; i<courses.length; i++) {
-         final parts = courses[i].time.split('~');
-         if(parts.length == 2) {
-            final endParts = parts[1].split(':');
-            if(endParts.length == 2) {
-               final endHour = int.tryParse(endParts[0]) ?? 0;
-               final endMinute = int.tryParse(endParts[1]) ?? 0;
-               final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
-               if(endTime.isAfter(now)) {
-                 nextCourseIndex = i;
-                 break;
-               }
-            }
-         }
-       }
-    }
-
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -400,50 +462,23 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(12)),
       itemBuilder: (context, index) {
-        final course = courses[index];
-        final isNext = index == nextCourseIndex;
-        return _buildCourseCard(context, course, width, isNext: isNext);
+        final vm = courses[index];
+        return _buildCourseCard(context, vm, width);
       },
     );
   }
 
-  Widget _buildCourseCard(BuildContext context, Course course, double width, {bool isNext = false}) {
+  Widget _buildCourseCard(BuildContext context, CourseViewModel vm, double width) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
+    final course = vm.course;
     final subjectColor = ColorUtils.generateColorFromName(course.subject);
     final isCurrent = course.isCurrent;
-
-    // Calculate progress
-    bool isCompleted = false;
-    double progress = 0;
-    
-    // ... (Keep existing progress logic or simplify)
-    // Reusing logic from before for consistency
-    final parts = course.time.split('~');
-    if (parts.length == 2) {
-      final startParts = parts[0].split(':');
-      final endParts = parts[1].split(':');
-      if (startParts.length == 2 && endParts.length == 2) {
-        final now = NtpService().now;
-        final startHour = int.tryParse(startParts[0]) ?? 0;
-        final startMinute = int.tryParse(startParts[1]) ?? 0;
-        final startTime = DateTime(now.year, now.month, now.day, startHour, startMinute);
-        final endHour = int.tryParse(endParts[0]) ?? 0;
-        final endMinute = int.tryParse(endParts[1]) ?? 0;
-        final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
-        
-        if (now.isAfter(endTime)) {
-          isCompleted = true;
-          progress = 1.0;
-        } else if (now.isAfter(startTime)) {
-          final total = endTime.difference(startTime).inMinutes;
-          final current = now.difference(startTime).inMinutes;
-          progress = total > 0 ? current / total : 0.0;
-        }
-      }
-    }
+    final isNext = vm.isNext;
+    final progress = vm.progress;
+    final isCompleted = vm.isCompleted;
 
     final cardColor = isCurrent 
         ? colorScheme.primaryContainer 
@@ -712,7 +747,8 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                       itemCount: courses.length,
                       separatorBuilder: (context, i) => const SizedBox(height: 4),
                       itemBuilder: (context, courseIndex) {
-                        final course = courses[courseIndex];
+                        final vm = courses[courseIndex];
+                        final course = vm.course;
                         final color = ColorUtils.generateColorFromName(course.subject);
                         
                         return InkWell(

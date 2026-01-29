@@ -179,10 +179,7 @@ class MD3NavigationStyles {
       shadowColor: shadowColor ?? colorScheme.shadow,
       surfaceTintColor: surfaceTintColor ?? colorScheme.surfaceTint,
       indicatorColor: indicatorColor ?? colorScheme.secondaryContainer,
-      indicatorShape: indicatorShape ??
-          const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-          ),
+      indicatorShape: indicatorShape ?? const StadiumBorder(),
       height: height ?? 80,
       labelBehavior:
           labelBehavior ?? NavigationDestinationLabelBehavior.alwaysShow,
@@ -254,10 +251,7 @@ class MD3NavigationStyles {
       minExtendedWidth: minExtendedWidth ?? 256,
       useIndicator: useIndicator ?? true,
       indicatorColor: indicatorColor ?? colorScheme.secondaryContainer,
-      indicatorShape: indicatorShape ??
-          const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-          ),
+      indicatorShape: indicatorShape ?? const StadiumBorder(),
     );
   }
 
@@ -316,9 +310,7 @@ class MD3NavigationStyles {
         title: label,
         selected: selected,
         onTap: onTap,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
+        shape: const StadiumBorder(),
         tileColor: selected ? colorScheme.secondaryContainer : null,
         selectedTileColor: colorScheme.secondaryContainer,
         iconColor: selected

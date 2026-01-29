@@ -11,6 +11,7 @@ class TimetableEditService extends ChangeNotifier {
   final List<DailyCourse> _dailyCourses = [];
   final List<TimeLayout> _timeLayouts = [];
   final List<Schedule> _schedules = [];
+  final List<ScheduleGroup> _groups = [];
 
   // Getters
   List<CourseInfo> get courses => List.unmodifiable(_courses);
@@ -18,6 +19,7 @@ class TimetableEditService extends ChangeNotifier {
   List<DailyCourse> get dailyCourses => List.unmodifiable(_dailyCourses);
   List<TimeLayout> get timeLayouts => List.unmodifiable(_timeLayouts);
   List<Schedule> get schedules => List.unmodifiable(_schedules);
+  List<ScheduleGroup> get groups => List.unmodifiable(_groups);
 
   // Auto-save method
   Future<void> _autoSave() async {
@@ -28,6 +30,7 @@ class TimetableEditService extends ChangeNotifier {
         dailyCourses: List.from(_dailyCourses),
         timeLayouts: List.from(_timeLayouts),
         schedules: List.from(_schedules),
+        groups: List.from(_groups),
       );
 
       await _storageService.saveTimetableData(updatedData);
@@ -169,6 +172,9 @@ class TimetableEditService extends ChangeNotifier {
     _schedules.clear();
     _schedules.addAll(data.schedules);
 
+    _groups.clear();
+    _groups.addAll(data.groups);
+
     notifyListeners();
   }
 
@@ -181,10 +187,78 @@ class TimetableEditService extends ChangeNotifier {
         dailyCourses: List.from(_dailyCourses),
         timeLayouts: List.from(_timeLayouts),
         schedules: List.from(_schedules),
+        groups: List.from(_groups),
       );
 
       await _storageService.saveTimetableData(updatedData);
       _timetableData = updatedData;
+    }
+  }
+
+  // Group management methods
+  void addGroup(ScheduleGroup group) {
+    _groups.add(group);
+    _autoSave();
+    notifyListeners();
+  }
+
+  void updateGroup(ScheduleGroup group) {
+    final index = _groups.indexWhere((g) => g.id == group.id);
+    if (index != -1) {
+      _groups[index] = group;
+      _autoSave();
+      notifyListeners();
+    }
+  }
+
+  void deleteGroup(String groupId) {
+    // Move children to parent (or root)
+    try {
+      final group = _groups.firstWhere((g) => g.id == groupId);
+      final parentId = group.parentId;
+
+      // Update child groups
+      for (var i = 0; i < _groups.length; i++) {
+        if (_groups[i].parentId == groupId) {
+          _groups[i] = _groups[i].copyWith(parentId: parentId);
+        }
+      }
+
+      // Update child schedules
+      // Note: copyWith cannot set null if we use the generated one usually.
+      // But we can construct new object.
+      for (var i = 0; i < _schedules.length; i++) {
+        if (_schedules[i].groupId == groupId) {
+          final s = _schedules[i];
+          _schedules[i] = Schedule(
+            id: s.id,
+            name: s.name,
+            timeLayoutId: s.timeLayoutId,
+            groupId: parentId, // Set new parent
+            triggers: s.triggers,
+            dayTimeLayoutIds: s.dayTimeLayoutIds,
+            courses: s.courses,
+            isAutoEnabled: s.isAutoEnabled,
+            priority: s.priority,
+            isOverlay: s.isOverlay,
+            overlaySourceId: s.overlaySourceId,
+          );
+        }
+      }
+
+      _groups.removeWhere((g) => g.id == groupId);
+      _autoSave();
+      notifyListeners();
+    } catch (e) {
+      Logger.e('Error deleting group: $e');
+    }
+  }
+
+  ScheduleGroup? getGroupById(String groupId) {
+    try {
+      return _groups.firstWhere((g) => g.id == groupId);
+    } catch (e) {
+      return null;
     }
   }
 
@@ -259,8 +333,16 @@ class TimetableEditService extends ChangeNotifier {
   Schedule? getActiveSchedule(DateTime date, {int? currentWeekNumber}) {
     final matchingSchedules = _schedules.where((schedule) {
       if (!schedule.isAutoEnabled) return false;
-      return schedule.triggerRule
-          .matches(date, currentWeekNumber: currentWeekNumber);
+      
+      // Check if any trigger matches
+      if (schedule.triggers.isEmpty) {
+        // Fallback for migration if needed, or just return false
+        return false;
+      }
+      
+      return schedule.triggers.any((trigger) => 
+        trigger.matches(date, currentWeekNumber: currentWeekNumber)
+      );
     }).toList();
 
     if (matchingSchedules.isEmpty) return null;
@@ -274,8 +356,12 @@ class TimetableEditService extends ChangeNotifier {
   List<Schedule> getMatchingSchedules(DateTime date, {int? currentWeekNumber}) {
     final matchingSchedules = _schedules.where((schedule) {
       if (!schedule.isAutoEnabled) return false;
-      return schedule.triggerRule
-          .matches(date, currentWeekNumber: currentWeekNumber);
+      
+      if (schedule.triggers.isEmpty) return false;
+      
+      return schedule.triggers.any((trigger) => 
+        trigger.matches(date, currentWeekNumber: currentWeekNumber)
+      );
     }).toList();
 
     // Sort by priority (lower number = higher priority)
@@ -376,6 +462,7 @@ class TimetableEditService extends ChangeNotifier {
       dailyCourses: List.from(_dailyCourses),
       timeLayouts: List.from(_timeLayouts),
       schedules: List.from(_schedules),
+      groups: List.from(_groups),
     );
   }
 

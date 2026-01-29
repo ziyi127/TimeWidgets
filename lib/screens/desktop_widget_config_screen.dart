@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/services/desktop_widget_service.dart';
-import 'package:time_widgets/services/localization_service.dart';
 import 'package:time_widgets/utils/md3_card_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
@@ -44,31 +44,32 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(LocalizationService.getString('reset_settings')),
+          content: Text(AppLocalizations.of(context)!.settingsResetSuccess),
           behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
 
-  String _getWidgetName(WidgetType type) {
+  String _getWidgetName(WidgetType type, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type) {
       case WidgetType.time:
-        return '时间显示';
+        return l10n.timeDisplay;
       case WidgetType.date:
-        return '日期显示';
+        return l10n.dateDisplay;
       case WidgetType.week:
-        return '周次显示';
+        return l10n.weekDisplay;
       case WidgetType.weather:
-        return LocalizationService.getString('weather_info');
+        return l10n.weatherTitle;
       case WidgetType.currentClass:
-        return LocalizationService.getString('current_class');
+        return l10n.currentClassTitle;
       case WidgetType.countdown:
-        return LocalizationService.getString('countdown_events');
+        return l10n.countdownTitle;
       case WidgetType.timetable:
-        return '课程表';
+        return l10n.tabSchedule;
       case WidgetType.settings:
-        return LocalizationService.getString('settings');
+        return l10n.settingsTitle;
     }
   }
 
@@ -229,13 +230,17 @@ class _DesktopWidgetConfigScreenState extends State<DesktopWidgetConfigScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _getWidgetName(type),
+                  _getWidgetName(type, context),
                   style: MD3TypographyStyles.titleMedium(context),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '位置: (${position.x.toInt()}, ${position.y.toInt()}) • '
-                  '尺寸: ${position.width.toInt()}×${position.height.toInt()}',
+                  AppLocalizations.of(context)!.positionInfo(
+                    position.x.toInt(),
+                    position.y.toInt(),
+                    position.width.toInt(),
+                    position.height.toInt(),
+                  ),
                   style: MD3TypographyStyles.bodySmall(
                     context,
                     color: colorScheme.onSurfaceVariant,

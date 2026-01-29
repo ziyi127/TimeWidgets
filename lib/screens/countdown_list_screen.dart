@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/services/countdown_storage_service.dart';
+import 'package:time_widgets/utils/md3_card_styles.dart';
+import 'package:time_widgets/utils/md3_typography_styles.dart';
 import 'package:time_widgets/widgets/countdown_edit_dialog.dart';
 
 class CountdownListScreen extends StatefulWidget {
@@ -54,157 +58,271 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
     }
   }
 
-  Future<void> _deleteCountdown(CountdownData countdown) async {
-    final shouldDelete = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('确认删除'),
-            content: Text('确定要删除"${countdown.title}"吗？'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('取消'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                child: const Text('删除'),
-              ),
-            ],
-          ),
-        ) ??
-        false;
+  Future<void> _handleDelete(CountdownData countdown, int index) async {
+    final l10n = AppLocalizations.of(context)!;
+    // Store for undo
+    final deletedItem = countdown;
+    
+    // Remove from storage
+    await _storageService.deleteCountdown(countdown.id);
 
-    if (shouldDelete) {
-      await _storageService.deleteCountdown(countdown.id);
-      await _loadCountdowns();
+    if (!mounted) return;
+
+    // Show SnackBar with Undo
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.deleteSuccess),
+        action: SnackBarAction(
+          label: l10n.undo,
+          onPressed: () async {
+            // Restore to storage
+            await _storageService.saveCountdown(deletedItem);
+            // Restore to UI
+            setState(() {
+              _countdowns.insert(index, deletedItem);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Color _getEventTypeColor(ColorScheme colorScheme, String eventType) {
+    switch (eventType.toLowerCase()) {
+      case 'exam':
+        return colorScheme.error;
+      case 'assignment':
+        return colorScheme.tertiary;
+      case 'project':
+        return colorScheme.secondary;
+      case 'holiday':
+        return colorScheme.primary;
+      default:
+        return colorScheme.primary;
+    }
+  }
+
+  IconData _getEventTypeIcon(String eventType) {
+    switch (eventType.toLowerCase()) {
+      case 'exam':
+        return Icons.quiz_rounded;
+      case 'assignment':
+        return Icons.assignment_rounded;
+      case 'project':
+        return Icons.work_rounded;
+      case 'holiday':
+        return Icons.celebration_rounded;
+      default:
+        return Icons.event_rounded;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('倒计时')),
+        appBar: AppBar(title: Text(l10n.countdownTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text('倒计时'),
+        title: Text(l10n.countdownTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadCountdowns,
-            tooltip: '刷新',
+            tooltip: l10n.refresh,
           ),
         ],
       ),
       body: _countdowns.isEmpty
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.timer_outlined,
-                    size: 64,
-                    color: Colors.grey,
+                    Icons.timer_off_outlined,
+                    size: 80,
+                    color: colorScheme.surfaceContainerHighest,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Text(
-                    '暂无倒计时',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    l10n.countdownEmpty,
+                    style: MD3TypographyStyles.headlineSmall(context).copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '点击右下角按钮添加第一个倒计时',
-                    style: TextStyle(color: Colors.grey),
+                    l10n.addFirstCountdown,
+                    style: MD3TypographyStyles.bodyMedium(context).copyWith(
+                      color: colorScheme.outline,
+                    ),
                   ),
                 ],
               ),
             )
-          : ListView.builder(
-              padding: const EdgeInsets.all(8),
+          : ListView.separated(
+              padding: const EdgeInsets.all(16),
               itemCount: _countdowns.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final countdown = _countdowns[index];
-                final timeLeft =
-                    '${countdown.remainingDays}天 ${countdown.remainingHours}小时 ${countdown.remainingMinutes}分钟';
+                final typeColor = _getEventTypeColor(colorScheme, countdown.type);
+                final formattedDate = DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(countdown.targetDate);
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: InkWell(
-                    onTap: () => _editCountdown(countdown),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  countdown.title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: () => _deleteCountdown(countdown),
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                            ],
+                return Dismissible(
+                  key: Key(countdown.id),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 24),
+                    decoration: BoxDecoration(
+                      color: colorScheme.error,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.delete_outline, color: colorScheme.onError),
+                  ),
+                  confirmDismiss: (direction) async {
+                    final shouldDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(l10n.confirmDelete),
+                        content: Text(l10n.deleteCountdownConfirm(countdown.title)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(l10n.cancel),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            countdown.description,
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: colorScheme.error,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                countdown.targetDate.toString(),
-                                style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              ),
-                              Text(
-                                timeLeft,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                            child: Text(l10n.delete),
                           ),
                         ],
                       ),
+                    );
+                    return shouldDelete ?? false;
+                  },
+                  onDismissed: (direction) {
+                    setState(() {
+                      _countdowns.removeAt(index);
+                    });
+                    _handleDelete(countdown, index);
+                  },
+                  child: MD3CardStyles.surfaceContainer(
+                    context: context,
+                    padding: const EdgeInsets.all(16),
+                    onTap: () => _editCountdown(countdown),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Icon
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: typeColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            _getEventTypeIcon(countdown.type),
+                            color: typeColor,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Content
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                countdown.title,
+                                style: MD3TypographyStyles.titleMedium(context),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                formattedDate,
+                                style: MD3TypographyStyles.bodySmall(context).copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              if (countdown.description.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  countdown.description,
+                                  style: MD3TypographyStyles.bodyMedium(context).copyWith(
+                                    color: colorScheme.outline,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                              const SizedBox(height: 12),
+                              // Chips
+                              Wrap(
+                                spacing: 8,
+                                children: [
+                                  if (countdown.category != null && countdown.category!.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.surfaceContainerHighest,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        countdown.category!,
+                                        style: MD3TypographyStyles.labelSmall(context).copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Days Left
+                        const SizedBox(width: 16),
+                        Column(
+                          children: [
+                            Text(
+                              '${countdown.remainingDays}',
+                              style: MD3TypographyStyles.displaySmall(context).copyWith(
+                                color: typeColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              l10n.days,
+                              style: MD3TypographyStyles.labelMedium(context).copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _addCountdown,
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addCountdown),
       ),
     );
   }

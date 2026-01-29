@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/countdown_model.dart';
 import 'package:time_widgets/screens/countdown_list_screen.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
@@ -42,9 +43,10 @@ class CountdownWidget extends StatelessWidget {
     final eventType = countdown.type;
     final typeColor = _getEventTypeColor(colorScheme, eventType);
 
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainerLow,
+    return RepaintBoundary(
+      child: Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
           ResponsiveUtils.getBorderRadius(width),
@@ -94,7 +96,7 @@ class CountdownWidget extends StatelessWidget {
                         // 限制文本宽度，避免溢出
                         Flexible(
                           child: Text(
-                            '倒计时',
+                            AppLocalizations.of(context)!.countdownTitle,
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontSize:
@@ -116,7 +118,7 @@ class CountdownWidget extends StatelessWidget {
                                 BorderRadius.circular(ResponsiveUtils.value(6)),
                           ),
                           child: Text(
-                            _getEventTypeLabel(eventType),
+                            _getEventTypeLabel(context, eventType),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: typeColor,
                               fontWeight: FontWeight.w600,
@@ -160,7 +162,7 @@ class CountdownWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '天',
+                    AppLocalizations.of(context)!.days,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) *
@@ -179,6 +181,7 @@ class CountdownWidget extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -188,9 +191,10 @@ class CountdownWidget extends StatelessWidget {
     ColorScheme colorScheme,
     double width,
   ) {
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainerLow,
+    return RepaintBoundary(
+      child: Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
           ResponsiveUtils.getBorderRadius(width),
@@ -233,13 +237,13 @@ class CountdownWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '暂无倒计时',
+                      AppLocalizations.of(context)!.countdownEmpty,
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     Text(
-                      '点击添加重要事件',
+                      AppLocalizations.of(context)!.countdownAddHint,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.outline,
                       ),
@@ -251,7 +255,7 @@ class CountdownWidget extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildErrorCard(
@@ -261,9 +265,10 @@ class CountdownWidget extends StatelessWidget {
   ) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
-    return Card(
-      elevation: 0,
-      color: colorScheme.errorContainer,
+    return RepaintBoundary(
+      child: Card(
+        elevation: 0,
+        color: colorScheme.errorContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
           ResponsiveUtils.getBorderRadius(width),
@@ -281,7 +286,7 @@ class CountdownWidget extends StatelessWidget {
             SizedBox(width: ResponsiveUtils.value(12)),
             Expanded(
               child: Text(
-                '倒计时加载失败',
+                AppLocalizations.of(context)!.countdownLoadFailed,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onErrorContainer,
                       fontSize:
@@ -295,7 +300,7 @@ class CountdownWidget extends StatelessWidget {
               TextButton(
                 onPressed: onRetry,
                 child: Text(
-                  '重试',
+                  AppLocalizations.of(context)!.retry,
                   style: TextStyle(
                     color: colorScheme.onErrorContainer,
                     fontSize: 14.0 * fontMultiplier,
@@ -305,7 +310,7 @@ class CountdownWidget extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Color _getEventTypeColor(ColorScheme colorScheme, String eventType) {
@@ -323,18 +328,18 @@ class CountdownWidget extends StatelessWidget {
     }
   }
 
-  String _getEventTypeLabel(String eventType) {
+  String _getEventTypeLabel(BuildContext context, String eventType) {
     switch (eventType.toLowerCase()) {
       case 'exam':
-        return '考试';
+        return AppLocalizations.of(context)!.eventExam;
       case 'assignment':
-        return '作业';
+        return AppLocalizations.of(context)!.eventAssignment;
       case 'project':
-        return '项目';
+        return AppLocalizations.of(context)!.eventProject;
       case 'holiday':
-        return '假期';
+        return AppLocalizations.of(context)!.eventHoliday;
       default:
-        return '事件';
+        return AppLocalizations.of(context)!.eventDefault;
     }
   }
 

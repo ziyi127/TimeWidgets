@@ -39,8 +39,12 @@ class ErrorClassifier {
 
   /// 判断是否为网络错误
   static bool _isNetworkError(dynamic error) {
-    if (error is SocketException) return true;
-    if (error is HttpException) return true;
+    if (error is SocketException) {
+      return true;
+    }
+    if (error is HttpException) {
+      return true;
+    }
 
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('network') ||
@@ -52,8 +56,12 @@ class ErrorClassifier {
 
   /// 判断是否为存储错误
   static bool _isStorageError(dynamic error) {
-    if (error is FileSystemException) return true;
-    if (error is PathNotFoundException) return true;
+    if (error is FileSystemException) {
+      return true;
+    }
+    if (error is PathNotFoundException) {
+      return true;
+    }
 
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('file') ||
@@ -76,7 +84,9 @@ class ErrorClassifier {
 
   /// 判断是否为状态错误
   static bool _isStateError(dynamic error) {
-    if (error is StateError) return true;
+    if (error is StateError) {
+      return true;
+    }
 
     final errorStr = error.toString().toLowerCase();
     return errorStr.contains('state') ||

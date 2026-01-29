@@ -14,7 +14,7 @@ class ResponsiveUtils {
   static double _scaleFactor = 1;
 
   /// 设置缩放比例
-  static void setScaleFactor(double factor) {
+  static set scaleFactor(double factor) {
     _scaleFactor = factor;
   }
 

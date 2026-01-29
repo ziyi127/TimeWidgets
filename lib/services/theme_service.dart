@@ -9,7 +9,7 @@ import 'package:time_widgets/utils/theme_utils.dart';
 /// 主题服务
 /// 管理应用的主题设置，包括种子颜色、主题模式等
 /// 支持 Material You 动态取色
-class ThemeService {
+class ThemeService extends ChangeNotifier {
   factory ThemeService() => _instance;
 
   ThemeService._internal();
@@ -61,11 +61,13 @@ class ThemeService {
 
       _isInitialized = true;
       _themeController.add(_currentSettings);
+      notifyListeners();
       return _currentSettings;
     } catch (e) {
       Logger.e('Error loading theme settings: $e');
       _currentSettings = ThemeSettings.defaultSettings();
       _isInitialized = true;
+      notifyListeners();
       return _currentSettings;
     }
   }
@@ -78,6 +80,7 @@ class ThemeService {
       await prefs.setString(_themeSettingsKey, jsonEncode(jsonData));
       _currentSettings = settings;
       _themeController.add(_currentSettings);
+      notifyListeners();
     } catch (e) {
       Logger.e('Error saving theme settings: $e');
       throw Exception('Failed to save theme settings');
@@ -85,11 +88,13 @@ class ThemeService {
   }
 
   /// 释放资源
+  @override
   void dispose() {
     _isInitialized = false;
     _currentSettings = ThemeSettings.defaultSettings();
     _themeController.close();
     Logger.i('ThemeService disposed');
+    super.dispose();
   }
 
   /// 生成浅色主题
@@ -136,30 +141,22 @@ class ThemeService {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
     );
@@ -209,30 +206,22 @@ class ThemeService {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8 * radiusScale),
-          ),
+          // MD3 uses StadiumBorder by default
         ),
       ),
     );

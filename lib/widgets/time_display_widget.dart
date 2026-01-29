@@ -61,9 +61,10 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
     final colorScheme = theme.colorScheme;
 
     // MD3: 使用 surfaceContainerLow 作为卡片背景
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainerLow,
+    return RepaintBoundary(
+      child: Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -105,6 +106,6 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

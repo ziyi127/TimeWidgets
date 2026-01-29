@@ -63,11 +63,21 @@ class ImportStats {
   @override
   String toString() {
     final parts = <String>[];
-    if (coursesCount > 0) parts.add('$coursesCount 个科目');
-    if (timeSlotsCount > 0) parts.add('$timeSlotsCount 个时间点');
-    if (dailyCoursesCount > 0) parts.add('$dailyCoursesCount 个课程安排');
-    if (timeLayoutsCount > 0) parts.add('$timeLayoutsCount 个时间表');
-    if (schedulesCount > 0) parts.add('$schedulesCount 个课表');
+    if (coursesCount > 0) {
+      parts.add('$coursesCount 个科目');
+    }
+    if (timeSlotsCount > 0) {
+      parts.add('$timeSlotsCount 个时间点');
+    }
+    if (dailyCoursesCount > 0) {
+      parts.add('$dailyCoursesCount 个课程安排');
+    }
+    if (timeLayoutsCount > 0) {
+      parts.add('$timeLayoutsCount 个时间表');
+    }
+    if (schedulesCount > 0) {
+      parts.add('$schedulesCount 个课表');
+    }
     return parts.isEmpty ? '无数据' : parts.join('、');
   }
 }
@@ -177,8 +187,10 @@ class TimetableExportService {
     }
 
     // 检查引用完整性
-    final courseIds = courses.map((c) => c['id'].toString()).toSet();
-    final timeSlotIds = timeSlots.map((t) => t['id'].toString()).toSet();
+    final courseIds =
+        courses.map((c) => (c as Map<String, dynamic>)['id'].toString()).toSet();
+    final timeSlotIds =
+        timeSlots.map((t) => (t as Map<String, dynamic>)['id'].toString()).toSet();
     final dailyCourses = jsonData['dailyCourses'] as List;
 
     for (var i = 0; i < dailyCourses.length; i++) {
@@ -229,8 +241,8 @@ class TimetableExportService {
         if (!schedule.containsKey('id') || !schedule.containsKey('name')) {
           return ValidationResult.invalid('schedules[$i] 缺少必需字段 (id, name)');
         }
-        if (!schedule.containsKey('triggerRule')) {
-          return ValidationResult.invalid('schedules[$i] 缺少必需字段 (triggerRule)');
+        if (!schedule.containsKey('triggers') && !schedule.containsKey('triggerRule')) {
+          return ValidationResult.invalid('schedules[$i] 缺少必需字段 (triggers)');
         }
       }
     }

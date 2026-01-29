@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import '../models/timetable_edit_model.dart';
 import '../services/timetable_edit_service.dart';
 
@@ -29,7 +30,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
     _teacherController.clear();
     _classroomController.clear();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('添加课程'),
@@ -103,7 +104,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
     _teacherController.text = course.teacher;
     _classroomController.text = course.classroom;
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('编辑课程'),
@@ -174,6 +175,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<TimetableEditService>(
       builder: (context, service, child) {
         final courses = service.courses;
@@ -186,21 +188,21 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '课程列表 (${courses.length})',
+                    l10n.courseListTitle(courses.length),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   ElevatedButton.icon(
                     onPressed: _showAddCourseDialog,
                     icon: const Icon(Icons.add),
-                    label: const Text('添加课程'),
+                    label: Text(l10n.addCourse),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: courses.isEmpty
-                  ? const Center(
-                      child: Text('暂无课程，请添加课程'),
+                  ? Center(
+                      child: Text(l10n.noCourses),
                     )
                   : ListView.builder(
                       itemCount: courses.length,
@@ -217,9 +219,9 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (course.teacher.isNotEmpty)
-                                  Text('教师: ${course.teacher}'),
+                                  Text(l10n.teacherPrefix(course.teacher)),
                                 if (course.classroom.isNotEmpty)
-                                  Text('教室: ${course.classroom}'),
+                                  Text(l10n.classroomPrefix(course.classroom)),
                               ],
                             ),
                             trailing: Row(
@@ -233,25 +235,25 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.delete),
                                   onPressed: () {
-                                    showDialog(
+                                    showDialog<void>(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: const Text('确认删除'),
+                                        title: Text(l10n.confirmDelete),
                                         content: Text(
-                                          '确定要删除课程"${course.name}"吗？',
+                                          l10n.deleteCourseConfirm(course.name),
                                         ),
                                         actions: [
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.of(context).pop(),
-                                            child: const Text('取消'),
+                                            child: Text(l10n.cancel),
                                           ),
                                           ElevatedButton(
                                             onPressed: () {
                                               service.deleteCourse(course.id);
                                               Navigator.of(context).pop();
                                             },
-                                            child: const Text('删除'),
+                                            child: Text(l10n.delete),
                                           ),
                                         ],
                                       ),

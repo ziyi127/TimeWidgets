@@ -73,7 +73,7 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
     setState(() => _isSaving = true);
 
     // 模拟保存延迟
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     // 创建课程对象
     final course = Course(

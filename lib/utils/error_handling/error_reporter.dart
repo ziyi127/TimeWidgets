@@ -238,6 +238,7 @@ class ErrorReporter {
   /// 确保报告目录存在
   Future<void> _ensureReportsDirectory() async {
     final dir = Directory(reportsDirectory);
+    // ignore: avoid_slow_async_io
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
@@ -259,7 +260,10 @@ class ErrorReporter {
 
     try {
       final dir = Directory(reportsDirectory);
-      if (!await dir.exists()) return reports;
+      // ignore: avoid_slow_async_io
+      if (!await dir.exists()) {
+        return reports;
+      }
 
       await for (final entity in dir.list()) {
         if (entity is File &&
@@ -284,7 +288,9 @@ class ErrorReporter {
   Future<void> cleanOldReports({int maxAgeDays = 30}) async {
     try {
       final dir = Directory(reportsDirectory);
-      if (!dir.existsSync()) return;
+      if (!dir.existsSync()) {
+        return;
+      }
 
       final cutoffDate = DateTime.now().subtract(Duration(days: maxAgeDays));
       var deletedCount = 0;

@@ -15,6 +15,32 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
   bool _isSlave = false;
   bool _initialized = false;
 
+  bool _isSyncing = false;
+
+  Future<void> _handleGlobalSync() async {
+    if (_isSyncing) return;
+    setState(() => _isSyncing = true);
+    
+    try {
+      await _service.reconnectPairedDevices();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('同步完成')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('同步过程中出现错误: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -148,11 +174,17 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
                       '已配对设备',
                       style: MD3TypographyStyles.titleMedium(context),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.sync),
-                      tooltip: '立即同步所有',
-                      onPressed: _service.reconnectPairedDevices,
-                    ),
+                    _isSyncing 
+                        ? const SizedBox(
+                            width: 24, 
+                            height: 24, 
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.sync),
+                            tooltip: '立即同步所有',
+                            onPressed: _handleGlobalSync,
+                          ),
                   ],
                 ),
               ),
@@ -257,7 +289,7 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
 
   Future<void> _connectToDevice(DiscoveredDevice device, {required bool isPairing}) async {
     try {
-      showDialog(
+      showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (context) => const Center(child: CircularProgressIndicator()),

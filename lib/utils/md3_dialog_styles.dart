@@ -209,6 +209,7 @@ class MD3DialogStyles {
     required String title,
     required List<SelectionDialogItem<T>> items,
     T? selectedValue,
+    List<Widget>? actions,
   }) {
     return showDialog<T>(
       context: context,
@@ -249,6 +250,7 @@ class MD3DialogStyles {
               },
             ),
           ),
+          actions: actions,
         );
       },
     );

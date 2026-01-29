@@ -140,7 +140,9 @@ class ColorUtils {
 /// Extension for pow operation on double
 extension DoublePow on double {
   double pow(double exponent) {
-    if (this < 0) return 0;
+    if (this < 0) {
+      return 0;
+    }
     double result = 1;
     final double base = this;
     final int exp = exponent.toInt();
@@ -163,7 +165,9 @@ extension DoublePow on double {
   static double _powFractional(double base, double frac) {
     // Simple approximation for fractional exponents
     // Using exp(frac * ln(base))
-    if (base <= 0) return 0;
+    if (base <= 0) {
+      return 0;
+    }
 
     // Natural log approximation
     double ln = 0;

@@ -1,0 +1,366 @@
+{
+  "appTitle": "Smart Timetable",
+  "loading": "Loading...",
+  "retry": "Retry",
+  "error": "Error",
+  
+  "weatherTitle": "Weather",
+  "weatherLoading": "Loading weather...",
+  "weatherLoadFailed": "Failed to load weather",
+  "weatherUnknown": "Unknown",
+
+  "countdownTitle": "Countdown",
+  "countdownEmpty": "No Countdowns",
+  "countdownAddHint": "Click to add important events",
+  "countdownLoadFailed": "Failed to load countdowns",
+  "deleteSuccess": "Deleted",
+  "undo": "Undo",
+  "days": "days",
+  "eventExam": "Exam",
+  "eventAssignment": "Assignment",
+  "eventProject": "Project",
+  "eventHoliday": "Holiday",
+  "eventDefault": "Event",
+
+  "desktopWidgetDisabled": "Desktop Widgets Disabled",
+  "desktopWidgetDisabledHint": "Enable in settings or right-click tray icon",
+
+  "currentClassTitle": "Current Class",
+  "currentClassEmpty": "No Class Now",
+  "currentClassNext": "Next",
+  "currentClassLocation": "Location",
+  "currentClassTime": "Time",
+  "currentClassTeacher": "Teacher",
+  "currentClassLoading": "Loading classes...",
+  "currentClassLoadFailed": "Failed to load classes",
+
+  "settingsTitle": "Settings",
+  "settingsSaved": "Settings saved",
+  "settingsResetTitle": "Reset Settings",
+  "settingsResetMessage": "Are you sure you want to reset all settings to default? This action cannot be undone.",
+  "settingsResetConfirm": "Reset",
+  "settingsResetSuccess": "Settings reset",
+  "resetToDefault": "Reset to default",
+  "select": "Select",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "change": "Change",
+  "notSet": "Not set",
+  "keepUnchanged": "Keep Unchanged",
+
+  "generalSettings": "General",
+  "language": "Language",
+  "languageZh": "Simplified Chinese",
+  "languageEn": "English",
+
+  "appearanceSettings": "Appearance",
+  "themeMode": "Theme Mode",
+  "themeModeSystem": "System",
+  "themeModeLight": "Light",
+  "themeModeDark": "Dark",
+  "dynamicColor": "Dynamic Color",
+  "dynamicColorSubtitle": "Use Material You dynamic coloring",
+  "followSystemColor": "Follow System Color",
+  "followSystemColorSubtitle": "Use system accent color",
+  "seedColor": "Seed Color",
+  "seedColorSubtitle": "Customize app theme color",
+  "selectSeedColor": "Select Seed Color",
+  "fontSize": "Font Size",
+  "borderRadius": "Border Radius",
+  "componentOpacity": "Component Opacity",
+  "shadowStrength": "Shadow Strength",
+  "enableGradients": "Enable Gradients",
+  "enableGradientsSubtitle": "Add gradient effects to buttons and cards",
+  "uiScale": "UI Scale",
+
+  "widgetDisplaySettings": "Widget Display",
+  "timeDisplay": "Time Display",
+  "timeDisplaySubtitle": "Show time on home screen",
+  "dateDisplay": "Date Display",
+  "dateDisplaySubtitle": "Show date on home screen",
+  "weekDisplay": "Week Display",
+  "weekDisplaySubtitle": "Show current week number on home screen",
+  "weatherDisplay": "Weather Display",
+  "weatherDisplaySubtitle": "Show weather info on home screen",
+  "weatherLocation": "Weather Location",
+  "countdownDisplay": "Countdown Display",
+  "countdownDisplaySubtitle": "Show countdown on home screen",
+  "currentClassDisplay": "Current Class Display",
+  "currentClassDisplaySubtitle": "Show current class on home screen",
+  "desktopWidgets": "Desktop Widgets",
+  "enableDesktopWidgets": "Enable Desktop Widgets",
+  "enableDesktopWidgetsSubtitle": "Show widgets on desktop",
+
+  "semesterSettings": "Semester",
+  "semesterStartDate": "Semester Start Date",
+
+  "refreshSettings": "Refresh Interval",
+  "weatherRefreshInterval": "Weather Refresh Interval",
+  "countdownRefreshInterval": "Countdown Refresh Interval",
+
+  "timeSyncSettings": "Time Sync",
+  "autoNtpSync": "Auto NTP Sync",
+  "autoNtpSyncSubtitle": "Automatically calibrate system time when enabled",
+  "ntpServer": "NTP Server",
+  "modifyNtpServer": "Modify NTP Server",
+  "serverAddress": "Server Address",
+  "syncInterval": "Sync Interval",
+  "currentStatus": "Current Status",
+  "timeOffset": "Time Offset",
+  "syncNow": "Sync Now",
+
+  "notificationSettings": "Notification",
+  "enableNotifications": "Enable Notifications",
+  "enableNotificationsSubtitle": "Receive course and countdown reminders",
+  "courseReminder": "Course Reminder",
+  "courseReminderSubtitle": "Remind before class starts when enabled",
+  "voiceReminder": "Voice Reminder",
+  "voiceReminderSubtitle": "Use system TTS for course reminders when enabled",
+  "classStartNotification": "Class Start Notification",
+  "classStartNotificationSubtitle": "Send notification when class starts",
+  "classEndNotification": "Class End Notification",
+  "classEndNotificationSubtitle": "Send notification when class ends",
+  "countdownNotification": "Countdown Notification",
+  "countdownNotificationSubtitle": "Send notification when countdown ends",
+
+  "startupSettings": "Startup",
+  "startWithWindows": "Start with Windows",
+  "startWithWindowsSubtitle": "Automatically run app on system startup",
+  "minimizeToTray": "Minimize to Tray",
+  "minimizeToTraySubtitle": "Minimize to system tray when closing window",
+
+  "advancedSettings": "Advanced",
+  "debugMode": "Debug Mode",
+  "debugModeSubtitle": "Show debug info and logs",
+  "performanceMonitoring": "Performance Monitoring",
+  "performanceMonitoringSubtitle": "Monitor app performance metrics",
+  "apiBaseUrl": "API Base URL",
+  "modifyApiBaseUrl": "Modify API Base URL",
+  "apiUrl": "API URL",
+
+  "interconnectionSettings": "Device Interconnection",
+  "experimental": "Experimental",
+  "interconnectionSubtitle": "Connect other devices to sync timetable and settings",
+  "securityWarning": "Security Warning",
+  "securityWarningMessage": "The device interconnection feature uses unencrypted LAN broadcast and transmission protocols.\n\nOnce enabled, your device name, IP address, and synced timetable data may be accessed by other users on the LAN.\n\nPlease ensure you only use this feature in a trusted network environment (e.g., home WiFi). Continue?",
+  "securityWarningConfirm": "I understand, continue",
+
+  "aboutSettings": "About",
+  "aboutApp": "About App",
+  "aboutAppSubtitle": "View app version, developer info, etc.",
+
+  "minutes": "minutes",
+  "seconds": "seconds",
+  "ntpServerHint": "e.g., pool.ntp.org",
+  "apiUrlHint": "e.g., http://localhost:3000/api",
+  
+  "timetableEditTitle": "Edit Timetable",
+  "tabSchedule": "Schedule",
+  "tabTimeLayout": "Time Layout",
+  "tabSubjects": "Subjects",
+  "saveTimetable": "Save Timetable",
+  "timetableSaved": "Timetable saved",
+  "saveFailed": "Save failed: {error}",
+  "@saveFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "courseListTitle": "Courses ({count})",
+  "@courseListTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "addCourse": "Add Course",
+  "editCourse": "Edit Course",
+  "noCourses": "No courses, please add one",
+  "courseName": "Course Name",
+  "pleaseEnterCourseName": "Please enter course name",
+  "teacherName": "Teacher",
+  "pleaseEnterTeacherName": "Please enter teacher name",
+  "classroom": "Classroom",
+  "pleaseEnterClassroom": "Please enter classroom location",
+  "deleteCourseConfirm": "Delete course \"{courseName}\"?",
+  "@deleteCourseConfirm": {
+    "placeholders": {
+      "courseName": { "type": "String" }
+    }
+  },
+  "confirmDelete": "Confirm Delete",
+  "delete": "Delete",
+  "save": "Save",
+  "add": "Add",
+  "teacherPrefix": "Teacher: {name}",
+  "@teacherPrefix": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "classroomPrefix": "Classroom: {name}",
+  "@classroomPrefix": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+
+  "importSuccess": "Imported: {stats}",
+  "@importSuccess": {
+    "placeholders": {
+      "stats": { "type": "String" }
+    }
+  },
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "exportSuccess": "Timetable exported",
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "createTimetable": "Create Timetable",
+  "selectOrCreateTimetable": "Select or create a timetable to edit",
+  "timetableSettings": "Timetable Settings",
+  "quickSchedule": "Quick Schedule",
+  "deleteTimetable": "Delete Timetable",
+  "timetableName": "Timetable Name",
+  "copyScheduleTo": "Copy schedule to...",
+  "copyTo": "Copy to {day}",
+  "@copyTo": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "scheduleCopied": "Copied schedule to {day}",
+  "@scheduleCopied": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "noCourse": "No Course",
+  "clearCourse": "Clear Course",
+  "editCourseInfo": "Edit \"{courseName}\"",
+  "@editCourseInfo": {
+    "placeholders": {
+      "courseName": { "type": "String" }
+    }
+  },
+  "removeFromSlot": "Remove from slot",
+  "createGroup": "Create Group",
+  "groupName": "Group Name",
+  "enterQuickEditMode": "Entered Quick Edit Mode",
+  "quickEditDoneNextDay": "Finished {day}, switching to next day",
+  "@quickEditDoneNextDay": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "quickEditAllDone": "Weekly schedule finished!",
+  "monday": "Mon",
+  "tuesday": "Tue",
+  "wednesday": "Wed",
+  "thursday": "Thu",
+  "friday": "Fri",
+  "saturday": "Sat",
+  "sunday": "Sun",
+
+  "defaultTimeLayout": "Default Layout",
+  "customTimeLayouts": "Custom Layouts",
+  "noCustomLayouts": "No custom layouts",
+  "addTimeLayout": "Add Layout",
+  "timeLayoutName": "Layout Name",
+  "addTimeSlot": "Add Time Slot",
+  "editTimeSlot": "Edit Time Slot",
+  "noTimeSlots": "No time slots",
+  "addTimeSlotHint": "Add time slots to define schedule",
+  "startTime": "Start Time",
+  "endTime": "End Time",
+  "timePointType": "Type",
+  "typeClass": "Class",
+  "typeBreak": "Break",
+  "typeDivider": "Divider",
+  "durationMinutes": "{minutes} min",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "exampleTimeLayoutName": "e.g., Weekend Layout",
+  "exampleScheduleName": "e.g., Summer Schedule",
+  "exampleTimeSlotName": "e.g., 1st Period",
+  "name": "Name",
+  "create": "Create",
+  "exampleGroupName": "e.g., Semester 1",
+  "timePointsCount": "{count} time points",
+  "@timePointsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "refresh": "Refresh",
+  "addFirstCountdown": "Click the button below to add your first countdown",
+  "deleteCountdownConfirm": "Delete \"{title}\"?",
+  "@deleteCountdownConfirm": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "editCountdown": "Edit Countdown",
+  "addCountdown": "Add Countdown",
+  "title": "Title",
+  "enterTitle": "Enter countdown title",
+  "pleaseEnterTitle": "Please enter title",
+  "description": "Description",
+  "optionalDescription": "(Optional) Enter description",
+  "targetDate": "Target Date",
+  "category": "Category",
+  "noCategory": "No Category",
+  "type": "Type",
+  "appName": "Time Widgets",
+  "developerInfo": "Developer Info",
+  "developer": "Developer",
+  "email": "Email",
+  "githubProject": "GitHub Project",
+  "copyright": "© 2025 ziyi127. All rights reserved.",
+  "license": "Open sourced under Apache License 2.0",
+  "desktopWidgetConfigTitle": "Desktop Widget Config",
+  "resetPositions": "Reset Positions",
+  "usageGuide": "Usage Guide",
+  "usageGuideContent": "• Toggle switches to control widget visibility\n• Click \"Edit Layout\" on desktop widget screen to drag and resize\n• Click \"Reset Positions\" to restore default layout",
+  "widgetManagement": "Widget Management",
+  "positionInfo": "Pos: ({x}, {y}) • Size: {width}×{height}",
+  "@positionInfo": {
+    "placeholders": {
+      "x": { "type": "int" },
+      "y": { "type": "int" },
+      "width": { "type": "int" },
+      "height": { "type": "int" }
+    }
+  },
+
+  "todayCourses": "Today's Courses",
+  "weekSchedule": "Weekly Schedule",
+  "weekNumber": "Week {week}",
+  "@weekNumber": {
+    "placeholders": {
+      "week": { "type": "int" }
+    }
+  },
+  "dayView": "Day",
+  "weekView": "Week",
+  "noCourseToday": "No courses today",
+  "enjoyFreeTime": "Enjoy your free time ☕",
+  "statusOngoing": "Ongoing",
+  "statusUpcoming": "Upcoming",
+  "statusEnded": "Ended",
+  "loadingWeekSchedule": "Loading weekly schedule...",
+  "copyToOtherTime": "Copy to other time",
+  "setReminder": "Set reminder"
+}

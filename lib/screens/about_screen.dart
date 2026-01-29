@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -7,10 +8,11 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('关于'),
+        title: Text(l10n.aboutSettings),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -37,7 +39,7 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '时间小组件',
+                    l10n.appName,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -63,25 +65,25 @@ class AboutScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '开发者信息',
+                    l10n.developerInfo,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('开发者'),
-                    subtitle: Text('ziyi127'),
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(l10n.developer),
+                    subtitle: const Text('ziyi127'),
                   ),
-                  const ListTile(
-                    leading: Icon(Icons.email),
-                    title: Text('联系邮箱'),
-                    subtitle: Text('ziyihed@outlook.com'),
+                  ListTile(
+                    leading: const Icon(Icons.email),
+                    title: Text(l10n.email),
+                    subtitle: const Text('ziyihed@outlook.com'),
                   ),
                   ListTile(
                     leading: const Icon(Icons.code),
-                    title: const Text('GitHub项目'),
+                    title: Text(l10n.githubProject),
                     subtitle:
                         const Text('https://github.com/ziyi127/TimeWidgets'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -107,21 +109,21 @@ class AboutScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '关于',
+                    l10n.aboutSettings,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    '© 2025 ziyi127. 保留所有权利。',
+                    l10n.copyright,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '基于 Apache License 2.0 开源',
+                    l10n.license,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
