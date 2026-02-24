@@ -10,6 +10,7 @@ import 'package:time_widgets/services/startup_service.dart';
 import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/widgets/city_search_dialog.dart';
+import 'package:time_widgets/utils/page_transitions.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -1283,7 +1284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (mounted) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute<void>(
+                    SmoothPageRoute<void>(
                       builder: (context) => const InterconnectionScreen(),
                     ),
                   );
@@ -1310,7 +1311,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (mounted) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute<void>(
+                    SmoothPageRoute<void>(
                       builder: (context) => const PluginManagementScreen(),
                     ),
                   );
@@ -1343,7 +1344,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute<void>(
+                SmoothPageRoute<void>(
                   builder: (context) => const AboutScreen(),
                 ),
               );

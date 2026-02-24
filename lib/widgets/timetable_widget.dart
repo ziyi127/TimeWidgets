@@ -431,10 +431,26 @@ class _TimetableWidgetState extends State<TimetableWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.weekend_rounded,
-              size: 64,
-              color: theme.colorScheme.primary.withValues(alpha: 0.5),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.85, end: 1.0),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.elasticOut,
+              builder: (context, value, child) {
+                return Transform.scale(scale: value, child: child);
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.weekend_rounded,
+                  size: 40,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.7),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Text(

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:time_widgets/screens/settings_screen.dart';
 import 'package:time_widgets/screens/timetable_edit_screen.dart';
+import 'package:time_widgets/utils/page_transitions.dart';
 import 'package:time_widgets/services/countdown_storage_service.dart';
 import 'package:time_widgets/services/enhanced_window_manager.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
@@ -220,7 +221,7 @@ class DesktopController extends ChangeNotifier with WindowListener {
 
     if (navigatorKey.currentState != null) {
       await navigatorKey.currentState!.push(
-        MaterialPageRoute<void>(
+        SmoothPageRoute<void>(
           builder: (context) => const TimetableEditScreen(),
         ),
       );

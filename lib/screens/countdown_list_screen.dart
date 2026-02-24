@@ -144,29 +144,53 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
       ),
       body: _countdowns.isEmpty
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.timer_off_outlined,
-                    size: 80,
-                    color: colorScheme.surfaceContainerHighest,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    l10n.countdownEmpty,
-                    style: MD3TypographyStyles.headlineSmall(context).copyWith(
-                      color: colorScheme.onSurfaceVariant,
+              child: AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOut,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.8, end: 1.0),
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.elasticOut,
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: value,
+                          child: child,
+                        );
+                      },
+                      child: Container(
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer.withAlpha(60),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.timer_off_outlined,
+                          size: 48,
+                          color: colorScheme.primary.withAlpha(120),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.addFirstCountdown,
-                    style: MD3TypographyStyles.bodyMedium(context).copyWith(
-                      color: colorScheme.outline,
+                    const SizedBox(height: 24),
+                    Text(
+                      l10n.countdownEmpty,
+                      style: MD3TypographyStyles.headlineSmall(context).copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.addFirstCountdown,
+                      style: MD3TypographyStyles.bodyMedium(context).copyWith(
+                        color: colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           : ListView.separated(

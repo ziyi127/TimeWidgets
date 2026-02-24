@@ -36,8 +36,8 @@ class WeatherWidget extends StatelessWidget {
     final temperature = weather?.temperature ?? 20;
     final description = weather?.description ?? AppLocalizations.of(context)!.loading;
     final humidity = weather?.humidity ?? 65;
-    final wind = weather?.wind ?? '微风';
-    final cityName = weather?.cityName ?? '北京';
+    final wind = weather?.wind ?? '--';
+    final cityName = weather?.cityName ?? AppLocalizations.of(context)!.weatherUnknown;
 
     return Card(
       elevation: 0,
@@ -193,22 +193,64 @@ class WeatherWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(ResponsiveUtils.value(16)),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: ResponsiveUtils.value(24),
-              height: ResponsiveUtils.value(24),
-              child: CircularProgressIndicator(
-                strokeWidth: ResponsiveUtils.value(2),
-                color: colorScheme.primary,
-              ),
+            // Skeleton header
+            Row(
+              children: [
+                Container(
+                  width: ResponsiveUtils.value(20),
+                  height: ResponsiveUtils.value(20),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: ResponsiveUtils.value(12)),
+                Container(
+                  width: ResponsiveUtils.value(100),
+                  height: ResponsiveUtils.value(14),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: ResponsiveUtils.value(16),
+                  height: ResponsiveUtils.value(16),
+                  child: CircularProgressIndicator(
+                    strokeWidth: ResponsiveUtils.value(2),
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: ResponsiveUtils.value(12)),
-            Text(
-              AppLocalizations.of(context)!.weatherLoading,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+            // Skeleton temperature
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  width: ResponsiveUtils.value(60),
+                  height: ResponsiveUtils.value(36),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                SizedBox(width: ResponsiveUtils.value(12)),
+                Container(
+                  width: ResponsiveUtils.value(40),
+                  height: ResponsiveUtils.value(16),
+                  margin: EdgeInsets.only(bottom: ResponsiveUtils.value(8)),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
