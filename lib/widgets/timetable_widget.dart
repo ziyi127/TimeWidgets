@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/course_model.dart';
 import 'package:time_widgets/screens/timetable_edit_screen.dart';
 import 'package:time_widgets/services/ntp_service.dart';
@@ -316,7 +317,9 @@ class _TimetableWidgetState extends State<TimetableWidget> {
               Row(
                 children: [
                   Text(
-                    _viewMode == TimetableViewMode.day ? '今日课程' : '本周课表',
+                    _viewMode == TimetableViewMode.day 
+                        ? AppLocalizations.of(context)!.todayCourses 
+                        : AppLocalizations.of(context)!.weekSchedule,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: colorScheme.onSurface,
                       fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
@@ -331,7 +334,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                        child: Padding(
                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                          child: Text(
-                           '回今天',
+                           AppLocalizations.of(context)!.todayCourses,
                            style: TextStyle(
                              color: colorScheme.primary,
                              fontSize: 12 * fontMultiplier,
@@ -382,7 +385,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
             _viewMode == TimetableViewMode.day ? Icons.view_week_rounded : Icons.view_day_rounded,
             size: 24,
           ),
-          tooltip: _viewMode == TimetableViewMode.day ? '切换至周视图' : '切换至日视图',
+          tooltip: _viewMode == TimetableViewMode.day ? AppLocalizations.of(context)!.weekView : AppLocalizations.of(context)!.dayView,
         ),
         SizedBox(width: ResponsiveUtils.value(12)),
         // IconButton.filled(
@@ -428,14 +431,30 @@ class _TimetableWidgetState extends State<TimetableWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.weekend_rounded,
-              size: 64,
-              color: theme.colorScheme.primary.withValues(alpha: 0.5),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.85, end: 1.0),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.elasticOut,
+              builder: (context, value, child) {
+                return Transform.scale(scale: value, child: child);
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.weekend_rounded,
+                  size: 40,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.7),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Text(
-              '没有安排课程',
+              AppLocalizations.of(context)!.noCourseToday,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
@@ -444,7 +463,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
             ),
             const SizedBox(height: 4),
             Text(
-              '享受自由时光吧',
+              AppLocalizations.of(context)!.enjoyFreeTime,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 14 * fontMultiplier,
@@ -567,7 +586,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                               const Icon(Icons.play_circle_fill, size: 14, color: Colors.white),
                               const SizedBox(width: 4),
                               Text(
-                                '进行中',
+                                AppLocalizations.of(context)!.statusOngoing,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12 * fontMultiplier,
@@ -769,14 +788,14 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                                  actions: [
                                    TextButton(
                                      onPressed: () => Navigator.pop(context),
-                                     child: const Text('关闭'),
+                                     child: Text(AppLocalizations.of(context)!.cancel),
                                    ),
                                    FilledButton(
                                       onPressed: () {
                                         Navigator.pop(context);
                                         _navigateToAddCourse();
                                       },
-                                      child: const Text('编辑'),
+                                      child: Text(AppLocalizations.of(context)!.editCourse),
                                    ),
                                  ],
                                ),

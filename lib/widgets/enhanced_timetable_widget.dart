@@ -457,11 +457,11 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (isCurrent) _buildStatusChip('进行中', subjectColor, colorScheme),
+            if (isCurrent) _buildStatusChip(AppLocalizations.of(context)!.statusOngoing, subjectColor, colorScheme),
             if (isUpcoming)
-              _buildStatusChip('即将开始', colorScheme.tertiary, colorScheme),
+              _buildStatusChip(AppLocalizations.of(context)!.statusUpcoming, colorScheme.tertiary, colorScheme),
             if (isCompleted)
-              _buildStatusChip('已结束', colorScheme.outline, colorScheme),
+              _buildStatusChip(AppLocalizations.of(context)!.statusEnded, colorScheme.outline, colorScheme),
           ],
         ),
         const SizedBox(height: 8),
@@ -617,7 +617,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           children: [
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('编辑课程'),
+              title: Text(AppLocalizations.of(context)!.editCourse),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: 编辑课程
@@ -625,7 +625,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             ),
             ListTile(
               leading: const Icon(Icons.copy_outlined),
-              title: const Text('复制到其他时间'),
+              title: Text(AppLocalizations.of(context)!.copyToOtherTime),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: 复制课程
@@ -633,7 +633,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             ),
             ListTile(
               leading: const Icon(Icons.notifications_outlined),
-              title: const Text('设置提醒'),
+              title: Text(AppLocalizations.of(context)!.setReminder),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: 设置提醒
@@ -641,7 +641,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('删除课程', style: TextStyle(color: Colors.red)),
+              title: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: 删除课程

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/week_service.dart';
@@ -64,6 +65,7 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // MD3: 使用 primaryContainer/secondaryContainer 作为强调背景
     final containerColor = _isOddWeek
@@ -73,62 +75,68 @@ class _WeekDisplayWidgetState extends State<WeekDisplayWidget> {
         ? colorScheme.onPrimaryContainer
         : colorScheme.onSecondaryContainer;
 
-    return Card(
-      elevation: 0,
-      color: containerColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.view_week_rounded,
-              size: 16,
-              color: onContainerColor,
-            ),
-            const SizedBox(width: 8),
-            if (_isLoading)
-              SizedBox(
-                width: 14,
-                height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: onContainerColor,
-                ),
-              )
-            else ...[
-              Text(
-                '第$_weekNumber周',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: onContainerColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
+    final weekLabelText = l10n.weekLabel(_weekNumber);
+    final parityText = _isOddWeek ? l10n.oddWeek : l10n.evenWeek;
+
+    return Semantics(
+      label: '$weekLabelText $parityText',
+      child: Card(
+        elevation: 0,
+        color: containerColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.view_week_rounded,
+                size: 16,
+                color: onContainerColor,
               ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: onContainerColor.withAlpha(38),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  _isOddWeek ? '单周' : '双周',
-                  style: theme.textTheme.labelSmall?.copyWith(
+              const SizedBox(width: 8),
+              if (_isLoading)
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: onContainerColor,
+                  ),
+                )
+              else ...[
+                Text(
+                  weekLabelText,
+                  style: theme.textTheme.labelLarge?.copyWith(
                     color: onContainerColor,
                     fontWeight: FontWeight.w600,
-                    fontSize: 11,
+                    fontSize: 12,
                   ),
                 ),
-              ),
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: onContainerColor.withAlpha(38),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    parityText,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: onContainerColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
