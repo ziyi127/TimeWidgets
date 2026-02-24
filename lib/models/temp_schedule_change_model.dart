@@ -86,4 +86,42 @@ class TempScheduleChange {
       'note': note,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TempScheduleChange &&
+        other.id == id &&
+        other.type == type &&
+        other.date == date &&
+        other.timeSlotId == timeSlotId &&
+        other.originalCourseId == originalCourseId &&
+        other.newCourseId == newCourseId &&
+        other.originalScheduleId == originalScheduleId &&
+        other.newScheduleId == newScheduleId &&
+        other.createdAt == createdAt &&
+        other.note == note;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      type,
+      date,
+      timeSlotId,
+      originalCourseId,
+      newCourseId,
+      originalScheduleId,
+      newScheduleId,
+      createdAt,
+      note,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'TempScheduleChange(id: $id, type: $type, date: $date, note: $note)';
+  }
 }
