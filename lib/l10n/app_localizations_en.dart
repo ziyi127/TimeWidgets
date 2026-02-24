@@ -816,4 +816,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setReminder => 'Set reminder';
+
+  @override
+  String get currentTimeLabel => 'Current Time';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String dateFormatMonthDay(int month, int day) {
+    return '$month/$day';
+  }
+
+  @override
+  String get oddWeek => 'Odd';
+
+  @override
+  String get evenWeek => 'Even';
+
+  @override
+  String weekLabel(int week) {
+    return 'Wk $week';
+  }
+
+  @override
+  String get weekdayMon => 'Mon';
+
+  @override
+  String get weekdayTue => 'Tue';
+
+  @override
+  String get weekdayWed => 'Wed';
+
+  @override
+  String get weekdayThu => 'Thu';
+
+  @override
+  String get weekdayFri => 'Fri';
+
+  @override
+  String get weekdaySat => 'Sat';
+
+  @override
+  String get weekdaySun => 'Sun';
+
+  @override
+  String get noClassFreeTime => 'No class right now, take a break';
+
+  @override
+  String get settingsSectionGeneral => 'General';
+
+  @override
+  String get settingsSectionAppearance => 'Appearance';
+
+  @override
+  String get settingsSectionWidgets => 'Widgets';
+
+  @override
+  String get settingsSectionData => 'Data & Sync';
+
+  @override
+  String get settingsSectionAdvanced => 'Advanced';
+
+  @override
+  String get pluginManagement => 'Plugin Management';
+
+  @override
+  String get pluginManagementSubtitle => 'Install and manage third-party plugins';
+
+  @override
+  String get pluginSecurityWarning => 'Plugins may access your device data. Only install plugins from trusted sources.';
+
+  @override
+  String dateFormatFull(int year, int month, int day) {
+    return '$year/$month/$day';
+  }
 }

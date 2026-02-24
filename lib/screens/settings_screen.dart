@@ -23,6 +23,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final ThemeService _themeService = ThemeService();
   late AppSettings _settings;
   bool _isLoading = true;
+  final ScrollController _scrollController = ScrollController();
+  int _activeSectionIndex = 0;
+  final List<GlobalKey> _sectionKeys = List.generate(5, (_) => GlobalKey());
 
   @override
   void initState() {
@@ -173,60 +176,137 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToSection(int index) {
+    final keyContext = _sectionKeys[index].currentContext;
+    if (keyContext != null) {
+      Scrollable.ensureVisible(
+        keyContext,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
+      );
+    }
+    setState(() {
+      _activeSectionIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.settingsTitle)),
+        appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
+    final sectionLabels = [
+      (l10n.settingsSectionGeneral, Icons.tune_rounded),
+      (l10n.settingsSectionAppearance, Icons.palette_outlined),
+      (l10n.settingsSectionWidgets, Icons.widgets_outlined),
+      (l10n.settingsSectionData, Icons.sync_rounded),
+      (l10n.settingsSectionAdvanced, Icons.settings_suggest_outlined),
+    ];
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settingsTitle),
+        title: Text(l10n.settingsTitle),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
+          tooltip: l10n.cancel,
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.restore),
             onPressed: _resetSettings,
-            tooltip: AppLocalizations.of(context)!.resetToDefault,
+            tooltip: l10n.resetToDefault,
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          _buildGeneralSettings(theme),
-          const SizedBox(height: 16),
-          _buildThemeSettings(theme),
-          const SizedBox(height: 16),
-          _buildWidgetSettings(theme),
-          const SizedBox(height: 16),
-          _buildSemesterSettings(theme),
-          const SizedBox(height: 16),
-          _buildRefreshSettings(theme),
-          const SizedBox(height: 16),
-          _buildTimeSyncSettings(theme),
-          const SizedBox(height: 16),
-          _buildNotificationSettings(theme),
-          const SizedBox(height: 16),
-          _buildStartupSettings(theme),
-          const SizedBox(height: 16),
-          _buildAdvancedSettings(theme),
-          const SizedBox(height: 16),
-          _buildInterconnectionSettings(theme),
-          const SizedBox(height: 16),
-          _buildAboutSettings(theme),
+          // Section navigation chips
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.outlineVariant.withAlpha(80),
+                ),
+              ),
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: List.generate(sectionLabels.length, (index) {
+                  final isActive = _activeSectionIndex == index;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      selected: isActive,
+                      label: Text(sectionLabels[index].$1),
+                      avatar: Icon(
+                        sectionLabels[index].$2,
+                        size: 18,
+                      ),
+                      onSelected: (_) => _scrollToSection(index),
+                      showCheckmark: false,
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          // Settings content
+          Expanded(
+            child: ListView(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Section 0: General
+                Container(key: _sectionKeys[0], child: _buildGeneralSettings(theme)),
+                const SizedBox(height: 16),
+
+                // Section 1: Appearance
+                Container(key: _sectionKeys[1], child: _buildThemeSettings(theme)),
+                const SizedBox(height: 16),
+
+                // Section 2: Widgets
+                Container(key: _sectionKeys[2], child: _buildWidgetSettings(theme)),
+                const SizedBox(height: 16),
+                _buildSemesterSettings(theme),
+                const SizedBox(height: 16),
+
+                // Section 3: Data & Sync
+                Container(key: _sectionKeys[3], child: _buildRefreshSettings(theme)),
+                const SizedBox(height: 16),
+                _buildTimeSyncSettings(theme),
+                const SizedBox(height: 16),
+                _buildNotificationSettings(theme),
+                const SizedBox(height: 16),
+
+                // Section 4: Advanced
+                Container(key: _sectionKeys[4], child: _buildStartupSettings(theme)),
+                const SizedBox(height: 16),
+                _buildAdvancedSettings(theme),
+                const SizedBox(height: 16),
+                _buildInterconnectionSettings(theme),
+                const SizedBox(height: 16),
+                _buildAboutSettings(theme),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -723,7 +803,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               () {
                 final date = _settings.semesterStartDate;
                 return date != null
-                    ? '${date.year}年${date.month}月${date.day}日'
+                    ? AppLocalizations.of(context)!.dateFormatFull(date.year, date.month, date.day)
                     : AppLocalizations.of(context)!.notSet;
               }(),
             ),
@@ -1213,14 +1293,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.extension),
-            title: const Text('插件管理'),
-            subtitle: const Text('安装和管理第三方插件'),
+            title: Text(AppLocalizations.of(context)!.pluginManagement),
+            subtitle: Text(AppLocalizations.of(context)!.pluginManagementSubtitle),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () async {
               final confirm = await MD3DialogStyles.showConfirmDialog(
                 context: context,
                 title: AppLocalizations.of(context)!.securityWarning,
-                message: '插件可能会访问您的设备数据，请注意安全。仅安装来自可信来源的插件。',
+                message: AppLocalizations.of(context)!.pluginSecurityWarning,
                 confirmText: AppLocalizations.of(context)!.securityWarningConfirm,
                 icon: Icon(Icons.warning_amber_rounded,
                     color: theme.colorScheme.error,),

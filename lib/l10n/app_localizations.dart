@@ -1615,6 +1615,144 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'设置提醒'**
   String get setReminder;
+
+  /// No description provided for @currentTimeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前时间'**
+  String get currentTimeLabel;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'日期'**
+  String get dateLabel;
+
+  /// No description provided for @dateFormatMonthDay.
+  ///
+  /// In zh, this message translates to:
+  /// **'{month}月{day}日'**
+  String dateFormatMonthDay(int month, int day);
+
+  /// No description provided for @oddWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'单周'**
+  String get oddWeek;
+
+  /// No description provided for @evenWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'双周'**
+  String get evenWeek;
+
+  /// No description provided for @weekLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'第{week}周'**
+  String weekLabel(int week);
+
+  /// No description provided for @weekdayMon.
+  ///
+  /// In zh, this message translates to:
+  /// **'周一'**
+  String get weekdayMon;
+
+  /// No description provided for @weekdayTue.
+  ///
+  /// In zh, this message translates to:
+  /// **'周二'**
+  String get weekdayTue;
+
+  /// No description provided for @weekdayWed.
+  ///
+  /// In zh, this message translates to:
+  /// **'周三'**
+  String get weekdayWed;
+
+  /// No description provided for @weekdayThu.
+  ///
+  /// In zh, this message translates to:
+  /// **'周四'**
+  String get weekdayThu;
+
+  /// No description provided for @weekdayFri.
+  ///
+  /// In zh, this message translates to:
+  /// **'周五'**
+  String get weekdayFri;
+
+  /// No description provided for @weekdaySat.
+  ///
+  /// In zh, this message translates to:
+  /// **'周六'**
+  String get weekdaySat;
+
+  /// No description provided for @weekdaySun.
+  ///
+  /// In zh, this message translates to:
+  /// **'周日'**
+  String get weekdaySun;
+
+  /// No description provided for @noClassFreeTime.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前无课，好好休息吧'**
+  String get noClassFreeTime;
+
+  /// No description provided for @settingsSectionGeneral.
+  ///
+  /// In zh, this message translates to:
+  /// **'常规'**
+  String get settingsSectionGeneral;
+
+  /// No description provided for @settingsSectionAppearance.
+  ///
+  /// In zh, this message translates to:
+  /// **'外观'**
+  String get settingsSectionAppearance;
+
+  /// No description provided for @settingsSectionWidgets.
+  ///
+  /// In zh, this message translates to:
+  /// **'小部件'**
+  String get settingsSectionWidgets;
+
+  /// No description provided for @settingsSectionData.
+  ///
+  /// In zh, this message translates to:
+  /// **'数据与同步'**
+  String get settingsSectionData;
+
+  /// No description provided for @settingsSectionAdvanced.
+  ///
+  /// In zh, this message translates to:
+  /// **'高级'**
+  String get settingsSectionAdvanced;
+
+  /// No description provided for @pluginManagement.
+  ///
+  /// In zh, this message translates to:
+  /// **'插件管理'**
+  String get pluginManagement;
+
+  /// No description provided for @pluginManagementSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'安装和管理第三方插件'**
+  String get pluginManagementSubtitle;
+
+  /// No description provided for @pluginSecurityWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'插件可能会访问您的设备数据...'**
+  String get pluginSecurityWarning;
+
+  /// No description provided for @dateFormatFull.
+  ///
+  /// In zh, this message translates to:
+  /// **'{year}年{month}月{day}日'**
+  String dateFormatFull(int year, int month, int day);
 }
 
 class _AppLocalizationsDelegate

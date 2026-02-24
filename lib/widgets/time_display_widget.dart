@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:time_widgets/l10n/app_localizations.dart';
 
 /// 时间显示组件 - MD3紧凑版
 class TimeDisplayWidget extends StatefulWidget {
@@ -59,53 +60,58 @@ class _TimeDisplayWidgetState extends State<TimeDisplayWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // MD3: 使用 surfaceContainerLow 作为卡片背景
     return RepaintBoundary(
-      child: Card(
-        elevation: 0,
-        color: colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.schedule_rounded,
-              size: 16,
-              color: colorScheme.primary,
+      child: Semantics(
+        label: '${l10n.currentTimeLabel}: $_currentTime:$_currentSeconds',
+        child: Card(
+          elevation: 0,
+          color: colorScheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.schedule_rounded,
+                  size: 16,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.currentTimeLabel,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  _currentTime,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _currentSeconds,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Text(
-              '当前时间',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              _currentTime,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-                fontSize: 20,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              _currentSeconds,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontSize: 14,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

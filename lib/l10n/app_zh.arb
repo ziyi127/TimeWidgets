@@ -362,5 +362,47 @@
   "statusEnded": "已结束",
   "loadingWeekSchedule": "正在加载周课表...",
   "copyToOtherTime": "复制到其他时间",
-  "setReminder": "设置提醒"
+  "setReminder": "设置提醒",
+
+  "currentTimeLabel": "当前时间",
+  "dateLabel": "日期",
+  "dateFormatMonthDay": "{month}月{day}日",
+  "@dateFormatMonthDay": {
+    "placeholders": {
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
+  "oddWeek": "单周",
+  "evenWeek": "双周",
+  "weekLabel": "第{week}周",
+  "@weekLabel": {
+    "placeholders": {
+      "week": { "type": "int" }
+    }
+  },
+  "weekdayMon": "周一",
+  "weekdayTue": "周二",
+  "weekdayWed": "周三",
+  "weekdayThu": "周四",
+  "weekdayFri": "周五",
+  "weekdaySat": "周六",
+  "weekdaySun": "周日",
+  "noClassFreeTime": "当前无课，好好休息吧",
+  "settingsSectionGeneral": "常规",
+  "settingsSectionAppearance": "外观",
+  "settingsSectionWidgets": "小部件",
+  "settingsSectionData": "数据与同步",
+  "settingsSectionAdvanced": "高级",
+  "pluginManagement": "插件管理",
+  "pluginManagementSubtitle": "安装和管理第三方插件",
+  "pluginSecurityWarning": "插件可能会访问您的设备数据，请注意安全。仅安装来自可信来源的插件。",
+  "dateFormatFull": "{year}年{month}月{day}日",
+  "@dateFormatFull": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  }
 }

@@ -57,33 +57,45 @@ class CurrentClassWidget extends StatelessWidget {
     }
 
     if (course == null) {
-      return Card(
-        elevation: 0,
-        color: colorScheme.surfaceContainerLow,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            ResponsiveUtils.getBorderRadius(width),
+      return Semantics(
+        label: AppLocalizations.of(context)!.currentClassEmpty,
+        child: Card(
+          elevation: 0,
+          color: colorScheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              ResponsiveUtils.getBorderRadius(width),
+            ),
           ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.free_breakfast_outlined,
-                color: colorScheme.secondary,
-                size: ResponsiveUtils.getIconSize(width, baseSize: 32),
-              ),
-              SizedBox(height: ResponsiveUtils.value(8)),
-              Text(
-                AppLocalizations.of(context)!.currentClassEmpty,
-                style: theme.textTheme.titleMedium?.copyWith(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.free_breakfast_outlined,
                   color: colorScheme.secondary,
-                  fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
-                      fontMultiplier,
+                  size: ResponsiveUtils.getIconSize(width, baseSize: 32),
                 ),
-              ),
-            ],
+                SizedBox(height: ResponsiveUtils.value(8)),
+                Text(
+                  AppLocalizations.of(context)!.currentClassEmpty,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.secondary,
+                    fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
+                        fontMultiplier,
+                  ),
+                ),
+                SizedBox(height: ResponsiveUtils.value(4)),
+                Text(
+                  AppLocalizations.of(context)!.noClassFreeTime,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: (theme.textTheme.bodySmall?.fontSize ?? 12) *
+                        fontMultiplier,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -134,7 +146,7 @@ class CurrentClassWidget extends StatelessWidget {
                         BorderRadius.circular(ResponsiveUtils.value(12)),
                   ),
                   child: Text(
-                    '进行中',
+                    AppLocalizations.of(context)!.statusOngoing,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colorScheme.onTertiaryContainer,
                       fontWeight: FontWeight.w600,

@@ -802,4 +802,79 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setReminder => '设置提醒';
+
+  @override
+  String get currentTimeLabel => '当前时间';
+
+  @override
+  String get dateLabel => '日期';
+
+  @override
+  String dateFormatMonthDay(int month, int day) {
+    return '$month月$day日';
+  }
+
+  @override
+  String get oddWeek => '单周';
+
+  @override
+  String get evenWeek => '双周';
+
+  @override
+  String weekLabel(int week) {
+    return '第$week周';
+  }
+
+  @override
+  String get weekdayMon => '周一';
+
+  @override
+  String get weekdayTue => '周二';
+
+  @override
+  String get weekdayWed => '周三';
+
+  @override
+  String get weekdayThu => '周四';
+
+  @override
+  String get weekdayFri => '周五';
+
+  @override
+  String get weekdaySat => '周六';
+
+  @override
+  String get weekdaySun => '周日';
+
+  @override
+  String get noClassFreeTime => '当前无课，好好休息吧';
+
+  @override
+  String get settingsSectionGeneral => '常规';
+
+  @override
+  String get settingsSectionAppearance => '外观';
+
+  @override
+  String get settingsSectionWidgets => '小部件';
+
+  @override
+  String get settingsSectionData => '数据与同步';
+
+  @override
+  String get settingsSectionAdvanced => '高级';
+
+  @override
+  String get pluginManagement => '插件管理';
+
+  @override
+  String get pluginManagementSubtitle => '安装和管理第三方插件';
+
+  @override
+  String get pluginSecurityWarning => '插件可能会访问您的设备数据，请注意安全。仅安装来自可信来源的插件。';
+
+  @override
+  String dateFormatFull(int year, int month, int day) {
+    return '$year年$month月$day日';
+  }
 }

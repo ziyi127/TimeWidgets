@@ -362,5 +362,47 @@
   "statusEnded": "Ended",
   "loadingWeekSchedule": "Loading weekly schedule...",
   "copyToOtherTime": "Copy to other time",
-  "setReminder": "Set reminder"
+  "setReminder": "Set reminder",
+
+  "currentTimeLabel": "Current Time",
+  "dateLabel": "Date",
+  "dateFormatMonthDay": "{month}/{day}",
+  "@dateFormatMonthDay": {
+    "placeholders": {
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
+  "oddWeek": "Odd",
+  "evenWeek": "Even",
+  "weekLabel": "Wk {week}",
+  "@weekLabel": {
+    "placeholders": {
+      "week": { "type": "int" }
+    }
+  },
+  "weekdayMon": "Mon",
+  "weekdayTue": "Tue",
+  "weekdayWed": "Wed",
+  "weekdayThu": "Thu",
+  "weekdayFri": "Fri",
+  "weekdaySat": "Sat",
+  "weekdaySun": "Sun",
+  "noClassFreeTime": "No class right now, take a break",
+  "settingsSectionGeneral": "General",
+  "settingsSectionAppearance": "Appearance",
+  "settingsSectionWidgets": "Widgets",
+  "settingsSectionData": "Data & Sync",
+  "settingsSectionAdvanced": "Advanced",
+  "pluginManagement": "Plugin Management",
+  "pluginManagementSubtitle": "Install and manage third-party plugins",
+  "pluginSecurityWarning": "Plugins may access your device data. Only install plugins from trusted sources.",
+  "dateFormatFull": "{year}/{month}/{day}",
+  "@dateFormatFull": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  }
 }
