@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:time_widgets/utils/platform_utils.dart';
+
 /// 屏幕尺寸类型枚举
 enum ScreenSize {
   compact, // < 600dp
@@ -165,5 +168,130 @@ class ResponsiveUtils {
       case ScreenSize.expanded:
         return expandedCount ?? 4;
     }
+  }
+
+  /// 获取平台特定的缩放因子
+  static double getPlatformScaleFactor() {
+    if (PlatformUtils.isLinux) {
+      return 0.95; // Linux 稍微缩小以适应不同的 DPI 设置
+    }
+    if (PlatformUtils.isMacOS) {
+      return 1.0; // macOS 通常有正确的 DPI
+    }
+    return 1.0;
+  }
+
+  /// 获取考虑平台的最终缩放因子
+  static double getEffectiveScaleFactor() {
+    return _scaleFactor * getPlatformScaleFactor();
+  }
+
+  /// 获取响应式动画持续时间
+  static Duration getAnimationDuration(double width) {
+    final screenSize = getScreenSize(width);
+    switch (screenSize) {
+      case ScreenSize.compact:
+        return const Duration(milliseconds: 200);
+      case ScreenSize.medium:
+        return const Duration(milliseconds: 250);
+      case ScreenSize.expanded:
+        return const Duration(milliseconds: 300);
+    }
+  }
+
+  /// 获取响应式阴影
+  static List<BoxShadow> getShadows(double width, {bool elevated = false}) {
+    final screenSize = getScreenSize(width);
+    final baseAlpha = elevated ? 0.15 : 0.05;
+    final baseBlur = elevated ? 20 : 4;
+    final baseOffset = elevated ? 10 : 2;
+
+    double multiplier;
+    switch (screenSize) {
+      case ScreenSize.compact:
+        multiplier = 0.8;
+        break;
+      case ScreenSize.medium:
+        multiplier = 1.0;
+        break;
+      case ScreenSize.expanded:
+        multiplier = 1.2;
+        break;
+    }
+
+    return [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: baseAlpha * multiplier),
+        blurRadius: baseBlur * multiplier,
+        offset: Offset(0, baseOffset * multiplier),
+      ),
+    ];
+  }
+
+  /// 获取响应式列表项高度
+  static double getListItemHeight(double width) {
+    final screenSize = getScreenSize(width);
+    switch (screenSize) {
+      case ScreenSize.compact:
+        return 56.0 * _scaleFactor;
+      case ScreenSize.medium:
+        return 64.0 * _scaleFactor;
+      case ScreenSize.expanded:
+        return 72.0 * _scaleFactor;
+    }
+  }
+
+  /// 获取响应式按钮高度
+  static double getButtonHeight(double width) {
+    final screenSize = getScreenSize(width);
+    switch (screenSize) {
+      case ScreenSize.compact:
+        return 40.0 * _scaleFactor;
+      case ScreenSize.medium:
+        return 44.0 * _scaleFactor;
+      case ScreenSize.expanded:
+        return 48.0 * _scaleFactor;
+    }
+  }
+
+  /// 获取响应式输入框高度
+  static double getInputHeight(double width) {
+    final screenSize = getScreenSize(width);
+    switch (screenSize) {
+      case ScreenSize.compact:
+        return 48.0 * _scaleFactor;
+      case ScreenSize.medium:
+        return 52.0 * _scaleFactor;
+      case ScreenSize.expanded:
+        return 56.0 * _scaleFactor;
+    }
+  }
+
+  /// 获取响应式对话/dialog 宽度
+  static double getDialogWidth(double width) {
+    final screenSize = getScreenSize(width);
+    switch (screenSize) {
+      case ScreenSize.compact:
+        return width * 0.92;
+      case ScreenSize.medium:
+        return 600.0 * _scaleFactor;
+      case ScreenSize.expanded:
+        return 800.0 * _scaleFactor;
+    }
+  }
+
+  /// 获取响应式底部动作表最大高度
+  static double getBottomSheetMaxHeight(double screenHeight) {
+    return screenHeight * 0.9;
+  }
+
+  /// 检查是否为触摸设备
+  static bool isTouchDevice(double width) {
+    return getScreenSize(width) == ScreenSize.compact;
+  }
+
+  /// 获取触摸友好的最小点击区域
+  static double getMinTouchTarget() {
+    return 48.0 * _scaleFactor;
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:time_widgets/utils/platform_utils.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:time_widgets/utils/logger.dart';
 import 'package:window_manager/window_manager.dart';
@@ -49,16 +50,31 @@ class EnhancedWindowManager {
         'Window initialized successfully: ${windowBounds.size} at ${windowBounds.topLeft}',
       );
       
-      // 强制显示窗口（Linux/macOS 兼容性）
-      await Future.delayed(const Duration(milliseconds: 500));
-      await windowManager.show();
-      await windowManager.focus();
+      // 跨平台窗口显示优化
+      await _showWindowWithPlatformOptimization();
       
       return true;
     } catch (e) {
       Logger.e('Window initialization failed: $e');
       return _initializeWithDefaultSize();
     }
+  }
+
+  /// 跨平台优化的窗口显示方法
+  static Future<void> _showWindowWithPlatformOptimization() async {
+    // 根据平台调整延迟时间
+    final delayMs = PlatformUtils.isLinux ? 800 : (PlatformUtils.isMacOS ? 600 : 400);
+    
+    await Future<void>.delayed(Duration(milliseconds: delayMs));
+    await windowManager.show();
+    
+    // macOS 需要额外的 focus 调用
+    if (PlatformUtils.isMacOS) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    await windowManager.focus();
+  }
+      
   }
 
   /// 保存主窗口原始尺寸和位置
