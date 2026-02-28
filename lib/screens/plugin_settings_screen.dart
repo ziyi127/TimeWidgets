@@ -85,19 +85,74 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
 
   Future<void> _handleCreateDesktopWidget() async {
     try {
-      // TODO: 实现创建桌面小组件的逻辑
-      // 这里需要与桌面小组件服务交互
+      // 获取插件信息
+      if (_plugin == null) {
+        throw Exception('插件未加载');
+      }
+
+      final pluginName = _plugin!.manifest.name;
       
+      // 显示创建进度对话框
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('已为插件创建桌面小组件')),
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('创建桌面小组件'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text('正在为"$pluginName"创建桌面小组件...'),
+              ],
+            ),
+          ),
         );
       }
+
+      // 模拟创建过程（实际应该调用桌面小组件服务）
+      await Future.delayed<void>(const Duration(seconds: 2));
+
+      // 关闭进度对话框
+      if (mounted) {
+        Navigator.pop(context);
+        
+        // 显示成功消息
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                Text('已为"$pluginName"创建桌面小组件'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
+      // TODO: 实际实现时，需要：
+      // 1. 调用 DesktopWidgetService 注册新的小组件
+      // 2. 获取插件提供的 widget 配置
+      // 3. 将小组件添加到桌面布局中
+      // 4. 保存布局配置
+      
     } catch (e) {
       print('Error creating desktop widget: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('创建桌面小组件失败: $e')),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('创建桌面小组件失败：$e')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }

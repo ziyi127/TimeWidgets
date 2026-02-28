@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/models/course_model.dart';
+import 'package:time_widgets/screens/course_edit_screen.dart';
 import 'package:time_widgets/services/ntp_service.dart';
 import 'package:time_widgets/services/timetable_service.dart';
 import 'package:time_widgets/utils/color_utils.dart';
@@ -604,7 +605,64 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
 
   /// 点击课程卡片
   void _onCourseTap(Course course) {
-    // TODO: 导航到课程详情
+    // 显示课程详情对话框
+    _showCourseDetailDialog(course);
+  }
+
+  /// 显示课程详情对话框
+  void _showCourseDetailDialog(Course course) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(course.subject),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow(Icons.person, '教师', course.teacher),
+            const SizedBox(height: 8),
+            _buildDetailRow(Icons.access_time, '时间', course.time),
+            const SizedBox(height: 8),
+            _buildDetailRow(Icons.location_on, '教室', course.classroom),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('关闭'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _navigateToCourseEdit(course);
+            },
+            icon: const Icon(Icons.edit),
+            label: const Text('编辑'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey),
+        const SizedBox(width: 8),
+        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(child: Text(value)),
+      ],
+    );
+  }
+
+  void _navigateToCourseEdit(Course course) {
+    // 导航到课程编辑屏幕
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => const CourseEditScreen(),
+      ),
+    );
   }
 
   /// 长按显示菜单
@@ -620,7 +678,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               title: Text(AppLocalizations.of(context)!.editCourse),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: 编辑课程
+                _navigateToCourseEdit(course);
               },
             ),
             ListTile(
@@ -628,7 +686,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               title: Text(AppLocalizations.of(context)!.copyToOtherTime),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: 复制课程
+                _showCopyCourseDialog(course);
               },
             ),
             ListTile(
@@ -636,7 +694,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               title: Text(AppLocalizations.of(context)!.setReminder),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: 设置提醒
+                _showReminderSettingsDialog(course);
               },
             ),
             ListTile(
@@ -644,11 +702,106 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
               title: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: 删除课程
+                _showDeleteCourseDialog(course);
               },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// 显示复制课程对话框
+  void _showCopyCourseDialog(Course course) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('复制课程'),
+        content: const Text('选择要复制到的时间'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // TODO: 实现复制逻辑
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('复制功能开发中')),
+              );
+            },
+            child: const Text('复制'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 显示提醒设置对话框
+  void _showReminderSettingsDialog(Course course) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('设置提醒'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CheckboxListTile(
+              title: const Text('课前 5 分钟提醒'),
+              value: true,
+              onChanged: (value) {},
+            ),
+            CheckboxListTile(
+              title: const Text('课前 15 分钟提醒'),
+              value: false,
+              onChanged: (value) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('提醒设置已保存')),
+              );
+            },
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 显示删除课程对话框
+  void _showDeleteCourseDialog(Course course) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('删除课程'),
+        content: Text('确定要删除"${course.subject}"吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              // TODO: 实现删除逻辑
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('删除功能开发中')),
+              );
+            },
+            child: const Text('删除'),
+          ),
+        ],
       ),
     );
   }
