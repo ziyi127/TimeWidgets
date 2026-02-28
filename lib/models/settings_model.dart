@@ -104,7 +104,7 @@ class AppSettings {
       showCurrentClassWidget: json['showCurrentClassWidget'] as bool? ?? true,
 
       // Desktop widget settings
-      enableDesktopWidgets: json['enableDesktopWidgets'] as bool? ?? false,
+      enableDesktopWidgets: json['enableDesktopWidgets'] as bool? ?? true,
 
       // Notification settings
       enableCourseReminder: json['enableCourseReminder'] as bool? ?? true,

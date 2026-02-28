@@ -1745,7 +1745,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginSecurityWarning.
   ///
   /// In zh, this message translates to:
-  /// **'插件可能会访问您的设备数据...'**
+  /// **'插件可能会访问您的设备数据，请注意安全。仅安装来自可信来源的插件。'**
   String get pluginSecurityWarning;
 
   /// No description provided for @dateFormatFull.

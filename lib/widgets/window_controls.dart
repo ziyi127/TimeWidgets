@@ -1,6 +1,6 @@
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/enhanced_window_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// 窗口控制组件
 /// 包含最小化、最大化和关闭按钮
@@ -22,7 +22,9 @@ class WindowControls extends StatelessWidget {
         // 最小化按钮
         IconButton(
           icon: const Icon(Icons.minimize),
-          onPressed: appWindow.minimize,
+          onPressed: () async {
+            await windowManager.minimize();
+          },
           tooltip: '最小化',
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           hoverColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
@@ -32,7 +34,13 @@ class WindowControls extends StatelessWidget {
         // 最大化/恢复按钮
         IconButton(
           icon: const Icon(Icons.fullscreen),
-          onPressed: appWindow.maximizeOrRestore,
+          onPressed: () async {
+            if (await windowManager.isMaximized()) {
+              await windowManager.restore();
+            } else {
+              await windowManager.maximize();
+            }
+          },
           tooltip: '最大化',
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           hoverColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),

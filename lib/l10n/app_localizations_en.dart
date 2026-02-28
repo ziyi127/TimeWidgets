@@ -882,10 +882,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pluginManagement => 'Plugin Management';
 
   @override
-  String get pluginManagementSubtitle => 'Install and manage third-party plugins';
+  String get pluginManagementSubtitle =>
+      'Install and manage third-party plugins';
 
   @override
-  String get pluginSecurityWarning => 'Plugins may access your device data. Only install plugins from trusted sources.';
+  String get pluginSecurityWarning =>
+      'Plugins may access your device data. Only install plugins from trusted sources.';
 
   @override
   String dateFormatFull(int year, int month, int day) {

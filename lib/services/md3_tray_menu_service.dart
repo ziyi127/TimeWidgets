@@ -5,8 +5,8 @@ import 'package:system_tray/system_tray.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
-/// MD3风格的系统托盘菜单服务
-/// 使用C++实现基础托盘，右键时显示Flutter MD3悬浮菜单
+/// MD3 风格的系统托盘菜单服务
+/// 使用 C++ 实现基础托盘，右键时显示 Flutter MD3 悬浮菜单
 class MD3TrayMenuService {
   MD3TrayMenuService._();
   static MD3TrayMenuService? _instance;
@@ -24,21 +24,29 @@ class MD3TrayMenuService {
   VoidCallback? onExit;
   VoidCallback? onTempScheduleChange; // 新增：临时调课回调
 
-  // MD3菜单显示回调 - 由main.dart设置
+  // MD3 菜单显示回调 - 由 main.dart 设置
   VoidCallback? onShowMD3Menu;
 
   /// 初始化系统托盘（仅图标，不设置原生菜单）
   Future<bool> initialize() async {
     if (_isInitialized) return true;
 
+    // 仅在 Windows 和 macOS 上初始化系统托盘
+    // Linux 上的系统托盘支持有限，跳过初始化
+    if (!Platform.isWindows && !Platform.isMacOS) {
+      Logger.w('系统托盘在 Linux 上不支持，跳过初始化');
+      _isInitialized = true;
+      return true;
+    }
+
     try {
       _systemTray = SystemTray();
 
-      // 系统托盘初始化 - 使用system_tray 2.0.3版本兼容的API
+      // 系统托盘初始化 - 使用 system_tray 2.0.3 版本兼容的 API
       final String iconPath = Platform.isWindows
           ? 'assets/icons/tray_icon.ico'
           : 'assets/icons/app_icon.png';
-      Logger.d('使用图标路径: $iconPath');
+      Logger.d('使用图标路径：$iconPath');
 
       await _systemTray!.initSystemTray(
         title: '智慧课程表',
@@ -48,7 +56,7 @@ class MD3TrayMenuService {
       // 设置工具提示
       await _systemTray!.setToolTip('智慧课程表');
 
-      // 创建菜单（使用system_tray 2.0.3版本兼容的API）
+      // 创建菜单（使用 system_tray 2.0.3 版本兼容的 API）
       final Menu menu = Menu();
 
       Logger.d('开始构建菜单');
@@ -57,7 +65,7 @@ class MD3TrayMenuService {
       final showHideItem = MenuItemLabel(
         label: '显示/隐藏窗口',
         onClicked: (menuItem) {
-          Logger.d('菜单点击: 显示/隐藏窗口');
+          Logger.d('菜单点击：显示/隐藏窗口');
           onToggleWindow?.call();
         },
       );
@@ -65,7 +73,7 @@ class MD3TrayMenuService {
       final editTimetableItem = MenuItemLabel(
         label: '编辑课表',
         onClicked: (menuItem) {
-          Logger.d('菜单点击: 编辑课表');
+          Logger.d('菜单点击：编辑课表');
           onShowTimetableEdit?.call();
         },
       );
@@ -73,7 +81,7 @@ class MD3TrayMenuService {
       final editLayoutItem = MenuItemLabel(
         label: '编辑布局',
         onClicked: (menuItem) {
-          Logger.d('菜单点击: 编辑布局');
+          Logger.d('菜单点击：编辑布局');
           onToggleEditMode?.call();
         },
       );
@@ -81,7 +89,7 @@ class MD3TrayMenuService {
       final tempScheduleItem = MenuItemLabel(
         label: '临时调课',
         onClicked: (menuItem) {
-          Logger.d('菜单点击: 临时调课');
+          Logger.d('菜单点击：临时调课');
           onTempScheduleChange?.call();
         },
       );
@@ -89,7 +97,7 @@ class MD3TrayMenuService {
       final settingsItem = MenuItemLabel(
         label: '设置',
         onClicked: (menuItem) {
-          Logger.d('菜单点击: 设置');
+          Logger.d('菜单点击：设置');
           onShowSettings?.call();
         },
       );
@@ -97,7 +105,7 @@ class MD3TrayMenuService {
       final exitItem = MenuItemLabel(
         label: '退出程序',
         onClicked: (menuItem) {
-          Logger.d('菜单点击: 退出程序');
+          Logger.d('菜单点击：退出程序');
           onExit?.call();
         },
       );
@@ -135,10 +143,10 @@ class MD3TrayMenuService {
       });
 
       _isInitialized = true;
-      Logger.i('系统托盘初始化成功（MD3模式）');
+      Logger.i('系统托盘初始化成功（MD3 模式）');
       return true;
     } catch (e) {
-      Logger.e('系统托盘初始化失败: $e');
+      Logger.e('系统托盘初始化失败：$e');
       return false;
     }
   }
@@ -160,7 +168,7 @@ class MD3TrayMenuService {
   bool get isInitialized => _isInitialized;
 }
 
-/// MD3风格的托盘悬浮菜单
+/// MD3 风格的托盘悬浮菜单
 /// 显示在屏幕右下角，靠近系统托盘位置
 class MD3TrayPopupMenu extends StatefulWidget {
   const MD3TrayPopupMenu({
@@ -228,7 +236,7 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
 
   @override
   void dispose() {
-    // 不在这里dispose，因为动画控制器可能被缓存重用
+    // 不在这里 dispose，因为动画控制器可能被缓存重用
     // _animationController.dispose();
     super.dispose();
   }
@@ -267,8 +275,8 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
             children: [
               // 菜单定位在右下角，根据托盘位置调整
               Positioned(
-                right: 16, // 距离右侧边界16px
-                bottom: 16, // 距离底部边界16px
+                right: 16, // 距离右侧边界 16px
+                bottom: 16, // 距离底部边界 16px
                 child: GestureDetector(
                   onTap: () {}, // 阻止点击穿透
                   child: FadeTransition(

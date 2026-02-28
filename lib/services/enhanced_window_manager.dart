@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:time_widgets/utils/logger.dart';
@@ -41,9 +41,6 @@ class EnhancedWindowManager {
       // 设置窗口属性
       await _configureWindow(windowBounds);
 
-      // 初始化bitsdojo_window
-      _initializeBitsdojoWindow();
-
       // 监听屏幕变化
       _startScreenMonitoring();
 
@@ -51,6 +48,12 @@ class EnhancedWindowManager {
       Logger.i(
         'Window initialized successfully: ${windowBounds.size} at ${windowBounds.topLeft}',
       );
+      
+      // 强制显示窗口（Linux/macOS 兼容性）
+      await Future.delayed(const Duration(milliseconds: 500));
+      await windowManager.show();
+      await windowManager.focus();
+      
       return true;
     } catch (e) {
       Logger.e('Window initialization failed: $e');
@@ -62,7 +65,7 @@ class EnhancedWindowManager {
   static Size? _mainWindowSize;
   static Offset? _mainWindowPosition;
 
-  /// 创建独立的16:9窗口
+  /// 创建独立的 16:9 窗口
   /// 用于编辑页面，如设置、课表编辑等
   static Future<void> createEditWindow(String title) async {
     try {
@@ -76,7 +79,7 @@ class EnhancedWindowManager {
       // 获取屏幕尺寸
       final screenSize = await _getScreenInfo() ?? const Size(1920, 1080);
 
-      // 计算16:9窗口尺寸（基于屏幕高度的80%）
+      // 计算 16:9 窗口尺寸（基于屏幕高度的 80%）
       final windowHeight = screenSize.height * 0.8;
       final windowWidth = windowHeight * (16 / 9);
 
@@ -96,16 +99,24 @@ class EnhancedWindowManager {
       await windowManager.setPosition(bounds.topLeft);
 
       // 使用系统默认窗口样式，带边框和标题栏
-      // 不要设置为无框窗口
       await windowManager.setBackgroundColor(Colors.transparent);
-      await windowManager.setHasShadow(true);
+      
+      // 设置窗口阴影（仅 Windows 和 macOS 支持）
+      if (Platform.isWindows || Platform.isMacOS) {
+        try {
+          await windowManager.setHasShadow(true);
+        } catch (e) {
+          Logger.w('setHasShadow not available: $e');
+        }
+      }
+      
       await windowManager.setAlwaysOnTop(false);
       await windowManager.setAlwaysOnBottom(false);
       await windowManager.setResizable(true);
       await windowManager.show();
 
       // 设置窗口标题
-      appWindow.title = title;
+      await windowManager.setTitle(title);
 
       Logger.i(
         'Created edit window: $title, size: ${bounds.size} at ${bounds.topLeft}',
@@ -122,9 +133,17 @@ class EnhancedWindowManager {
       if (_mainWindowSize != null && _mainWindowPosition != null) {
         await windowManager.setSize(_mainWindowSize!);
         await windowManager.setPosition(_mainWindowPosition!);
-        await windowManager.setAsFrameless();
+        if (Platform.isWindows) {
+          await windowManager.setAsFrameless();
+        }
         await windowManager.setResizable(false);
-        await windowManager.setHasShadow(false);
+        if (Platform.isWindows || Platform.isMacOS) {
+          try {
+            await windowManager.setHasShadow(false);
+          } catch (e) {
+            Logger.w('setHasShadow not available: $e');
+          }
+        }
         await windowManager.setBackgroundColor(Colors.transparent);
 
         // 设置窗口层级 - 确保主窗口回到桌面背景层
@@ -147,7 +166,6 @@ class EnhancedWindowManager {
     try {
       // 使用 screen_retriever 获取主屏幕信息 (跨平台)
       final primaryDisplay = await screenRetriever.getPrimaryDisplay();
-      // primaryDisplay.size is not nullable in newer versions or logic
       return Size(primaryDisplay.size.width, primaryDisplay.size.height);
     } catch (e) {
       Logger.e('Error getting screen info: $e');
@@ -155,15 +173,9 @@ class EnhancedWindowManager {
     }
   }
 
-  /// 获取Windows屏幕尺寸
-  // static Future<Size?> _getWindowsScreenSize() async {
-  //   // Deprecated: replaced by screen_retriever
-  //   return null;
-  // }
-
   /// 计算窗口边界
   static Rect _calculateWindowBounds(Size screenSize) {
-    // 窗口宽度为屏幕宽度的1/4
+    // 窗口宽度为屏幕宽度的 1/4
     final windowWidth = screenSize.width / 4;
     final windowHeight = screenSize.height;
 
@@ -190,43 +202,77 @@ class EnhancedWindowManager {
       // 设置窗口位置
       await windowManager.setPosition(bounds.topLeft);
 
-      // 设置窗口样式
-      await windowManager.setAsFrameless();
+      // 设置窗口样式 - 不使用无框窗口以提高兼容性
+      if (Platform.isWindows) {
+        // 仅在 Windows 上使用无框窗口
+        try {
+          await windowManager.setAsFrameless();
+        } catch (e) {
+          Logger.w('setAsFrameless not available: $e');
+        }
+      }
       await windowManager.setBackgroundColor(Colors.transparent);
-      await windowManager.setHasShadow(false);
+      
+      // 设置窗口阴影（仅 Windows 和 macOS 支持）
+      if (Platform.isWindows || Platform.isMacOS) {
+        try {
+          await windowManager.setHasShadow(true);
+        } catch (e) {
+          Logger.w('setHasShadow not available: $e');
+        }
+      }
 
-      // 设置窗口层级 - 在桌面背景上显示，但不遮挡其他应用
-      // 这样Win+D时会显示，同时不会影响其他应用
-      await windowManager.setAlwaysOnTop(false);
-      await windowManager.setAlwaysOnBottom(true);
+      // 设置窗口层级 - 普通窗口层级
+      try {
+        await windowManager.setAlwaysOnTop(false);
+      } catch (e) {
+        Logger.w('setAlwaysOnTop not available: $e');
+      }
+      try {
+        await windowManager.setAlwaysOnBottom(false);
+      } catch (e) {
+        Logger.w('setAlwaysOnBottom not available: $e');
+      }
 
-      // 禁用鼠标穿透，确保小组件可以交互
-      await windowManager.setIgnoreMouseEvents(false);
+      // 禁用鼠标穿透，确保小组件可以交互（仅 Windows 支持）
+      if (Platform.isWindows) {
+        try {
+          await windowManager.setIgnoreMouseEvents(false);
+        } catch (e) {
+          Logger.w('setIgnoreMouseEvents not available: $e');
+        }
+      }
 
       // 设置窗口可调整大小（可选）
-      await windowManager.setResizable(false);
+      try {
+        await windowManager.setResizable(false);
+      } catch (e) {
+        Logger.w('setResizable not available: $e');
+      }
 
       // 确保窗口可见
       await windowManager.show();
+      
+      // 在 Linux 上，使用多次 show() 调用确保窗口显示
+      if (Platform.isLinux) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        await windowManager.show();
+        await windowManager.focus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        await windowManager.show();
+      } else {
+        await windowManager.focus();
+      }
 
       // 防止窗口直接关闭，交由应用层处理（实现最小化到托盘）
-      await windowManager.setPreventClose(true);
+      try {
+        await windowManager.setPreventClose(true);
+      } catch (e) {
+        Logger.w('setPreventClose not available: $e');
+      }
     } catch (e) {
       Logger.e('Error configuring window: $e');
       rethrow;
-    }
-  }
-
-  /// 初始化bitsdojo_window
-  static void _initializeBitsdojoWindow() {
-    try {
-      doWhenWindowReady(() {
-        final win = appWindow;
-        win.title = "智慧课程表";
-        win.show();
-      });
-    } catch (e) {
-      Logger.e('Error initializing bitsdojo_window: $e');
     }
   }
 
@@ -234,22 +280,61 @@ class EnhancedWindowManager {
   static Future<bool> _initializeWithDefaultSize() async {
     try {
       const defaultSize = Size(480, 1080);
-      const defaultPosition = Offset(1440, 0); // 假设1920x1080屏幕
+      const defaultPosition = Offset(1440, 0); // 假设 1920x1080 屏幕
 
       await windowManager.setSize(defaultSize);
       await windowManager.setPosition(defaultPosition);
-      await windowManager.setAsFrameless();
+      
+      // 仅在 Windows 上使用无框窗口
+      if (Platform.isWindows) {
+        try {
+          await windowManager.setAsFrameless();
+        } catch (e) {
+          Logger.w('setAsFrameless not available: $e');
+        }
+      }
+      
       await windowManager.setBackgroundColor(Colors.transparent);
-      await windowManager.setHasShadow(false);
-      // 设置窗口层级 - 在桌面背景上显示，但不遮挡其他应用
-      await windowManager.setAlwaysOnTop(false);
-      await windowManager.setAlwaysOnBottom(true);
-      // 禁用鼠标穿透，确保小组件可以交互
-      await windowManager.setIgnoreMouseEvents(false);
+      
+      // 设置窗口阴影（仅 Windows 和 macOS 支持）
+      if (Platform.isWindows || Platform.isMacOS) {
+        try {
+          await windowManager.setHasShadow(true);
+        } catch (e) {
+          Logger.w('setHasShadow not available: $e');
+        }
+      }
+      
+      // 设置窗口层级 - 普通窗口层级
+      try {
+        await windowManager.setAlwaysOnTop(false);
+      } catch (e) {
+        Logger.w('setAlwaysOnTop not available: $e');
+      }
+      try {
+        await windowManager.setAlwaysOnBottom(false);
+      } catch (e) {
+        Logger.w('setAlwaysOnBottom not available: $e');
+      }
+      
+      // 禁用鼠标穿透，确保小组件可以交互（仅 Windows 支持）
+      if (Platform.isWindows) {
+        try {
+          await windowManager.setIgnoreMouseEvents(false);
+        } catch (e) {
+          Logger.w('setIgnoreMouseEvents not available: $e');
+        }
+      }
+      
       await windowManager.show();
-      await windowManager.setPreventClose(true);
+      await windowManager.focus();
+      
+      try {
+        await windowManager.setPreventClose(true);
+      } catch (e) {
+        Logger.w('setPreventClose not available: $e');
+      }
 
-      _initializeBitsdojoWindow();
       _isInitialized = true;
 
       Logger.i(
@@ -267,7 +352,7 @@ class EnhancedWindowManager {
     // 停止之前的定时器
     _screenMonitorTimer?.cancel();
 
-    // 减少检查频率，从5秒改为30秒
+    // 减少检查频率，从 5 秒改为 30 秒
     _screenMonitorTimer =
         Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {

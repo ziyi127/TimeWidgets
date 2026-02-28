@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 
 import 'package:time_widgets/screens/settings_screen.dart';
@@ -63,6 +62,9 @@ class DesktopController extends ChangeNotifier with WindowListener {
       ResponsiveUtils.scaleFactor = settings.uiScale;
       notifyListeners();
     }
+
+    // 只在窗口初始化后处理显示/隐藏
+    if (!_isWindowInitialized) return;
 
     if (!settings.enableDesktopWidgets && !_showTrayMenu && !_isEditMode) {
       if (_isWindowVisible) {
@@ -165,13 +167,13 @@ class DesktopController extends ChangeNotifier with WindowListener {
   }
 
   void showMainWindow() {
-    appWindow.show();
+    windowManager.show();
     _isWindowVisible = true;
     notifyListeners();
   }
 
   void hideMainWindow() {
-    appWindow.hide();
+    windowManager.hide();
     _isWindowVisible = false;
     notifyListeners();
   }
@@ -183,7 +185,7 @@ class DesktopController extends ChangeNotifier with WindowListener {
     } catch (e) {
       Logger.e('Error setting prevent close to false: $e');
     }
-    appWindow.close();
+    await windowManager.close();
     exit(0);
   }
 
