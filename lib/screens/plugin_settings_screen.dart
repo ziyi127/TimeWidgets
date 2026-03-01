@@ -112,7 +112,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
       }
 
       // 模拟创建过程（实际应该调用桌面小组件服务）
-      await Future.delayed<void>(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
       // 关闭进度对话框
       if (mounted) {
