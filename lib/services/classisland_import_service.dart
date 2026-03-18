@@ -1,7 +1,3 @@
-import 'dart:convert' show jsonDecode, utf8;
-
-import 'package:file_picker/file_picker.dart';
-
 import '../models/timetable_edit_model.dart';
 import '../utils/color_utils.dart';
 import '../utils/logger.dart';
@@ -65,28 +61,8 @@ class ClassislandImportService {
 
   /// 导入Classisland数据并转换为本程序格式(带统计)
   static Future<ClassIslandImportResult> importFromFileWithStats() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        withData: true,
-      );
-
-      if (result == null || result.files.isEmpty) {
-        return ClassIslandImportResult.failure('未选择文件');
-      }
-
-      final bytes = result.files.first.bytes;
-      if (bytes == null) {
-        return ClassIslandImportResult.failure('无法读取文件内容');
-      }
-
-      final contents = utf8.decode(bytes);
-      final classislandData = jsonDecode(contents) as Map<String, dynamic>;
-
-      return _convertClassislandToTimetable(classislandData);
-    } catch (e) {
-      Logger.e('导入失败: $e');
-      return ClassIslandImportResult.failure('导入失败: $e');
-    }
+    Logger.w('ClassislandImportService.importFromFileWithStats is disabled in Flutter-only mode');
+    return ClassIslandImportResult.failure('当前版本不支持本地文件选择导入，请使用 JSON 文本导入。');
   }
 
   /// 从JSON Map导入 (用于测试或直接数据导入)

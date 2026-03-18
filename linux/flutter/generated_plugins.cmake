@@ -3,13 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  desktop_multi_window
   dynamic_color
   isar_flutter_libs
-  screen_retriever
-  system_tray
   url_launcher_linux
-  window_manager
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

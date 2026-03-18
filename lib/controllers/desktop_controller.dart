@@ -16,9 +16,8 @@ import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 import 'package:time_widgets/widgets/dialogs/temp_schedule_menu_dialog.dart';
-import 'package:window_manager/window_manager.dart';
 
-class DesktopController extends ChangeNotifier with WindowListener {
+class DesktopController extends ChangeNotifier {
   final SettingsService _settingsService;
   final GlobalKey<NavigatorState> navigatorKey;
 
@@ -36,13 +35,11 @@ class DesktopController extends ChangeNotifier with WindowListener {
     required SettingsService settingsService,
     required this.navigatorKey,
   }) : _settingsService = settingsService {
-    windowManager.addListener(this);
     _settingsService.addListener(_onSettingsChanged);
   }
 
   @override
   void dispose() {
-    windowManager.removeListener(this);
     _settingsService.removeListener(_onSettingsChanged);
     MD3TrayMenuService.instance.destroy();
     
@@ -167,33 +164,26 @@ class DesktopController extends ChangeNotifier with WindowListener {
   }
 
   void showMainWindow() {
-    windowManager.show();
+    unawaited(EnhancedWindowManager.showWindow());
     _isWindowVisible = true;
     notifyListeners();
   }
 
   void hideMainWindow() {
-    windowManager.hide();
+    unawaited(EnhancedWindowManager.hideWindow());
     _isWindowVisible = false;
     notifyListeners();
   }
 
   Future<void> exitApplication() async {
     await MD3TrayMenuService.instance.destroy();
-    try {
-      await windowManager.setPreventClose(false);
-    } catch (e) {
-      Logger.e('Error setting prevent close to false: $e');
-    }
-    await windowManager.close();
     exit(0);
   }
 
-  @override
   Future<void> onWindowClose() async {
     final settings = _settingsService.currentSettings;
     if (settings.minimizeToTray) {
-      await windowManager.hide();
+      await EnhancedWindowManager.hideWindow();
       _isWindowVisible = false;
       notifyListeners();
     } else {

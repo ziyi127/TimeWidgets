@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:file_picker/file_picker.dart';
 import '../models/timetable_edit_model.dart';
 import '../utils/color_utils.dart';
 import '../utils/logger.dart';
@@ -68,41 +66,12 @@ class GeneralImportStats {
 class GeneralImportService {
   /// 导入文件并尝试解析
   static Future<GeneralImportResult> importFromFile() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        withData: true,
-        type: FileType.custom,
-        allowedExtensions: ['json', 'txt', 'conf', 'cfg'],
-      );
-
-      if (result == null || result.files.isEmpty) {
-        return GeneralImportResult.failure('未选择文件');
-      }
-
-      final bytes = result.files.first.bytes;
-      if (bytes == null) {
-        return GeneralImportResult.failure('无法读取文件内容');
-      }
-
-      final contents = utf8.decode(bytes);
-      
-      // 尝试解析 JSON
-      try {
-        final jsonData = jsonDecode(contents);
-        return _heuristicParseJson(jsonData);
-      } catch (e) {
-        // 如果不是 JSON，目前暂不支持其他文本格式的复杂解析
-        // 可以扩展支持 XML, YAML 等，或者简单的正则提取
-        return GeneralImportResult.failure('仅支持 JSON 格式文件的模糊解析');
-      }
-    } catch (e) {
-      Logger.e('通用导入失败: $e');
-      return GeneralImportResult.failure('导入失败: $e');
-    }
+    Logger.w('GeneralImportService.importFromFile is disabled in Flutter-only mode');
+    return GeneralImportResult.failure('当前版本不支持本地文件选择导入，请使用粘贴 JSON 文本的方式导入。');
   }
 
   /// 启发式解析 JSON 数据
-  static GeneralImportResult _heuristicParseJson(dynamic json) {
+  static GeneralImportResult heuristicParseJson(dynamic json) {
     if (json is! Map<String, dynamic> && json is! List<dynamic>) {
       return GeneralImportResult.failure('无效的 JSON 结构');
     }

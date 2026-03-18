@@ -7,7 +7,6 @@ import 'package:time_widgets/services/theme_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 import 'package:time_widgets/services/settings_service.dart';
-import 'package:window_manager/window_manager.dart';
 
 class SubWindowScreen extends StatefulWidget {
   final int windowId;
@@ -71,9 +70,10 @@ class _SubWindowScreenState extends State<SubWindowScreen> {
                     actions: [
                       IconButton(
                         icon: const Icon(Icons.close),
-                        onPressed: () async {
-                          // Close this window using window_manager
-                          await windowManager.close();
+                        onPressed: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
                         },
                       ),
                     ],

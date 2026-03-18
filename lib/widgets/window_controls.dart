@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:time_widgets/services/enhanced_window_manager.dart';
-import 'package:window_manager/window_manager.dart';
 
 /// 窗口控制组件
 /// 包含最小化、最大化和关闭按钮
@@ -23,7 +22,10 @@ class WindowControls extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.minimize),
           onPressed: () async {
-            await windowManager.minimize();
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('当前平台不支持最小化窗口控制')), 
+            );
           },
           tooltip: '最小化',
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -35,11 +37,10 @@ class WindowControls extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.fullscreen),
           onPressed: () async {
-            if (await windowManager.isMaximized()) {
-              await windowManager.restore();
-            } else {
-              await windowManager.maximize();
-            }
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('当前平台不支持最大化窗口控制')), 
+            );
           },
           tooltip: '最大化',
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

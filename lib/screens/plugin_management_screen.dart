@@ -1,14 +1,6 @@
-import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:archive/archive.dart';
-import 'package:archive/archive_io.dart';
-import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/plugins/core/plugin_manager.dart';
-import 'package:time_widgets/plugins/models/plugin_manifest.dart';
 import 'package:time_widgets/screens/plugin_settings_screen.dart';
-import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
 
 class PluginManagementScreen extends StatefulWidget {
@@ -44,89 +36,11 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
 
   Future<void> _installPlugin() async {
     try {
-      // 打开文件选择器
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['zip'],
-        dialogTitle: '选择插件ZIP文件',
-      );
-
-      if (result == null || result.files.isEmpty) {
-        return;
-      }
-
-      final file = File(result.files.first.path!);
-
-      // 临时解析插件清单以获取信息
-      PluginManifest? tempManifest;
-      try {
-        // 从ZIP文件读取plugin.json
-        final bytes = await file.readAsBytes();
-        final archive = ZipDecoder().decodeBytes(bytes);
-        
-        // 查找plugin.json文件
-        ArchiveFile? manifestEntry;
-        try {
-          manifestEntry = archive.findFile('plugin.json');
-          // 如果根目录没找到，尝试在一级子目录中查找
-          if (manifestEntry == null) {
-            for (final entry in archive) {
-              if (entry.name.endsWith('/plugin.json')) {
-                manifestEntry = entry;
-                break;
-              }
-            }
-          }
-        } catch (_) {}
-        
-        if (manifestEntry != null) {
-          final manifestContent = utf8.decode(manifestEntry.content as List<int>);
-          tempManifest = PluginManifest.parse(manifestContent);
-        } else {
-          throw Exception('plugin.json not found');
-        }
-      } catch (e) {
-        debugPrint('Error parsing manifest: $e');
-        tempManifest = PluginManifest(
-          id: 'temp_id',
-          name: '插件',
-          version: '1.0.0',
-          author: '未知',
-          description: '无法解析插件信息，请谨慎安装',
-          minAppVersion: '1.0.0',
-          entryPoint: 'main.js',
-        );
-      }
-
-      // 显示安装确认对话框
-      final confirm = await MD3DialogStyles.showConfirmDialog(
-        context: context,
-        title: '安装插件',
-        message: '名称: ${tempManifest.name}\n版本: ${tempManifest.version}\n作者: ${tempManifest.author}\n\n${tempManifest.description}\n\n确定要安装此插件吗？请确保插件来自可信来源。',
-        confirmText: '安装',
-        cancelText: '取消',
-        icon: const Icon(Icons.extension),
-      );
-
-      if (confirm != true) {
-        return;
-      }
-
-      // 显示加载状态
-      setState(() {
-        _isLoading = true;
-      });
-
-      // 安装插件
-      await _pluginManager.installPlugin(file);
-
-      // 重新加载插件列表
-      await _loadPlugins();
-
-      // 显示安装成功消息
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('插件安装成功: ${tempManifest.name}')),
+          const SnackBar(
+            content: Text('当前版本不支持本地插件文件安装。'),
+          ),
         );
       }
     } catch (e) {
@@ -136,32 +50,6 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
           SnackBar(content: Text('安装失败: ${e.toString()}')),
         );
       }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<Widget?> _loadPluginWidget(String pluginId) async {
-    try {
-      // 启用插件
-      await _pluginManager.enablePlugin(pluginId);
-      
-      // 获取插件实例
-      final plugin = _pluginManager.activePlugins.firstWhere(
-        (p) => p.manifest.id == pluginId,
-        orElse: () => throw Exception('Plugin not active'),
-      );
-      
-      // 构建widget
-      final widget = plugin.buildWidget(context);
-      return widget;
-    } catch (e) {
-      debugPrint('Error loading plugin widget: $e');
-      throw e;
     }
   }
 
@@ -238,7 +126,7 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
                               // 导航到插件设置页面
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
+                                MaterialPageRoute<void>(
                                   builder: (context) => PluginSettingsScreen(pluginId: manifest.id),
                                 ),
                               );

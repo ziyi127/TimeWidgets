@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:system_tray/system_tray.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
@@ -13,7 +10,6 @@ class MD3TrayMenuService {
   static MD3TrayMenuService get instance =>
       _instance ??= MD3TrayMenuService._();
 
-  SystemTray? _systemTray;
   bool _isInitialized = false;
 
   // 回调函数
@@ -31,137 +27,18 @@ class MD3TrayMenuService {
   Future<bool> initialize() async {
     if (_isInitialized) return true;
 
-    // 仅在 Windows 和 macOS 上初始化系统托盘
-    // Linux 上的系统托盘支持有限，跳过初始化
-    if (!Platform.isWindows && !Platform.isMacOS) {
-      Logger.w('系统托盘在 Linux 上不支持，跳过初始化');
-      _isInitialized = true;
-      return true;
-    }
-
-    try {
-      _systemTray = SystemTray();
-
-      // 系统托盘初始化 - 使用 system_tray 2.0.3 版本兼容的 API
-      final String iconPath = Platform.isWindows
-          ? 'assets/icons/tray_icon.ico'
-          : 'assets/icons/app_icon.png';
-      Logger.d('使用图标路径：$iconPath');
-
-      await _systemTray!.initSystemTray(
-        title: '智慧课程表',
-        iconPath: iconPath,
-      );
-
-      // 设置工具提示
-      await _systemTray!.setToolTip('智慧课程表');
-
-      // 创建菜单（使用 system_tray 2.0.3 版本兼容的 API）
-      final Menu menu = Menu();
-
-      Logger.d('开始构建菜单');
-
-      // 先创建菜单项
-      final showHideItem = MenuItemLabel(
-        label: '显示/隐藏窗口',
-        onClicked: (menuItem) {
-          Logger.d('菜单点击：显示/隐藏窗口');
-          onToggleWindow?.call();
-        },
-      );
-
-      final editTimetableItem = MenuItemLabel(
-        label: '编辑课表',
-        onClicked: (menuItem) {
-          Logger.d('菜单点击：编辑课表');
-          onShowTimetableEdit?.call();
-        },
-      );
-
-      final editLayoutItem = MenuItemLabel(
-        label: '编辑布局',
-        onClicked: (menuItem) {
-          Logger.d('菜单点击：编辑布局');
-          onToggleEditMode?.call();
-        },
-      );
-
-      final tempScheduleItem = MenuItemLabel(
-        label: '临时调课',
-        onClicked: (menuItem) {
-          Logger.d('菜单点击：临时调课');
-          onTempScheduleChange?.call();
-        },
-      );
-
-      final settingsItem = MenuItemLabel(
-        label: '设置',
-        onClicked: (menuItem) {
-          Logger.d('菜单点击：设置');
-          onShowSettings?.call();
-        },
-      );
-
-      final exitItem = MenuItemLabel(
-        label: '退出程序',
-        onClicked: (menuItem) {
-          Logger.d('菜单点击：退出程序');
-          onExit?.call();
-        },
-      );
-
-      // 构建菜单
-      await menu.buildFrom([
-        showHideItem,
-        editTimetableItem,
-        editLayoutItem,
-        tempScheduleItem,
-        settingsItem,
-        MenuSeparator(),
-        exitItem,
-      ]);
-
-      Logger.d('菜单构建完成');
-
-      // 设置菜单
-      await _systemTray!.setContextMenu(menu);
-      Logger.d('上下文菜单设置完成');
-
-      // 设置点击事件
-      _systemTray!.registerSystemTrayEventHandler((eventName) {
-        Logger.d('MD3 Tray Event: $eventName');
-        if (eventName == kSystemTrayEventClick) {
-          // 左键点击显示/隐藏窗口
-          Logger.d('MD3 Tray: Left click - toggle window');
-          onToggleWindow?.call();
-        } else if (eventName == kSystemTrayEventRightClick) {
-          // 右键点击显示原生菜单（由系统托盘库处理）
-          Logger.d('MD3 Tray: Right click - show native menu');
-          // 手动弹出菜单，确保右键菜单显示
-          _systemTray!.popUpContextMenu();
-        }
-      });
-
-      _isInitialized = true;
-      Logger.i('系统托盘初始化成功（MD3 模式）');
-      return true;
-    } catch (e) {
-      Logger.e('系统托盘初始化失败：$e');
-      return false;
-    }
+    _isInitialized = true;
+    Logger.i('MD3TrayMenuService initialized in Flutter-only mode');
+    return true;
   }
 
   /// 更新托盘提示
   Future<void> updateTooltip(String tooltip) async {
-    if (_systemTray != null) {
-      await _systemTray!.setToolTip(tooltip);
-    }
+    Logger.d('updateTooltip ignored in Flutter-only mode: $tooltip');
   }
 
   /// 销毁托盘
   Future<void> destroy() async {
-    await _systemTray?.destroy();
-    _systemTray = null;
     _isInitialized = false;
   }
 

@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:time_widgets/models/timetable_edit_model.dart';
 import 'package:time_widgets/utils/logger.dart';
 
@@ -252,85 +250,19 @@ class TimetableExportService {
 
   /// 导出到文件
   Future<bool> exportToFile(TimetableData data) async {
-    try {
-      final jsonString = exportToJson(data);
-      final result = await FilePicker.platform.saveFile(
-        dialogTitle: '导出课表数据',
-        fileName: 'timetable_${DateTime.now().millisecondsSinceEpoch}.json',
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-      );
-
-      if (result != null) {
-        final file = File(result);
-        await file.writeAsString(jsonString);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      Logger.e('Error exporting to file: $e');
-      return false;
-    }
+    Logger.w('exportToFile is disabled in Flutter-only mode');
+    return false;
   }
 
   /// 从文件导入
   Future<TimetableData?> importFromFile() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-        withData: true,
-      );
-
-      if (result != null && result.files.isNotEmpty) {
-        final bytes = result.files.first.bytes;
-        if (bytes != null) {
-          final jsonString = utf8.decode(bytes);
-          final validation = validateJson(jsonString);
-
-          if (!validation.isValid) {
-            throw Exception(validation.errorMessage);
-          }
-
-          return importFromJson(jsonString);
-        }
-      }
-      return null;
-    } catch (e) {
-      Logger.e('Error importing from file: $e');
-      rethrow;
-    }
+    Logger.w('importFromFile is disabled in Flutter-only mode');
+    return null;
   }
 
   /// 从文件导入(带统计)
   Future<ImportResult> importFromFileWithStats() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-        withData: true,
-      );
-
-      if (result == null || result.files.isEmpty) {
-        return ImportResult.failure('未选择文件');
-      }
-
-      final bytes = result.files.first.bytes;
-      if (bytes == null) {
-        return ImportResult.failure('无法读取文件内容');
-      }
-
-      final jsonString = utf8.decode(bytes);
-      final validation = validateJson(jsonString);
-
-      if (!validation.isValid) {
-        return ImportResult.failure(validation.errorMessage ?? '验证失败');
-      }
-
-      return importFromJsonWithStats(jsonString);
-    } catch (e) {
-      Logger.e('Error importing from file: $e');
-      return ImportResult.failure('导入失败: $e');
-    }
+    Logger.w('importFromFileWithStats is disabled in Flutter-only mode');
+    return ImportResult.failure('当前版本不支持本地文件选择导入，请使用 JSON 文本导入。');
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:window_manager/window_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -29,10 +28,7 @@ void main(List<String> args) async {
     final argument = args[2].isEmpty
         ? const <String, dynamic>{}
         : jsonDecode(args[2]) as Map<String, dynamic>;
-    
-    // Initialize window manager for sub-window
-    await windowManager.ensureInitialized();
-    
+
     runApp(SubWindowScreen(windowId: windowId, arguments: argument));
   } else {
     // 禁用调试信息以减少内存和CPU
@@ -165,9 +161,10 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
           home: Stack(
             children: [
               // 主界面
-              DesktopWidgetScreen(
-                isEditMode: desktopController.isEditMode,
-              ),
+              if (desktopController.isWindowVisible)
+                DesktopWidgetScreen(
+                  isEditMode: desktopController.isEditMode,
+                ),
 
               // MD3托盘菜单覆盖层
               if (desktopController.showTrayMenu)
