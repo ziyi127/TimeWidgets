@@ -1,8 +1,8 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../utils/md3_chip_styles.dart';
 
 /// 无障碍设置卡片
-/// 
+///
 /// 包含：
 /// 1. 色盲模式选择
 /// 2. 高对比度模式
@@ -136,7 +136,8 @@ class AccessibilitySettingsCard extends StatelessWidget {
   }
 
   /// 色盲模式选择器
-  Widget _buildColorBlindModeSelector(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildColorBlindModeSelector(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -244,8 +245,8 @@ class AccessibilitySettingsCard extends StatelessWidget {
 
 /// 色盲模式枚举
 enum ColorBlindMode {
-  none,        // 正常
-  protanopia,  // 红色盲
-  deuteranopia,// 绿色盲
-  tritanopia,  // 蓝色盲
+  none, // 正常
+  protanopia, // 红色盲
+  deuteranopia, // 绿色盲
+  tritanopia, // 蓝色盲
 }

@@ -25,7 +25,9 @@ class TimeUtils {
 
   /// Parses a time range string "HH:mm~HH:mm"
   static ({DateTime start, DateTime end})? parseTimeRange(
-      String timeRange, DateTime date,) {
+    String timeRange,
+    DateTime date,
+  ) {
     if (timeRange.isEmpty) {
       return null;
     }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../../models/timetable_edit_model.dart';
-import '../../utils/md3_typography_styles.dart';
+import '../../utils/md3_button_styles.dart';
 import '../../utils/md3_dialog_styles.dart';
 import '../../utils/md3_form_styles.dart';
-import '../../utils/md3_button_styles.dart';
+import '../../utils/md3_typography_styles.dart';
 
 class TimetableTreeWidget extends StatefulWidget {
   const TimetableTreeWidget({
@@ -76,7 +77,7 @@ class _TimetableTreeWidgetState extends State<TimetableTreeWidget> {
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32),
         child: Text(
           '暂无课表\n点击上方按钮创建',
           textAlign: TextAlign.center,
@@ -87,18 +88,21 @@ class _TimetableTreeWidgetState extends State<TimetableTreeWidget> {
   }
 
   Widget _buildTree(BuildContext context, String? parentId) {
-    final childrenGroups = widget.groups.where((g) => g.parentId == parentId).toList();
-    final childrenSchedules = widget.schedules.where((s) => s.groupId == parentId).toList();
+    final childrenGroups =
+        widget.groups.where((g) => g.parentId == parentId).toList();
+    final childrenSchedules =
+        widget.schedules.where((s) => s.groupId == parentId).toList();
 
     if (childrenGroups.isEmpty && childrenSchedules.isEmpty) {
-        if (parentId == null) return _buildEmptyState(context);
-        return const SizedBox(); // Empty folder
+      if (parentId == null) return _buildEmptyState(context);
+      return const SizedBox(); // Empty folder
     }
 
     return Column(
       children: [
         ...childrenGroups.map((group) => _buildGroupNode(context, group)),
-        ...childrenSchedules.map((schedule) => _buildScheduleNode(context, schedule)),
+        ...childrenSchedules
+            .map((schedule) => _buildScheduleNode(context, schedule)),
       ],
     );
   }
@@ -116,19 +120,21 @@ class _TimetableTreeWidgetState extends State<TimetableTreeWidget> {
           ),
           title: Text(group.name),
           trailing: PopupMenuButton<String>(
-             icon: const Icon(Icons.more_vert, size: 20),
-             onSelected: (value) {
-               if (value == 'add_group') widget.onAddGroup(group.id);
-               if (value == 'add_schedule') widget.onAddSchedule(group.id);
-               if (value == 'delete') _confirmDeleteGroup(context, group);
-               if (value == 'rename') _showRenameGroupDialog(context, group);
-             },
-             itemBuilder: (context) => [
-               const PopupMenuItem(value: 'add_group', child: Text('新建子分组')),
-               const PopupMenuItem(value: 'add_schedule', child: Text('新建课表')),
-               const PopupMenuItem(value: 'rename', child: Text('重命名')),
-               const PopupMenuItem(value: 'delete', child: Text('删除', style: TextStyle(color: Colors.red))),
-             ],
+            icon: const Icon(Icons.more_vert, size: 20),
+            onSelected: (value) {
+              if (value == 'add_group') widget.onAddGroup(group.id);
+              if (value == 'add_schedule') widget.onAddSchedule(group.id);
+              if (value == 'delete') _confirmDeleteGroup(context, group);
+              if (value == 'rename') _showRenameGroupDialog(context, group);
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'add_group', child: Text('新建子分组')),
+              const PopupMenuItem(value: 'add_schedule', child: Text('新建课表')),
+              const PopupMenuItem(value: 'rename', child: Text('重命名')),
+              const PopupMenuItem(
+                  value: 'delete',
+                  child: Text('删除', style: TextStyle(color: Colors.red))),
+            ],
           ),
           onTap: () {
             setState(() {
@@ -169,8 +175,9 @@ class _TimetableTreeWidgetState extends State<TimetableTreeWidget> {
       contentPadding: const EdgeInsets.only(left: 16, right: 16),
     );
   }
-  
-  Future<void> _showRenameGroupDialog(BuildContext context, ScheduleGroup group) async {
+
+  Future<void> _showRenameGroupDialog(
+      BuildContext context, ScheduleGroup group) async {
     final nameController = TextEditingController(text: group.name);
     final result = await showDialog<bool>(
       context: context,
@@ -202,7 +209,8 @@ class _TimetableTreeWidgetState extends State<TimetableTreeWidget> {
     }
   }
 
-  Future<void> _confirmDeleteGroup(BuildContext context, ScheduleGroup group) async {
+  Future<void> _confirmDeleteGroup(
+      BuildContext context, ScheduleGroup group) async {
     final confirmed = await MD3DialogStyles.showDeleteConfirmDialog(
       context: context,
       itemName: group.name,

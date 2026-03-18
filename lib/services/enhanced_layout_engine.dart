@@ -214,7 +214,7 @@ class PositionCalculator {
 
     // 使用更小的卡片宽度，让组件更紧凑
     final cardWidth = math.min(300.0, containerSize.width - 2 * _padding);
-    
+
     // 默认靠右对齐
     final defaultX = containerSize.width - _padding - cardWidth;
 
@@ -277,7 +277,7 @@ class PositionCalculator {
     final positions = <WidgetType, WidgetPosition>{};
     final safeWidth = math.min(280.0, containerSize.width - 32);
     const safeHeight = 80.0;
-    
+
     // 默认靠右
     final safeX = containerSize.width - 16 - safeWidth;
 
@@ -315,8 +315,7 @@ class PositionCalculator {
     double height,
     Size containerSize,
   ) {
-    final adjustedX =
-        x.clamp(0.0, math.max(0.0, containerSize.width - width));
+    final adjustedX = x.clamp(0.0, math.max(0.0, containerSize.width - width));
     final adjustedY =
         y.clamp(0.0, math.max(0.0, containerSize.height - height));
     return Offset(adjustedX.toDouble(), adjustedY.toDouble());
@@ -419,7 +418,7 @@ class CollisionDetector {
 
     // 使用更小的卡片宽度，让组件更紧凑
     final cardWidth = math.min(300.0, containerSize.width - 2 * padding);
-    
+
     // 默认右对齐
     final flowX = containerSize.width - padding - cardWidth;
 
@@ -478,10 +477,14 @@ class CollisionDetector {
     // 最后处理settings按钮，确保不会与其他组件重叠
     if (settingsKey != null && settingsPosition != null) {
       // 将settings按钮放置在右下角，确保不会溢出
-      final settingsX =
-          math.max(0.0, containerSize.width - padding - settingsPosition.width);
-      final settingsY =
-          math.max(0.0, containerSize.height - padding - settingsPosition.height);
+      final settingsX = math.max(
+        0.0,
+        containerSize.width - padding - settingsPosition.width,
+      );
+      final settingsY = math.max(
+        0.0,
+        containerSize.height - padding - settingsPosition.height,
+      );
 
       flowLayout[settingsKey] = WidgetPosition(
         type: settingsPosition.type,

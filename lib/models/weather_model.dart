@@ -59,8 +59,9 @@ class WeatherData {
     final aqiLevel = int.tryParse(aqi['aqi']?.toString() ?? '0') ?? 0;
 
     // 解析日出日落时间
-    final sunRiseSetList =
-        forecastDaily['sunRiseSet']?['value'] as List<dynamic>?;
+    final sunRiseSetValues =
+        forecastDaily['sunRiseSet'] as Map<String, dynamic>?;
+    final sunRiseSetList = sunRiseSetValues?['value'] as List<dynamic>?;
     final sunRiseSet = (sunRiseSetList != null && sunRiseSetList.isNotEmpty)
         ? sunRiseSetList[0] as Map<String, dynamic>
         : <String, dynamic>{};
@@ -68,7 +69,9 @@ class WeatherData {
     final sunset = _formatTimeFromISO(sunRiseSet['to']?.toString() ?? '');
 
     // 解析温度范围（从今日预报获取）
-    final tempList = forecastDaily['temperature']?['value'] as List<dynamic>?;
+    final temperatureValues =
+        forecastDaily['temperature'] as Map<String, dynamic>?;
+    final tempList = temperatureValues?['value'] as List<dynamic>?;
     final todayTemp = (tempList != null && tempList.isNotEmpty)
         ? tempList[0] as Map<String, dynamic>
         : <String, dynamic>{};

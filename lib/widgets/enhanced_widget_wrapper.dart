@@ -180,6 +180,7 @@ class _EnhancedWidgetWrapperState extends State<EnhancedWidgetWrapper> {
             : SystemMouseCursors.basic,
         child: GestureDetector(
           onTap: widget.onTap,
+          behavior: HitTestBehavior.opaque,
           child: content,
         ),
       );

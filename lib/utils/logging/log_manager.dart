@@ -136,7 +136,7 @@ class LogManager {
   Future<void> _cleanOldLogs() async {
     try {
       final dir = Directory(config.logDirectory);
-    // ignore: avoid_slow_async_io
+      // ignore: avoid_slow_async_io
       if (!await dir.exists()) return;
 
       final cutoffDate = DateTime.now().subtract(

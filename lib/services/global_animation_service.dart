@@ -31,7 +31,7 @@ class GlobalAnimationService {
   Timer? _cleanupTimer;
 
   /// 性能监控开关
-  bool _performanceMonitoringEnabled = true;
+  bool performanceMonitoringEnabled = true;
 
   /// 动画性能统计
   final Map<String, Map<String, dynamic>> _animationStats = {};
@@ -65,7 +65,7 @@ class GlobalAnimationService {
     );
 
     // 添加性能监控
-    if (_performanceMonitoringEnabled) {
+    if (performanceMonitoringEnabled) {
       controller.addStatusListener((status) {
         _trackAnimationStatus(key, status);
       });
@@ -217,11 +217,6 @@ class GlobalAnimationService {
     _animationCache.clear();
     _animationStats.clear();
     _lastAccessTime.clear();
-  }
-
-  /// 启用/禁用性能监控
-  set performanceMonitoringEnabled(bool enabled) {
-    _performanceMonitoringEnabled = enabled;
   }
 
   /// 获取动画性能统计

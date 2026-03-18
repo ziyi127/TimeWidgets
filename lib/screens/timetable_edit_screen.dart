@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:time_widgets/services/timetable_edit_service.dart';
-import 'package:time_widgets/services/timetable_storage_service.dart';
-import 'package:time_widgets/services/timetable_export_service.dart';
 import 'package:time_widgets/services/classisland_import_service.dart';
+import 'package:time_widgets/services/timetable_edit_service.dart';
+import 'package:time_widgets/services/timetable_export_service.dart';
+import 'package:time_widgets/services/timetable_storage_service.dart';
 import 'package:time_widgets/utils/md3_button_styles.dart';
 import 'package:time_widgets/utils/md3_navigation_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
@@ -97,7 +97,7 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
     try {
       final exportService = TimetableExportService();
       final result = await exportService.importFromFileWithStats();
-      
+
       if (result.success && result.data != null) {
         _timetableEditService.loadTimetableData(result.data!);
         _showSuccessSnackBar('导入成功: ${result.stats}');
@@ -112,7 +112,7 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
   Future<void> _importFromClassIsland() async {
     try {
       final result = await ClassislandImportService.importFromFileWithStats();
-      
+
       if (result.success && result.data != null) {
         _timetableEditService.loadTimetableData(result.data!);
         _showSuccessSnackBar('导入成功: ${result.stats}');
@@ -129,7 +129,7 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
       final exportService = TimetableExportService();
       final data = _timetableEditService.getTimetableData();
       final success = await exportService.exportToFile(data);
-      
+
       if (success) {
         _showSuccessSnackBar('导出成功');
       } else {
@@ -175,12 +175,12 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
               tooltip: '更多选项',
               itemBuilder: (context) {
                 final List<PopupMenuEntry<void>> items = [];
-                
+
                 items.add(
                   PopupMenuItem<void>(
-                    onTap: () => _importFromThisApp(),
-                    child: Row(
-                      children: const [
+                    onTap: _importFromThisApp,
+                    child: const Row(
+                      children: [
                         Icon(Icons.file_upload, size: 20),
                         SizedBox(width: 12),
                         Text('导入本程序课表文件'),
@@ -188,12 +188,12 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
                     ),
                   ),
                 );
-                
+
                 items.add(
                   PopupMenuItem<void>(
-                    onTap: () => _importFromClassIsland(),
-                    child: Row(
-                      children: const [
+                    onTap: _importFromClassIsland,
+                    child: const Row(
+                      children: [
                         Icon(Icons.file_upload, size: 20),
                         SizedBox(width: 12),
                         Text('导入 ClassIsland 课表文件'),
@@ -201,14 +201,14 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
                     ),
                   ),
                 );
-                
+
                 items.add(const PopupMenuDivider());
-                
+
                 items.add(
                   PopupMenuItem<void>(
-                    onTap: () => _exportToFile(),
-                    child: Row(
-                      children: const [
+                    onTap: _exportToFile,
+                    child: const Row(
+                      children: [
                         Icon(Icons.file_download, size: 20),
                         SizedBox(width: 12),
                         Text('导出课表数据为 JSON'),
@@ -216,7 +216,7 @@ class _TimetableEditScreenState extends State<TimetableEditScreen>
                     ),
                   ),
                 );
-                
+
                 return items;
               },
             ),

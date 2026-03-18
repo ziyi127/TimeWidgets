@@ -9,17 +9,6 @@ import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class CountdownViewModel extends ChangeNotifier {
-  final ApiService _apiService;
-  final SettingsService _settingsService;
-  final CountdownStorageService _storageService;
-
-  CountdownData? _countdownData;
-  bool _isLoading = true;
-  String? _error;
-  
-  StreamSubscription<dynamic>? _storageSubscription;
-  Timer? _refreshTimer;
-
   CountdownViewModel({
     ApiService? apiService,
     SettingsService? settingsService,
@@ -29,6 +18,16 @@ class CountdownViewModel extends ChangeNotifier {
         _storageService = storageService ?? CountdownStorageService() {
     _init();
   }
+  final ApiService _apiService;
+  final SettingsService _settingsService;
+  final CountdownStorageService _storageService;
+
+  CountdownData? _countdownData;
+  bool _isLoading = true;
+  String? _error;
+
+  StreamSubscription<dynamic>? _storageSubscription;
+  Timer? _refreshTimer;
 
   CountdownData? get countdownData => _countdownData;
   bool get isLoading => _isLoading;
@@ -71,7 +70,7 @@ class CountdownViewModel extends ChangeNotifier {
         _isLoading = false;
         notifyListeners();
       }
-      
+
       if (_settingsService.currentSettings.showCountdownWidget) {
         refreshCountdown();
       }
@@ -104,7 +103,8 @@ class CountdownViewModel extends ChangeNotifier {
 
   void _startAutoRefresh() {
     _stopAutoRefresh();
-    final intervalSeconds = _settingsService.currentSettings.countdownRefreshInterval;
+    final intervalSeconds =
+        _settingsService.currentSettings.countdownRefreshInterval;
     if (intervalSeconds > 0) {
       _refreshTimer = Timer.periodic(
         Duration(seconds: intervalSeconds),

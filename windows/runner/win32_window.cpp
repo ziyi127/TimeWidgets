@@ -143,7 +143,7 @@ bool Win32Window::Create(const std::wstring& title,
   int window_y = work_area.top;
 
   HWND window = CreateWindowEx(
-      WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT,  // Floating window attributes
+      WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED,  // Floating window attributes
       window_class, title.c_str(), 
       WS_POPUP | WS_VISIBLE,  // Borderless popup window
       window_x, window_y,

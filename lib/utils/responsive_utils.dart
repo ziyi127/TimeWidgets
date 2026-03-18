@@ -14,19 +14,11 @@ class ResponsiveUtils {
   ResponsiveUtils._();
 
   /// UI缩放比例
-  static double _scaleFactor = 1;
-
-  /// 设置缩放比例
-  static set scaleFactor(double factor) {
-    _scaleFactor = factor;
-  }
-
-  /// 获取当前缩放比例
-  static double get scaleFactor => _scaleFactor;
+  static double scaleFactor = 1;
 
   /// 缩放数值
   static double value(double val) {
-    return val * _scaleFactor;
+    return val * scaleFactor;
   }
 
   /// Material Design 3 断点定义
@@ -65,11 +57,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 16.0 * _scaleFactor;
+        return 16.0 * scaleFactor;
       case ScreenSize.medium:
-        return 24.0 * _scaleFactor;
+        return 24.0 * scaleFactor;
       case ScreenSize.expanded:
-        return 32.0 * _scaleFactor;
+        return 32.0 * scaleFactor;
     }
   }
 
@@ -78,10 +70,10 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 16.0 * _scaleFactor;
+        return 16.0 * scaleFactor;
       case ScreenSize.medium:
       case ScreenSize.expanded:
-        return 24.0 * _scaleFactor;
+        return 24.0 * scaleFactor;
     }
   }
 
@@ -90,11 +82,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 12.0 * _scaleFactor;
+        return 12.0 * scaleFactor;
       case ScreenSize.medium:
-        return 16.0 * _scaleFactor;
+        return 16.0 * scaleFactor;
       case ScreenSize.expanded:
-        return 20.0 * _scaleFactor;
+        return 20.0 * scaleFactor;
     }
   }
 
@@ -113,12 +105,12 @@ class ResponsiveUtils {
         baseMultiplier = 1.1;
         break;
     }
-    return baseMultiplier * _scaleFactor;
+    return baseMultiplier * scaleFactor;
   }
 
   /// 获取响应式图标大小
   static double getIconSize(double width, {double baseSize = 24.0}) {
-    return baseSize * _scaleFactor;
+    return baseSize * scaleFactor;
   }
 
   /// 获取响应式边框圆角
@@ -136,7 +128,7 @@ class ResponsiveUtils {
         multiplier = 1.25;
         break;
     }
-    return baseRadius * multiplier * _scaleFactor;
+    return baseRadius * multiplier * scaleFactor;
   }
 
   /// 获取响应式列数
@@ -176,14 +168,14 @@ class ResponsiveUtils {
       return 0.95; // Linux 稍微缩小以适应不同的 DPI 设置
     }
     if (PlatformUtils.isMacOS) {
-      return 1.0; // macOS 通常有正确的 DPI
+      return 1; // macOS 通常有正确的 DPI
     }
-    return 1.0;
+    return 1;
   }
 
   /// 获取考虑平台的最终缩放因子
   static double getEffectiveScaleFactor() {
-    return _scaleFactor * getPlatformScaleFactor();
+    return scaleFactor * getPlatformScaleFactor();
   }
 
   /// 获取响应式动画持续时间
@@ -233,11 +225,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 56.0 * _scaleFactor;
+        return 56.0 * scaleFactor;
       case ScreenSize.medium:
-        return 64.0 * _scaleFactor;
+        return 64.0 * scaleFactor;
       case ScreenSize.expanded:
-        return 72.0 * _scaleFactor;
+        return 72.0 * scaleFactor;
     }
   }
 
@@ -246,11 +238,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 40.0 * _scaleFactor;
+        return 40.0 * scaleFactor;
       case ScreenSize.medium:
-        return 44.0 * _scaleFactor;
+        return 44.0 * scaleFactor;
       case ScreenSize.expanded:
-        return 48.0 * _scaleFactor;
+        return 48.0 * scaleFactor;
     }
   }
 
@@ -259,11 +251,11 @@ class ResponsiveUtils {
     final screenSize = getScreenSize(width);
     switch (screenSize) {
       case ScreenSize.compact:
-        return 48.0 * _scaleFactor;
+        return 48.0 * scaleFactor;
       case ScreenSize.medium:
-        return 52.0 * _scaleFactor;
+        return 52.0 * scaleFactor;
       case ScreenSize.expanded:
-        return 56.0 * _scaleFactor;
+        return 56.0 * scaleFactor;
     }
   }
 
@@ -274,9 +266,9 @@ class ResponsiveUtils {
       case ScreenSize.compact:
         return width * 0.92;
       case ScreenSize.medium:
-        return 600.0 * _scaleFactor;
+        return 600.0 * scaleFactor;
       case ScreenSize.expanded:
-        return 800.0 * _scaleFactor;
+        return 800.0 * scaleFactor;
     }
   }
 
@@ -292,6 +284,6 @@ class ResponsiveUtils {
 
   /// 获取触摸友好的最小点击区域
   static double getMinTouchTarget() {
-    return 48.0 * _scaleFactor;
+    return 48.0 * scaleFactor;
   }
 }

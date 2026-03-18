@@ -24,7 +24,7 @@ class WindowControls extends StatelessWidget {
           onPressed: () async {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('当前平台不支持最小化窗口控制')), 
+              const SnackBar(content: Text('当前平台不支持最小化窗口控制')),
             );
           },
           tooltip: '最小化',
@@ -39,7 +39,7 @@ class WindowControls extends StatelessWidget {
           onPressed: () async {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('当前平台不支持最大化窗口控制')), 
+              const SnackBar(content: Text('当前平台不支持最大化窗口控制')),
             );
           },
           tooltip: '最大化',

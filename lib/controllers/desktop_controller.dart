@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:time_widgets/screens/settings_screen.dart';
 import 'package:time_widgets/screens/timetable_edit_screen.dart';
-import 'package:time_widgets/utils/page_transitions.dart';
 import 'package:time_widgets/services/countdown_storage_service.dart';
 import 'package:time_widgets/services/enhanced_window_manager.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
@@ -14,10 +12,17 @@ import 'package:time_widgets/services/md3_tray_menu_service.dart';
 import 'package:time_widgets/services/performance_optimization_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/utils/logger.dart';
+import 'package:time_widgets/utils/page_transitions.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 import 'package:time_widgets/widgets/dialogs/temp_schedule_menu_dialog.dart';
 
 class DesktopController extends ChangeNotifier {
+  DesktopController({
+    required SettingsService settingsService,
+    required this.navigatorKey,
+  }) : _settingsService = settingsService {
+    _settingsService.addListener(_onSettingsChanged);
+  }
   final SettingsService _settingsService;
   final GlobalKey<NavigatorState> navigatorKey;
 
@@ -31,24 +36,17 @@ class DesktopController extends ChangeNotifier {
   bool get showTrayMenu => _showTrayMenu;
   bool get isEditMode => _isEditMode;
 
-  DesktopController({
-    required SettingsService settingsService,
-    required this.navigatorKey,
-  }) : _settingsService = settingsService {
-    _settingsService.addListener(_onSettingsChanged);
-  }
-
   @override
   void dispose() {
     _settingsService.removeListener(_onSettingsChanged);
     MD3TrayMenuService.instance.destroy();
-    
+
     GlobalAnimationService.instance.dispose();
     EnhancedWindowManager.dispose();
     PerformanceOptimizationService.stopMemoryMonitoring();
     PerformanceOptimizationService.stopPerformanceMonitoring();
     CountdownStorageService().dispose();
-    
+
     super.dispose();
   }
 
@@ -79,11 +77,12 @@ class DesktopController extends ChangeNotifier {
 
     try {
       final success = await EnhancedWindowManager.initializeWindow(
-        onScreenSizeChanged: () => notifyListeners(),
+        onScreenSizeChanged: notifyListeners,
       );
 
       if (!success) {
-        Logger.w('Enhanced window initialization failed, falling back to default');
+        Logger.w(
+            'Enhanced window initialization failed, falling back to default');
       }
 
       _isWindowInitialized = true;
@@ -125,7 +124,8 @@ class DesktopController extends ChangeNotifier {
     _showTrayMenu = false;
     notifyListeners();
 
-    if (!_settingsService.currentSettings.enableDesktopWidgets && !_isEditMode) {
+    if (!_settingsService.currentSettings.enableDesktopWidgets &&
+        !_isEditMode) {
       hideMainWindow();
     }
   }
@@ -150,14 +150,17 @@ class DesktopController extends ChangeNotifier {
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEditMode 
-              ? LocalizationService.getString('enter_edit_mode')
-              : LocalizationService.getString('exit_edit_mode')),
+          content: Text(
+            _isEditMode
+                ? LocalizationService.getString('enter_edit_mode')
+                : LocalizationService.getString('exit_edit_mode'),
+          ),
           duration: const Duration(seconds: 2),
         ),
       );
 
-      if (!_isEditMode && !_settingsService.currentSettings.enableDesktopWidgets) {
+      if (!_isEditMode &&
+          !_settingsService.currentSettings.enableDesktopWidgets) {
         hideMainWindow();
       }
     }
@@ -235,11 +238,4 @@ class DesktopController extends ChangeNotifier {
       ),
     );
   }
-
-
-
-
-
-
-
 }

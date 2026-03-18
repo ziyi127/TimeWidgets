@@ -159,15 +159,24 @@ class PerformanceOptimizationService {
   static final Map<String, List<int>> _apiCallDurations = {};
   static final List<int> _frameDurations = [];
   static const int _maxFrameSamples = 50;
+  static bool _isPerformanceMonitoring = false;
 
   /// 性能监控
   static void startPerformanceMonitoring() {
+    if (_isPerformanceMonitoring) {
+      return;
+    }
     SchedulerBinding.instance.addTimingsCallback(_onFrameTimings);
+    _isPerformanceMonitoring = true;
     Logger.i('Performance monitoring started');
   }
 
   static void stopPerformanceMonitoring() {
+    if (!_isPerformanceMonitoring) {
+      return;
+    }
     SchedulerBinding.instance.removeTimingsCallback(_onFrameTimings);
+    _isPerformanceMonitoring = false;
     Logger.i('Performance monitoring stopped');
   }
 

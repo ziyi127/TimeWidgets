@@ -2,25 +2,25 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:time_widgets/plugins/core/plugin_interface.dart';
-import 'package:time_widgets/plugins/models/plugin_manifest.dart';
-import 'package:time_widgets/plugins/ui/json_widget_builder.dart';
 import 'package:path/path.dart' as path;
+import 'package:time_widgets/plugins/core/plugin_interface.dart';
+import 'package:time_widgets/plugins/ui/json_widget_builder.dart';
+import 'package:time_widgets/utils/logger.dart';
 
 class JsonPlugin extends TimeWidgetsPlugin {
+  JsonPlugin(super.manifest, this.pluginDir);
   final String pluginDir;
   Map<String, dynamic>? _layoutJson;
   List<dynamic>? _trayJson;
   List<dynamic>? _settingsJson;
-
-  JsonPlugin(PluginManifest manifest, this.pluginDir) : super(manifest);
 
   @override
   Future<void> onInit() async {
     // Load layout.json if exists
     final layoutFile = File(path.join(pluginDir, 'layout.json'));
     if (await layoutFile.exists()) {
-      _layoutJson = json.decode(await layoutFile.readAsString()) as Map<String, dynamic>?;
+      _layoutJson =
+          json.decode(await layoutFile.readAsString()) as Map<String, dynamic>?;
     }
 
     // Load tray.json if exists
@@ -32,7 +32,8 @@ class JsonPlugin extends TimeWidgetsPlugin {
     // Load settings.json if exists
     final settingsFile = File(path.join(pluginDir, 'settings.json'));
     if (await settingsFile.exists()) {
-      _settingsJson = json.decode(await settingsFile.readAsString()) as List<dynamic>?;
+      _settingsJson =
+          json.decode(await settingsFile.readAsString()) as List<dynamic>?;
     }
   }
 
@@ -54,13 +55,13 @@ class JsonPlugin extends TimeWidgetsPlugin {
   @override
   List<PluginMenuItem> getTrayMenuItems() {
     if (_trayJson == null) return [];
-    
+
     return _trayJson!.map((item) {
       final map = item as Map<String, dynamic>;
       return PluginMenuItem(
         label: map['label'] as String? ?? 'Menu Item',
         onTap: () {
-          print('Plugin menu item tapped: ${map['action']}');
+          Logger.i('Plugin menu item tapped: ${map['action']}');
           // Handle actions (url, command, etc.)
         },
       );
@@ -73,13 +74,13 @@ class JsonPlugin extends TimeWidgetsPlugin {
 
     return _settingsJson!.map((item) {
       final map = item as Map<String, dynamic>;
-      
+
       // 提取额外属性
       final extra = <String, dynamic>{};
       if (map.containsKey('multiline')) {
         extra['multiline'] = map['multiline'];
       }
-      
+
       return PluginSettingItem(
         key: map['key'] as String,
         label: map['label'] as String,
@@ -93,16 +94,20 @@ class JsonPlugin extends TimeWidgetsPlugin {
 
   SettingType _parseSettingType(String? type) {
     switch (type) {
-      case 'boolean': return SettingType.boolean;
-      case 'number': return SettingType.number;
-      case 'choice': return SettingType.choice;
-      default: return SettingType.string;
+      case 'boolean':
+        return SettingType.boolean;
+      case 'number':
+        return SettingType.number;
+      case 'choice':
+        return SettingType.choice;
+      default:
+        return SettingType.string;
     }
   }
 
   @override
   void onSettingChanged(String key, dynamic value) {
     // Save to persistent storage or notify plugin logic
-    print('Plugin ${manifest.id} setting changed: $key = $value');
+    Logger.i('Plugin ${manifest.id} setting changed: $key = $value');
   }
 }

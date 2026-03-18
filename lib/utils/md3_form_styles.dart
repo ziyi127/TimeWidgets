@@ -95,24 +95,12 @@ class MD3FormStyles {
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest,
         border: UnderlineInputBorder(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: UnderlineInputBorder(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
       ),
@@ -153,24 +141,11 @@ class MD3FormStyles {
         labelText: label,
         hintText: hint,
         prefixIcon: prefixIcon,
-        border: const UnderlineInputBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
-        ),
+        border: const UnderlineInputBorder(),
         enabledBorder: UnderlineInputBorder(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(4),
-            topRight: Radius.circular(4),
-          ),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         filled: true,

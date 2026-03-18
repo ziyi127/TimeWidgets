@@ -34,10 +34,12 @@ class WeatherWidget extends StatelessWidget {
 
     final weather = weatherData;
     final temperature = weather?.temperature ?? 20;
-    final description = weather?.description ?? AppLocalizations.of(context)!.loading;
+    final description =
+        weather?.description ?? AppLocalizations.of(context)!.loading;
     final humidity = weather?.humidity ?? 65;
     final wind = weather?.wind ?? '--';
-    final cityName = weather?.cityName ?? AppLocalizations.of(context)!.weatherUnknown;
+    final cityName =
+        weather?.cityName ?? AppLocalizations.of(context)!.weatherUnknown;
 
     return Card(
       elevation: 0,

@@ -12,7 +12,7 @@ class TimetableService {
   final ApiService _apiService = ApiService();
   final TimetableStorageService _storageService = TimetableStorageService();
   final EnhancedErrorHandler _errorHandler = EnhancedErrorHandler();
-  
+
   // Memory cache
   TimetableData? _cachedData;
 
@@ -71,7 +71,7 @@ class TimetableService {
     try {
       // 优先从本地存储获取
       TimetableData timetableData;
-      
+
       if (_cachedData != null) {
         timetableData = _cachedData!;
       } else {

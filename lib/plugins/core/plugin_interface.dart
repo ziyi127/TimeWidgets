@@ -5,9 +5,8 @@ import 'package:time_widgets/plugins/models/plugin_manifest.dart';
 /// In a purely dynamic system (e.g. JS/Lua), the Loader would wrap the script
 /// in an implementation of this interface.
 abstract class TimeWidgetsPlugin {
-  final PluginManifest manifest;
-
   TimeWidgetsPlugin(this.manifest);
+  final PluginManifest manifest;
 
   /// Called when the plugin is loaded.
   /// Use this to initialize resources, register services, etc.
@@ -33,26 +32,20 @@ abstract class TimeWidgetsPlugin {
 }
 
 class PluginMenuItem {
-  final String label;
-  final VoidCallback onTap;
-  final List<PluginMenuItem>? subItems;
-
   PluginMenuItem({
     required this.label,
     required this.onTap,
     this.subItems,
   });
+  final String label;
+  final VoidCallback onTap;
+  final List<PluginMenuItem>? subItems;
 }
 
 enum SettingType { string, boolean, number, choice }
 
 class PluginSettingItem {
-  final String key;
-  final String label;
-  final SettingType type;
-  final dynamic defaultValue;
-  final List<String>? options; // For choice type
-  final Map<String, dynamic> extra; // For extra properties like multiline
+  // For extra properties like multiline
 
   PluginSettingItem({
     required this.key,
@@ -62,4 +55,10 @@ class PluginSettingItem {
     this.options,
     this.extra = const {},
   });
+  final String key;
+  final String label;
+  final SettingType type;
+  final dynamic defaultValue;
+  final List<String>? options; // For choice type
+  final Map<String, dynamic> extra;
 }

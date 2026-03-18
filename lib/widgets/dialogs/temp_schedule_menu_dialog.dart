@@ -30,7 +30,8 @@ class TempScheduleMenuDialog extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.schedule_outlined),
             title: Text(LocalizationService.getString('change_by_period')),
-            subtitle: Text(LocalizationService.getString('change_by_period_desc')),
+            subtitle:
+                Text(LocalizationService.getString('change_by_period_desc')),
             onTap: () {
               Navigator.pop(context); // Close menu
               showDialog<void>(
@@ -43,7 +44,8 @@ class TempScheduleMenuDialog extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.manage_history_outlined),
             title: Text(LocalizationService.getString('manage_temp_changes')),
-            subtitle: Text(LocalizationService.getString('manage_temp_changes_desc')),
+            subtitle:
+                Text(LocalizationService.getString('manage_temp_changes_desc')),
             onTap: () {
               Navigator.pop(context); // Close menu
               showDialog<void>(

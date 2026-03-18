@@ -67,7 +67,6 @@ class AppSettings {
       enableCourseReminder: false,
       showNotificationOnClassStart: false,
       showNotificationForCountdown: false,
-      minimizeToTray: false,
     );
   }
 

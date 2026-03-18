@@ -185,10 +185,12 @@ class TimetableExportService {
     }
 
     // 检查引用完整性
-    final courseIds =
-        courses.map((c) => (c as Map<String, dynamic>)['id'].toString()).toSet();
-    final timeSlotIds =
-        timeSlots.map((t) => (t as Map<String, dynamic>)['id'].toString()).toSet();
+    final courseIds = courses
+        .map((c) => (c as Map<String, dynamic>)['id'].toString())
+        .toSet();
+    final timeSlotIds = timeSlots
+        .map((t) => (t as Map<String, dynamic>)['id'].toString())
+        .toSet();
     final dailyCourses = jsonData['dailyCourses'] as List;
 
     for (var i = 0; i < dailyCourses.length; i++) {
@@ -239,7 +241,8 @@ class TimetableExportService {
         if (!schedule.containsKey('id') || !schedule.containsKey('name')) {
           return ValidationResult.invalid('schedules[$i] 缺少必需字段 (id, name)');
         }
-        if (!schedule.containsKey('triggers') && !schedule.containsKey('triggerRule')) {
+        if (!schedule.containsKey('triggers') &&
+            !schedule.containsKey('triggerRule')) {
           return ValidationResult.invalid('schedules[$i] 缺少必需字段 (triggers)');
         }
       }

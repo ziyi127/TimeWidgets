@@ -23,7 +23,7 @@ void main() {
         description: 'Test description',
         targetDate: DateTime(2026, 12, 25),
         type: type,
-        progress: 0.0,
+        progress: 0,
       );
     }
 
@@ -34,8 +34,9 @@ void main() {
       });
 
       test('returns stored countdowns', () async {
-        await service.saveCountdown(createCountdown(id: 'cd-1'));
-        await service.saveCountdown(createCountdown(id: 'cd-2', title: 'Second'));
+        await service.saveCountdown(createCountdown());
+        await service
+            .saveCountdown(createCountdown(id: 'cd-2', title: 'Second'));
 
         final countdowns = await service.loadAllCountdowns();
 
@@ -91,7 +92,7 @@ void main() {
 
     group('deleteCountdown', () {
       test('deletes existing countdown', () async {
-        await service.saveCountdown(createCountdown(id: 'cd-1'));
+        await service.saveCountdown(createCountdown());
         await service.saveCountdown(createCountdown(id: 'cd-2', title: 'Keep'));
 
         await service.deleteCountdown('cd-1');

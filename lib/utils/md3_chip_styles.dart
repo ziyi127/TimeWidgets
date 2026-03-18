@@ -21,10 +21,14 @@ class MD3ChipStyles {
       backgroundColor: colorScheme.surfaceContainer,
       selectedColor: colorScheme.primaryContainer,
       labelStyle: selected
-          ? textTheme.labelMedium?.copyWith(color: colorScheme.onPrimaryContainer)
-          : textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          ? textTheme.labelMedium
+              ?.copyWith(color: colorScheme.onPrimaryContainer)
+          : textTheme.labelMedium
+              ?.copyWith(color: colorScheme.onSurfaceVariant),
       side: BorderSide(
-        color: selected ? colorScheme.primaryContainer : colorScheme.outlineVariant,
+        color: selected
+            ? colorScheme.primaryContainer
+            : colorScheme.outlineVariant,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -47,7 +51,8 @@ class MD3ChipStyles {
       label: Text(label),
       onDeleted: enabled ? onDeleted : null,
       backgroundColor: colorScheme.surfaceContainer,
-      labelStyle: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+      labelStyle:
+          textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
       deleteIconColor: colorScheme.onSurfaceVariant,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -98,10 +103,14 @@ class MD3ChipStyles {
       backgroundColor: colorScheme.surfaceContainer,
       selectedColor: colorScheme.primaryContainer,
       labelStyle: selected
-          ? textTheme.labelMedium?.copyWith(color: colorScheme.onPrimaryContainer)
-          : textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          ? textTheme.labelMedium
+              ?.copyWith(color: colorScheme.onPrimaryContainer)
+          : textTheme.labelMedium
+              ?.copyWith(color: colorScheme.onSurfaceVariant),
       side: BorderSide(
-        color: selected ? colorScheme.primaryContainer : colorScheme.outlineVariant,
+        color: selected
+            ? colorScheme.primaryContainer
+            : colorScheme.outlineVariant,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

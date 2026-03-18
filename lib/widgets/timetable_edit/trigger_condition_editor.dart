@@ -70,7 +70,8 @@ class _TriggerConditionEditorState extends State<TriggerConditionEditor> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(child: Text('未设置条件 (默认不生效)')),
@@ -134,18 +135,20 @@ class _ConditionCard extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 children: List.generate(7, (index) {
-                  // 0=Sun, 1=Mon... in some systems. 
-                  // Model: 0=Sun, 1=Mon? 
-                  // Let's check model again. 
-                  // ScheduleTriggerRule had 0=Sun. 
+                  // 0=Sun, 1=Mon... in some systems.
+                  // Model: 0=Sun, 1=Mon?
+                  // Let's check model again.
+                  // ScheduleTriggerRule had 0=Sun.
                   // Let's assume standard DateTime: 1=Mon, 7=Sun.
                   // But `DayOfWeek` enum usually is 0-based.
                   // The previous code `days[rule.weekDay]` where `days` started with Sunday implies 0=Sun.
                   // Wait, `const days = ['周日', '周一'...]`
                   // Let's stick to 0=Sun, 1=Mon, ..., 6=Sat for storage to match `DateTime.weekday % 7`.
-                  final dayLabel = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][index];
-                  final isSelected = condition.weekDays?.contains(index) ?? false;
-                  
+                  final dayLabel =
+                      ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][index];
+                  final isSelected =
+                      condition.weekDays?.contains(index) ?? false;
+
                   return MD3ChipStyles.filterChip(
                     context: context,
                     label: dayLabel,
@@ -163,7 +166,7 @@ class _ConditionCard extends StatelessWidget {
                 }),
               ),
               const SizedBox(height: 16),
-              
+
               // Week Numbers
               Text('周次', style: MD3TypographyStyles.labelMedium(context)),
               const SizedBox(height: 8),
@@ -172,7 +175,8 @@ class _ConditionCard extends StatelessWidget {
                   Expanded(
                     child: MD3FormStyles.outlinedTextField(
                       context: context,
-                      controller: TextEditingController(text: condition.startWeek?.toString()),
+                      controller: TextEditingController(
+                          text: condition.startWeek?.toString()),
                       label: '开始周',
                       onChanged: (v) {
                         final val = int.tryParse(v);
@@ -184,7 +188,8 @@ class _ConditionCard extends StatelessWidget {
                   Expanded(
                     child: MD3FormStyles.outlinedTextField(
                       context: context,
-                      controller: TextEditingController(text: condition.endWeek?.toString()),
+                      controller: TextEditingController(
+                          text: condition.endWeek?.toString()),
                       label: '结束周',
                       onChanged: (v) {
                         final val = int.tryParse(v);
@@ -197,7 +202,8 @@ class _ConditionCard extends StatelessWidget {
               const SizedBox(height: 8),
               MD3FormStyles.outlinedTextField(
                 context: context,
-                controller: TextEditingController(text: condition.weekNumbers?.join(',')),
+                controller: TextEditingController(
+                    text: condition.weekNumbers?.join(',')),
                 label: '指定周次 (用逗号分隔)',
                 hint: '例如: 1,3,5',
                 onChanged: (v) {
@@ -206,9 +212,8 @@ class _ConditionCard extends StatelessWidget {
                     return;
                   }
                   try {
-                    final list = v.split(',')
-                        .map((e) => int.parse(e.trim()))
-                        .toList();
+                    final list =
+                        v.split(',').map((e) => int.parse(e.trim())).toList();
                     onChanged(condition.copyWith(weekNumbers: list));
                   } catch (_) {
                     // Ignore parse error
@@ -246,8 +251,12 @@ class _ConditionCard extends StatelessWidget {
                         lastDate: DateTime(2030),
                       );
                       if (date != null) {
-                        final newDates = List<DateTime>.from(condition.dates ?? []);
-                        if (!newDates.any((d) => d.year == date.year && d.month == date.month && d.day == date.day)) {
+                        final newDates =
+                            List<DateTime>.from(condition.dates ?? []);
+                        if (!newDates.any((d) =>
+                            d.year == date.year &&
+                            d.month == date.month &&
+                            d.day == date.day)) {
                           newDates.add(date);
                           onChanged(condition.copyWith(dates: newDates));
                         }

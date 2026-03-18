@@ -62,7 +62,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
     final l10n = AppLocalizations.of(context)!;
     // Store for undo
     final deletedItem = countdown;
-    
+
     // Remove from storage
     await _storageService.deleteCountdown(countdown.id);
 
@@ -122,7 +122,7 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.countdownTitle)),
@@ -145,14 +145,14 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
       body: _countdowns.isEmpty
           ? Center(
               child: AnimatedOpacity(
-                opacity: 1.0,
+                opacity: 1,
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeOut,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.8, end: 1.0),
+                      tween: Tween(begin: 0.8, end: 1),
                       duration: const Duration(milliseconds: 800),
                       curve: Curves.elasticOut,
                       builder: (context, value, child) {
@@ -178,7 +178,8 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                     const SizedBox(height: 24),
                     Text(
                       l10n.countdownEmpty,
-                      style: MD3TypographyStyles.headlineSmall(context).copyWith(
+                      style:
+                          MD3TypographyStyles.headlineSmall(context).copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -199,8 +200,11 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final countdown = _countdowns[index];
-                final typeColor = _getEventTypeColor(colorScheme, countdown.type);
-                final formattedDate = DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(countdown.targetDate);
+                final typeColor =
+                    _getEventTypeColor(colorScheme, countdown.type);
+                final formattedDate =
+                    DateFormat.yMMMd(Localizations.localeOf(context).toString())
+                        .format(countdown.targetDate);
 
                 return Dismissible(
                   key: Key(countdown.id),
@@ -212,14 +216,16 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                       color: colorScheme.error,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.delete_outline, color: colorScheme.onError),
+                    child:
+                        Icon(Icons.delete_outline, color: colorScheme.onError),
                   ),
                   confirmDismiss: (direction) async {
                     final shouldDelete = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(l10n.confirmDelete),
-                        content: Text(l10n.deleteCountdownConfirm(countdown.title)),
+                        content:
+                            Text(l10n.deleteCountdownConfirm(countdown.title)),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
@@ -279,7 +285,8 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 formattedDate,
-                                style: MD3TypographyStyles.bodySmall(context).copyWith(
+                                style: MD3TypographyStyles.bodySmall(context)
+                                    .copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
@@ -287,7 +294,8 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                                 const SizedBox(height: 8),
                                 Text(
                                   countdown.description,
-                                  style: MD3TypographyStyles.bodyMedium(context).copyWith(
+                                  style: MD3TypographyStyles.bodyMedium(context)
+                                      .copyWith(
                                     color: colorScheme.outline,
                                   ),
                                   maxLines: 2,
@@ -299,16 +307,21 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                               Wrap(
                                 spacing: 8,
                                 children: [
-                                  if (countdown.category != null && countdown.category!.isNotEmpty)
+                                  if (countdown.category != null &&
+                                      countdown.category!.isNotEmpty)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: colorScheme.surfaceContainerHighest,
+                                        color:
+                                            colorScheme.surfaceContainerHighest,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         countdown.category!,
-                                        style: MD3TypographyStyles.labelSmall(context).copyWith(
+                                        style: MD3TypographyStyles.labelSmall(
+                                                context)
+                                            .copyWith(
                                           color: colorScheme.onSurfaceVariant,
                                         ),
                                       ),
@@ -324,14 +337,16 @@ class _CountdownListScreenState extends State<CountdownListScreen> {
                           children: [
                             Text(
                               '${countdown.remainingDays}',
-                              style: MD3TypographyStyles.displaySmall(context).copyWith(
+                              style: MD3TypographyStyles.displaySmall(context)
+                                  .copyWith(
                                 color: typeColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               l10n.days,
-                              style: MD3TypographyStyles.labelMedium(context).copyWith(
+                              style: MD3TypographyStyles.labelMedium(context)
+                                  .copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
                             ),

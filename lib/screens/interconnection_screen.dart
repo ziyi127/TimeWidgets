@@ -20,7 +20,7 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
   Future<void> _handleGlobalSync() async {
     if (_isSyncing) return;
     setState(() => _isSyncing = true);
-    
+
     try {
       await _service.reconnectPairedDevices();
       if (mounted) {
@@ -148,7 +148,8 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
                   children: [
                     Text(title, style: MD3TypographyStyles.titleLarge(context)),
                     const SizedBox(height: 8),
-                    Text(subtitle, style: MD3TypographyStyles.bodyMedium(context)),
+                    Text(subtitle,
+                        style: MD3TypographyStyles.bodyMedium(context)),
                   ],
                 ),
               ),
@@ -175,10 +176,10 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
                       '已配对设备',
                       style: MD3TypographyStyles.titleMedium(context),
                     ),
-                    _isSyncing 
+                    _isSyncing
                         ? const SizedBox(
-                            width: 24, 
-                            height: 24, 
+                            width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : IconButton(
@@ -209,8 +210,10 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
                       itemBuilder: (context, index) {
                         final device = devices[index];
                         return ListTile(
-                          leading: const Icon(Icons.phonelink_ring,
-                              color: Colors.green,),
+                          leading: const Icon(
+                            Icons.phonelink_ring,
+                            color: Colors.green,
+                          ),
                           title: Text(device.name),
                           subtitle: Text(device.ip),
                           trailing: Row(
@@ -218,7 +221,8 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.sync),
-                                onPressed: () => _connectToDevice(device, isPairing: false),
+                                onPressed: () =>
+                                    _connectToDevice(device, isPairing: false),
                                 tooltip: '同步',
                               ),
                               IconButton(
@@ -272,7 +276,8 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
                           title: Text(device.name),
                           subtitle: Text(device.ip),
                           trailing: ElevatedButton(
-                            onPressed: () => _connectToDevice(device, isPairing: true),
+                            onPressed: () =>
+                                _connectToDevice(device, isPairing: true),
                             child: const Text('连接并配对'),
                           ),
                         );
@@ -288,7 +293,8 @@ class _InterconnectionScreenState extends State<InterconnectionScreen> {
     );
   }
 
-  Future<void> _connectToDevice(DiscoveredDevice device, {required bool isPairing}) async {
+  Future<void> _connectToDevice(DiscoveredDevice device,
+      {required bool isPairing}) async {
     try {
       showDialog<void>(
         context: context,

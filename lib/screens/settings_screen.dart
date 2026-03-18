@@ -9,8 +9,8 @@ import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/services/startup_service.dart';
 import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
-import 'package:time_widgets/widgets/city_search_dialog.dart';
 import 'package:time_widgets/utils/page_transitions.dart';
+import 'package:time_widgets/widgets/city_search_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -69,7 +69,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await _loadSettings();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.settingsResetSuccess)),
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.settingsResetSuccess)),
         );
       }
     }
@@ -188,7 +190,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         keyContext,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
-        alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
       );
     }
     setState(() {
@@ -276,21 +277,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 // Section 0: General
-                Container(key: _sectionKeys[0], child: _buildGeneralSettings(theme)),
+                Container(
+                    key: _sectionKeys[0], child: _buildGeneralSettings(theme)),
                 const SizedBox(height: 16),
 
                 // Section 1: Appearance
-                Container(key: _sectionKeys[1], child: _buildThemeSettings(theme)),
+                Container(
+                    key: _sectionKeys[1], child: _buildThemeSettings(theme)),
                 const SizedBox(height: 16),
 
                 // Section 2: Widgets
-                Container(key: _sectionKeys[2], child: _buildWidgetSettings(theme)),
+                Container(
+                    key: _sectionKeys[2], child: _buildWidgetSettings(theme)),
                 const SizedBox(height: 16),
                 _buildSemesterSettings(theme),
                 const SizedBox(height: 16),
 
                 // Section 3: Data & Sync
-                Container(key: _sectionKeys[3], child: _buildRefreshSettings(theme)),
+                Container(
+                    key: _sectionKeys[3], child: _buildRefreshSettings(theme)),
                 const SizedBox(height: 16),
                 _buildTimeSyncSettings(theme),
                 const SizedBox(height: 16),
@@ -298,7 +303,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
 
                 // Section 4: Advanced
-                Container(key: _sectionKeys[4], child: _buildStartupSettings(theme)),
+                Container(
+                    key: _sectionKeys[4], child: _buildStartupSettings(theme)),
                 const SizedBox(height: 16),
                 _buildAdvancedSettings(theme),
                 const SizedBox(height: 16),
@@ -328,9 +334,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.language_outlined),
             title: Text(AppLocalizations.of(context)!.language),
-            subtitle: Text(_settings.language == 'zh' 
-              ? AppLocalizations.of(context)!.languageZh 
-              : AppLocalizations.of(context)!.languageEn),
+            subtitle: Text(
+              _settings.language == 'zh'
+                  ? AppLocalizations.of(context)!.languageZh
+                  : AppLocalizations.of(context)!.languageEn,
+            ),
             trailing: DropdownButton<String>(
               value: _settings.language,
               underline: const SizedBox(),
@@ -422,7 +430,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.wallpaper),
             title: Text(AppLocalizations.of(context)!.followSystemColor),
-            subtitle: Text(AppLocalizations.of(context)!.followSystemColorSubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.followSystemColorSubtitle),
             value: _settings.themeSettings.useSystemColor,
             onChanged: (value) async {
               final newThemeSettings =
@@ -490,7 +499,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   min: 0.7,
                   max: 1.5,
                   divisions: 8,
-                  label: _settings.themeSettings.fontSizeScale.toStringAsFixed(1),
+                  label:
+                      _settings.themeSettings.fontSizeScale.toStringAsFixed(1),
                   onChanged: (value) async {
                     final newThemeSettings =
                         _settings.themeSettings.copyWith(fontSizeScale: value);
@@ -598,11 +608,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.themeSettings.shadowStrength,
                   max: 2,
                   divisions: 20,
-                  label: _settings.themeSettings.shadowStrength
-                      .toStringAsFixed(1),
+                  label:
+                      _settings.themeSettings.shadowStrength.toStringAsFixed(1),
                   onChanged: (value) async {
-                    final newThemeSettings = _settings.themeSettings
-                        .copyWith(shadowStrength: value);
+                    final newThemeSettings =
+                        _settings.themeSettings.copyWith(shadowStrength: value);
                     await _saveSettings(
                       _settings.copyWith(
                         themeSettings: newThemeSettings,
@@ -617,11 +627,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.gradient_outlined),
             title: Text(AppLocalizations.of(context)!.enableGradients),
-            subtitle: Text(AppLocalizations.of(context)!.enableGradientsSubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.enableGradientsSubtitle),
             value: _settings.themeSettings.enableGradients,
             onChanged: (value) async {
-              final newThemeSettings = _settings.themeSettings
-                  .copyWith(enableGradients: value);
+              final newThemeSettings =
+                  _settings.themeSettings.copyWith(enableGradients: value);
               await _saveSettings(
                 _settings.copyWith(themeSettings: newThemeSettings),
               );
@@ -711,7 +722,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.cloud_outlined),
             title: Text(AppLocalizations.of(context)!.weatherDisplay),
-            subtitle: Text(AppLocalizations.of(context)!.weatherDisplaySubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.weatherDisplaySubtitle),
             value: _settings.showWeatherWidget,
             onChanged: (value) {
               _saveSettings(_settings.copyWith(showWeatherWidget: value));
@@ -720,7 +732,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.location_on_outlined),
             title: Text(AppLocalizations.of(context)!.weatherLocation),
-            subtitle: Text(_settings.cityName ?? AppLocalizations.of(context)!.notSet),
+            subtitle: Text(
+                _settings.cityName ?? AppLocalizations.of(context)!.notSet),
             trailing: ElevatedButton(
               onPressed: () async {
                 final city = await showDialog<Map<String, dynamic>>(
@@ -743,7 +756,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.timer_outlined),
             title: Text(AppLocalizations.of(context)!.countdownDisplay),
-            subtitle: Text(AppLocalizations.of(context)!.countdownDisplaySubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.countdownDisplaySubtitle),
             value: _settings.showCountdownWidget,
             onChanged: (value) {
               _saveSettings(
@@ -754,7 +768,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.school_outlined),
             title: Text(AppLocalizations.of(context)!.currentClassDisplay),
-            subtitle: Text(AppLocalizations.of(context)!.currentClassDisplaySubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.currentClassDisplaySubtitle),
             value: _settings.showCurrentClassWidget,
             onChanged: (value) {
               _saveSettings(
@@ -772,7 +787,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.desktop_windows_outlined),
             title: Text(AppLocalizations.of(context)!.enableDesktopWidgets),
-            subtitle: Text(AppLocalizations.of(context)!.enableDesktopWidgetsSubtitle),
+            subtitle: Text(
+                AppLocalizations.of(context)!.enableDesktopWidgetsSubtitle),
             value: _settings.enableDesktopWidgets,
             onChanged: (value) {
               _saveSettings(
@@ -804,7 +820,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               () {
                 final date = _settings.semesterStartDate;
                 return date != null
-                    ? AppLocalizations.of(context)!.dateFormatFull(date.year, date.month, date.day)
+                    ? AppLocalizations.of(context)!
+                        .dateFormatFull(date.year, date.month, date.day)
                     : AppLocalizations.of(context)!.notSet;
               }(),
             ),
@@ -833,7 +850,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.cloud_sync_outlined),
             title: Text(AppLocalizations.of(context)!.weatherRefreshInterval),
-            subtitle: Text('${_settings.weatherRefreshInterval} ${AppLocalizations.of(context)!.minutes}'),
+            subtitle: Text(
+                '${_settings.weatherRefreshInterval} ${AppLocalizations.of(context)!.minutes}'),
             trailing: SizedBox(
               width: 120,
               child: Row(
@@ -868,7 +886,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.timer_outlined),
             title: Text(AppLocalizations.of(context)!.countdownRefreshInterval),
-            subtitle: Text('${_settings.countdownRefreshInterval} ${AppLocalizations.of(context)!.seconds}'),
+            subtitle: Text(
+                '${_settings.countdownRefreshInterval} ${AppLocalizations.of(context)!.seconds}'),
             trailing: SizedBox(
               width: 120,
               child: Row(
@@ -939,11 +958,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final result = await showDialog<String>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text(AppLocalizations.of(context)!.modifyNtpServer),
+                      title:
+                          Text(AppLocalizations.of(context)!.modifyNtpServer),
                       content: TextField(
                         controller: controller,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.serverAddress,
+                          labelText:
+                              AppLocalizations.of(context)!.serverAddress,
                           hintText: AppLocalizations.of(context)!.ntpServerHint,
                         ),
                       ),
@@ -973,7 +994,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ListTile(
               leading: const Icon(Icons.timer_outlined),
               title: Text(AppLocalizations.of(context)!.syncInterval),
-              subtitle: Text('${_settings.ntpSyncInterval} ${AppLocalizations.of(context)!.minutes}'),
+              subtitle: Text(
+                  '${_settings.ntpSyncInterval} ${AppLocalizations.of(context)!.minutes}'),
               trailing: SizedBox(
                 width: 120,
                 child: Row(
@@ -1008,7 +1030,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: Text(AppLocalizations.of(context)!.currentStatus),
-              subtitle: Text('${AppLocalizations.of(context)!.timeOffset}: ${NtpService().offset}ms'),
+              subtitle: Text(
+                  '${AppLocalizations.of(context)!.timeOffset}: ${NtpService().offset}ms'),
               trailing: TextButton(
                 onPressed: () async {
                   await NtpService().syncTime();
@@ -1039,7 +1062,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.notifications_outlined),
             title: Text(AppLocalizations.of(context)!.enableNotifications),
-            subtitle: Text(AppLocalizations.of(context)!.enableNotificationsSubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.enableNotificationsSubtitle),
             value: _settings.enableNotifications,
             onChanged: (value) {
               _saveSettings(
@@ -1051,7 +1075,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SwitchListTile(
               secondary: const Icon(Icons.access_time_outlined),
               title: Text(AppLocalizations.of(context)!.courseReminder),
-              subtitle: Text(AppLocalizations.of(context)!.courseReminderSubtitle),
+              subtitle:
+                  Text(AppLocalizations.of(context)!.courseReminderSubtitle),
               value: _settings.enableCourseReminder,
               onChanged: (value) {
                 _saveSettings(
@@ -1062,7 +1087,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SwitchListTile(
               secondary: const Icon(Icons.volume_up_outlined),
               title: Text(AppLocalizations.of(context)!.voiceReminder),
-              subtitle: Text(AppLocalizations.of(context)!.voiceReminderSubtitle),
+              subtitle:
+                  Text(AppLocalizations.of(context)!.voiceReminderSubtitle),
               value: _settings.enableTtsForReminder,
               onChanged: (value) {
                 _saveSettings(
@@ -1073,7 +1099,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SwitchListTile(
               secondary: const Icon(Icons.class_outlined),
               title: Text(AppLocalizations.of(context)!.classStartNotification),
-              subtitle: Text(AppLocalizations.of(context)!.classStartNotificationSubtitle),
+              subtitle: Text(
+                  AppLocalizations.of(context)!.classStartNotificationSubtitle),
               value: _settings.showNotificationOnClassStart,
               onChanged: (value) {
                 _saveSettings(
@@ -1086,7 +1113,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SwitchListTile(
               secondary: const Icon(Icons.class_outlined),
               title: Text(AppLocalizations.of(context)!.classEndNotification),
-              subtitle: Text(AppLocalizations.of(context)!.classEndNotificationSubtitle),
+              subtitle: Text(
+                  AppLocalizations.of(context)!.classEndNotificationSubtitle),
               value: _settings.showNotificationOnClassEnd,
               onChanged: (value) {
                 _saveSettings(
@@ -1099,7 +1127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SwitchListTile(
               secondary: const Icon(Icons.timer_outlined),
               title: Text(AppLocalizations.of(context)!.countdownNotification),
-              subtitle: Text(AppLocalizations.of(context)!.countdownNotificationSubtitle),
+              subtitle: Text(
+                  AppLocalizations.of(context)!.countdownNotificationSubtitle),
               value: _settings.showNotificationForCountdown,
               onChanged: (value) {
                 _saveSettings(
@@ -1130,7 +1159,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.start_outlined),
             title: Text(AppLocalizations.of(context)!.startWithWindows),
-            subtitle: Text(AppLocalizations.of(context)!.startWithWindowsSubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.startWithWindowsSubtitle),
             value: _settings.startWithWindows,
             onChanged: (value) async {
               if (value) {
@@ -1144,7 +1174,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.minimize_outlined),
             title: Text(AppLocalizations.of(context)!.minimizeToTray),
-            subtitle: Text(AppLocalizations.of(context)!.minimizeToTraySubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.minimizeToTraySubtitle),
             value: _settings.minimizeToTray,
             onChanged: (value) {
               _saveSettings(_settings.copyWith(minimizeToTray: value));
@@ -1179,7 +1210,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             secondary: const Icon(Icons.speed_outlined),
             title: Text(AppLocalizations.of(context)!.performanceMonitoring),
-            subtitle: Text(AppLocalizations.of(context)!.performanceMonitoringSubtitle),
+            subtitle: Text(
+                AppLocalizations.of(context)!.performanceMonitoringSubtitle),
             value: _settings.enablePerformanceMonitoring,
             onChanged: (value) {
               _saveSettings(
@@ -1244,7 +1276,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(
                   AppLocalizations.of(context)!.interconnectionSettings,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
                 Container(
@@ -1268,16 +1301,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.devices_other),
             title: Text(AppLocalizations.of(context)!.interconnectionSettings),
-            subtitle: Text(AppLocalizations.of(context)!.interconnectionSubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.interconnectionSubtitle),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () async {
               final confirm = await MD3DialogStyles.showConfirmDialog(
                 context: context,
                 title: AppLocalizations.of(context)!.securityWarning,
                 message: AppLocalizations.of(context)!.securityWarningMessage,
-                confirmText: AppLocalizations.of(context)!.securityWarningConfirm,
-                icon: Icon(Icons.warning_amber_rounded,
-                    color: theme.colorScheme.error,),
+                confirmText:
+                    AppLocalizations.of(context)!.securityWarningConfirm,
+                icon: Icon(
+                  Icons.warning_amber_rounded,
+                  color: theme.colorScheme.error,
+                ),
               );
 
               if (confirm ?? false) {
@@ -1295,16 +1332,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.extension),
             title: Text(AppLocalizations.of(context)!.pluginManagement),
-            subtitle: Text(AppLocalizations.of(context)!.pluginManagementSubtitle),
+            subtitle:
+                Text(AppLocalizations.of(context)!.pluginManagementSubtitle),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () async {
               final confirm = await MD3DialogStyles.showConfirmDialog(
                 context: context,
                 title: AppLocalizations.of(context)!.securityWarning,
                 message: AppLocalizations.of(context)!.pluginSecurityWarning,
-                confirmText: AppLocalizations.of(context)!.securityWarningConfirm,
-                icon: Icon(Icons.warning_amber_rounded,
-                    color: theme.colorScheme.error,),
+                confirmText:
+                    AppLocalizations.of(context)!.securityWarningConfirm,
+                icon: Icon(
+                  Icons.warning_amber_rounded,
+                  color: theme.colorScheme.error,
+                ),
               );
 
               if (confirm ?? false) {
@@ -1376,7 +1417,9 @@ class ThemePreview extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          isDark ? AppLocalizations.of(context)!.themeModeDark : AppLocalizations.of(context)!.themeModeLight,
+          isDark
+              ? AppLocalizations.of(context)!.themeModeDark
+              : AppLocalizations.of(context)!.themeModeLight,
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.bold,

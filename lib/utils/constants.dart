@@ -2,42 +2,42 @@ import 'package:flutter/material.dart';
 
 /// 课程状态枚举
 enum CourseStatus {
-  upcoming,   // 即将开始
-  current,    // 正在进行
-  completed,  // 已结束
+  upcoming, // 即将开始
+  current, // 正在进行
+  completed, // 已结束
 }
 
 /// 事件类型枚举
 enum EventType {
-  exam,       // 考试
+  exam, // 考试
   assignment, // 作业
-  meeting,    // 会议
-  other,      // 其他
+  meeting, // 会议
+  other, // 其他
 }
 
 /// 天气状态枚举
 enum WeatherCondition {
-  sunny,      // 晴天
-  cloudy,     // 多云
-  rainy,      // 雨天
-  snowy,      // 雪天
-  foggy,      // 雾天
-  stormy,     // 暴风雨
-  unknown,    // 未知
+  sunny, // 晴天
+  cloudy, // 多云
+  rainy, // 雨天
+  snowy, // 雪天
+  foggy, // 雾天
+  stormy, // 暴风雨
+  unknown, // 未知
 }
 
 /// 主题模式枚举
 enum AppThemeMode {
-  system,     // 跟随系统
-  light,      // 浅色主题
-  dark,       // 深色主题
+  system, // 跟随系统
+  light, // 浅色主题
+  dark, // 深色主题
 }
 
 /// 语言设置枚举
 enum AppLanguage {
-  system,     // 跟随系统
-  chinese,    // 中文
-  english,    // 英文
+  system, // 跟随系统
+  chinese, // 中文
+  english, // 英文
 }
 
 /// 应用常量定义
@@ -58,25 +58,25 @@ class AppConstants {
   static const Duration longAnimationDuration = Duration(milliseconds: 500);
 
   /// 边框圆角
-  static const double smallBorderRadius = 8.0;
-  static const double mediumBorderRadius = 16.0;
-  static const double largeBorderRadius = 24.0;
+  static const double smallBorderRadius = 8;
+  static const double mediumBorderRadius = 16;
+  static const double largeBorderRadius = 24;
 
   /// 间距
-  static const double smallSpacing = 8.0;
-  static const double mediumSpacing = 16.0;
-  static const double largeSpacing = 24.0;
-  static const double extraLargeSpacing = 32.0;
+  static const double smallSpacing = 8;
+  static const double mediumSpacing = 16;
+  static const double largeSpacing = 24;
+  static const double extraLargeSpacing = 32;
 
   /// 图标大小
-  static const double smallIconSize = 16.0;
-  static const double mediumIconSize = 24.0;
-  static const double largeIconSize = 32.0;
-  static const double extraLargeIconSize = 48.0;
+  static const double smallIconSize = 16;
+  static const double mediumIconSize = 24;
+  static const double largeIconSize = 32;
+  static const double extraLargeIconSize = 48;
 
   /// 字体大小倍数
   static const double smallFontMultiplier = 0.8;
-  static const double mediumFontMultiplier = 1.0;
+  static const double mediumFontMultiplier = 1;
   static const double largeFontMultiplier = 1.2;
 
   /// 透明度
@@ -85,9 +85,9 @@ class AppConstants {
   static const double highOpacity = 0.8;
 
   /// 阴影
-  static const double lowElevation = 2.0;
-  static const double mediumElevation = 4.0;
-  static const double highElevation = 8.0;
+  static const double lowElevation = 2;
+  static const double mediumElevation = 4;
+  static const double highElevation = 8;
 
   /// 时间格式
   static const String timeFormat = 'HH:mm:ss';

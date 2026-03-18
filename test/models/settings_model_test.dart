@@ -22,7 +22,7 @@ void main() {
         expect(settings.showCountdownWidget, false);
         expect(settings.showCurrentClassWidget, false);
         expect(settings.enableCourseReminder, false);
-        expect(settings.minimizeToTray, false);
+        expect(settings.minimizeToTray, true);
         expect(settings.enableDebugMode, false);
         expect(settings.enablePerformanceMonitoring, false);
       });
@@ -68,7 +68,7 @@ void main() {
 
         expect(settings.apiBaseUrl, 'http://example.com/api');
         expect(settings.enableNotifications, true);
-        expect(settings.semesterStartDate, DateTime(2026, 9, 1));
+        expect(settings.semesterStartDate, DateTime(2026, 9));
         expect(settings.language, 'en');
         expect(settings.weatherRefreshInterval, 60);
         expect(settings.countdownRefreshInterval, 120);
@@ -132,7 +132,7 @@ void main() {
           themeSettings: ThemeSettings.defaultSettings(),
           apiBaseUrl: 'http://test.com/api',
           language: 'en',
-          semesterStartDate: DateTime(2026, 9, 1),
+          semesterStartDate: DateTime(2026, 9),
         );
 
         final json = settings.toJson();
@@ -228,8 +228,8 @@ void main() {
 
     group('convenience getters', () {
       test('themeMode delegates to themeSettings', () {
-        final settings = AppSettings(
-          themeSettings: const ThemeSettings(
+        const settings = AppSettings(
+          themeSettings: ThemeSettings(
             seedColor: Color(0xFF6750A4),
             themeMode: ThemeMode.dark,
             useDynamicColor: false,
@@ -241,8 +241,8 @@ void main() {
       });
 
       test('seedColor delegates to themeSettings', () {
-        final settings = AppSettings(
-          themeSettings: const ThemeSettings(
+        const settings = AppSettings(
+          themeSettings: ThemeSettings(
             seedColor: Color(0xFFFF5722),
             themeMode: ThemeMode.system,
             useDynamicColor: false,

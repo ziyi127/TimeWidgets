@@ -102,7 +102,6 @@ void main() {
           borderRadiusScale: 0.9,
           componentOpacity: 0.95,
           shadowStrength: 0.7,
-          enableGradients: true,
         );
 
         final json = settings.toJson();

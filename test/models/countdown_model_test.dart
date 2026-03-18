@@ -4,10 +4,7 @@ import 'package:time_widgets/models/countdown_model.dart';
 
 void main() {
   group('CountdownData', () {
-    final now = DateTime(2026, 3, 1, 12, 0, 0);
-    final futureDate = DateTime(2026, 3, 10, 12, 0, 0);
-    final pastDate = DateTime(2026, 2, 20, 12, 0, 0);
-    final approachingDate = DateTime(2026, 3, 5, 12, 0, 0);
+    final futureDate = DateTime(2026, 3, 10, 12);
 
     CountdownData createCountdown({
       String id = 'test-1',
@@ -74,7 +71,7 @@ void main() {
         expect(countdown.id, 'cd-1');
         expect(countdown.title, 'Exam');
         expect(countdown.description, 'Math final');
-        expect(countdown.targetDate, DateTime(2026, 6, 15, 9, 0, 0));
+        expect(countdown.targetDate, DateTime(2026, 6, 15, 9));
         expect(countdown.type, 'exam');
         expect(countdown.progress, 0.75);
         expect(countdown.category, 'study');
@@ -119,7 +116,7 @@ void main() {
           id: 'cd-1',
           title: 'Exam',
           description: 'Math final',
-          targetDate: DateTime(2026, 6, 15, 9, 0, 0),
+          targetDate: DateTime(2026, 6, 15, 9),
           type: 'exam',
           progress: 0.75,
           category: 'study',
@@ -174,7 +171,7 @@ void main() {
 
     group('typeLabel', () {
       test('returns correct label for exam', () {
-        final countdown = createCountdown(type: 'exam');
+        final countdown = createCountdown();
         expect(countdown.typeLabel, '考试');
       });
 
@@ -211,7 +208,7 @@ void main() {
       });
 
       test('returns red for exam type', () {
-        final countdown = createCountdown(type: 'exam');
+        final countdown = createCountdown();
         expect(countdown.typeColor, const Color(0xFFF44336));
       });
 

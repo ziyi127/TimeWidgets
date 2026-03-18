@@ -131,7 +131,7 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
     // Watch services
     final themeService = context.watch<ThemeService>();
     final desktopController = context.watch<DesktopController>();
-    
+
     final themeSettings = themeService.currentSettings;
 
     return DynamicColorBuilder(
@@ -160,22 +160,45 @@ class _DesktopWrapperState extends State<DesktopWrapper> {
           themeMode: themeSettings.themeMode,
           home: Stack(
             children: [
-              // 主界面
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
               if (desktopController.isWindowVisible)
-                DesktopWidgetScreen(
-                  isEditMode: desktopController.isEditMode,
+                Positioned.fill(
+                  child: DesktopWidgetScreen(
+                    isEditMode: desktopController.isEditMode,
+                  ),
                 ),
 
               // MD3托盘菜单覆盖层
               if (desktopController.showTrayMenu)
-                MD3TrayPopupMenu(
-                  onShowSettings: desktopController.navigateToSettings,
-                  onShowTimetableEdit: desktopController.navigateToTimetableEdit,
-                  onToggleWindow: desktopController.toggleMainWindow,
-                  onToggleEditMode: desktopController.toggleEditMode,
-                  onExit: desktopController.exitApplication,
-                  onTempScheduleChange: desktopController.showTempScheduleChangeMenu,
-                  onDismiss: desktopController.hideMD3TrayMenu,
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: desktopController.hideMD3TrayMenu,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          right: 16,
+                          bottom: 16,
+                          child: MD3TrayPopupMenu(
+                            onShowSettings:
+                                desktopController.navigateToSettings,
+                            onShowTimetableEdit:
+                                desktopController.navigateToTimetableEdit,
+                            onToggleWindow: desktopController.toggleMainWindow,
+                            onToggleEditMode: desktopController.toggleEditMode,
+                            onExit: desktopController.exitApplication,
+                            onTempScheduleChange:
+                                desktopController.showTempScheduleChangeMenu,
+                            onDismiss: desktopController.hideMD3TrayMenu,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
             ],
           ),

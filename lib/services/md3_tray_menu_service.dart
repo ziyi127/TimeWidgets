@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:system_tray/system_tray.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 /// MD3 风格的系统托盘菜单服务
-/// 使用 C++ 实现基础托盘，右键时显示 Flutter MD3 悬浮菜单
+/// 使用 system_tray 库实现系统托盘功能
 class MD3TrayMenuService {
   MD3TrayMenuService._();
   static MD3TrayMenuService? _instance;
@@ -11,6 +14,7 @@ class MD3TrayMenuService {
       _instance ??= MD3TrayMenuService._();
 
   bool _isInitialized = false;
+  SystemTray? _systemTray;
 
   // 回调函数
   VoidCallback? onShowSettings;
@@ -23,22 +27,70 @@ class MD3TrayMenuService {
   // MD3 菜单显示回调 - 由 main.dart 设置
   VoidCallback? onShowMD3Menu;
 
-  /// 初始化系统托盘（仅图标，不设置原生菜单）
+  /// 初始化系统托盘
   Future<bool> initialize() async {
     if (_isInitialized) return true;
 
-    _isInitialized = true;
-    Logger.i('MD3TrayMenuService initialized in Flutter-only mode');
-    return true;
+    try {
+      _systemTray = SystemTray();
+
+      // 设置托盘图标
+      final iconPath = Platform.isWindows
+          ? 'assets/icons/tray_icon.ico'
+          : 'assets/icons/tray_icon.png';
+
+      await _systemTray!.initSystemTray(
+        title: "智慧课程表",
+        iconPath: iconPath,
+      );
+
+      // 绑定点击事件
+      _systemTray!.registerSystemTrayEventHandler((eventName) async {
+        if (eventName == kSystemTrayEventClick) {
+          // 左键点击显示 MD3 菜单
+          onShowMD3Menu?.call();
+        }
+      });
+
+      _isInitialized = true;
+      Logger.i('系统托盘初始化成功');
+      return true;
+    } catch (e) {
+      Logger.e('系统托盘初始化失败: $e');
+      _isInitialized = false;
+      return false;
+    }
   }
 
   /// 更新托盘提示
   Future<void> updateTooltip(String tooltip) async {
-    Logger.d('updateTooltip ignored in Flutter-only mode: $tooltip');
+    if (_systemTray != null && _isInitialized) {
+      try {
+        // system_tray 库可能没有直接的 setTooltip 方法
+        // 我们可以通过重新初始化系统托盘来更新提示
+        final iconPath = Platform.isWindows
+            ? 'assets/icons/tray_icon.ico'
+            : 'assets/icons/tray_icon.png';
+
+        await _systemTray!.initSystemTray(
+          title: tooltip,
+          iconPath: iconPath,
+        );
+      } catch (e) {
+        Logger.e('更新托盘提示失败: $e');
+      }
+    }
   }
 
   /// 销毁托盘
   Future<void> destroy() async {
+    if (_systemTray != null) {
+      try {
+        await _systemTray!.destroy();
+      } catch (e) {
+        Logger.e('销毁托盘失败: $e');
+      }
+    }
     _isInitialized = false;
   }
 
@@ -137,61 +189,43 @@ class _MD3TrayPopupMenuState extends State<MD3TrayPopupMenu>
 
     return Material(
       color: Colors.transparent,
-      child: GestureDetector(
-        onTap: () {
-          // 点击外部关闭菜单，使用智能反向动画
-          GlobalAnimationService.instance.smartReverse(
-            controller: _animationController,
-          );
-          widget.onDismiss?.call();
-        },
-        behavior: HitTestBehavior.opaque,
-        child: ColoredBox(
-          color: Colors.transparent,
-          child: Stack(
-            children: [
-              // 菜单定位在右下角，根据托盘位置调整
-              Positioned(
-                right: 16, // 距离右侧边界 16px
-                bottom: 16, // 距离底部边界 16px
-                child: GestureDetector(
-                  onTap: () {}, // 阻止点击穿透
-                  child: FadeTransition(
-                    opacity: _opacityAnimation,
-                    child: ScaleTransition(
-                      scale: _scaleAnimation,
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        width: 240,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHigh,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colorScheme.shadow.withValues(alpha: 0.2),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildMenuHeader(theme, colorScheme),
-                            Divider(
-                              height: 1,
-                              color: colorScheme.outlineVariant,
-                            ),
-                            _buildMenuItems(context),
-                          ],
-                        ),
+      child: ColoredBox(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            FadeTransition(
+              opacity: _opacityAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  width: 240,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.shadow.withValues(alpha: 0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildMenuHeader(theme, colorScheme),
+                      Divider(
+                        height: 1,
+                        color: colorScheme.outlineVariant,
+                      ),
+                      _buildMenuItems(context),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

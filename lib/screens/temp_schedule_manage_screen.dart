@@ -203,7 +203,10 @@ class _TempScheduleManageScreenState extends State<TempScheduleManageScreen> {
   }
 
   Widget _buildChangeItem(
-      BuildContext context, TempScheduleChange change, ColorScheme colorScheme,) {
+    BuildContext context,
+    TempScheduleChange change,
+    ColorScheme colorScheme,
+  ) {
     final isPast = change.date.isBefore(DateTime.now());
 
     return Card(

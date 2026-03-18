@@ -18,7 +18,6 @@ linter:
   rules:
     # Error rules
     - avoid_dynamic_calls
-    - avoid_slow_async_io
     - avoid_type_to_string
     - cancel_subscriptions
     - close_sinks
@@ -31,7 +30,6 @@ linter:
 
     # Style rules
     - always_declare_return_types
-    - always_put_control_body_on_new_line
     - annotate_overrides
     - avoid_bool_literals_in_conditional_expressions
     - avoid_catching_errors
@@ -45,13 +43,11 @@ linter:
     - avoid_js_rounded_ints
     - avoid_multiple_declarations_per_line
     - avoid_null_checks_in_equality_operators
-    - avoid_positional_boolean_parameters
     - avoid_private_typedef_functions
     - avoid_redundant_argument_values
     - avoid_relative_lib_imports
     - avoid_return_types_on_setters
     - avoid_returning_null_for_void
-    - avoid_returning_this
     - avoid_setters_without_getters
     - avoid_shadowing_type_parameters
     - avoid_single_cascade_in_expression_statements
@@ -69,7 +65,6 @@ linter:
     - curly_braces_in_flow_control_structures
     - depend_on_referenced_packages
     - deprecated_consistency
-    - directives_ordering
     - empty_catches
     - empty_constructor_bodies
     - empty_statements
@@ -114,7 +109,6 @@ linter:
     - prefer_if_null_operators
     - prefer_initializing_formals
     - prefer_inlined_adds
-    - prefer_int_literals
     - prefer_interpolation_to_compose_strings
     - prefer_is_empty
     - prefer_is_not_empty
@@ -128,22 +122,18 @@ linter:
     - prefer_void_to_null
     - provide_deprecation_message
     - recursive_getters
-    - require_trailing_commas
     - secure_pubspec_urls
     - sized_box_for_whitespace
     - slash_for_doc_comments
     - sort_child_properties_last
-    - sort_constructors_first
     - sort_unnamed_constructors_first
     - tighten_type_of_initializing_formals
     - type_annotate_public_apis
     - type_init_formals
-    - unawaited_futures
     - unnecessary_await_in_return
     - unnecessary_brace_in_string_interps
     - unnecessary_const
     - unnecessary_constructor_name
-    - unnecessary_getters_setters
     - unnecessary_lambdas
     - unnecessary_late
     - unnecessary_new
@@ -166,12 +156,10 @@ linter:
     - use_if_null_to_convert_nulls_to_bools
     - use_is_even_rather_than_modulo
     - use_key_in_widget_constructors
-    - use_late_for_private_fields_and_variables
     - use_named_constants
     - use_raw_strings
     - use_rethrow_when_possible
     - use_setters_to_change_properties
-    - use_string_buffers
     - use_super_parameters
     - use_test_throws_matchers
     - valid_regexps

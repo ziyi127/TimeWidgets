@@ -3,8 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  desktop_multi_window
   dynamic_color
   isar_flutter_libs
+  system_tray
   url_launcher_windows
 )
 

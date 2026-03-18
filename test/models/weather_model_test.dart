@@ -153,8 +153,8 @@ void main() {
             'weather': '1',
             'pubTime': '',
           },
-          'aqi': {},
-          'forecastDaily': {},
+          'aqi': <String, dynamic>{},
+          'forecastDaily': <String, dynamic>{},
         };
 
         final weather = WeatherData.fromJson(json);
@@ -173,7 +173,7 @@ void main() {
           aqiLevel: 30,
           humidity: 50,
           wind: '5km/h',
-          pressure: 1013.0,
+          pressure: 1013,
           sunrise: '06:00',
           sunset: '18:00',
           weatherType: 0,

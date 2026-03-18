@@ -105,115 +105,117 @@ class CurrentClassWidget extends StatelessWidget {
       child: Card(
         elevation: 0,
         color: colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          ResponsiveUtils.getBorderRadius(width),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            ResponsiveUtils.getBorderRadius(width),
+          ),
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(ResponsiveUtils.value(16)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 头部
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.school_rounded,
-                  size: ResponsiveUtils.getIconSize(width, baseSize: 20),
-                  color: colorScheme.primary,
-                ),
-                SizedBox(width: ResponsiveUtils.value(12)),
-                Text(
-                  AppLocalizations.of(context)!.currentClassTitle,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
-                        fontMultiplier,
+        child: Padding(
+          padding: EdgeInsets.all(ResponsiveUtils.value(16)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 头部
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.school_rounded,
+                    size: ResponsiveUtils.getIconSize(width, baseSize: 20),
+                    color: colorScheme.primary,
                   ),
-                ),
-                SizedBox(width: ResponsiveUtils.value(16)),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ResponsiveUtils.value(10),
-                    vertical: ResponsiveUtils.value(4),
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.tertiaryContainer,
-                    borderRadius:
-                        BorderRadius.circular(ResponsiveUtils.value(12)),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.statusOngoing,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: colorScheme.onTertiaryContainer,
-                      fontWeight: FontWeight.w600,
-                      fontSize: (theme.textTheme.labelMedium?.fontSize ?? 12) *
+                  SizedBox(width: ResponsiveUtils.value(12)),
+                  Text(
+                    AppLocalizations.of(context)!.currentClassTitle,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: (theme.textTheme.titleSmall?.fontSize ?? 14) *
                           fontMultiplier,
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: ResponsiveUtils.value(12)),
-            // 课程信息
-            Row(
-              children: [
-                // 课程图标
-                Container(
-                  width: ResponsiveUtils.value(44),
-                  height: ResponsiveUtils.value(44),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius:
-                        BorderRadius.circular(ResponsiveUtils.value(12)),
-                  ),
-                  child: Icon(
-                    Icons.menu_book_rounded,
-                    size: ResponsiveUtils.getIconSize(width, baseSize: 22),
-                    color: colorScheme.onPrimaryContainer,
-                  ),
-                ),
-                SizedBox(width: ResponsiveUtils.value(12)),
-                // 课程详情
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${course!.subject} · ${course!.teacher}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                          fontSize:
-                              (theme.textTheme.titleMedium?.fontSize ?? 16) *
-                                  fontMultiplier,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                  SizedBox(width: ResponsiveUtils.value(16)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveUtils.value(10),
+                      vertical: ResponsiveUtils.value(4),
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.tertiaryContainer,
+                      borderRadius:
+                          BorderRadius.circular(ResponsiveUtils.value(12)),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.statusOngoing,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onTertiaryContainer,
+                        fontWeight: FontWeight.w600,
+                        fontSize:
+                            (theme.textTheme.labelMedium?.fontSize ?? 12) *
+                                fontMultiplier,
                       ),
-                      SizedBox(height: ResponsiveUtils.value(2)),
-                      Text(
-                        '${course!.time} · ${course!.classroom}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize:
-                              (theme.textTheme.bodySmall?.fontSize ?? 12) *
-                                  fontMultiplier,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              SizedBox(height: ResponsiveUtils.value(12)),
+              // 课程信息
+              Row(
+                children: [
+                  // 课程图标
+                  Container(
+                    width: ResponsiveUtils.value(44),
+                    height: ResponsiveUtils.value(44),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius:
+                          BorderRadius.circular(ResponsiveUtils.value(12)),
+                    ),
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      size: ResponsiveUtils.getIconSize(width, baseSize: 22),
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                  SizedBox(width: ResponsiveUtils.value(12)),
+                  // 课程详情
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${course!.subject} · ${course!.teacher}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                            fontSize:
+                                (theme.textTheme.titleMedium?.fontSize ?? 16) *
+                                    fontMultiplier,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: ResponsiveUtils.value(2)),
+                        Text(
+                          '${course!.time} · ${course!.classroom}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize:
+                                (theme.textTheme.bodySmall?.fontSize ?? 12) *
+                                    fontMultiplier,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

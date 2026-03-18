@@ -61,7 +61,8 @@ class ClassislandImportService {
 
   /// 导入Classisland数据并转换为本程序格式(带统计)
   static Future<ClassIslandImportResult> importFromFileWithStats() async {
-    Logger.w('ClassislandImportService.importFromFileWithStats is disabled in Flutter-only mode');
+    Logger.w(
+        'ClassislandImportService.importFromFileWithStats is disabled in Flutter-only mode');
     return ClassIslandImportResult.failure('当前版本不支持本地文件选择导入，请使用 JSON 文本导入。');
   }
 

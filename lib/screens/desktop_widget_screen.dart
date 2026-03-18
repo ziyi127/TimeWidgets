@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:provider/provider.dart';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:time_widgets/l10n/app_localizations.dart';
 import 'package:time_widgets/services/desktop_widget_service.dart';
 import 'package:time_widgets/services/settings_service.dart';
@@ -34,6 +33,7 @@ class DesktopWidgetScreen extends StatefulWidget {
 
 class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   final SettingsService _settingsService = SettingsService();
+  bool _isDisposed = false;
 
   // 数据状态
   // Weather state moved to WeatherViewModel
@@ -52,11 +52,20 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
     super.initState();
     // Countdown listener removed - handled by ViewModel
 
+    _settingsService.addListener(_handleSettingsChanged);
+
     // 延迟到下一帧执行，避免在构建过程中调用 setState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
       _loadLayout();
     });
+  }
+
+  void _handleSettingsChanged() {
+    if (_isDisposed || !mounted) {
+      return;
+    }
+    setState(() {});
   }
 
   void _loadData() {
@@ -116,7 +125,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         );
       case WidgetType.weather:
         if (!settings.showWeatherWidget) return const SizedBox.shrink();
-        
+
         // Use Consumer to listen to WeatherViewModel updates
         return Consumer<WeatherViewModel>(
           builder: (context, weatherVM, child) {
@@ -125,9 +134,10 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
               backgroundColor: Colors.transparent,
               onTap: weatherVM.refreshWeather,
               child: WeatherWidget(
-                weatherData: weatherVM.isLoading && weatherVM.weatherData == null 
-                    ? null 
-                    : weatherVM.weatherData,
+                weatherData:
+                    weatherVM.isLoading && weatherVM.weatherData == null
+                        ? null
+                        : weatherVM.weatherData,
                 error: weatherVM.error,
                 onRetry: weatherVM.refreshWeather,
                 isCompact: true,
@@ -137,7 +147,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         );
       case WidgetType.currentClass:
         if (!settings.showCurrentClassWidget) return const SizedBox.shrink();
-        
+
         return Consumer<TimetableViewModel>(
           builder: (context, timetableVM, child) {
             return EnhancedWidgetWrapper(
@@ -154,7 +164,7 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
         );
       case WidgetType.countdown:
         if (!settings.showCountdownWidget) return const SizedBox.shrink();
-        
+
         // Use Consumer to listen to CountdownViewModel updates
         return Consumer<CountdownViewModel>(
           builder: (context, countdownVM, child) {
@@ -163,9 +173,10 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
               backgroundColor: Colors.transparent,
               onTap: countdownVM.refreshCountdown,
               child: CountdownWidget(
-                countdownData: countdownVM.isLoading && countdownVM.countdownData == null
-                    ? null 
-                    : countdownVM.countdownData,
+                countdownData:
+                    countdownVM.isLoading && countdownVM.countdownData == null
+                        ? null
+                        : countdownVM.countdownData,
                 error: countdownVM.error,
                 onRetry: countdownVM.refreshCountdown,
                 isCompact: true,
@@ -195,6 +206,8 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
 
   @override
   void dispose() {
+    _isDisposed = true;
+    _settingsService.removeListener(_handleSettingsChanged);
     _layoutTimer?.cancel();
     super.dispose();
   }
@@ -203,130 +216,132 @@ class _DesktopWidgetScreenState extends State<DesktopWidgetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // 如果禁用了桌面小组件且不在编辑模式，显示提示信息
-          if (!_settingsService.currentSettings.enableDesktopWidgets &&
-              !widget.isEditMode) {
-            return Center(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.widgets_outlined,
-                      size: 48,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!.desktopWidgetDisabled,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppLocalizations.of(context)!.desktopWidgetDisabledHint,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          if (!_isLayoutLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          // 如果布局为空，使用默认布局
-          if (_layout == null) {
-            return Center(child: Text(AppLocalizations.of(context)!.error));
-          }
-
-          final layout = _layout!;
-          return Stack(
-            children: layout.entries.map((entry) {
-              if (!entry.value.isVisible) return const SizedBox.shrink();
-
-              return Positioned(
-                left: entry.value.x,
-                top: entry.value.y,
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 500),
-                  opacity: _isLayoutLoaded ? 1.0 : 0.0,
-                  curve: Curves.easeIn,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: entry.value.width,
-                      // 移除 maxHeight 限制，让组件根据内容自适应高度
-                    ),
-                    child: widget.isEditMode
-                        ? GestureDetector(
-                            onPanUpdate: (details) {
-                              setState(() {
-                                final currentPos = layout[entry.key];
-                                if (currentPos != null) {
-                                  layout[entry.key] = currentPos.copyWith(
-                                    x: currentPos.x + details.delta.dx,
-                                    y: currentPos.y + details.delta.dy,
-                                  );
-                                }
-                              });
-                            },
-                            onPanEnd: (details) {
-                              // 直接保存当前布局
-                              final currentLayout = _layout;
-                              if (currentLayout != null) {
-                                // 保存位置
-                                DesktopWidgetService.saveWidgetPositions(
-                                  currentLayout,
-                                );
-                                Logger.i('Widget positions saved after drag');
-                              }
-                            },
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.move,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    width: ResponsiveUtils.value(2),
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    ResponsiveUtils.value(16),
-                                  ),
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surface
-                                      .withValues(alpha: 0.5),
-                                ),
-                                child: IgnorePointer(
-                                  child: _buildWidget(entry.key),
-                                ),
-                              ),
-                            ),
-                          )
-                        : _buildWidget(entry.key),
-                  ),
-                ),
-              );
-            }).toList(),
-          );
-        },
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: _buildContent,
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, BoxConstraints constraints) {
+    if (!_settingsService.currentSettings.enableDesktopWidgets &&
+        !widget.isEditMode) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.widgets_outlined,
+                size: 48,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                AppLocalizations.of(context)!.desktopWidgetDisabled,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.desktopWidgetDisabledHint,
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (!_isLayoutLoaded) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_layout == null) {
+      return Center(child: Text(AppLocalizations.of(context)!.error));
+    }
+
+    final layout = _layout!;
+    return Stack(
+      children: layout.entries.map((entry) {
+        if (!entry.value.isVisible) return const SizedBox.shrink();
+
+        return Positioned(
+          left: entry.value.x,
+          top: entry.value.y,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 500),
+            opacity: _isLayoutLoaded ? 1.0 : 0.0,
+            curve: Curves.easeIn,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: entry.value.width,
+              ),
+              child: widget.isEditMode
+                  ? GestureDetector(
+                      onPanUpdate: (details) {
+                        setState(() {
+                          final currentPos = layout[entry.key];
+                          if (currentPos != null) {
+                            layout[entry.key] = currentPos.copyWith(
+                              x: currentPos.x + details.delta.dx,
+                              y: currentPos.y + details.delta.dy,
+                            );
+                          }
+                        });
+                      },
+                      onPanEnd: (details) {
+                        final currentLayout = _layout;
+                        if (currentLayout != null) {
+                          DesktopWidgetService.saveWidgetPositions(
+                            currentLayout,
+                          );
+                          Logger.i('Widget positions saved after drag');
+                        }
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.move,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: ResponsiveUtils.value(2),
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              ResponsiveUtils.value(16),
+                            ),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withValues(alpha: 0.5),
+                          ),
+                          child: IgnorePointer(
+                            child: _buildWidget(entry.key),
+                          ),
+                        ),
+                      ),
+                    )
+                  : _buildWidget(entry.key),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

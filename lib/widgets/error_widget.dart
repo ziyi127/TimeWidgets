@@ -324,8 +324,12 @@ class ErrorDetailsDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(ColorScheme colorScheme, double width, double fontMultiplier,
-      ThemeData theme,) {
+  Widget _buildTitle(
+    ColorScheme colorScheme,
+    double width,
+    double fontMultiplier,
+    ThemeData theme,
+  ) {
     return Row(
       children: [
         Icon(
@@ -355,8 +359,7 @@ class ErrorDetailsDialog extends StatelessWidget {
           '错误消息:',
           error!.message,
         ),
-        if (error!.userMessage != null &&
-            error!.userMessage != error!.message)
+        if (error!.userMessage != null && error!.userMessage != error!.message)
           _buildSection(
             theme,
             fontMultiplier,
@@ -388,7 +391,11 @@ class ErrorDetailsDialog extends StatelessWidget {
   }
 
   Widget _buildSection(
-      ThemeData theme, double fontMultiplier, String title, String content,) {
+    ThemeData theme,
+    double fontMultiplier,
+    String title,
+    String content,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

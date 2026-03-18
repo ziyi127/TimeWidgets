@@ -34,11 +34,11 @@ class QuickSchedulePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final dayName = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][currentDayIndex];
-    
+
     // Determine current slot name
     String currentSlotName = '完成';
     if (currentSlotIndex < timeSlots.length) {
-        currentSlotName = timeSlots[currentSlotIndex].name;
+      currentSlotName = timeSlots[currentSlotIndex].name;
     }
 
     return Container(
@@ -67,7 +67,7 @@ class QuickSchedulePanel extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
-          
+
           // Status
           Container(
             padding: const EdgeInsets.all(16),
@@ -84,7 +84,7 @@ class QuickSchedulePanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  currentSlotIndex < timeSlots.length 
+                  currentSlotIndex < timeSlots.length
                       ? '当前时间段: $currentSlotName'
                       : '该天课程已全部排完，将切换至下一天',
                   style: MD3TypographyStyles.bodyMedium(context),
@@ -92,7 +92,7 @@ class QuickSchedulePanel extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Actions
           Padding(
             padding: const EdgeInsets.all(16),
@@ -110,16 +110,18 @@ class QuickSchedulePanel extends StatelessWidget {
                 Expanded(
                   child: MD3ButtonStyles.filledTonalButton(
                     context: context,
-                    onPressed: currentSlotIndex < timeSlots.length ? onSkipSlot : () {},
+                    onPressed: currentSlotIndex < timeSlots.length
+                        ? onSkipSlot
+                        : () {},
                     text: '跳过/留空',
                   ),
                 ),
               ],
             ),
           ),
-          
+
           const Divider(height: 1),
-          
+
           // Course List
           Expanded(
             child: SingleChildScrollView(
@@ -130,10 +132,12 @@ class QuickSchedulePanel extends StatelessWidget {
                 children: service.courses.map((course) {
                   final color = ColorUtils.parseHexColor(course.color) ??
                       ColorUtils.generateColorFromName(course.name);
-                  final label = course.abbreviation.isNotEmpty 
-                      ? course.abbreviation 
-                      : (course.name.length > 2 ? course.name.substring(0, 2) : course.name);
-                      
+                  final label = course.abbreviation.isNotEmpty
+                      ? course.abbreviation
+                      : (course.name.length > 2
+                          ? course.name.substring(0, 2)
+                          : course.name);
+
                   return MD3ChipStyles.actionChip(
                     context: context,
                     avatar: CircleAvatar(
@@ -147,7 +151,7 @@ class QuickSchedulePanel extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Helper text
           Padding(
             padding: const EdgeInsets.all(16),

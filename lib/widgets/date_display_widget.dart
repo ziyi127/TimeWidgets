@@ -56,22 +56,28 @@ class _DateDisplayWidgetState extends State<DateDisplayWidget> {
     _midnightTimer?.cancel();
     final tomorrow = DateTime(_now.year, _now.month, _now.day + 1);
     final duration = tomorrow.difference(_now) + const Duration(seconds: 1);
-    _midnightTimer = Timer(duration, () {
-      _refreshDate();
-    });
+    _midnightTimer = Timer(duration, _refreshDate);
   }
 
   String _getWeekdayName(BuildContext context, int weekday) {
     final l10n = AppLocalizations.of(context)!;
     switch (weekday) {
-      case 1: return l10n.weekdayMon;
-      case 2: return l10n.weekdayTue;
-      case 3: return l10n.weekdayWed;
-      case 4: return l10n.weekdayThu;
-      case 5: return l10n.weekdayFri;
-      case 6: return l10n.weekdaySat;
-      case 7: return l10n.weekdaySun;
-      default: return '';
+      case 1:
+        return l10n.weekdayMon;
+      case 2:
+        return l10n.weekdayTue;
+      case 3:
+        return l10n.weekdayWed;
+      case 4:
+        return l10n.weekdayThu;
+      case 5:
+        return l10n.weekdayFri;
+      case 6:
+        return l10n.weekdaySat;
+      case 7:
+        return l10n.weekdaySun;
+      default:
+        return '';
     }
   }
 

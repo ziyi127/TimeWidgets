@@ -241,11 +241,11 @@ void main() {
       test('creates instance with empty courses', () {
         final timetable = Timetable(
           courses: const [],
-          date: DateTime(2026, 3, 1),
+          date: DateTime(2026, 3),
         );
 
         expect(timetable.courses, isEmpty);
-        expect(timetable.date, DateTime(2026, 3, 1));
+        expect(timetable.date, DateTime(2026, 3));
       });
 
       test('creates instance with courses', () {
@@ -258,7 +258,7 @@ void main() {
               classroom: 'Room 101',
             ),
           ],
-          date: DateTime(2026, 3, 1),
+          date: DateTime(2026, 3),
         );
 
         expect(timetable.courses.length, 1);
@@ -291,7 +291,7 @@ void main() {
         expect(timetable.courses.length, 2);
         expect(timetable.courses[0].subject, 'Math');
         expect(timetable.courses[1].subject, 'English');
-        expect(timetable.date, DateTime(2026, 3, 1));
+        expect(timetable.date, DateTime(2026, 3));
       });
 
       test('handles null courses list', () {
@@ -317,7 +317,7 @@ void main() {
               classroom: 'Room 101',
             ),
           ],
-          date: DateTime(2026, 3, 1),
+          date: DateTime(2026, 3),
         );
 
         final json = timetable.toJson();
@@ -355,12 +355,12 @@ void main() {
       test('copies with changed date', () {
         final original = Timetable(
           courses: const [],
-          date: DateTime(2026, 3, 1),
+          date: DateTime(2026, 3),
         );
 
-        final copied = original.copyWith(date: DateTime(2026, 4, 1));
+        final copied = original.copyWith(date: DateTime(2026, 4));
 
-        expect(copied.date, DateTime(2026, 4, 1));
+        expect(copied.date, DateTime(2026, 4));
         expect(copied.courses, isEmpty);
       });
     });
@@ -376,7 +376,7 @@ void main() {
               classroom: 'Room 101',
             ),
           ],
-          date: DateTime(2026, 3, 1),
+          date: DateTime(2026, 3),
         );
 
         final str = timetable.toString();

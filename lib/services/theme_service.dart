@@ -10,19 +10,25 @@ import 'package:time_widgets/utils/theme_utils.dart';
 /// 管理应用的主题设置，包括种子颜色、主题模式等
 /// 支持 Material You 动态取色
 class ThemeService extends ChangeNotifier {
-  factory ThemeService() => _instance;
+  factory ThemeService() {
+    final instance = _instance;
+    if (instance == null || instance._isDisposed) {
+      _instance = ThemeService._internal();
+    }
+    return _instance!;
+  }
 
   ThemeService._internal();
   static const String _themeSettingsKey = 'theme_settings';
 
-  // 单例模式实现
-  static final ThemeService _instance = ThemeService._internal();
+  static ThemeService? _instance;
 
   final StreamController<ThemeSettings> _themeController =
       StreamController<ThemeSettings>.broadcast();
 
   ThemeSettings _currentSettings = ThemeSettings.defaultSettings();
   bool _isInitialized = false;
+  bool _isDisposed = false;
 
   /// 主题设置流
   Stream<ThemeSettings> get themeStream => _themeController.stream;
@@ -90,9 +96,16 @@ class ThemeService extends ChangeNotifier {
   /// 释放资源
   @override
   void dispose() {
+    if (_isDisposed) {
+      return;
+    }
+    _isDisposed = true;
     _isInitialized = false;
     _currentSettings = ThemeSettings.defaultSettings();
-    _themeController.close();
+    if (!_themeController.isClosed) {
+      _themeController.close();
+    }
+    _instance = null;
     Logger.i('ThemeService disposed');
     super.dispose();
   }
@@ -141,23 +154,23 @@ class ThemeService extends ChangeNotifier {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
     );
   }
@@ -206,23 +219,23 @@ class ThemeService extends ChangeNotifier {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          // MD3 uses StadiumBorder by default
-        ),
+            // MD3 uses StadiumBorder by default
+            ),
       ),
     );
   }

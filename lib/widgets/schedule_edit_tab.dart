@@ -30,7 +30,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   String? _selectedScheduleId;
   int? _selectedDayIndex; // 0-6 (Mon-Sun based on implementation)
   final TimetableExportService _exportService = TimetableExportService();
-  
+
   // Quick Edit State
   bool _isQuickEditMode = false;
   int _quickEditSlotIndex = 0;
@@ -164,8 +164,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                     _selectedDayIndex = dayIndex;
                   });
                 },
-                onAddSchedule: (groupId) => _showAddScheduleDialog(context, service, groupId),
-                onAddGroup: (parentId) => _showAddGroupDialog(context, service, parentId),
+                onAddSchedule: (groupId) =>
+                    _showAddScheduleDialog(context, service, groupId),
+                onAddGroup: (parentId) =>
+                    _showAddGroupDialog(context, service, parentId),
                 onDeleteGroup: (groupId) => service.deleteGroup(groupId),
                 onUpdateGroup: (group) => service.updateGroup(group),
               ),
@@ -189,14 +191,15 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildQuickEditPanel(BuildContext context, TimetableEditService service) {
+  Widget _buildQuickEditPanel(
+      BuildContext context, TimetableEditService service) {
     final schedule = service.getScheduleById(_selectedScheduleId!);
     if (schedule == null) {
       return const SizedBox();
     }
 
     final dayIndex = _selectedDayIndex ?? 0;
-    
+
     // Get effective time slots
     final currentLayoutId = schedule.dayTimeLayoutIds[dayIndex];
     final effectiveLayoutId = currentLayoutId ?? schedule.timeLayoutId;
@@ -206,20 +209,21 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     final timeSlots = timeLayout?.timeSlots ?? service.timeSlots;
 
     return QuickSchedulePanel(
-        service: service,
-        schedule: schedule,
-        currentDayIndex: dayIndex,
-        currentSlotIndex: _quickEditSlotIndex,
-        timeSlots: timeSlots,
-        onCourseSelected: (course) => _handleQuickEdit(service, schedule, timeSlots, course),
-        onSkipSlot: () => _handleQuickEdit(service, schedule, timeSlots, null),
-        onUndo: () => _handleQuickEditUndo(service, schedule),
-        onClose: () {
-          setState(() {
-            _isQuickEditMode = false;
-            _quickEditHistory.clear();
-          });
-        },
+      service: service,
+      schedule: schedule,
+      currentDayIndex: dayIndex,
+      currentSlotIndex: _quickEditSlotIndex,
+      timeSlots: timeSlots,
+      onCourseSelected: (course) =>
+          _handleQuickEdit(service, schedule, timeSlots, course),
+      onSkipSlot: () => _handleQuickEdit(service, schedule, timeSlots, null),
+      onUndo: () => _handleQuickEditUndo(service, schedule),
+      onClose: () {
+        setState(() {
+          _isQuickEditMode = false;
+          _quickEditHistory.clear();
+        });
+      },
     );
   }
 
@@ -239,9 +243,11 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 
     // 1. Save history
     // Find if there was a course before (for undo)
-    final existingCourse = schedule.courses.where((dc) => 
-      dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id
-    ).firstOrNull;
+    final existingCourse = schedule.courses
+        .where(
+          (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id,
+        )
+        .firstOrNull;
 
     _quickEditHistory.add({
       'dayIndex': dayIndex,
@@ -252,19 +258,21 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     // 2. Update Schedule
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
     // Remove existing
-    updatedCourses.removeWhere((dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id);
-    
+    updatedCourses.removeWhere(
+        (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id);
+
     // Add new if not null (skip)
     if (course != null) {
-      updatedCourses.add(DailyCourse(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        dayOfWeek: dayOfWeek,
-        timeSlotId: slot.id,
-        courseId: course.id,
-        weekType: WeekType.both,
-      ));
+      updatedCourses.add(
+        DailyCourse(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          dayOfWeek: dayOfWeek,
+          timeSlotId: slot.id,
+          courseId: course.id,
+        ),
+      );
     }
-    
+
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));
 
     // 3. Advance to next slot/day
@@ -274,12 +282,13 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
       if (_quickEditSlotIndex >= timeSlots.length) {
         // Switch to next day
         if (dayIndex < 6) {
-           _selectedDayIndex = dayIndex + 1;
-           _quickEditSlotIndex = 0;
-           _showSuccessSnackBar(l10n.quickEditDoneNextDay(_getDayName(dayOfWeek)));
+          _selectedDayIndex = dayIndex + 1;
+          _quickEditSlotIndex = 0;
+          _showSuccessSnackBar(
+              l10n.quickEditDoneNextDay(_getDayName(dayOfWeek)));
         } else {
-           _showSuccessSnackBar(l10n.quickEditAllDone);
-           _isQuickEditMode = false; // Exit mode
+          _showSuccessSnackBar(l10n.quickEditAllDone);
+          _isQuickEditMode = false; // Exit mode
         }
       }
     });
@@ -296,9 +305,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     final prevCourse = lastAction['prevCourse'] as DailyCourse?;
 
     final dayOfWeek = DayOfWeek.values[dayIndex];
-    
+
     // Need to get slots again to find ID, assuming slots didn't change
-    // We can just query by dayIndex, but we need the slot ID. 
+    // We can just query by dayIndex, but we need the slot ID.
     // Wait, prevCourse has slot ID. But if prevCourse is null (it was empty), we need to know which slot ID to clear.
     // So we need to re-fetch slots logic or store slot ID in history.
     // Let's rely on re-fetching logic in UI but here we are in logic method.
@@ -307,13 +316,13 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     // But we don't know the slot ID if prevCourse is null.
     // So we DO need the slot ID.
     // Let's assume we can get it from the current state? No, we might have switched days.
-    
+
     // Better approach for Undo:
     // Just revert the schedule change and restore indices.
-    
+
     // However, I need to know which slot ID I just modified to clear it if I am reverting to empty.
     // Let's fetch the slot ID from the service/layout again.
-    
+
     final currentLayoutId = schedule.dayTimeLayoutIds[dayIndex];
     final effectiveLayoutId = currentLayoutId ?? schedule.timeLayoutId;
     final timeLayout = effectiveLayoutId != null
@@ -328,13 +337,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
     // Remove current (the one we just added/skipped)
-    updatedCourses.removeWhere((dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slotId);
-    
+    updatedCourses.removeWhere(
+        (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slotId);
+
     // Restore previous
     if (prevCourse != null) {
       updatedCourses.add(prevCourse);
     }
-    
+
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));
 
     setState(() {
@@ -372,7 +382,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  Widget _buildEditorContent(BuildContext context, TimetableEditService service) {
+  Widget _buildEditorContent(
+      BuildContext context, TimetableEditService service) {
     final schedule = service.getScheduleById(_selectedScheduleId!);
     if (schedule == null) {
       return const SizedBox();
@@ -398,18 +409,21 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 Tab(text: l10n.friday),
                 Tab(text: l10n.saturday),
                 Tab(text: l10n.sunday),
-                Tab(text: l10n.settingsTitle, icon: const Icon(Icons.settings_outlined, size: 18)),
+                Tab(
+                    text: l10n.settingsTitle,
+                    icon: const Icon(Icons.settings_outlined, size: 18)),
               ],
             ),
           ),
           if (_isQuickEditMode)
             LinearProgressIndicator(
               value: 0, // Indeterminate or based on slots
-              // To make it useful we need total slots. 
+              // To make it useful we need total slots.
               // But simpler is just a divider or small hint.
-              // Let's just use a different color for TabBar? 
+              // Let's just use a different color for TabBar?
               // Or maybe just show it's in quick mode.
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
               color: Theme.of(context).colorScheme.primary,
               minHeight: 2,
             ),
@@ -417,7 +431,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
             child: TabBarView(
               // Disable swiping when in quick mode to avoid confusion?
               // No, user might want to look around.
-              physics: _isQuickEditMode ? const NeverScrollableScrollPhysics() : null,
+              physics: _isQuickEditMode
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
               children: [
                 _buildDailyEditor(context, service, schedule, 0),
                 _buildDailyEditor(context, service, schedule, 1),
@@ -456,14 +472,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 context: context,
                 icon: const Icon(Icons.flash_on),
                 onPressed: () {
-                    setState(() {
-                      _isQuickEditMode = !_isQuickEditMode;
-                      if (_isQuickEditMode) {
-                        _quickEditSlotIndex = 0;
-                        _quickEditHistory.clear();
-                        _showSuccessSnackBar('已进入快速排课模式');
-                      }
-                    });
+                  setState(() {
+                    _isQuickEditMode = !_isQuickEditMode;
+                    if (_isQuickEditMode) {
+                      _quickEditSlotIndex = 0;
+                      _quickEditHistory.clear();
+                      _showSuccessSnackBar('已进入快速排课模式');
+                    }
+                  });
                 },
                 text: '快速排课',
               ),
@@ -507,13 +523,13 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   ) {
     final dayName = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][dayIndex];
     final currentLayoutId = schedule.dayTimeLayoutIds[dayIndex];
-    
+
     // 获取实际生效的时间表用于显示课程网格
     final effectiveLayoutId = currentLayoutId ?? schedule.timeLayoutId;
     final timeLayout = effectiveLayoutId != null
         ? service.getTimeLayoutById(effectiveLayoutId)
         : null;
-        
+
     final timeSlots = timeLayout?.timeSlots ?? service.timeSlots;
 
     return Column(
@@ -523,7 +539,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text('$dayName - 课程安排', style: MD3TypographyStyles.titleMedium(context)),
+              Text('$dayName - 课程安排',
+                  style: MD3TypographyStyles.titleMedium(context)),
               const SizedBox(width: 8),
               // Copy button
               PopupMenuButton<int>(
@@ -537,14 +554,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   targetDayIndex,
                 ),
                 itemBuilder: (context) {
-                   final days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-                   return List.generate(7, (index) {
-                     if (index == dayIndex) return null;
-                     return PopupMenuItem(
-                       value: index,
-                       child: Text('复制到 ${days[index]}'),
-                     );
-                   }).whereType<PopupMenuItem<int>>().toList();
+                  final days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                  return List.generate(7, (index) {
+                    if (index == dayIndex) return null;
+                    return PopupMenuItem(
+                      value: index,
+                      child: Text('复制到 ${days[index]}'),
+                    );
+                  }).whereType<PopupMenuItem<int>>().toList();
                 },
               ),
               const Spacer(),
@@ -554,13 +571,15 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   timeLayouts: service.timeLayouts,
                   selectedLayoutId: currentLayoutId,
                   onChanged: (newId) {
-                    final newMap = Map<int, String>.from(schedule.dayTimeLayoutIds);
+                    final newMap =
+                        Map<int, String>.from(schedule.dayTimeLayoutIds);
                     if (newId == null) {
                       newMap.remove(dayIndex);
                     } else {
                       newMap[dayIndex] = newId;
                     }
-                    service.updateSchedule(schedule.copyWith(dayTimeLayoutIds: newMap));
+                    service.updateSchedule(
+                        schedule.copyWith(dayTimeLayoutIds: newMap));
                   },
                 ),
               ),
@@ -571,10 +590,14 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         // Grid
         Expanded(
           child: timeSlots.isEmpty
-              ? Center(child: Text('该时间表没有时间段', style: TextStyle(color: Theme.of(context).colorScheme.outline)))
+              ? Center(
+                  child: Text('该时间表没有时间段',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline)))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  child: _buildDayCourseList(context, service, schedule, dayIndex, timeSlots),
+                  child: _buildDayCourseList(
+                      context, service, schedule, dayIndex, timeSlots),
                 ),
         ),
       ],
@@ -591,21 +614,24 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     // 1. Get source courses
     final sourceDay = DayOfWeek.values[sourceDayIndex];
     final targetDay = DayOfWeek.values[targetDayIndex];
-    
-    final sourceCourses = schedule.courses.where((c) => c.dayOfWeek == sourceDay).toList();
-    
+
+    final sourceCourses =
+        schedule.courses.where((c) => c.dayOfWeek == sourceDay).toList();
+
     // 2. Remove existing courses on target day
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
     updatedCourses.removeWhere((c) => c.dayOfWeek == targetDay);
-    
+
     // 3. Add copies
     for (final course in sourceCourses) {
-      updatedCourses.add(course.copyWith(
-        id: '${DateTime.now().millisecondsSinceEpoch}_${updatedCourses.length}',
-        dayOfWeek: targetDay,
-      ));
+      updatedCourses.add(
+        course.copyWith(
+          id: '${DateTime.now().millisecondsSinceEpoch}_${updatedCourses.length}',
+          dayOfWeek: targetDay,
+        ),
+      );
     }
-    
+
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));
     final l10n = AppLocalizations.of(context)!;
     _showSuccessSnackBar(l10n.scheduleCopied(_getDayName(targetDay)));
@@ -614,13 +640,20 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   String _getDayName(DayOfWeek day) {
     final l10n = AppLocalizations.of(context)!;
     switch (day) {
-      case DayOfWeek.monday: return l10n.monday;
-      case DayOfWeek.tuesday: return l10n.tuesday;
-      case DayOfWeek.wednesday: return l10n.wednesday;
-      case DayOfWeek.thursday: return l10n.thursday;
-      case DayOfWeek.friday: return l10n.friday;
-      case DayOfWeek.saturday: return l10n.saturday;
-      case DayOfWeek.sunday: return l10n.sunday;
+      case DayOfWeek.monday:
+        return l10n.monday;
+      case DayOfWeek.tuesday:
+        return l10n.tuesday;
+      case DayOfWeek.wednesday:
+        return l10n.wednesday;
+      case DayOfWeek.thursday:
+        return l10n.thursday;
+      case DayOfWeek.friday:
+        return l10n.friday;
+      case DayOfWeek.saturday:
+        return l10n.saturday;
+      case DayOfWeek.sunday:
+        return l10n.sunday;
     }
   }
 
@@ -631,9 +664,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     int dayIndex,
     List<TimeSlot> timeSlots,
   ) {
-    // Model's DayOfWeek enum logic: 
+    // Model's DayOfWeek enum logic:
     // Assuming DayOfWeek.values[dayIndex] corresponds to the dayIndex we passed (0-6).
-    // Let's verify: DayOfWeek enum usually: monday, tuesday... 
+    // Let's verify: DayOfWeek enum usually: monday, tuesday...
     // In `TimetableTreeWidget` we used `DayOfWeek.values[index]`.
     // So here we should use the same.
     final dayOfWeek = DayOfWeek.values[dayIndex];
@@ -642,23 +675,28 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     return Column(
       children: timeSlots.map((slot) {
         // Find course for this slot and day
-        final dailyCourse = schedule.courses.where((dc) => 
-          dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id
-        ).firstOrNull;
-        
-        final course = dailyCourse != null 
-            ? service.getCourseById(dailyCourse.courseId) 
+        final dailyCourse = schedule.courses
+            .where(
+              (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id,
+            )
+            .firstOrNull;
+
+        final course = dailyCourse != null
+            ? service.getCourseById(dailyCourse.courseId)
             : null;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           child: MD3CardStyles.surfaceContainer(
             context: context,
-            onTap: () => _showCoursePickerDialog(context, service, schedule, slot, dayOfWeek),
+            onTap: () => _showCoursePickerDialog(
+                context, service, schedule, slot, dayOfWeek),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
@@ -667,8 +705,11 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(slot.startTime, style: MD3TypographyStyles.labelMedium(context)),
-                    Text(slot.endTime, style: MD3TypographyStyles.labelSmall(context).copyWith(color: Theme.of(context).colorScheme.outline)),
+                    Text(slot.startTime,
+                        style: MD3TypographyStyles.labelMedium(context)),
+                    Text(slot.endTime,
+                        style: MD3TypographyStyles.labelSmall(context).copyWith(
+                            color: Theme.of(context).colorScheme.outline)),
                   ],
                 ),
               ),
@@ -679,21 +720,26 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 children: [
                   if (course != null) ...[
                     CircleAvatar(
-                      backgroundColor: ColorUtils.parseHexColor(course.color) ?? Colors.grey,
+                      backgroundColor:
+                          ColorUtils.parseHexColor(course.color) ?? Colors.grey,
                       radius: 6,
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                        icon: const Icon(Icons.clear, size: 20),
-                        tooltip: l10n.clearCourse,
-                        onPressed: () {
-                          // Clear course
-                          final updatedCourses = List<DailyCourse>.from(schedule.courses);
-                          updatedCourses.removeWhere((dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id);
-                          service.updateSchedule(schedule.copyWith(courses: updatedCourses));
-                        },
+                      icon: const Icon(Icons.clear, size: 20),
+                      tooltip: l10n.clearCourse,
+                      onPressed: () {
+                        // Clear course
+                        final updatedCourses =
+                            List<DailyCourse>.from(schedule.courses);
+                        updatedCourses.removeWhere((dc) =>
+                            dc.dayOfWeek == dayOfWeek &&
+                            dc.timeSlotId == slot.id);
+                        service.updateSchedule(
+                            schedule.copyWith(courses: updatedCourses));
+                      },
                     ),
-                  ] else 
+                  ] else
                     const Icon(Icons.add_circle_outline),
                 ],
               ),
@@ -704,107 +750,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     );
   }
 
-  void _showCourseContextMenu(
+  Future<void> _showAddSubjectDialog(
     BuildContext context,
     TimetableEditService service,
-    Schedule schedule,
-    TimeSlot slot,
-    DayOfWeek day,
-    CourseInfo course,
-  ) {
-    // ignore: unused_local_variable
-    final RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
-    final l10n = AppLocalizations.of(context)!;
-    
-    // We need to get the tap position, but LongPress doesn't give it easily without GestureDetector details.
-    // For now, let's use a ModalBottomSheet or a Dialog, or a PopupMenuButton on the card itself if we change structure.
-    // Simpler: Just showing a bottom sheet.
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit_outlined),
-              title: Text(l10n.editCourseInfo(course.name)),
-              onTap: () {
-                Navigator.pop(context);
-                // Switch to Subject Tab and edit? Or show dialog?
-                // Showing dialog is better.
-                _showEditSubjectDialog(context, service, course);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: Text(l10n.removeFromSlot, style: const TextStyle(color: Colors.red)),
-              onTap: () {
-                Navigator.pop(context);
-                final updatedCourses = List<DailyCourse>.from(schedule.courses);
-                updatedCourses.removeWhere((dc) => dc.dayOfWeek == day && dc.timeSlotId == slot.id);
-                service.updateSchedule(schedule.copyWith(courses: updatedCourses));
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  Future<void> _showEditSubjectDialog(
-      BuildContext context, TimetableEditService service, CourseInfo course) async {
-    // This requires replicating SubjectEditTab's dialog logic or reusing it.
-    // For simplicity, let's just show a snackbar saying "Please go to Subjects tab" or implement a simple edit.
-    // Implementing simple edit here.
-    final nameController = TextEditingController(text: course.name);
-    final teacherController = TextEditingController(text: course.teacher);
-    final roomController = TextEditingController(text: course.classroom);
-    final l10n = AppLocalizations.of(context)!;
-    
-    await showDialog<void>(
-      context: context,
-      builder: (context) => MD3DialogStyles.dialog(
-        context: context,
-        title: Text(l10n.editCourse),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MD3FormStyles.outlinedTextField(
-                context: context, controller: nameController, label: l10n.courseName),
-            const SizedBox(height: 16),
-            MD3FormStyles.outlinedTextField(
-                context: context, controller: teacherController, label: l10n.teacherName),
-            const SizedBox(height: 16),
-            MD3FormStyles.outlinedTextField(
-                context: context, controller: roomController, label: l10n.classroom),
-          ],
-        ),
-        actions: [
-          MD3ButtonStyles.textButton(
-            context: context,
-            onPressed: () => Navigator.pop(context),
-            text: l10n.cancel,
-          ),
-          MD3ButtonStyles.filledButton(
-            context: context,
-            onPressed: () {
-              final updated = course.copyWith(
-                name: nameController.text,
-                teacher: teacherController.text,
-                classroom: roomController.text,
-              );
-              service.updateCourse(updated);
-              Navigator.pop(context);
-            },
-            text: l10n.save,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showAddSubjectDialog(
-      BuildContext context, TimetableEditService service) async {
+  ) async {
     final nameController = TextEditingController();
     final teacherController = TextEditingController();
     final roomController = TextEditingController();
@@ -819,13 +768,22 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           mainAxisSize: MainAxisSize.min,
           children: [
             MD3FormStyles.outlinedTextField(
-                context: context, controller: nameController, label: l10n.courseName),
+              context: context,
+              controller: nameController,
+              label: l10n.courseName,
+            ),
             const SizedBox(height: 16),
             MD3FormStyles.outlinedTextField(
-                context: context, controller: teacherController, label: l10n.teacherName),
+              context: context,
+              controller: teacherController,
+              label: l10n.teacherName,
+            ),
             const SizedBox(height: 16),
             MD3FormStyles.outlinedTextField(
-                context: context, controller: roomController, label: l10n.classroom),
+              context: context,
+              controller: roomController,
+              label: l10n.classroom,
+            ),
           ],
         ),
         actions: [
@@ -844,7 +802,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   teacher: teacherController.text,
                   classroom: roomController.text,
                   color: ColorUtils.toHexString(
-                      ColorUtils.generateColorFromName(nameController.text)),
+                    ColorUtils.generateColorFromName(nameController.text),
+                  ),
                 );
                 service.addCourse(newCourse);
                 Navigator.pop(context);
@@ -980,7 +939,8 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     final courses = service.courses;
     final l10n = AppLocalizations.of(context)!;
 
-    final selectedCourse = await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
+    final selectedCourse =
+        await MD3DialogStyles.showSelectionDialog<CourseInfo?>(
       context: context,
       title: l10n.select,
       items: [
@@ -1023,18 +983,20 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     // Update Schedule
     // Logic: Remove existing for this slot/day, add new if not null
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
-    updatedCourses.removeWhere((dc) => dc.dayOfWeek == day && dc.timeSlotId == slot.id);
-    
+    updatedCourses
+        .removeWhere((dc) => dc.dayOfWeek == day && dc.timeSlotId == slot.id);
+
     if (selectedCourse != null) {
-      updatedCourses.add(DailyCourse(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        dayOfWeek: day,
-        timeSlotId: slot.id,
-        courseId: selectedCourse.id,
-        weekType: WeekType.both, // Default, not used in new logic much
-      ));
+      updatedCourses.add(
+        DailyCourse(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          dayOfWeek: day,
+          timeSlotId: slot.id,
+          courseId: selectedCourse.id,
+        ),
+      );
     }
-    
+
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));
   }
 }

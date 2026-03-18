@@ -87,8 +87,7 @@ class EnhancedWindowManager {
 
   static void _startScreenMonitoring() {
     _screenMonitorTimer?.cancel();
-    _screenMonitorTimer =
-        Timer.periodic(const Duration(seconds: 30), (_) {
+    _screenMonitorTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       final current = _getCurrentScreenSize();
       if (_lastScreenSize != null && current != _lastScreenSize) {
         Logger.i('Screen size changed from $_lastScreenSize to $current');

@@ -23,15 +23,15 @@ class UIAnimations {
     return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 0.02);
+        const begin = Offset(0, 0.02);
         const end = Offset.zero;
         const curve = Curves.easeInOutCubic;
 
-        var tween = Tween(begin: begin, end: end).chain(
+        final tween = Tween(begin: begin, end: end).chain(
           CurveTween(curve: curve),
         );
 
-        var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+        final fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
           CurvedAnimation(parent: animation, curve: curve),
         );
 
@@ -54,11 +54,11 @@ class UIAnimations {
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const curve = Curves.easeInOutCubic;
 
-        var scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+        final scaleAnimation = Tween<double>(begin: 0.9, end: 1).animate(
           CurvedAnimation(parent: animation, curve: curve),
         );
 
-        var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+        final fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
           CurvedAnimation(parent: animation, curve: curve),
         );
 
@@ -79,7 +79,7 @@ class UIAnimations {
     AnimationController controller, {
     Curve curve = standardCurve,
   }) {
-    return Tween<double>(begin: 0.0, end: 1.0).animate(
+    return Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: controller, curve: curve),
     );
   }
@@ -89,7 +89,7 @@ class UIAnimations {
     AnimationController controller, {
     Curve curve = standardCurve,
   }) {
-    return Tween<double>(begin: 1.0, end: 0.0).animate(
+    return Tween<double>(begin: 1, end: 0).animate(
       CurvedAnimation(parent: controller, curve: curve),
     );
   }
@@ -109,7 +109,7 @@ class UIAnimations {
   /// 位移动画
   static Animation<Offset> createSlideAnimation(
     AnimationController controller, {
-    Offset begin = const Offset(0.0, 0.1),
+    Offset begin = const Offset(0, 0.1),
     Offset end = Offset.zero,
     Curve curve = standardCurve,
   }) {
@@ -133,7 +133,7 @@ class UIAnimations {
   /// 弹性位移动画
   static Animation<Offset> createBounceSlideAnimation(
     AnimationController controller, {
-    Offset begin = const Offset(0.0, -0.2),
+    Offset begin = const Offset(0, -0.2),
     Offset end = Offset.zero,
   }) {
     return Tween<Offset>(begin: begin, end: end).animate(
@@ -178,11 +178,10 @@ class UIAnimations {
     int staggerDelay = 50,
     Curve curve = standardCurve,
   }) {
-    
     return tween.animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(0.0, 1.0, curve: curve),
+        curve: Interval(0, 1, curve: curve),
       ),
     );
   }
@@ -197,7 +196,7 @@ class UIAnimations {
       count,
       (index) => createStaggeredAnimation(
         controller,
-        Tween<double>(begin: 0.0, end: 1.0),
+        Tween<double>(begin: 0, end: 1),
         index: index,
         staggerDelay: staggerDelay,
       ),
@@ -208,7 +207,7 @@ class UIAnimations {
   static List<Animation<Offset>> createStaggeredSlides(
     AnimationController controller,
     int count, {
-    Offset begin = const Offset(0.0, 0.1),
+    Offset begin = const Offset(0, 0.1),
     Offset end = Offset.zero,
     int staggerDelay = 50,
   }) {
@@ -226,12 +225,6 @@ class UIAnimations {
 
 /// 动画预设组件
 class AnimatedPulse extends StatefulWidget {
-  final Widget child;
-  final Duration duration;
-  final double minScale;
-  final double maxScale;
-  final bool autoStart;
-
   const AnimatedPulse({
     super.key,
     required this.child,
@@ -240,6 +233,11 @@ class AnimatedPulse extends StatefulWidget {
     this.maxScale = 1.05,
     this.autoStart = true,
   });
+  final Widget child;
+  final Duration duration;
+  final double minScale;
+  final double maxScale;
+  final bool autoStart;
 
   @override
   State<AnimatedPulse> createState() => _AnimatedPulseState();
@@ -282,16 +280,15 @@ class _AnimatedPulseState extends State<AnimatedPulse>
 
 /// 悬停放大组件
 class HoverScale extends StatefulWidget {
-  final Widget child;
-  final double scale;
-  final Duration duration;
-
   const HoverScale({
     super.key,
     required this.child,
     this.scale = 1.05,
     this.duration = const Duration(milliseconds: 200),
   });
+  final Widget child;
+  final double scale;
+  final Duration duration;
 
   @override
   State<HoverScale> createState() => _HoverScaleState();
@@ -317,16 +314,15 @@ class _HoverScaleState extends State<HoverScale> {
 
 /// 点击涟漪组件
 class RippleEffect extends StatefulWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-  final Color? rippleColor;
-
   const RippleEffect({
     super.key,
     required this.child,
     this.onTap,
     this.rippleColor,
   });
+  final Widget child;
+  final VoidCallback? onTap;
+  final Color? rippleColor;
 
   @override
   State<RippleEffect> createState() => _RippleEffectState();
@@ -336,7 +332,6 @@ class _RippleEffectState extends State<RippleEffect>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -345,7 +340,7 @@ class _RippleEffectState extends State<RippleEffect>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _animation = Tween<double>(begin: 1.0, end: 0.95).animate(
+    _animation = Tween<double>(begin: 1, end: 0.95).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -360,16 +355,13 @@ class _RippleEffectState extends State<RippleEffect>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) {
-        setState(() => _isPressed = true);
         _controller.forward();
       },
       onTapUp: (_) {
-        setState(() => _isPressed = false);
         _controller.reverse();
         widget.onTap?.call();
       },
       onTapCancel: () {
-        setState(() => _isPressed = false);
         _controller.reverse();
       },
       child: AnimatedBuilder(

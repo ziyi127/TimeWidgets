@@ -23,7 +23,6 @@ class DailyTimeLayoutSelector extends StatelessWidget {
       onChanged: onChanged,
       items: [
         const DropdownMenuItem(
-          value: null,
           child: Text(
             '默认 (跟随全局)',
             overflow: TextOverflow.ellipsis,

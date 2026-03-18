@@ -25,7 +25,7 @@ class IsarTimeLayout {
   late String layoutId;
 
   late String name;
-  
+
   List<IsarTimeSlot> timeSlots = [];
 }
 
@@ -35,10 +35,10 @@ class IsarTimeSlot {
   late String startTime;
   late String endTime;
   late String name;
-  
+
   @enumerated
   late int type; // 0: classTime, 1: breakTime, 2: divider
-  
+
   String? defaultSubjectId;
   late bool isHiddenByDefault;
 }
@@ -53,14 +53,14 @@ class IsarSchedule {
   late String name;
   String? timeLayoutId;
   String? groupId;
-  
+
   List<IsarTriggerCondition> triggers = [];
-  
+
   // Map<int, String> stored as List of entries because Isar doesn't support Maps
   List<IsarDayTimeLayout> dayTimeLayouts = [];
-  
+
   List<IsarDailyCourse> courses = [];
-  
+
   late bool isAutoEnabled;
   late int priority;
   late bool isOverlay;
@@ -96,16 +96,17 @@ class IsarDayTimeLayout {
 
 @embedded
 class IsarDailyCourse {
-  late String courseId; // Just keep ID for now to avoid complexity of Links in Embedded
+  late String
+      courseId; // Just keep ID for now to avoid complexity of Links in Embedded
   late String dailyCourseId;
-  
+
   @enumerated
   late int dayOfWeek; // 0-6 or Enum index
-  
+
   late String timeSlotId;
-  
+
   @enumerated
   late int weekType; // 0: single, 1: double, 2: both
-  
+
   late bool isChangedClass;
 }

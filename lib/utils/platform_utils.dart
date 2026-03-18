@@ -1,6 +1,5 @@
 import 'dart:io';
 
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -117,10 +116,10 @@ class PlatformUtils {
 
   /// 获取默认窗口标题栏高度
   static double get defaultTitleBarHeight {
-    if (isMacOS) return 38.0;
-    if (isWindows) return 32.0;
-    if (isLinux) return 40.0;
-    return 56.0; // 移动端默认
+    if (isMacOS) return 38;
+    if (isWindows) return 32;
+    if (isLinux) return 40;
+    return 56; // 移动端默认
   }
 
   /// 获取平台特定的快捷键修饰键
@@ -144,7 +143,7 @@ class PlatformUtils {
 
   /// 获取平台特定的路径分隔符
   static String get pathSeparator {
-    if (isWindows) return '\\';
+    if (isWindows) return r'\';
     return '/';
   }
 
@@ -209,13 +208,13 @@ class WindowsStyles extends PlatformStyles {
   const WindowsStyles();
 
   @override
-  double get windowBorderRadius => 8.0;
+  double get windowBorderRadius => 8;
 
   @override
-  double get cardBorderRadius => 8.0;
+  double get cardBorderRadius => 8;
 
   @override
-  double get buttonBorderRadius => 4.0;
+  double get buttonBorderRadius => 4;
 
   @override
   bool get useElevation => true;
@@ -224,10 +223,10 @@ class WindowsStyles extends PlatformStyles {
   bool get useRippleEffect => true;
 
   @override
-  double get defaultPadding => 16.0;
+  double get defaultPadding => 16;
 
   @override
-  double get iconSize => 20.0;
+  double get iconSize => 20;
 }
 
 /// macOS 样式
@@ -235,13 +234,13 @@ class MacOSStyles extends PlatformStyles {
   const MacOSStyles();
 
   @override
-  double get windowBorderRadius => 10.0;
+  double get windowBorderRadius => 10;
 
   @override
-  double get cardBorderRadius => 10.0;
+  double get cardBorderRadius => 10;
 
   @override
-  double get buttonBorderRadius => 6.0;
+  double get buttonBorderRadius => 6;
 
   @override
   bool get useElevation => false;
@@ -250,10 +249,10 @@ class MacOSStyles extends PlatformStyles {
   bool get useRippleEffect => false;
 
   @override
-  double get defaultPadding => 16.0;
+  double get defaultPadding => 16;
 
   @override
-  double get iconSize => 22.0;
+  double get iconSize => 22;
 }
 
 /// Linux 样式
@@ -261,13 +260,13 @@ class LinuxStyles extends PlatformStyles {
   const LinuxStyles();
 
   @override
-  double get windowBorderRadius => 6.0;
+  double get windowBorderRadius => 6;
 
   @override
-  double get cardBorderRadius => 6.0;
+  double get cardBorderRadius => 6;
 
   @override
-  double get buttonBorderRadius => 4.0;
+  double get buttonBorderRadius => 4;
 
   @override
   bool get useElevation => true;
@@ -276,10 +275,10 @@ class LinuxStyles extends PlatformStyles {
   bool get useRippleEffect => true;
 
   @override
-  double get defaultPadding => 14.0;
+  double get defaultPadding => 14;
 
   @override
-  double get iconSize => 20.0;
+  double get iconSize => 20;
 }
 
 /// 默认样式
@@ -287,13 +286,13 @@ class DefaultStyles extends PlatformStyles {
   const DefaultStyles();
 
   @override
-  double get windowBorderRadius => 8.0;
+  double get windowBorderRadius => 8;
 
   @override
-  double get cardBorderRadius => 8.0;
+  double get cardBorderRadius => 8;
 
   @override
-  double get buttonBorderRadius => 4.0;
+  double get buttonBorderRadius => 4;
 
   @override
   bool get useElevation => true;
@@ -302,8 +301,8 @@ class DefaultStyles extends PlatformStyles {
   bool get useRippleEffect => true;
 
   @override
-  double get defaultPadding => 16.0;
+  double get defaultPadding => 16;
 
   @override
-  double get iconSize => 24.0;
+  double get iconSize => 24;
 }

@@ -590,7 +590,8 @@ class _TimeSlotCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             '${timeSlot.startTime} - ${timeSlot.endTime}',
-                            style: MD3TypographyStyles.bodySmall(context).copyWith(
+                            style:
+                                MD3TypographyStyles.bodySmall(context).copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
@@ -635,7 +636,8 @@ class _TimeSlotCard extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 '${timeSlot.startTime} - ${timeSlot.endTime}',
-                                style: MD3TypographyStyles.bodySmall(context).copyWith(
+                                style: MD3TypographyStyles.bodySmall(context)
+                                    .copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
@@ -644,7 +646,8 @@ class _TimeSlotCard extends StatelessWidget {
                         ),
                         Text(
                           l10n.durationMinutes(timeSlot.durationMinutes),
-                          style: MD3TypographyStyles.labelMedium(context).copyWith(
+                          style:
+                              MD3TypographyStyles.labelMedium(context).copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
@@ -680,7 +683,8 @@ class _TimeSlotCard extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 '${timeSlot.startTime} - ${timeSlot.endTime}',
-                                style: MD3TypographyStyles.bodySmall(context).copyWith(
+                                style: MD3TypographyStyles.bodySmall(context)
+                                    .copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
@@ -689,7 +693,8 @@ class _TimeSlotCard extends StatelessWidget {
                         ),
                         Text(
                           l10n.durationMinutes(timeSlot.durationMinutes),
-                          style: MD3TypographyStyles.labelMedium(context).copyWith(
+                          style:
+                              MD3TypographyStyles.labelMedium(context).copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),

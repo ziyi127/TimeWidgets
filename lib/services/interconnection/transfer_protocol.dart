@@ -31,12 +31,12 @@ class TransferProtocol {
 
   static List<int> createPacket(PacketType type, Map<String, dynamic> payload) {
     final jsonBytes = utf8.encode(jsonEncode(payload));
-    
+
     // Compress using dart:io GZipCodec
     final compressed = GZipCodec().encode(jsonBytes);
-    
+
     // Encrypt (Placeholder for now)
-    final encrypted = compressed; 
+    final encrypted = compressed;
 
     final length = encrypted.length;
     final header = Uint8List(headerLength);
@@ -54,9 +54,11 @@ class TransferProtocol {
   static Future<Map<String, dynamic>?> parsePacket(List<int> packetData) async {
     if (packetData.length < headerLength) return null;
 
-    final headerView = ByteData.view(Uint8List.fromList(packetData.sublist(0, headerLength)).buffer);
-    
-    if (headerView.getUint8(0) != magicByte1 || headerView.getUint8(1) != magicByte2) {
+    final headerView = ByteData.view(
+        Uint8List.fromList(packetData.sublist(0, headerLength)).buffer);
+
+    if (headerView.getUint8(0) != magicByte1 ||
+        headerView.getUint8(1) != magicByte2) {
       Logger.e('Invalid Magic Bytes');
       return null;
     }
@@ -67,7 +69,7 @@ class TransferProtocol {
 
     if (packetData.length < headerLength + length) {
       // Incomplete packet
-      return null; 
+      return null;
     }
 
     final payload = packetData.sublist(headerLength, headerLength + length);

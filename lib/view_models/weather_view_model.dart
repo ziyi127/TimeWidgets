@@ -8,14 +8,6 @@ import 'package:time_widgets/services/settings_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class WeatherViewModel extends ChangeNotifier {
-  final ApiService _apiService;
-  final SettingsService _settingsService;
-  
-  WeatherData? _weatherData;
-  bool _isLoading = false;
-  String? _error;
-  Timer? _refreshTimer;
-
   WeatherViewModel({
     ApiService? apiService,
     SettingsService? settingsService,
@@ -23,6 +15,13 @@ class WeatherViewModel extends ChangeNotifier {
         _settingsService = settingsService ?? SettingsService() {
     _init();
   }
+  final ApiService _apiService;
+  final SettingsService _settingsService;
+
+  WeatherData? _weatherData;
+  bool _isLoading = false;
+  String? _error;
+  Timer? _refreshTimer;
 
   WeatherData? get weatherData => _weatherData;
   bool get isLoading => _isLoading;
@@ -94,7 +93,8 @@ class WeatherViewModel extends ChangeNotifier {
 
   void _startAutoRefresh() {
     _stopAutoRefresh();
-    final intervalMinutes = _settingsService.currentSettings.weatherRefreshInterval;
+    final intervalMinutes =
+        _settingsService.currentSettings.weatherRefreshInterval;
     if (intervalMinutes > 0) {
       _refreshTimer = Timer.periodic(
         Duration(minutes: intervalMinutes),

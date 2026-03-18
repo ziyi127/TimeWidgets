@@ -47,7 +47,7 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
       debugPrint('Error installing plugin: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('安装失败: ${e.toString()}')),
+          SnackBar(content: Text('安装失败: $e')),
         );
       }
     }
@@ -79,7 +79,8 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: colorScheme.onErrorContainer),
+                    Icon(Icons.warning_amber_rounded,
+                        color: colorScheme.onErrorContainer),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
@@ -101,7 +102,8 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
             const SizedBox(height: 8),
             Text(
               '安装和管理第三方插件',
-              style: MD3TypographyStyles.bodyMedium(context, color: colorScheme.onSurfaceVariant),
+              style: MD3TypographyStyles.bodyMedium(context,
+                  color: colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 24),
 
@@ -127,7 +129,8 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute<void>(
-                                  builder: (context) => PluginSettingsScreen(pluginId: manifest.id),
+                                  builder: (context) => PluginSettingsScreen(
+                                      pluginId: manifest.id),
                                 ),
                               );
                             },
@@ -141,7 +144,9 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
                           child: Center(
                             child: Column(
                               children: [
-                                Icon(Icons.extension_off, size: 64, color: colorScheme.onSurfaceVariant),
+                                Icon(Icons.extension_off,
+                                    size: 64,
+                                    color: colorScheme.onSurfaceVariant),
                                 const SizedBox(height: 16),
                                 Text(
                                   '暂无已安装的插件',
@@ -150,16 +155,17 @@ class _PluginManagementScreenState extends State<PluginManagementScreen> {
                                 const SizedBox(height: 8),
                                 Text(
                                   '点击下方按钮安装插件',
-                                  style: MD3TypographyStyles.bodyMedium(context, color: colorScheme.onSurfaceVariant),
+                                  style: MD3TypographyStyles.bodyMedium(context,
+                                      color: colorScheme.onSurfaceVariant),
                                 ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // 安装插件按钮
                     FilledButton.icon(
                       onPressed: () async {

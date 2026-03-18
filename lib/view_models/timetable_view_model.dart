@@ -8,17 +8,6 @@ import 'package:time_widgets/services/timetable_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
 class TimetableViewModel extends ChangeNotifier {
-  final TimetableService _timetableService;
-  final SettingsService _settingsService;
-  final NtpService _ntpService;
-
-  Timetable? _timetable;
-  Course? _currentCourse;
-  bool _isLoading = true;
-  String? _error;
-  
-  Timer? _refreshTimer;
-
   TimetableViewModel({
     TimetableService? timetableService,
     SettingsService? settingsService,
@@ -28,6 +17,16 @@ class TimetableViewModel extends ChangeNotifier {
         _ntpService = ntpService ?? NtpService() {
     _init();
   }
+  final TimetableService _timetableService;
+  final SettingsService _settingsService;
+  final NtpService _ntpService;
+
+  Timetable? _timetable;
+  Course? _currentCourse;
+  bool _isLoading = true;
+  String? _error;
+
+  Timer? _refreshTimer;
 
   Timetable? get timetable => _timetable;
   Course? get currentCourse => _currentCourse;
@@ -84,7 +83,8 @@ class TimetableViewModel extends ChangeNotifier {
 
     try {
       // 查找当前正在进行的课程
-      final currentCourses = _timetable!.courses.where((c) => c.isCurrent).toList();
+      final currentCourses =
+          _timetable!.courses.where((c) => c.isCurrent).toList();
       if (currentCourses.isNotEmpty) {
         _currentCourse = currentCourses.first;
       } else {

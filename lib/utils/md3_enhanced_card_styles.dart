@@ -109,7 +109,8 @@ class MD3EnhancedCardStyles {
         child: Container(
           padding: padding ?? EdgeInsets.all(platformStyles.defaultPadding),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(platformStyles.cardBorderRadius),
+            borderRadius:
+                BorderRadius.circular(platformStyles.cardBorderRadius),
             gradient: gradient ??
                 LinearGradient(
                   begin: Alignment.topLeft,
@@ -137,7 +138,7 @@ class MD3EnhancedCardStyles {
     Color? color,
   }) {
     final platformStyles = PlatformUtils.getPlatformStyles();
-    
+
     // 仅在不支持透明效果的平台降级为标准 Card
     if (!PlatformUtils.supportsTransparency) {
       return surfaceContainer(
@@ -158,14 +159,14 @@ class MD3EnhancedCardStyles {
             color: color ?? Colors.white.withValues(alpha: 0.1),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.2),
-              width: 1,
             ),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(platformStyles.cardBorderRadius),
+              borderRadius:
+                  BorderRadius.circular(platformStyles.cardBorderRadius),
               child: child,
             ),
           ),
@@ -177,12 +178,6 @@ class MD3EnhancedCardStyles {
 
 /// 悬停效果 Card 组件
 class _HoverEffectCard extends StatefulWidget {
-  final BuildContext context;
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  final VoidCallback? onTap;
-  final Color? hoverColor;
-
   const _HoverEffectCard({
     required this.context,
     required this.child,
@@ -190,6 +185,11 @@ class _HoverEffectCard extends StatefulWidget {
     this.onTap,
     this.hoverColor,
   });
+  final BuildContext context;
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTap;
+  final Color? hoverColor;
 
   @override
   State<_HoverEffectCard> createState() => _HoverEffectCardState();
@@ -218,7 +218,8 @@ class _HoverEffectCardState extends State<_HoverEffectCard> {
           boxShadow: platformStyles.useElevation
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: _isHovered ? 0.1 : 0.05),
+                    color:
+                        Colors.black.withValues(alpha: _isHovered ? 0.1 : 0.05),
                     blurRadius: _isHovered ? 8 : 4,
                     offset: Offset(0, _isHovered ? 4 : 2),
                   ),
@@ -229,9 +230,11 @@ class _HoverEffectCardState extends State<_HoverEffectCard> {
           color: Colors.transparent,
           child: InkWell(
             onTap: widget.onTap,
-            borderRadius: BorderRadius.circular(platformStyles.cardBorderRadius),
+            borderRadius:
+                BorderRadius.circular(platformStyles.cardBorderRadius),
             child: Container(
-              padding: widget.padding ?? EdgeInsets.all(platformStyles.defaultPadding),
+              padding: widget.padding ??
+                  EdgeInsets.all(platformStyles.defaultPadding),
               child: widget.child,
             ),
           ),
@@ -243,17 +246,16 @@ class _HoverEffectCardState extends State<_HoverEffectCard> {
 
 /// 缩放点击效果 Card 组件
 class _ScaleOnTapCard extends StatefulWidget {
-  final BuildContext context;
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  final VoidCallback? onTap;
-
   const _ScaleOnTapCard({
     required this.context,
     required this.child,
     this.padding,
     this.onTap,
   });
+  final BuildContext context;
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTap;
 
   @override
   State<_ScaleOnTapCard> createState() => _ScaleOnTapCardState();
@@ -271,7 +273,7 @@ class _ScaleOnTapCardState extends State<_ScaleOnTapCard>
       duration: const Duration(milliseconds: 100),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+    _scaleAnimation = Tween<double>(begin: 1, end: 0.95).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -306,9 +308,11 @@ class _ScaleOnTapCardState extends State<_ScaleOnTapCard>
         child: Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(platformStyles.cardBorderRadius),
+            borderRadius:
+                BorderRadius.circular(platformStyles.cardBorderRadius),
           ),
-          padding: widget.padding ?? EdgeInsets.all(platformStyles.defaultPadding),
+          padding:
+              widget.padding ?? EdgeInsets.all(platformStyles.defaultPadding),
           child: widget.child,
         ),
       ),

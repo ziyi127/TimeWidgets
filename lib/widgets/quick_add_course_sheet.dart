@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:time_widgets/models/course_model.dart';
 
 /// 快速添加课程底部抽屉
-/// 
+///
 /// UX 优化：
 /// 1. 简化表单，仅显示核心字段
 /// 2. 自动补全历史输入
@@ -194,7 +194,8 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
               borderRadius: BorderRadius.circular(16),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            fillColor:
+                colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -216,7 +217,8 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
               borderRadius: BorderRadius.circular(16),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            fillColor:
+                colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           ),
           items: _commonTimeSlots.map((slot) {
             return DropdownMenuItem(
@@ -242,7 +244,8 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
               borderRadius: BorderRadius.circular(16),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            fillColor:
+                colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -273,7 +276,8 @@ class _QuickAddCourseSheetState extends State<QuickAddCourseSheet>
                 borderRadius: BorderRadius.circular(16),
               ),
               filled: true,
-              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              fillColor:
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             ),
           ),
         ],

@@ -1,16 +1,6 @@
 import 'dart:convert';
 
 class PluginManifest {
-  final String id;
-  final String name;
-  final String version;
-  final String description;
-  final String author;
-  final String minAppVersion;
-  final String entryPoint;
-  final List<String> permissions;
-  final Map<String, dynamic> extra;
-
   PluginManifest({
     required this.id,
     required this.name,
@@ -39,6 +29,15 @@ class PluginManifest {
       extra: json['extra'] as Map<String, dynamic>? ?? {},
     );
   }
+  final String id;
+  final String name;
+  final String version;
+  final String description;
+  final String author;
+  final String minAppVersion;
+  final String entryPoint;
+  final List<String> permissions;
+  final Map<String, dynamic> extra;
 
   Map<String, dynamic> toJson() {
     return {
@@ -55,6 +54,7 @@ class PluginManifest {
   }
 
   static PluginManifest parse(String jsonString) {
-    return PluginManifest.fromJson(json.decode(jsonString) as Map<String, dynamic>);
+    return PluginManifest.fromJson(
+        json.decode(jsonString) as Map<String, dynamic>);
   }
 }

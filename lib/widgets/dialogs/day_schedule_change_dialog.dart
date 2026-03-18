@@ -9,7 +9,8 @@ class DayScheduleChangeDialog extends StatefulWidget {
   const DayScheduleChangeDialog({super.key});
 
   @override
-  State<DayScheduleChangeDialog> createState() => _DayScheduleChangeDialogState();
+  State<DayScheduleChangeDialog> createState() =>
+      _DayScheduleChangeDialogState();
 }
 
 class _DayScheduleChangeDialogState extends State<DayScheduleChangeDialog> {
@@ -40,7 +41,8 @@ class _DayScheduleChangeDialogState extends State<DayScheduleChangeDialog> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(LocalizationService.getString('no_available_schedule')),
+                content: Text(
+                    LocalizationService.getString('no_available_schedule')),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -156,16 +158,16 @@ class _DayScheduleChangeDialogState extends State<DayScheduleChangeDialog> {
     // 简单展示第一个触发条件的信息
     final trigger = schedule.triggers.first;
     final weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    
+
     // 如果指定了星期
     if (trigger.weekDays != null && trigger.weekDays!.isNotEmpty) {
       final daysText = trigger.weekDays!.map((d) => weekDays[d]).join('、');
       return '$daysText • ${schedule.courses.length}节课';
     }
-    
+
     // 如果指定了日期
     if (trigger.dates != null && trigger.dates!.isNotEmpty) {
-       return '特定日期 • ${schedule.courses.length}节课';
+      return '特定日期 • ${schedule.courses.length}节课';
     }
 
     return '${schedule.courses.length}节课';
@@ -197,9 +199,12 @@ class _DayScheduleChangeDialogState extends State<DayScheduleChangeDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              LocalizationService.getString('set_temp_schedule_success', params: {
-                'date': '${date.month}月${date.day}日'
-              }),
+              LocalizationService.getString(
+                'set_temp_schedule_success',
+                params: {
+                  'date': '${date.month}月${date.day}日',
+                },
+              ),
             ),
           ),
         );
@@ -208,7 +213,8 @@ class _DayScheduleChangeDialogState extends State<DayScheduleChangeDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${LocalizationService.getString('save_failed')}: $e'),
+            content:
+                Text('${LocalizationService.getString('save_failed')}: $e'),
             backgroundColor: Colors.red,
           ),
         );

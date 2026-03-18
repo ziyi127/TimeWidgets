@@ -158,7 +158,7 @@ class LocalizationService {
     'no_available_schedule': '没有可用的课表，请先创建课表',
     'no_available_course': '没有可用的课程，请先创建课程',
     'no_available_period': '没有可用的时间段，请先创建时间表',
-    
+
     // 编辑模式
     'enter_edit_mode': '已进入布局编辑模式，拖动组件可调整位置',
     'exit_edit_mode': '已退出布局编辑模式',

@@ -9,14 +9,16 @@ class PeriodScheduleChangeDialog extends StatefulWidget {
   const PeriodScheduleChangeDialog({super.key});
 
   @override
-  State<PeriodScheduleChangeDialog> createState() => _PeriodScheduleChangeDialogState();
+  State<PeriodScheduleChangeDialog> createState() =>
+      _PeriodScheduleChangeDialogState();
 }
 
-class _PeriodScheduleChangeDialogState extends State<PeriodScheduleChangeDialog> {
+class _PeriodScheduleChangeDialogState
+    extends State<PeriodScheduleChangeDialog> {
   DateTime _selectedDate = DateTime.now();
   String? _selectedTimeSlotId;
   String? _selectedCourseId;
-  
+
   List<TimeSlot> _timeSlots = [];
   List<CourseInfo> _courses = [];
   bool _isLoading = true;
@@ -224,9 +226,12 @@ class _PeriodScheduleChangeDialogState extends State<PeriodScheduleChangeDialog>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              LocalizationService.getString('set_temp_change_success', params: {
-                'date': '${date.month}月${date.day}日'
-              }),
+              LocalizationService.getString(
+                'set_temp_change_success',
+                params: {
+                  'date': '${date.month}月${date.day}日',
+                },
+              ),
             ),
           ),
         );
@@ -235,7 +240,8 @@ class _PeriodScheduleChangeDialogState extends State<PeriodScheduleChangeDialog>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${LocalizationService.getString('save_failed')}: $e'),
+            content:
+                Text('${LocalizationService.getString('save_failed')}: $e'),
             backgroundColor: Colors.red,
           ),
         );
