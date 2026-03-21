@@ -11,7 +11,7 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 enum TimetableViewMode { day, week }
 
 /// 课程表组件 - 优化版
-///
+/// 
 /// UX 优化点：
 /// 1. 信息架构：增强了当前课程与非当前课程的视觉区分，周视图信息更紧凑清晰。
 /// 2. 交互体验：新增左右滑动切换日期/周次，周视图支持点击查看详情。
@@ -32,6 +32,7 @@ class TimetableWidget extends StatefulWidget {
 }
 
 class CourseViewModel {
+
   CourseViewModel({
     required this.course,
     this.progress = 0,
@@ -83,74 +84,70 @@ class _TimetableWidgetState extends State<TimetableWidget> {
   List<CourseViewModel> _processCourses(List<Course> courses, DateTime date) {
     final now = NtpService().now;
     final viewModels = <CourseViewModel>[];
-
+    
     // Find next course index logic
     int nextCourseIndex = -1;
     final hasCurrent = courses.any((c) => c.isCurrent);
     // Use the provided date for comparison if needed, or just assume 'date' is the date of courses
-    final isToday =
-        date.year == now.year && date.month == now.month && date.day == now.day;
+    final isToday = date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
 
     if (!hasCurrent && isToday) {
-      for (int i = 0; i < courses.length; i++) {
-        final parts = courses[i].time.split('~');
-        if (parts.length == 2) {
-          final endParts = parts[1].split(':');
-          if (endParts.length == 2) {
-            final endHour = int.tryParse(endParts[0]) ?? 0;
-            final endMinute = int.tryParse(endParts[1]) ?? 0;
-            final endTime =
-                DateTime(now.year, now.month, now.day, endHour, endMinute);
-            if (endTime.isAfter(now)) {
-              nextCourseIndex = i;
-              break;
+       for(int i=0; i<courses.length; i++) {
+         final parts = courses[i].time.split('~');
+         if(parts.length == 2) {
+            final endParts = parts[1].split(':');
+            if(endParts.length == 2) {
+               final endHour = int.tryParse(endParts[0]) ?? 0;
+               final endMinute = int.tryParse(endParts[1]) ?? 0;
+               final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
+               if(endTime.isAfter(now)) {
+                 nextCourseIndex = i;
+                 break;
+               }
             }
-          }
-        }
-      }
+         }
+       }
     }
 
     for (int i = 0; i < courses.length; i++) {
       final course = courses[i];
       double progress = 0;
       bool isCompleted = false;
-
+      
       if (course.isCurrent) {
-        // Calculate progress
-        final parts = course.time.split('~');
-        if (parts.length == 2) {
-          final startParts = parts[0].split(':');
-          final endParts = parts[1].split(':');
-          if (startParts.length == 2 && endParts.length == 2) {
-            final startHour = int.tryParse(startParts[0]) ?? 0;
-            final startMinute = int.tryParse(startParts[1]) ?? 0;
-            final startTime =
-                DateTime(now.year, now.month, now.day, startHour, startMinute);
-            final endHour = int.tryParse(endParts[0]) ?? 0;
-            final endMinute = int.tryParse(endParts[1]) ?? 0;
-            final endTime =
-                DateTime(now.year, now.month, now.day, endHour, endMinute);
-
-            if (now.isAfter(endTime)) {
-              isCompleted = true;
-              progress = 1.0;
-            } else if (now.isAfter(startTime)) {
-              final total = endTime.difference(startTime).inMinutes;
-              final current = now.difference(startTime).inMinutes;
-              progress = total > 0 ? current / total : 0.0;
+         // Calculate progress
+         final parts = course.time.split('~');
+         if (parts.length == 2) {
+            final startParts = parts[0].split(':');
+            final endParts = parts[1].split(':');
+            if (startParts.length == 2 && endParts.length == 2) {
+              final startHour = int.tryParse(startParts[0]) ?? 0;
+              final startMinute = int.tryParse(startParts[1]) ?? 0;
+              final startTime = DateTime(now.year, now.month, now.day, startHour, startMinute);
+              final endHour = int.tryParse(endParts[0]) ?? 0;
+              final endMinute = int.tryParse(endParts[1]) ?? 0;
+              final endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
+              
+              if (now.isAfter(endTime)) {
+                isCompleted = true;
+                progress = 1.0;
+              } else if (now.isAfter(startTime)) {
+                final total = endTime.difference(startTime).inMinutes;
+                final current = now.difference(startTime).inMinutes;
+                progress = total > 0 ? current / total : 0.0;
+              }
             }
-          }
-        }
+         }
       }
-
-      viewModels.add(
-        CourseViewModel(
-          course: course,
-          progress: progress,
-          isCompleted: isCompleted,
-          isNext: i == nextCourseIndex,
-        ),
-      );
+      
+      viewModels.add(CourseViewModel(
+        course: course,
+        progress: progress,
+        isCompleted: isCompleted,
+        isNext: i == nextCourseIndex,
+      ),);
     }
     return viewModels;
   }
@@ -176,9 +173,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
 
         final futures = List.generate(7, (i) {
           final date = monday.add(Duration(days: i));
-          return _timetableService
-              .getTimetable(date)
-              .then((t) => MapEntry(i, _processCourses(t.courses, date)));
+          return _timetableService.getTimetable(date).then((t) => MapEntry(i, _processCourses(t.courses, date)));
         });
 
         final results = await Future.wait(futures);
@@ -246,8 +241,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(ResponsiveUtils.getBorderRadius(width)),
+        borderRadius: BorderRadius.circular(ResponsiveUtils.getBorderRadius(width)),
       ),
       child: Padding(
         padding: EdgeInsets.all(ResponsiveUtils.value(16)),
@@ -289,20 +283,17 @@ class _TimetableWidgetState extends State<TimetableWidget> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ThemeData theme,
-      ColorScheme colorScheme, double width) {
+  Widget _buildHeader(BuildContext context, ThemeData theme, ColorScheme colorScheme, double width) {
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
     final now = NtpService().now;
     final isToday = _selectedDate.year == now.year &&
         _selectedDate.month == now.month &&
         _selectedDate.day == now.day;
-
+    
     final displayDate = DateFormat('MM月dd日', 'zh_CN').format(_selectedDate);
-    final weekBegin =
-        _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
+    final weekBegin = _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
     final weekEnd = weekBegin.add(const Duration(days: 6));
-    final displayWeek =
-        '${DateFormat('MM/dd').format(weekBegin)} - ${DateFormat('MM/dd').format(weekEnd)}';
+    final displayWeek = '${DateFormat('MM/dd').format(weekBegin)} - ${DateFormat('MM/dd').format(weekEnd)}';
 
     return Row(
       children: [
@@ -326,54 +317,48 @@ class _TimetableWidgetState extends State<TimetableWidget> {
               Row(
                 children: [
                   Text(
-                    _viewMode == TimetableViewMode.day
-                        ? AppLocalizations.of(context)!.todayCourses
+                    _viewMode == TimetableViewMode.day 
+                        ? AppLocalizations.of(context)!.todayCourses 
                         : AppLocalizations.of(context)!.weekSchedule,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: colorScheme.onSurface,
-                      fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) *
-                          fontMultiplier,
+                      fontSize: (theme.textTheme.titleLarge?.fontSize ?? 22) * fontMultiplier,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   if (!isToday) ...[
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: _resetToToday,
-                      borderRadius: BorderRadius.circular(4),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 2),
-                        child: Text(
-                          AppLocalizations.of(context)!.todayCourses,
-                          style: TextStyle(
-                            color: colorScheme.primary,
-                            fontSize: 12 * fontMultiplier,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                     const SizedBox(width: 8),
+                     InkWell(
+                       onTap: _resetToToday,
+                       borderRadius: BorderRadius.circular(4),
+                       child: Padding(
+                         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                         child: Text(
+                           AppLocalizations.of(context)!.todayCourses,
+                           style: TextStyle(
+                             color: colorScheme.primary,
+                             fontSize: 12 * fontMultiplier,
+                             fontWeight: FontWeight.bold,
+                           ),
+                         ),
+                       ),
+                     ),
                   ],
                 ],
               ),
               Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.chevron_left_rounded,
-                        size: 18 * fontMultiplier),
+                    icon: Icon(Icons.chevron_left_rounded, size: 18 * fontMultiplier),
                     onPressed: () => _onDateChanged(-1),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    style: IconButton.styleFrom(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                    style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
-                      _viewMode == TimetableViewMode.day
-                          ? displayDate
-                          : displayWeek,
+                      _viewMode == TimetableViewMode.day ? displayDate : displayWeek,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 14 * fontMultiplier,
@@ -381,32 +366,26 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.chevron_right_rounded,
-                        size: 18 * fontMultiplier),
+                    icon: Icon(Icons.chevron_right_rounded, size: 18 * fontMultiplier),
                     onPressed: () => _onDateChanged(1),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    style: IconButton.styleFrom(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                    style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                   ),
                 ],
               ),
             ],
           ),
         ),
-
+        
         // Actions
         IconButton.filledTonal(
           onPressed: _toggleViewMode,
           icon: Icon(
-            _viewMode == TimetableViewMode.day
-                ? Icons.view_week_rounded
-                : Icons.view_day_rounded,
+            _viewMode == TimetableViewMode.day ? Icons.view_week_rounded : Icons.view_day_rounded,
             size: 24,
           ),
-          tooltip: _viewMode == TimetableViewMode.day
-              ? AppLocalizations.of(context)!.weekView
-              : AppLocalizations.of(context)!.dayView,
+          tooltip: _viewMode == TimetableViewMode.day ? AppLocalizations.of(context)!.weekView : AppLocalizations.of(context)!.dayView,
         ),
         SizedBox(width: ResponsiveUtils.value(12)),
         // IconButton.filled(
@@ -420,16 +399,15 @@ class _TimetableWidgetState extends State<TimetableWidget> {
 
   Widget _buildDayView(BuildContext context, ThemeData theme, double width) {
     // 优先使用 widget.courses (如果它是今天的)，否则使用内部加载的 _dayCourses
-
+    
     final now = NtpService().now;
     final isToday = _selectedDate.year == now.year &&
         _selectedDate.month == now.month &&
         _selectedDate.day == now.day;
-
-    final courses =
-        (isToday && _externalCourses != null && _externalCourses!.isNotEmpty)
-            ? _externalCourses!
-            : _dayCourses;
+    
+    final courses = (isToday && _externalCourses != null && _externalCourses!.isNotEmpty)
+        ? _externalCourses!
+        : _dayCourses;
 
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
@@ -448,8 +426,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+          border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -465,8 +442,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color:
-                      theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -482,8 +458,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
-                fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
-                    fontMultiplier,
+                fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) * fontMultiplier,
               ),
             ),
             const SizedBox(height: 4),
@@ -504,8 +479,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: courses.length,
       padding: const EdgeInsets.symmetric(vertical: 4),
-      separatorBuilder: (context, index) =>
-          SizedBox(height: ResponsiveUtils.value(12)),
+      separatorBuilder: (context, index) => SizedBox(height: ResponsiveUtils.value(12)),
       itemBuilder: (context, index) {
         final vm = courses[index];
         return _buildCourseCard(context, vm, width);
@@ -513,8 +487,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
     );
   }
 
-  Widget _buildCourseCard(
-      BuildContext context, CourseViewModel vm, double width) {
+  Widget _buildCourseCard(BuildContext context, CourseViewModel vm, double width) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
@@ -526,14 +499,15 @@ class _TimetableWidgetState extends State<TimetableWidget> {
     final progress = vm.progress;
     final isCompleted = vm.isCompleted;
 
-    final cardColor = isCurrent
-        ? colorScheme.primaryContainer
-        : isNext
-            ? colorScheme.surfaceContainerHigh
+    final cardColor = isCurrent 
+        ? colorScheme.primaryContainer 
+        : isNext 
+            ? colorScheme.surfaceContainerHigh 
             : colorScheme.surfaceContainer;
 
-    final onCardColor =
-        isCurrent ? colorScheme.onPrimaryContainer : colorScheme.onSurface;
+    final onCardColor = isCurrent 
+        ? colorScheme.onPrimaryContainer 
+        : colorScheme.onSurface;
 
     return Card(
       elevation: isCurrent ? 4 : (isNext ? 2 : 0),
@@ -561,6 +535,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                   color: subjectColor.withValues(alpha: 0.1),
                 ),
               ),
+              
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -572,8 +547,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                         width: 4,
                         height: 24,
                         decoration: BoxDecoration(
-                          color:
-                              isCompleted ? colorScheme.outline : subjectColor,
+                          color: isCompleted ? colorScheme.outline : subjectColor,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -594,8 +568,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                       ),
                       if (isCurrent)
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: subjectColor,
                             borderRadius: BorderRadius.circular(20),
@@ -610,8 +583,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.play_circle_fill,
-                                  size: 14, color: Colors.white),
+                              const Icon(Icons.play_circle_fill, size: 14, color: Colors.white),
                               const SizedBox(width: 4),
                               Text(
                                 AppLocalizations.of(context)!.statusOngoing,
@@ -629,14 +601,12 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      _buildInfoChip(context, Icons.location_on_rounded,
-                          course.classroom, isCurrent || isNext, width),
+                      _buildInfoChip(context, Icons.location_on_rounded, course.classroom, isCurrent || isNext, width),
                       const SizedBox(width: 8),
-                      _buildInfoChip(context, Icons.access_time_filled_rounded,
-                          course.time, isCurrent || isNext, width),
+                      _buildInfoChip(context, Icons.access_time_filled_rounded, course.time, isCurrent || isNext, width),
                       const Spacer(),
                       if (course.teacher.isNotEmpty)
-                        Text(
+                         Text(
                           course.teacher,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: onCardColor.withValues(alpha: 0.7),
@@ -645,6 +615,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                         ),
                     ],
                   ),
+                  
                   if (isCurrent) ...[
                     const SizedBox(height: 16),
                     ClipRRect(
@@ -665,17 +636,16 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       ),
     );
   }
-
-  Widget _buildInfoChip(BuildContext context, IconData icon, String label,
-      bool prominent, double width) {
+  
+  Widget _buildInfoChip(BuildContext context, IconData icon, String label, bool prominent, double width) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
-
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: prominent
+        color: prominent 
             ? colorScheme.surface.withValues(alpha: 0.5)
             : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
@@ -686,16 +656,13 @@ class _TimetableWidgetState extends State<TimetableWidget> {
           Icon(
             icon,
             size: 16 * fontMultiplier,
-            color:
-                prominent ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            color: prominent ? colorScheme.primary : colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 6),
           Text(
             label,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: prominent
-                  ? colorScheme.onSurface
-                  : colorScheme.onSurfaceVariant,
+              color: prominent ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
               fontWeight: prominent ? FontWeight.bold : FontWeight.normal,
               fontSize: 13 * fontMultiplier,
             ),
@@ -723,12 +690,11 @@ class _TimetableWidgetState extends State<TimetableWidget> {
     final todayWeekday = now.weekday - 1; // 0-6
     // 简化的判断：如果选中的日期的周和现在的周一样。
     // 比较周一的日期
-    final selectedMonday =
-        _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
+    final selectedMonday = _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1));
     final currentMonday = now.subtract(Duration(days: now.weekday - 1));
-    final isSameWeek = selectedMonday.year == currentMonday.year &&
-        selectedMonday.month == currentMonday.month &&
-        selectedMonday.day == currentMonday.day;
+    final isSameWeek = selectedMonday.year == currentMonday.year && 
+                       selectedMonday.month == currentMonday.month && 
+                       selectedMonday.day == currentMonday.day;
 
     final fontMultiplier = ResponsiveUtils.getFontSizeMultiplier(width);
 
@@ -736,8 +702,7 @@ class _TimetableWidgetState extends State<TimetableWidget> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
       ),
       padding: const EdgeInsets.all(8),
       child: Column(
@@ -771,14 +736,12 @@ class _TimetableWidgetState extends State<TimetableWidget> {
             }),
           ),
           const SizedBox(height: 8),
-          Divider(
-              height: 1,
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
+          Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
           const SizedBox(height: 8),
 
           // Week Grid
           SizedBox(
-            height: ResponsiveUtils.value(350),
+            height: ResponsiveUtils.value(350), 
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: List.generate(7, (dayIndex) {
@@ -788,68 +751,58 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                 return Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isToday
-                          ? theme.colorScheme.surfaceContainerHighest
-                              .withValues(alpha: 0.3)
-                          : null,
+                      color: isToday ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3) : null,
                       borderRadius: BorderRadius.circular(8),
                       border: dayIndex < 6
                           ? Border(
                               right: BorderSide(
-                                color: theme.colorScheme.outlineVariant
-                                    .withValues(alpha: 0.1),
+                                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1),
                               ),
                             )
                           : null,
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
                     child: ListView.separated(
                       itemCount: courses.length,
-                      separatorBuilder: (context, i) =>
-                          const SizedBox(height: 4),
+                      separatorBuilder: (context, i) => const SizedBox(height: 4),
                       itemBuilder: (context, courseIndex) {
                         final vm = courses[courseIndex];
                         final course = vm.course;
-                        final color =
-                            ColorUtils.generateColorFromName(course.subject);
-
+                        final color = ColorUtils.generateColorFromName(course.subject);
+                        
                         return InkWell(
                           onTap: () {
-                            showDialog<void>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(course.subject),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('时间: ${course.time}'),
-                                    Text('地点: ${course.classroom}'),
-                                    Text('教师: ${course.teacher}'),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text(
-                                        AppLocalizations.of(context)!.cancel),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _navigateToAddCourse();
-                                    },
-                                    child: Text(AppLocalizations.of(context)!
-                                        .editCourse),
-                                  ),
-                                ],
-                              ),
-                            );
+                             showDialog<void>(
+                               context: context,
+                               builder: (context) => AlertDialog(
+                                 title: Text(course.subject),
+                                 content: Column(
+                                   mainAxisSize: MainAxisSize.min,
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: [
+                                     Text('时间: ${course.time}'),
+                                     Text('地点: ${course.classroom}'),
+                                     Text('教师: ${course.teacher}'),
+                                   ],
+                                 ),
+                                 actions: [
+                                   TextButton(
+                                     onPressed: () => Navigator.pop(context),
+                                     child: Text(AppLocalizations.of(context)!.cancel),
+                                   ),
+                                   FilledButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        _navigateToAddCourse();
+                                      },
+                                      child: Text(AppLocalizations.of(context)!.editCourse),
+                                   ),
+                                 ],
+                               ),
+                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 4),
+                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                             decoration: BoxDecoration(
                               color: color.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),

@@ -66,8 +66,7 @@ class GeneralImportStats {
 class GeneralImportService {
   /// 导入文件并尝试解析
   static Future<GeneralImportResult> importFromFile() async {
-    Logger.w(
-        'GeneralImportService.importFromFile is disabled in Flutter-only mode');
+    Logger.w('GeneralImportService.importFromFile is disabled in Flutter-only mode');
     return GeneralImportResult.failure('当前版本不支持本地文件选择导入，请使用粘贴 JSON 文本的方式导入。');
   }
 
@@ -108,22 +107,19 @@ class GeneralImportService {
     // 重新扫描以解析 Schedule (因为可能在 Courses 之前出现)
     _traverseJson(json, (key, value) {
       if (_isScheduleList(key, value)) {
-        _parseSchedules(
-            value as List, schedules, courses, timeLayouts, timeSlots);
+        _parseSchedules(value as List, schedules, courses, timeLayouts, timeSlots);
       }
     });
 
     // 如果没有找到时间表，但找到了零散的时间点，创建一个默认时间表
     if (timeLayouts.isEmpty && timeSlots.isNotEmpty) {
-      timeLayouts.add(
-        TimeLayout(
-          id: 'imported_layout_default',
-          name: '导入时间表',
-          timeSlots: timeSlots,
-        ),
-      );
+      timeLayouts.add(TimeLayout(
+        id: 'imported_layout_default',
+        name: '导入时间表',
+        timeSlots: timeSlots,
+      ),);
     }
-
+    
     // 如果找到了时间表但没有找到时间点列表(可能时间点直接在时间表里)，
     // 上面的 _parseTimeLayoutsAndSlots 应该已经处理了
 
@@ -144,8 +140,7 @@ class GeneralImportService {
     );
   }
 
-  static void _traverseJson(
-      dynamic data, void Function(String key, dynamic value) onVisit) {
+  static void _traverseJson(dynamic data, void Function(String key, dynamic value) onVisit) {
     if (data is Map<String, dynamic>) {
       data.forEach((key, value) {
         onVisit(key, value);
@@ -166,8 +161,8 @@ class GeneralImportService {
     }
     final lowerKey = key.toLowerCase();
     // 关键词匹配
-    if (lowerKey.contains('subject') ||
-        lowerKey.contains('course') ||
+    if (lowerKey.contains('subject') || 
+        lowerKey.contains('course') || 
         lowerKey.contains('lesson')) {
       // 检查列表项是否像课程
       return _itemsLookLikeCourses(value);
@@ -184,15 +179,7 @@ class GeneralImportService {
       return false;
     }
     // 必须包含类似 name 的字段
-    return _hasField(first, [
-      'name',
-      'title',
-      'subject',
-      'courseName',
-      'lesson',
-      'kemu',
-      'mingcheng'
-    ]);
+    return _hasField(first, ['name', 'title', 'subject', 'courseName', 'lesson', 'kemu', 'mingcheng']);
   }
 
   static bool _isTimeLayoutOrSlotList(String key, dynamic value) {
@@ -200,9 +187,9 @@ class GeneralImportService {
       return false;
     }
     final lowerKey = key.toLowerCase();
-    if (lowerKey.contains('time') ||
-        lowerKey.contains('layout') ||
-        lowerKey.contains('slot') ||
+    if (lowerKey.contains('time') || 
+        lowerKey.contains('layout') || 
+        lowerKey.contains('slot') || 
         lowerKey.contains('section') ||
         lowerKey.contains('jie')) {
       return _itemsLookLikeTimeSlots(value) || _itemsLookLikeTimeLayouts(value);
@@ -219,12 +206,12 @@ class GeneralImportService {
       return false;
     }
     // 必须包含时间字段
-    return (_hasField(first, ['start', 'begin', 'from', 'kssj', 'kaishi']) &&
+    return (_hasField(first, ['start', 'begin', 'from', 'kssj', 'kaishi']) && 
             _hasField(first, ['end', 'stop', 'to', 'jssj', 'jieshu'])) ||
-        (_hasField(first, ['startTime', 'start_time']) &&
+           (_hasField(first, ['startTime', 'start_time']) && 
             _hasField(first, ['endTime', 'end_time']));
   }
-
+  
   static bool _itemsLookLikeTimeLayouts(List<dynamic> list) {
     if (list.isEmpty) {
       return false;
@@ -242,13 +229,12 @@ class GeneralImportService {
       return false;
     }
     final lowerKey = key.toLowerCase();
-    if (lowerKey.contains('schedule') ||
-        lowerKey.contains('plan') ||
+    if (lowerKey.contains('schedule') || 
+        lowerKey.contains('plan') || 
         lowerKey.contains('table') ||
         lowerKey.contains('daily') ||
         lowerKey.contains('kebiao')) {
-      return _itemsLookLikeSchedules(value) ||
-          _itemsLookLikeDailyCourses(value);
+      return _itemsLookLikeSchedules(value) || _itemsLookLikeDailyCourses(value);
     }
     return false;
   }
@@ -262,11 +248,9 @@ class GeneralImportService {
       return false;
     }
     // 包含课程列表
-    return first.keys.any((k) =>
-        k.toLowerCase().contains('course') ||
-        k.toLowerCase().contains('class'));
+    return first.keys.any((k) => k.toLowerCase().contains('course') || k.toLowerCase().contains('class'));
   }
-
+  
   static bool _itemsLookLikeDailyCourses(List<dynamic> list) {
     if (list.isEmpty) {
       return false;
@@ -275,9 +259,8 @@ class GeneralImportService {
     if (first is! Map<String, dynamic>) {
       return false;
     }
-    return _hasField(
-            first, ['day', 'week', 'weekday', 'xingqi', 'zhou', 'xq']) &&
-        _hasField(first, ['course', 'subject', 'class', 'kemu', 'kc']);
+    return _hasField(first, ['day', 'week', 'weekday', 'xingqi', 'zhou', 'xq']) && 
+           _hasField(first, ['course', 'subject', 'class', 'kemu', 'kc']);
   }
 
   static bool _hasField(Map<dynamic, dynamic> map, List<String> candidates) {
@@ -297,63 +280,30 @@ class GeneralImportService {
       if (item is! Map<String, dynamic>) {
         continue;
       }
-
-      final id = _getString(item, ['id', 'code', 'uid']) ??
-          DateTime.now().millisecondsSinceEpoch.toString();
-      final name = _getString(item, [
-            'name',
-            'title',
-            'subjectname',
-            'coursename',
-            'lesson',
-            'kemu',
-            'mingcheng'
-          ]) ??
-          '未知课程';
-      final teacher = _getString(item, [
-            'teacher',
-            'instructor',
-            'professor',
-            'laoshi',
-            'js',
-            'jiaoshi'
-          ]) ??
-          '';
-      final classroom = _getString(item, [
-            'classroom',
-            'room',
-            'location',
-            'place',
-            'site',
-            'address',
-            'didian',
-            'jiaoshi'
-          ]) ??
-          '';
-      final abbreviation =
-          _getString(item, ['abbr', 'short', 'code', 'jiancheng', 'jc']) ?? '';
-      final color =
-          _getString(item, ['color', 'bg', 'background', 'yanse', 'ys']) ??
-              ColorUtils.toHexString(ColorUtils.generateColorFromName(name));
-
+      
+      final id = _getString(item, ['id', 'code', 'uid']) ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final name = _getString(item, ['name', 'title', 'subjectname', 'coursename', 'lesson', 'kemu', 'mingcheng']) ?? '未知课程';
+      final teacher = _getString(item, ['teacher', 'instructor', 'professor', 'laoshi', 'js', 'jiaoshi']) ?? '';
+      final classroom = _getString(item, ['classroom', 'room', 'location', 'place', 'site', 'address', 'didian', 'jiaoshi']) ?? '';
+      final abbreviation = _getString(item, ['abbr', 'short', 'code', 'jiancheng', 'jc']) ?? '';
+      final color = _getString(item, ['color', 'bg', 'background', 'yanse', 'ys']) ?? 
+                    ColorUtils.toHexString(ColorUtils.generateColorFromName(name));
+      
       // 避免重复
       if (!result.any((c) => c.id == id || c.name == name)) {
-        result.add(
-          CourseInfo(
-            id: id,
-            name: name,
-            abbreviation: abbreviation,
-            teacher: teacher,
-            classroom: classroom,
-            color: color,
-          ),
-        );
+        result.add(CourseInfo(
+          id: id,
+          name: name,
+          abbreviation: abbreviation,
+          teacher: teacher,
+          classroom: classroom,
+          color: color,
+        ),);
       }
     }
   }
 
-  static void _parseTimeLayoutsAndSlots(
-      List<dynamic> list, List<TimeLayout> layouts, List<TimeSlot> slots) {
+  static void _parseTimeLayoutsAndSlots(List<dynamic> list, List<TimeLayout> layouts, List<TimeSlot> slots) {
     // 检查是 Layout 列表还是 Slot 列表
     if (_itemsLookLikeTimeSlots(list)) {
       // 这是一个 Slot 列表，直接解析为 Slots
@@ -363,7 +313,7 @@ class GeneralImportService {
         }
         final slot = _parseTimeSlot(item, slots.length + 1);
         if (slot != null) {
-          slots.add(slot);
+           slots.add(slot);
         }
       }
     } else if (_itemsLookLikeTimeLayouts(list)) {
@@ -372,65 +322,51 @@ class GeneralImportService {
         if (item is! Map<String, dynamic>) {
           continue;
         }
-        final id = _getString(item, ['id', 'uid']) ??
-            DateTime.now().millisecondsSinceEpoch.toString();
+        final id = _getString(item, ['id', 'uid']) ?? DateTime.now().millisecondsSinceEpoch.toString();
         final name = _getString(item, ['name', 'title']) ?? '时间表';
-
+        
         final layoutSlots = <TimeSlot>[];
         // 查找内部的 Slots
         item.forEach((k, v) {
           if (v is List<dynamic> && _itemsLookLikeTimeSlots(v)) {
             for (final slotItem in v) {
-              if (slotItem is Map<String, dynamic>) {
-                final slot = _parseTimeSlot(slotItem, layoutSlots.length + 1);
-                if (slot != null) {
-                  layoutSlots.add(slot);
-                }
-              }
+               if (slotItem is Map<String, dynamic>) {
+                 final slot = _parseTimeSlot(slotItem, layoutSlots.length + 1);
+                 if (slot != null) {
+                   layoutSlots.add(slot);
+                 }
+               }
             }
           }
         });
 
-        layouts.add(
-          TimeLayout(
-            id: id,
-            name: name,
-            timeSlots: layoutSlots,
-          ),
-        );
-
+        layouts.add(TimeLayout(
+          id: id,
+          name: name,
+          timeSlots: layoutSlots,
+        ),);
+        
         // 也添加到全局 slots 以备后用（去重）
         for (final s in layoutSlots) {
-          if (!slots.any((existing) => existing.id == s.id)) {
-            slots.add(s);
-          }
+           if (!slots.any((existing) => existing.id == s.id)) {
+             slots.add(s);
+           }
         }
       }
     }
   }
 
   static TimeSlot? _parseTimeSlot(Map<String, dynamic> item, int index) {
-    final start = _getTimeString(item, [
-      'start',
-      'begin',
-      'from',
-      'kssj',
-      'kaishi',
-      'startTime',
-      'start_time'
-    ]);
-    final end = _getTimeString(
-        item, ['end', 'stop', 'to', 'jssj', 'jieshu', 'endTime', 'end_time']);
-
+    final start = _getTimeString(item, ['start', 'begin', 'from', 'kssj', 'kaishi', 'startTime', 'start_time']);
+    final end = _getTimeString(item, ['end', 'stop', 'to', 'jssj', 'jieshu', 'endTime', 'end_time']);
+    
     if (start == null || end == null) {
       return null;
     }
 
     final id = _getString(item, ['id', 'uid']) ?? 'slot_$index';
-    final name =
-        _getString(item, ['name', 'title', 'label', 'index', 'jie', 'jc']) ??
-            '第$index节';
-
+    final name = _getString(item, ['name', 'title', 'label', 'index', 'jie', 'jc']) ?? '第$index节';
+    
     return TimeSlot(
       id: id,
       startTime: start,
@@ -440,137 +376,116 @@ class GeneralImportService {
   }
 
   static void _parseSchedules(
-    List<dynamic> list,
-    List<Schedule> schedules,
+    List<dynamic> list, 
+    List<Schedule> schedules, 
     List<CourseInfo> courses,
     List<TimeLayout> layouts,
     List<TimeSlot> slots,
   ) {
-    // 简单处理：假设列表里的每个对象是一个 Schedule
-    // 如果列表项看起来像 DailyCourse，那么整个列表可能是一个 Schedule 的内容
-    if (_itemsLookLikeDailyCourses(list)) {
-      // 创建一个默认 Schedule 包含这些课程
-      final dailyCourses = <DailyCourse>[];
-      for (final item in list) {
-        if (item is Map<String, dynamic>) {
-          final dc = _parseDailyCourse(item, courses, slots);
-          if (dc != null) {
-            dailyCourses.add(dc);
-          }
-        }
-      }
-      if (dailyCourses.isNotEmpty) {
-        schedules.add(
-          Schedule(
-            id: 'imported_schedule_default',
-            name: '导入课表',
-            triggers: [
-              const TriggerCondition(id: 'default_trigger', weekDays: [1]),
-            ],
-            courses: dailyCourses,
-            timeLayoutId: layouts.isNotEmpty ? layouts.first.id : null,
-          ),
-        );
-      }
-    } else {
-      // 列表项是 Schedule 对象
-      for (final item in list) {
-        if (item is! Map<String, dynamic>) {
-          continue;
-        }
-
-        final id = _getString(item, ['id']) ??
-            DateTime.now().millisecondsSinceEpoch.toString();
-        final name = _getString(item, ['name']) ?? '课表';
-
-        final scheduleCourses = <DailyCourse>[];
-        // 查找内部的 Courses/Classes
-        item.forEach((k, v) {
-          if (v is List<dynamic> && _itemsLookLikeDailyCourses(v)) {
-            for (final courseItem in v) {
-              if (courseItem is Map<String, dynamic>) {
-                final dc = _parseDailyCourse(courseItem, courses, slots);
-                if (dc != null) {
-                  scheduleCourses.add(dc);
-                }
-              }
-            }
-          }
-        });
-
-        if (scheduleCourses.isNotEmpty) {
-          schedules.add(
-            Schedule(
-              id: id,
-              name: name,
-              triggers: [
-                TriggerCondition(id: 'trigger_$id', weekDays: const [1]),
-              ],
-              courses: scheduleCourses,
-              timeLayoutId: layouts.isNotEmpty ? layouts.first.id : null,
-            ),
-          );
-        }
-      }
-    }
+     // 简单处理：假设列表里的每个对象是一个 Schedule
+     // 如果列表项看起来像 DailyCourse，那么整个列表可能是一个 Schedule 的内容
+     if (_itemsLookLikeDailyCourses(list)) {
+       // 创建一个默认 Schedule 包含这些课程
+       final dailyCourses = <DailyCourse>[];
+       for (final item in list) {
+         if (item is Map<String, dynamic>) {
+           final dc = _parseDailyCourse(item, courses, slots);
+           if (dc != null) {
+             dailyCourses.add(dc);
+           }
+         }
+       }
+       if (dailyCourses.isNotEmpty) {
+         schedules.add(Schedule(
+           id: 'imported_schedule_default',
+           name: '导入课表',
+           triggers: [
+             const TriggerCondition(id: 'default_trigger', weekDays: [1]),
+           ],
+           courses: dailyCourses,
+           timeLayoutId: layouts.isNotEmpty ? layouts.first.id : null,
+         ),);
+       }
+     } else {
+       // 列表项是 Schedule 对象
+       for (final item in list) {
+         if (item is! Map<String, dynamic>) {
+           continue;
+         }
+         
+         final id = _getString(item, ['id']) ?? DateTime.now().millisecondsSinceEpoch.toString();
+         final name = _getString(item, ['name']) ?? '课表';
+         
+         final scheduleCourses = <DailyCourse>[];
+         // 查找内部的 Courses/Classes
+         item.forEach((k, v) {
+           if (v is List<dynamic> && _itemsLookLikeDailyCourses(v)) {
+             for (final courseItem in v) {
+               if (courseItem is Map<String, dynamic>) {
+                 final dc = _parseDailyCourse(courseItem, courses, slots);
+                 if (dc != null) {
+                   scheduleCourses.add(dc);
+                 }
+               }
+             }
+           }
+         });
+         
+         if (scheduleCourses.isNotEmpty) {
+           schedules.add(Schedule(
+             id: id,
+             name: name,
+             triggers: [
+               TriggerCondition(id: 'trigger_$id', weekDays: const [1]),
+             ],
+             courses: scheduleCourses,
+             timeLayoutId: layouts.isNotEmpty ? layouts.first.id : null,
+           ),);
+         }
+       }
+     }
   }
 
-  static DailyCourse? _parseDailyCourse(Map<String, dynamic> item,
-      List<CourseInfo> courses, List<TimeSlot> slots) {
+  static DailyCourse? _parseDailyCourse(Map<String, dynamic> item, List<CourseInfo> courses, List<TimeSlot> slots) {
     // 解析 Course
     String? courseId = _getString(item, ['courseId', 'subjectId', 'kcid']);
     if (courseId == null) {
       // 尝试按名称匹配
-      final courseName = _getString(item, [
-        'courseName',
-        'subjectName',
-        'name',
-        'course',
-        'subject',
-        'kemu',
-        'kc',
-        'mingcheng'
-      ]);
+      final courseName = _getString(item, ['courseName', 'subjectName', 'name', 'course', 'subject', 'kemu', 'kc', 'mingcheng']);
       if (courseName != null) {
-        final course = courses.firstWhere((c) => c.name == courseName,
-            orElse: () => const CourseInfo(id: '', name: '', teacher: ''));
+        final course = courses.firstWhere((c) => c.name == courseName, orElse: () => const CourseInfo(id: '', name: '', teacher: ''));
         if (course.id.isNotEmpty) {
           courseId = course.id;
         } else {
           // 如果没找到，创建一个新课程? 或者忽略
           // 这里简单起见，创建一个
           final newId = 'auto_${courses.length + 1}';
-          final newCourse =
-              CourseInfo(id: newId, name: courseName, teacher: '');
+          final newCourse = CourseInfo(id: newId, name: courseName, teacher: '');
           courses.add(newCourse);
           courseId = newId;
         }
       }
     }
-
+    
     if (courseId == null) {
       return null;
     }
 
     // 解析 TimeSlot
-    String? timeSlotId =
-        _getString(item, ['timeSlotId', 'slotId', 'section', 'jie', 'jc']);
+    String? timeSlotId = _getString(item, ['timeSlotId', 'slotId', 'section', 'jie', 'jc']);
     if (timeSlotId == null) {
-      // 尝试按名称或索引匹配
-      // 暂不支持复杂的索引匹配，需要更多上下文
-      // 如果 item 有 startTime，可以尝试匹配 slots
-      final startTime =
-          _getTimeString(item, ['startTime', 'start', 'begin', 'kssj']);
-      if (startTime != null) {
-        final slot = slots.firstWhere((s) => s.startTime == startTime,
-            orElse: () =>
-                const TimeSlot(id: '', startTime: '', endTime: '', name: ''));
-        if (slot.id.isNotEmpty) {
-          timeSlotId = slot.id;
-        }
-      }
+       // 尝试按名称或索引匹配
+       // 暂不支持复杂的索引匹配，需要更多上下文
+       // 如果 item 有 startTime，可以尝试匹配 slots
+       final startTime = _getTimeString(item, ['startTime', 'start', 'begin', 'kssj']);
+       if (startTime != null) {
+         final slot = slots.firstWhere((s) => s.startTime == startTime, orElse: () => const TimeSlot(id: '', startTime: '', endTime: '', name: ''));
+         if (slot.id.isNotEmpty) {
+           timeSlotId = slot.id;
+         }
+       }
     }
-
+    
     // 如果还是没找到 TimeSlotId，尝试读取 index
     if (timeSlotId == null) {
       final index = _getInt(item, ['index', 'order', 'num', 'jie', 'jc']);
@@ -586,15 +501,13 @@ class GeneralImportService {
     }
 
     // 解析 DayOfWeek
-    final dayInt =
-        _getInt(item, ['day', 'week', 'weekday', 'xingqi', 'zhou', 'xq']);
-    final dayOfWeek = (dayInt != null && dayInt >= 0 && dayInt <= 6)
+    final dayInt = _getInt(item, ['day', 'week', 'weekday', 'xingqi', 'zhou', 'xq']);
+    final dayOfWeek = (dayInt != null && dayInt >= 0 && dayInt <= 6) 
         ? DayOfWeek.values[dayInt == 0 ? 6 : dayInt - 1] // 假设 0 是周日，转为 6
         : DayOfWeek.monday;
 
     return DailyCourse(
-      id: DateTime.now().millisecondsSinceEpoch.toString() +
-          (item.hashCode.toString()),
+      id: DateTime.now().millisecondsSinceEpoch.toString() + (item.hashCode.toString()),
       dayOfWeek: dayOfWeek,
       timeSlotId: timeSlotId!,
       courseId: courseId,
@@ -614,15 +527,14 @@ class GeneralImportService {
     }
     return null;
   }
-
+  
   static int? _getInt(Map<dynamic, dynamic> map, List<String> keys) {
     for (final key in keys) {
       for (final mapKey in map.keys) {
-        if (mapKey.toString().toLowerCase() == key.toLowerCase()) {
-          // Int 最好精确匹配 key
-          final val = map[mapKey];
-          if (val is int) return val;
-          if (val is String) return int.tryParse(val);
+        if (mapKey.toString().toLowerCase() == key.toLowerCase()) { // Int 最好精确匹配 key
+           final val = map[mapKey];
+           if (val is int) return val;
+           if (val is String) return int.tryParse(val);
         }
       }
     }
@@ -637,10 +549,10 @@ class GeneralImportService {
       final parts = val.split(RegExp(r'[T\s]')); // split by T or space
       for (final part in parts) {
         if (part.contains(':')) {
-          final timeParts = part.split(':');
-          if (timeParts.length >= 2) {
-            return '${timeParts[0].padLeft(2, '0')}:${timeParts[1].padLeft(2, '0')}';
-          }
+           final timeParts = part.split(':');
+           if (timeParts.length >= 2) {
+             return '${timeParts[0].padLeft(2, '0')}:${timeParts[1].padLeft(2, '0')}';
+           }
         }
       }
     } catch (_) {

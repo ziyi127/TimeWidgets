@@ -9,6 +9,7 @@ import 'package:time_widgets/services/theme_service.dart';
 import 'package:time_widgets/widgets/dynamic_color_builder.dart';
 
 class SubWindowScreen extends StatefulWidget {
+
   const SubWindowScreen({
     super.key,
     required this.windowId,
@@ -39,8 +40,7 @@ class _SubWindowScreenState extends State<SubWindowScreen> {
     // We need to provide basic services like Theme for the sub-window
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (_) => SettingsService()..loadSettings()),
+        ChangeNotifierProvider(create: (_) => SettingsService()..loadSettings()),
         ChangeNotifierProvider(create: (_) => ThemeService()..loadSettings()),
       ],
       child: DynamicColorBuilder(
@@ -48,7 +48,7 @@ class _SubWindowScreenState extends State<SubWindowScreen> {
           return Consumer<ThemeService>(
             builder: (context, themeService, _) {
               final themeSettings = themeService.currentSettings;
-
+              
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: const [
@@ -88,8 +88,8 @@ class _SubWindowScreenState extends State<SubWindowScreen> {
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
-                            // Example: Send message back to main window (usually window 0)
-                            // DesktopMultiWindow.invokeMethod(0, 'fromSubWindow', 'Hello from ${widget.windowId}');
+                             // Example: Send message back to main window (usually window 0)
+                             // DesktopMultiWindow.invokeMethod(0, 'fromSubWindow', 'Hello from ${widget.windowId}');
                           },
                           child: const Text('Send Message to Main Window'),
                         ),

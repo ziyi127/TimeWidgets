@@ -238,12 +238,9 @@ class TriggerCondition {
   factory TriggerCondition.fromJson(Map<String, dynamic> json) {
     return TriggerCondition(
       id: json['id'] as String? ?? DateTime.now().toIso8601String(),
-      dates: (json['dates'] as List?)
-          ?.map((e) => DateTime.parse(e as String))
-          .toList(),
+      dates: (json['dates'] as List?)?.map((e) => DateTime.parse(e as String)).toList(),
       weekDays: (json['weekDays'] as List?)?.map((e) => e as int).toList(),
-      weekNumbers:
-          (json['weekNumbers'] as List?)?.map((e) => e as int).toList(),
+      weekNumbers: (json['weekNumbers'] as List?)?.map((e) => e as int).toList(),
       startWeek: json['startWeek'] as int?,
       endWeek: json['endWeek'] as int?,
     );
@@ -273,13 +270,12 @@ class TriggerCondition {
     if (dates != null && dates!.isNotEmpty) {
       // ignore: unused_local_variable
       final dateStr = "${date.year}-${date.month}-${date.day}";
-      final matchesDate = dates!.any(
-        (d) =>
-            d.year == date.year && d.month == date.month && d.day == date.day,
+      final matchesDate = dates!.any((d) => 
+        d.year == date.year && d.month == date.month && d.day == date.day,
       );
       // 如果指定了日期，必须匹配日期 (或者与其他条件是 OR 关系? 用户说是组合条件，通常一个Condition内是AND)
       // 用户需求： "支持组合条件（如：每月的第一个星期一，或第2、4、6周等）"
-      // "每月的第一个星期一" -> WeekDay=1 AND DayOfMonth <= 7?
+      // "每月的第一个星期一" -> WeekDay=1 AND DayOfMonth <= 7? 
       // 这里的简单模型可能无法覆盖所有自然语言描述，但 Specific Date, Weekday, Week Number 是基础。
       // 假设 Condition 内字段是 AND 关系。
       if (!matchesDate) return false;
@@ -302,7 +298,7 @@ class TriggerCondition {
 
     return true;
   }
-
+  
   TriggerCondition copyWith({
     String? id,
     List<DateTime>? dates,
@@ -344,24 +340,21 @@ class Schedule {
     // Migration logic for old fields could go here
     final triggers = (json['triggers'] as List?)
             ?.map((t) => TriggerCondition.fromJson(t as Map<String, dynamic>))
-            .toList() ??
-        [];
-
+            .toList() ?? [];
+            
     // Migrate old triggerRule if triggers is empty and triggerRule exists
     if (triggers.isEmpty && json['triggerRule'] != null) {
-      // Simple migration logic...
-      try {
-        final oldRuleMap = json['triggerRule'] as Map<String, dynamic>;
-        final weekDay = oldRuleMap['weekDay'] as int?;
-        if (weekDay != null) {
-          triggers.add(
-            TriggerCondition(
-              id: 'migrated_${DateTime.now().millisecondsSinceEpoch}',
-              weekDays: [weekDay],
-            ),
-          );
-        }
-      } catch (_) {}
+        // Simple migration logic...
+        try {
+           final oldRuleMap = json['triggerRule'] as Map<String, dynamic>;
+           final weekDay = oldRuleMap['weekDay'] as int?;
+           if (weekDay != null) {
+             triggers.add(TriggerCondition(
+               id: 'migrated_${DateTime.now().millisecondsSinceEpoch}',
+               weekDays: [weekDay],
+             ),);
+           }
+        } catch (_) {}
     }
 
     return Schedule(
@@ -370,11 +363,9 @@ class Schedule {
       timeLayoutId: json['timeLayoutId'] as String?,
       groupId: json['groupId'] as String?,
       triggers: triggers,
-      dayTimeLayoutIds:
-          (json['dayTimeLayoutIds'] as Map<String, dynamic>?)?.map(
-                (k, v) => MapEntry(int.parse(k), v as String),
-              ) ??
-              {},
+      dayTimeLayoutIds: (json['dayTimeLayoutIds'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(int.parse(k), v as String),
+      ) ?? {},
       courses: (json['courses'] as List?)
               ?.map((c) => DailyCourse.fromJson(c as Map<String, dynamic>))
               .toList() ??
@@ -385,7 +376,7 @@ class Schedule {
       overlaySourceId: json['overlaySourceId'] as String?,
     );
   }
-
+  
   final String id;
   final String name;
   final String? timeLayoutId; // Default fallback layout ID
@@ -433,8 +424,7 @@ class Schedule {
       'timeLayoutId': timeLayoutId,
       'groupId': groupId,
       'triggers': triggers.map((t) => t.toJson()).toList(),
-      'dayTimeLayoutIds':
-          dayTimeLayoutIds.map((k, v) => MapEntry(k.toString(), v)),
+      'dayTimeLayoutIds': dayTimeLayoutIds.map((k, v) => MapEntry(k.toString(), v)),
       'courses': courses.map((c) => c.toJson()).toList(),
       'isAutoEnabled': isAutoEnabled,
       'priority': priority,

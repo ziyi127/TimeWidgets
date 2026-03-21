@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:time_widgets/utils/logger.dart';
 
 class JsonWidgetBuilder {
   static Widget build(Map<String, dynamic> json, BuildContext context) {
@@ -34,7 +33,7 @@ class JsonWidgetBuilder {
   }
 
   static Widget _buildContainer(
-      Map<String, dynamic> json, BuildContext context) {
+      Map<String, dynamic> json, BuildContext context,) {
     final width = _parseDouble(json['width']);
     final height = _parseDouble(json['height']);
     final padding = _parseEdgeInsets(json['padding']);
@@ -121,7 +120,7 @@ class JsonWidgetBuilder {
   }
 
   static Widget _buildSizedBox(
-      Map<String, dynamic> json, BuildContext context) {
+      Map<String, dynamic> json, BuildContext context,) {
     final width = _parseDouble(json['width']);
     final height = _parseDouble(json['height']);
 
@@ -140,7 +139,7 @@ class JsonWidgetBuilder {
   }
 
   static Widget _buildGestureDetector(
-      Map<String, dynamic> json, BuildContext context) {
+      Map<String, dynamic> json, BuildContext context,) {
     final childJson = json['child'] as Map<String, dynamic>?;
     final onTap = json['onTap'] as String?;
 
@@ -153,7 +152,7 @@ class JsonWidgetBuilder {
       child: child,
       onTap: () {
         // 处理点击事件，这里可以根据onTap属性执行不同的操作
-        Logger.i('GestureDetector tapped: $onTap');
+        print('GestureDetector tapped: $onTap');
       },
     );
   }
@@ -225,11 +224,11 @@ class JsonWidgetBuilder {
     if (value == null) return null;
     if (value is String) {
       // Hex string #RRGGBB or #AARRGGBB
-      var normalized = value.replaceAll('#', '');
-      if (normalized.length == 6) {
-        normalized = 'FF$normalized';
+      value = value.replaceAll('#', '');
+      if (value.length == 6) {
+        value = 'FF$value';
       }
-      return Color(int.parse(normalized, radix: 16));
+      return Color(int.parse(value, radix: 16));
     }
     return null;
   }
@@ -359,10 +358,9 @@ class JsonWidgetBuilder {
     if (decoration == null) return null;
 
     return BoxDecoration(
-      color: _parseColor(decoration['color']),
-      borderRadius: _parseBorderRadius(decoration['borderRadius']),
-      boxShadow: _parseBoxShadow(decoration['boxShadow'] as List<dynamic>?),
-    );
+        color: _parseColor(decoration['color']),
+        borderRadius: _parseBorderRadius(decoration['borderRadius']),
+        boxShadow: _parseBoxShadow(decoration['boxShadow'] as List<dynamic>?),);
   }
 
   static BorderRadius? _parseBorderRadius(dynamic value) {
@@ -378,15 +376,11 @@ class JsonWidgetBuilder {
 
     return shadows.map((shadow) {
       final shadowMap = shadow as Map<String, dynamic>;
-      final offsetMap = shadowMap['offset'] as Map<String, dynamic>?;
       return BoxShadow(
-        color: _parseColor(shadowMap['color']) ?? Colors.black,
-        offset: Offset(
-          _parseDouble(offsetMap?['x']) ?? 0,
-          _parseDouble(offsetMap?['y']) ?? 0,
-        ),
-        blurRadius: _parseDouble(shadowMap['blurRadius']) ?? 0,
-      );
+          color: _parseColor(shadowMap['color']) ?? Colors.black,
+          offset: Offset(_parseDouble(shadowMap['offset']['x']) ?? 0,
+              _parseDouble(shadowMap['offset']['y']) ?? 0,),
+          blurRadius: _parseDouble(shadowMap['blurRadius']) ?? 0,);
     }).toList();
   }
 }

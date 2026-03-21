@@ -477,10 +477,8 @@ class CollisionDetector {
     // 最后处理settings按钮，确保不会与其他组件重叠
     if (settingsKey != null && settingsPosition != null) {
       // 将settings按钮放置在右下角，确保不会溢出
-      final settingsX = math.max(
-        0.0,
-        containerSize.width - padding - settingsPosition.width,
-      );
+      final settingsX =
+          math.max(0.0, containerSize.width - padding - settingsPosition.width);
       final settingsY = math.max(
         0.0,
         containerSize.height - padding - settingsPosition.height,

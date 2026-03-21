@@ -13,9 +13,8 @@ void main() {
       final decoded = await TransferProtocol.parsePacket(packet);
 
       expect(decoded, isNotNull);
-      final decodedData = decoded!;
-      expect(decodedData['type'], 'syncData');
-      final data = decodedData['data'] as Map<String, dynamic>;
+      expect(decoded!['type'], 'syncData');
+      final data = decoded['data'] as Map<String, dynamic>;
       expect(data['foo'], 'bar');
       expect(data['count'], 123);
     });

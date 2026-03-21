@@ -5,6 +5,7 @@ import 'package:time_widgets/plugins/models/plugin_manifest.dart';
 /// In a purely dynamic system (e.g. JS/Lua), the Loader would wrap the script
 /// in an implementation of this interface.
 abstract class TimeWidgetsPlugin {
+
   TimeWidgetsPlugin(this.manifest);
   final PluginManifest manifest;
 
@@ -32,6 +33,7 @@ abstract class TimeWidgetsPlugin {
 }
 
 class PluginMenuItem {
+
   PluginMenuItem({
     required this.label,
     required this.onTap,
@@ -44,8 +46,7 @@ class PluginMenuItem {
 
 enum SettingType { string, boolean, number, choice }
 
-class PluginSettingItem {
-  // For extra properties like multiline
+class PluginSettingItem { // For extra properties like multiline
 
   PluginSettingItem({
     required this.key,

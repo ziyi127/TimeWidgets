@@ -8,7 +8,7 @@ import 'package:time_widgets/utils/color_utils.dart';
 import 'package:time_widgets/utils/responsive_utils.dart';
 
 /// 增强版课程表组件 - UX优化版
-///
+/// 
 /// 主要改进：
 /// 1. 信息层级更清晰
 /// 2. 视觉对比度增强
@@ -118,8 +118,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
       elevation: 0,
       color: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(ResponsiveUtils.getBorderRadius(width)),
+        borderRadius: BorderRadius.circular(ResponsiveUtils.getBorderRadius(width)),
       ),
       child: Padding(
         padding: EdgeInsets.all(ResponsiveUtils.value(16)),
@@ -176,9 +175,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _viewMode == TimetableViewMode.day
-                    ? l10n.todayCourses
-                    : l10n.weekSchedule,
+                _viewMode == TimetableViewMode.day ? l10n.todayCourses : l10n.weekSchedule,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurface,
                   fontSize: (theme.textTheme.titleMedium?.fontSize ?? 16) *
@@ -313,65 +310,64 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
           child: Card(
             elevation: isCurrent ? 4 : 0,
             margin: EdgeInsets.zero,
-            color: _getCardBackgroundColor(
-              colorScheme,
-              subjectColor,
-              isCurrent,
-              isCompleted,
-              isUpcoming,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: isCurrent
-                  ? BorderSide(color: subjectColor, width: 2)
-                  : isUpcoming
-                      ? BorderSide(
-                          color: colorScheme.tertiary.withValues(alpha: 0.5),
-                          width: 1.5,
-                        )
-                      : BorderSide.none,
-            ),
-            child: InkWell(
-              onTap: () => _onCourseTap(course),
-              onLongPress: () => _showCourseMenu(context, course),
-              borderRadius: BorderRadius.circular(16),
-              splashColor: subjectColor.withValues(alpha: 0.12),
-              highlightColor: subjectColor.withValues(alpha: 0.08),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // 状态指示条 - 多维度区分
-                    _buildStatusIndicator(
-                      colorScheme,
-                      subjectColor,
-                      isCurrent,
-                      isCompleted,
-                      isUpcoming,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: _buildCardContent(
-                          theme,
-                          colorScheme,
-                          course,
-                          subjectColor,
-                          isCurrent,
-                          isCompleted,
-                          isUpcoming,
-                          fontMultiplier,
-                        ),
+          color: _getCardBackgroundColor(
+            colorScheme,
+            subjectColor,
+            isCurrent,
+            isCompleted,
+            isUpcoming,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: isCurrent
+                ? BorderSide(color: subjectColor, width: 2)
+                : isUpcoming
+                    ? BorderSide(
+                        color: colorScheme.tertiary.withValues(alpha: 0.5),
+                        width: 1.5,
+                      )
+                    : BorderSide.none,
+          ),
+          child: InkWell(
+            onTap: () => _onCourseTap(course),
+            onLongPress: () => _showCourseMenu(context, course),
+            borderRadius: BorderRadius.circular(16),
+            splashColor: subjectColor.withValues(alpha: 0.12),
+            highlightColor: subjectColor.withValues(alpha: 0.08),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 状态指示条 - 多维度区分
+                  _buildStatusIndicator(
+                    colorScheme,
+                    subjectColor,
+                    isCurrent,
+                    isCompleted,
+                    isUpcoming,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildCardContent(
+                        theme,
+                        colorScheme,
+                        course,
+                        subjectColor,
+                        isCurrent,
+                        isCompleted,
+                        isUpcoming,
+                        fontMultiplier,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ),
-    );
+    ),);
   }
 
   /// 状态指示条 - 颜色 + 图案纹理（色盲友好）
@@ -462,15 +458,11 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (isCurrent)
-              _buildStatusChip(AppLocalizations.of(context)!.statusOngoing,
-                  subjectColor, colorScheme),
+            if (isCurrent) _buildStatusChip(AppLocalizations.of(context)!.statusOngoing, subjectColor, colorScheme),
             if (isUpcoming)
-              _buildStatusChip(AppLocalizations.of(context)!.statusUpcoming,
-                  colorScheme.tertiary, colorScheme),
+              _buildStatusChip(AppLocalizations.of(context)!.statusUpcoming, colorScheme.tertiary, colorScheme),
             if (isCompleted)
-              _buildStatusChip(AppLocalizations.of(context)!.statusEnded,
-                  colorScheme.outline, colorScheme),
+              _buildStatusChip(AppLocalizations.of(context)!.statusEnded, colorScheme.outline, colorScheme),
           ],
         ),
         const SizedBox(height: 8),
@@ -707,8 +699,7 @@ class _EnhancedTimetableWidgetState extends State<EnhancedTimetableWidget>
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: Text(AppLocalizations.of(context)!.delete,
-                  style: const TextStyle(color: Colors.red)),
+              title: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteCourseDialog(course);

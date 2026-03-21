@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:time_widgets/plugins/core/plugin_manager.dart';
 
 class PluginContainer extends StatelessWidget {
+
   const PluginContainer({super.key, required this.pluginId});
   final String pluginId;
 
@@ -16,7 +17,7 @@ class PluginContainer extends StatelessWidget {
         );
 
         // If plugin is not found or not active, we might want to show error or empty
-        // But the firstWhere with orElse above handles it roughly.
+        // But the firstWhere with orElse above handles it roughly. 
         // Better safety:
         try {
           final widget = plugin.buildWidget(context);

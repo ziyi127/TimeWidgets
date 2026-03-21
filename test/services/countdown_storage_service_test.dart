@@ -35,8 +35,7 @@ void main() {
 
       test('returns stored countdowns', () async {
         await service.saveCountdown(createCountdown());
-        await service
-            .saveCountdown(createCountdown(id: 'cd-2', title: 'Second'));
+        await service.saveCountdown(createCountdown(id: 'cd-2', title: 'Second'));
 
         final countdowns = await service.loadAllCountdowns();
 

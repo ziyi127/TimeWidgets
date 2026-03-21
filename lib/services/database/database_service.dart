@@ -14,7 +14,7 @@ class DatabaseService {
     if (_isar != null) return;
 
     final dir = await getApplicationDocumentsDirectory();
-
+    
     _isar = await Isar.open(
       [
         IsarCourseInfoSchema,
@@ -34,7 +34,7 @@ class DatabaseService {
   }
 
   // Mappers
-
+  
   // Domain -> Isar
   IsarCourseInfo _mapCourseToIsar(CourseInfo course) {
     return IsarCourseInfo()
@@ -51,28 +51,23 @@ class DatabaseService {
     return IsarTimeLayout()
       ..layoutId = layout.id
       ..name = layout.name
-      ..timeSlots = layout.timeSlots
-          .map(
-            (s) => IsarTimeSlot()
-              ..slotId = s.id
-              ..startTime = s.startTime
-              ..endTime = s.endTime
-              ..name = s.name
-              ..type = s.type.index
-              ..defaultSubjectId = s.defaultSubjectId
-              ..isHiddenByDefault = s.isHiddenByDefault,
-          )
-          .toList();
+      ..timeSlots = layout.timeSlots.map((s) => IsarTimeSlot()
+        ..slotId = s.id
+        ..startTime = s.startTime
+        ..endTime = s.endTime
+        ..name = s.name
+        ..type = s.type.index
+        ..defaultSubjectId = s.defaultSubjectId
+        ..isHiddenByDefault = s.isHiddenByDefault,
+      ).toList();
   }
 
   IsarSchedule _mapScheduleToIsar(Schedule schedule) {
     final dayTimeLayouts = <IsarDayTimeLayout>[];
     schedule.dayTimeLayoutIds.forEach((day, layoutId) {
-      dayTimeLayouts.add(
-        IsarDayTimeLayout()
-          ..dayOfWeek = day
-          ..layoutId = layoutId,
-      );
+      dayTimeLayouts.add(IsarDayTimeLayout()
+        ..dayOfWeek = day
+        ..layoutId = layoutId,);
     });
 
     return IsarSchedule()
@@ -80,35 +75,29 @@ class DatabaseService {
       ..name = schedule.name
       ..timeLayoutId = schedule.timeLayoutId
       ..groupId = schedule.groupId
-      ..triggers = schedule.triggers
-          .map(
-            (t) => IsarTriggerCondition()
-              ..conditionId = t.id
-              ..dates = t.dates
-              ..weekDays = t.weekDays
-              ..weekNumbers = t.weekNumbers
-              ..startWeek = t.startWeek
-              ..endWeek = t.endWeek,
-          )
-          .toList()
+      ..triggers = schedule.triggers.map((t) => IsarTriggerCondition()
+        ..conditionId = t.id
+        ..dates = t.dates
+        ..weekDays = t.weekDays
+        ..weekNumbers = t.weekNumbers
+        ..startWeek = t.startWeek
+        ..endWeek = t.endWeek,
+      ).toList()
       ..dayTimeLayouts = dayTimeLayouts
-      ..courses = schedule.courses
-          .map(
-            (c) => IsarDailyCourse()
-              ..dailyCourseId = c.id
-              ..dayOfWeek = c.dayOfWeek.index
-              ..timeSlotId = c.timeSlotId
-              ..courseId = c.courseId
-              ..weekType = c.weekType.index
-              ..isChangedClass = c.isChangedClass,
-          )
-          .toList()
+      ..courses = schedule.courses.map((c) => IsarDailyCourse()
+        ..dailyCourseId = c.id
+        ..dayOfWeek = c.dayOfWeek.index
+        ..timeSlotId = c.timeSlotId
+        ..courseId = c.courseId
+        ..weekType = c.weekType.index
+        ..isChangedClass = c.isChangedClass,
+      ).toList()
       ..isAutoEnabled = schedule.isAutoEnabled
       ..priority = schedule.priority
       ..isOverlay = schedule.isOverlay
       ..overlaySourceId = schedule.overlaySourceId;
   }
-
+  
   IsarScheduleGroup _mapGroupToIsar(ScheduleGroup group) {
     return IsarScheduleGroup()
       ..groupId = group.id
@@ -133,19 +122,15 @@ class DatabaseService {
     return TimeLayout(
       id: isarLayout.layoutId,
       name: isarLayout.name,
-      timeSlots: isarLayout.timeSlots
-          .map(
-            (s) => TimeSlot(
-              id: s.slotId,
-              startTime: s.startTime,
-              endTime: s.endTime,
-              name: s.name,
-              type: TimePointType.values[s.type],
-              defaultSubjectId: s.defaultSubjectId,
-              isHiddenByDefault: s.isHiddenByDefault,
-            ),
-          )
-          .toList(),
+      timeSlots: isarLayout.timeSlots.map((s) => TimeSlot(
+        id: s.slotId,
+        startTime: s.startTime,
+        endTime: s.endTime,
+        name: s.name,
+        type: TimePointType.values[s.type],
+        defaultSubjectId: s.defaultSubjectId,
+        isHiddenByDefault: s.isHiddenByDefault,
+      ),).toList(),
     );
   }
 
@@ -160,31 +145,23 @@ class DatabaseService {
       name: isarSchedule.name,
       timeLayoutId: isarSchedule.timeLayoutId,
       groupId: isarSchedule.groupId,
-      triggers: isarSchedule.triggers
-          .map(
-            (t) => TriggerCondition(
-              id: t.conditionId,
-              dates: t.dates,
-              weekDays: t.weekDays,
-              weekNumbers: t.weekNumbers,
-              startWeek: t.startWeek,
-              endWeek: t.endWeek,
-            ),
-          )
-          .toList(),
+      triggers: isarSchedule.triggers.map((t) => TriggerCondition(
+        id: t.conditionId,
+        dates: t.dates,
+        weekDays: t.weekDays,
+        weekNumbers: t.weekNumbers,
+        startWeek: t.startWeek,
+        endWeek: t.endWeek,
+      ),).toList(),
       dayTimeLayoutIds: dayTimeLayoutIds,
-      courses: isarSchedule.courses
-          .map(
-            (c) => DailyCourse(
-              id: c.dailyCourseId,
-              dayOfWeek: DayOfWeek.values[c.dayOfWeek],
-              timeSlotId: c.timeSlotId,
-              courseId: c.courseId,
-              weekType: WeekType.values[c.weekType],
-              isChangedClass: c.isChangedClass,
-            ),
-          )
-          .toList(),
+      courses: isarSchedule.courses.map((c) => DailyCourse(
+        id: c.dailyCourseId,
+        dayOfWeek: DayOfWeek.values[c.dayOfWeek],
+        timeSlotId: c.timeSlotId,
+        courseId: c.courseId,
+        weekType: WeekType.values[c.weekType],
+        isChangedClass: c.isChangedClass,
+      ),).toList(),
       isAutoEnabled: isarSchedule.isAutoEnabled,
       priority: isarSchedule.priority,
       isOverlay: isarSchedule.isOverlay,
@@ -211,14 +188,10 @@ class DatabaseService {
       await isar.isarScheduleGroups.clear();
 
       // Put new data
-      await isar.isarCourseInfos
-          .putAll(data.courses.map(_mapCourseToIsar).toList());
-      await isar.isarTimeLayouts
-          .putAll(data.timeLayouts.map(_mapTimeLayoutToIsar).toList());
-      await isar.isarSchedules
-          .putAll(data.schedules.map(_mapScheduleToIsar).toList());
-      await isar.isarScheduleGroups
-          .putAll(data.groups.map(_mapGroupToIsar).toList());
+      await isar.isarCourseInfos.putAll(data.courses.map(_mapCourseToIsar).toList());
+      await isar.isarTimeLayouts.putAll(data.timeLayouts.map(_mapTimeLayoutToIsar).toList());
+      await isar.isarSchedules.putAll(data.schedules.map(_mapScheduleToIsar).toList());
+      await isar.isarScheduleGroups.putAll(data.groups.map(_mapGroupToIsar).toList());
     });
   }
 
@@ -235,7 +208,7 @@ class DatabaseService {
     // However, if the app relies on flat lists, we might need to populate them.
     // Looking at the original model, TimetableData has flat lists AND structured lists.
     // Let's populate the structured ones primarily.
-
+    
     return TimetableData(
       courses: isarCourses.map(_mapIsarToCourse).toList(),
       timeLayouts: isarLayouts.map(_mapIsarToTimeLayout).toList(),
@@ -246,7 +219,7 @@ class DatabaseService {
       dailyCourses: [], // Or flatten from schedules?
     );
   }
-
+  
   Future<void> clearAll() async {
     await isar.writeTxn(() async {
       await isar.clear();

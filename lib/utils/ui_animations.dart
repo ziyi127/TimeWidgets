@@ -225,6 +225,7 @@ class UIAnimations {
 
 /// 动画预设组件
 class AnimatedPulse extends StatefulWidget {
+
   const AnimatedPulse({
     super.key,
     required this.child,
@@ -280,6 +281,7 @@ class _AnimatedPulseState extends State<AnimatedPulse>
 
 /// 悬停放大组件
 class HoverScale extends StatefulWidget {
+
   const HoverScale({
     super.key,
     required this.child,
@@ -314,6 +316,7 @@ class _HoverScaleState extends State<HoverScale> {
 
 /// 点击涟漪组件
 class RippleEffect extends StatefulWidget {
+
   const RippleEffect({
     super.key,
     required this.child,

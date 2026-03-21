@@ -9,6 +9,21 @@ analyzer:
     missing_return: error
     dead_code: error
     always_declare_return_types: error
+    always_put_control_body_on_new_line: ignore
+    avoid_returning_this: ignore
+    avoid_slow_async_io: ignore
+    unawaited_futures: ignore
+    prefer_int_literals: ignore
+    avoid_positional_boolean_parameters: ignore
+    avoid_print: ignore
+    avoid_dynamic_calls: ignore
+    use_late_for_private_fields_and_variables: ignore
+    parameter_assignments: ignore
+    eol_at_end_of_file: ignore
+    avoid_setters_without_getters: ignore
+    sort_constructors_first: ignore
+    unnecessary_getters_setters: ignore
+    use_string_buffers: ignore
   language:
     strict-casts: true
     strict-inference: true

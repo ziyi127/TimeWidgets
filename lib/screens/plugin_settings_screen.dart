@@ -5,9 +5,9 @@ import 'package:time_widgets/plugins/core/plugin_interface.dart';
 import 'package:time_widgets/plugins/core/plugin_manager.dart';
 import 'package:time_widgets/utils/md3_dialog_styles.dart';
 import 'package:time_widgets/utils/md3_typography_styles.dart';
-import 'package:time_widgets/utils/logger.dart';
 
 class PluginSettingsScreen extends StatefulWidget {
+
   const PluginSettingsScreen({super.key, required this.pluginId});
   final String pluginId;
 
@@ -44,7 +44,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
       // 加载插件设置
       _loadPluginSettings();
     } catch (e) {
-      Logger.e('Error loading plugin: $e');
+      print('Error loading plugin: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('加载插件失败: $e')),
@@ -140,7 +140,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
       // 3. 将小组件添加到桌面布局中
       // 4. 保存布局配置
     } catch (e) {
-      Logger.e('Error creating desktop widget: $e');
+      print('Error creating desktop widget: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -184,7 +184,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
         Navigator.of(context).pop();
       }
     } catch (e) {
-      Logger.e('Error uninstalling plugin: $e');
+      print('Error uninstalling plugin: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('移除失败: $e')),
@@ -252,6 +252,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
             // 显示选择对话框
             if (setting.options == null || setting.options!.isEmpty) return;
 
+            // 转换为选择对话框项
             // TODO: 实现选择对话框
             // 这里需要使用MD3DialogStyles.showSelectionDialog
 
@@ -319,13 +320,13 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
                         Text(
                           '版本: ${_plugin!.manifest.version}',
                           style: MD3TypographyStyles.bodySmall(context,
-                              color: colorScheme.onSurfaceVariant),
+                              color: colorScheme.onSurfaceVariant,),
                         ),
                         const SizedBox(width: 24),
                         Text(
                           '作者: ${_plugin!.manifest.author}',
                           style: MD3TypographyStyles.bodySmall(context,
-                              color: colorScheme.onSurfaceVariant),
+                              color: colorScheme.onSurfaceVariant,),
                         ),
                       ],
                     ),
@@ -333,7 +334,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
                     Text(
                       '最低应用版本: ${_plugin!.manifest.minAppVersion}',
                       style: MD3TypographyStyles.bodySmall(context,
-                          color: colorScheme.onSurfaceVariant),
+                          color: colorScheme.onSurfaceVariant,),
                     ),
                     if (_plugin!.manifest.permissions.isNotEmpty)
                       Column(
@@ -343,7 +344,7 @@ class _PluginSettingsScreenState extends State<PluginSettingsScreen> {
                           Text(
                             '权限: ${_plugin!.manifest.permissions.join(', ')}',
                             style: MD3TypographyStyles.bodySmall(context,
-                                color: colorScheme.onSurfaceVariant),
+                                color: colorScheme.onSurfaceVariant,),
                           ),
                         ],
                       ),

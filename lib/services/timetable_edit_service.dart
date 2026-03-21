@@ -333,16 +333,15 @@ class TimetableEditService extends ChangeNotifier {
   Schedule? getActiveSchedule(DateTime date, {int? currentWeekNumber}) {
     final matchingSchedules = _schedules.where((schedule) {
       if (!schedule.isAutoEnabled) return false;
-
+      
       // Check if any trigger matches
       if (schedule.triggers.isEmpty) {
         // Fallback for migration if needed, or just return false
         return false;
       }
-
-      return schedule.triggers.any(
-        (trigger) =>
-            trigger.matches(date, currentWeekNumber: currentWeekNumber),
+      
+      return schedule.triggers.any((trigger) => 
+        trigger.matches(date, currentWeekNumber: currentWeekNumber),
       );
     }).toList();
 
@@ -357,12 +356,11 @@ class TimetableEditService extends ChangeNotifier {
   List<Schedule> getMatchingSchedules(DateTime date, {int? currentWeekNumber}) {
     final matchingSchedules = _schedules.where((schedule) {
       if (!schedule.isAutoEnabled) return false;
-
+      
       if (schedule.triggers.isEmpty) return false;
-
-      return schedule.triggers.any(
-        (trigger) =>
-            trigger.matches(date, currentWeekNumber: currentWeekNumber),
+      
+      return schedule.triggers.any((trigger) => 
+        trigger.matches(date, currentWeekNumber: currentWeekNumber),
       );
     }).toList();
 

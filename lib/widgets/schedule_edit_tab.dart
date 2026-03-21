@@ -192,7 +192,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Widget _buildQuickEditPanel(
-      BuildContext context, TimetableEditService service) {
+      BuildContext context, TimetableEditService service,) {
     final schedule = service.getScheduleById(_selectedScheduleId!);
     if (schedule == null) {
       return const SizedBox();
@@ -244,9 +244,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     // 1. Save history
     // Find if there was a course before (for undo)
     final existingCourse = schedule.courses
-        .where(
-          (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id,
-        )
+        .where((dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id)
         .firstOrNull;
 
     _quickEditHistory.add({
@@ -259,18 +257,16 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
     // Remove existing
     updatedCourses.removeWhere(
-        (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id);
+        (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id,);
 
     // Add new if not null (skip)
     if (course != null) {
-      updatedCourses.add(
-        DailyCourse(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          dayOfWeek: dayOfWeek,
-          timeSlotId: slot.id,
-          courseId: course.id,
-        ),
-      );
+      updatedCourses.add(DailyCourse(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        dayOfWeek: dayOfWeek,
+        timeSlotId: slot.id,
+        courseId: course.id,
+      ),);
     }
 
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));
@@ -285,7 +281,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           _selectedDayIndex = dayIndex + 1;
           _quickEditSlotIndex = 0;
           _showSuccessSnackBar(
-              l10n.quickEditDoneNextDay(_getDayName(dayOfWeek)));
+              l10n.quickEditDoneNextDay(_getDayName(dayOfWeek)),);
         } else {
           _showSuccessSnackBar(l10n.quickEditAllDone);
           _isQuickEditMode = false; // Exit mode
@@ -338,7 +334,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
     final updatedCourses = List<DailyCourse>.from(schedule.courses);
     // Remove current (the one we just added/skipped)
     updatedCourses.removeWhere(
-        (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slotId);
+        (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slotId,);
 
     // Restore previous
     if (prevCourse != null) {
@@ -383,7 +379,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Widget _buildEditorContent(
-      BuildContext context, TimetableEditService service) {
+      BuildContext context, TimetableEditService service,) {
     final schedule = service.getScheduleById(_selectedScheduleId!);
     if (schedule == null) {
       return const SizedBox();
@@ -411,7 +407,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                 Tab(text: l10n.sunday),
                 Tab(
                     text: l10n.settingsTitle,
-                    icon: const Icon(Icons.settings_outlined, size: 18)),
+                    icon: const Icon(Icons.settings_outlined, size: 18),),
               ],
             ),
           ),
@@ -540,7 +536,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           child: Row(
             children: [
               Text('$dayName - 课程安排',
-                  style: MD3TypographyStyles.titleMedium(context)),
+                  style: MD3TypographyStyles.titleMedium(context),),
               const SizedBox(width: 8),
               // Copy button
               PopupMenuButton<int>(
@@ -579,7 +575,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                       newMap[dayIndex] = newId;
                     }
                     service.updateSchedule(
-                        schedule.copyWith(dayTimeLayoutIds: newMap));
+                        schedule.copyWith(dayTimeLayoutIds: newMap),);
                   },
                 ),
               ),
@@ -593,11 +589,11 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
               ? Center(
                   child: Text('该时间表没有时间段',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline)))
+                          color: Theme.of(context).colorScheme.outline,),),)
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: _buildDayCourseList(
-                      context, service, schedule, dayIndex, timeSlots),
+                      context, service, schedule, dayIndex, timeSlots,),
                 ),
         ),
       ],
@@ -624,12 +620,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
 
     // 3. Add copies
     for (final course in sourceCourses) {
-      updatedCourses.add(
-        course.copyWith(
-          id: '${DateTime.now().millisecondsSinceEpoch}_${updatedCourses.length}',
-          dayOfWeek: targetDay,
-        ),
-      );
+      updatedCourses.add(course.copyWith(
+        id: '${DateTime.now().millisecondsSinceEpoch}_${updatedCourses.length}',
+        dayOfWeek: targetDay,
+      ),);
     }
 
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));
@@ -677,8 +671,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         // Find course for this slot and day
         final dailyCourse = schedule.courses
             .where(
-              (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id,
-            )
+                (dc) => dc.dayOfWeek == dayOfWeek && dc.timeSlotId == slot.id,)
             .firstOrNull;
 
         final course = dailyCourse != null
@@ -690,7 +683,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           child: MD3CardStyles.surfaceContainer(
             context: context,
             onTap: () => _showCoursePickerDialog(
-                context, service, schedule, slot, dayOfWeek),
+                context, service, schedule, slot, dayOfWeek,),
             child: ListTile(
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -706,10 +699,10 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(slot.startTime,
-                        style: MD3TypographyStyles.labelMedium(context)),
+                        style: MD3TypographyStyles.labelMedium(context),),
                     Text(slot.endTime,
                         style: MD3TypographyStyles.labelSmall(context).copyWith(
-                            color: Theme.of(context).colorScheme.outline)),
+                            color: Theme.of(context).colorScheme.outline,),),
                   ],
                 ),
               ),
@@ -734,9 +727,9 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                             List<DailyCourse>.from(schedule.courses);
                         updatedCourses.removeWhere((dc) =>
                             dc.dayOfWeek == dayOfWeek &&
-                            dc.timeSlotId == slot.id);
+                            dc.timeSlotId == slot.id,);
                         service.updateSchedule(
-                            schedule.copyWith(courses: updatedCourses));
+                            schedule.copyWith(courses: updatedCourses),);
                       },
                     ),
                   ] else
@@ -751,9 +744,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
   }
 
   Future<void> _showAddSubjectDialog(
-    BuildContext context,
-    TimetableEditService service,
-  ) async {
+      BuildContext context, TimetableEditService service,) async {
     final nameController = TextEditingController();
     final teacherController = TextEditingController();
     final roomController = TextEditingController();
@@ -768,22 +759,19 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
           mainAxisSize: MainAxisSize.min,
           children: [
             MD3FormStyles.outlinedTextField(
-              context: context,
-              controller: nameController,
-              label: l10n.courseName,
-            ),
+                context: context,
+                controller: nameController,
+                label: l10n.courseName,),
             const SizedBox(height: 16),
             MD3FormStyles.outlinedTextField(
-              context: context,
-              controller: teacherController,
-              label: l10n.teacherName,
-            ),
+                context: context,
+                controller: teacherController,
+                label: l10n.teacherName,),
             const SizedBox(height: 16),
             MD3FormStyles.outlinedTextField(
-              context: context,
-              controller: roomController,
-              label: l10n.classroom,
-            ),
+                context: context,
+                controller: roomController,
+                label: l10n.classroom,),
           ],
         ),
         actions: [
@@ -802,8 +790,7 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
                   teacher: teacherController.text,
                   classroom: roomController.text,
                   color: ColorUtils.toHexString(
-                    ColorUtils.generateColorFromName(nameController.text),
-                  ),
+                      ColorUtils.generateColorFromName(nameController.text),),
                 );
                 service.addCourse(newCourse);
                 Navigator.pop(context);
@@ -987,14 +974,12 @@ class _ScheduleEditTabState extends State<ScheduleEditTab> {
         .removeWhere((dc) => dc.dayOfWeek == day && dc.timeSlotId == slot.id);
 
     if (selectedCourse != null) {
-      updatedCourses.add(
-        DailyCourse(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          dayOfWeek: day,
-          timeSlotId: slot.id,
-          courseId: selectedCourse.id,
-        ),
-      );
+      updatedCourses.add(DailyCourse(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        dayOfWeek: day,
+        timeSlotId: slot.id,
+        courseId: selectedCourse.id,
+      ),);
     }
 
     service.updateSchedule(schedule.copyWith(courses: updatedCourses));

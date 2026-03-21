@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 class PluginManifest {
+
   PluginManifest({
     required this.id,
     required this.name,
@@ -54,7 +55,6 @@ class PluginManifest {
   }
 
   static PluginManifest parse(String jsonString) {
-    return PluginManifest.fromJson(
-        json.decode(jsonString) as Map<String, dynamic>);
+    return PluginManifest.fromJson(json.decode(jsonString) as Map<String, dynamic>);
   }
 }
