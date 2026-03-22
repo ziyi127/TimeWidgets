@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_multi_window
   dynamic_color
   isar_flutter_libs
-  system_tray
+  tray_manager
   url_launcher_linux
 )
 

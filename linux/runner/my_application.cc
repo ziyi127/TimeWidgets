@@ -1,9 +1,6 @@
 #include "my_application.h"
 
 #include <flutter_linux/flutter_linux.h>
-#ifdef GDK_WINDOWING_X11
-#include <gdk/gdkx.h>
-#endif
 
 #include "flutter/generated_plugin_registrant.h"
 
@@ -14,9 +11,58 @@ struct _MyApplication {
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 
+static void configure_floating_window(GtkWindow* window) {
+  // Re-apply these flags aggressively for desktop environments that may
+  // override initial hints during map/show lifecycle.
+  gtk_window_set_title(window, "time_widgets");
+  gtk_window_set_decorated(window, FALSE);
+  gtk_window_set_resizable(window, FALSE);
+  gtk_window_set_keep_above(window, TRUE);
+  gtk_window_set_skip_taskbar_hint(window, TRUE);
+  gtk_window_set_skip_pager_hint(window, TRUE);
+  // UTILITY may still show a slim title strip on some compositors.
+  // DOCK better matches borderless floating widgets on Linux desktops.
+  gtk_window_set_type_hint(window, GDK_WINDOW_TYPE_HINT_DOCK);
+  gtk_window_set_titlebar(window, nullptr);
+
+  GtkWidget* widget = GTK_WIDGET(window);
+  gtk_widget_set_name(widget, "floating-widget-window");
+  gtk_widget_set_app_paintable(widget, TRUE);
+  GdkScreen* screen = gtk_widget_get_screen(widget);
+  if (screen != nullptr) {
+    GdkVisual* visual = gdk_screen_get_rgba_visual(screen);
+    if (visual != nullptr && gdk_screen_is_composited(screen)) {
+      gtk_widget_set_visual(widget, visual);
+    }
+
+    static gboolean css_installed = FALSE;
+    if (!css_installed) {
+      GtkCssProvider* provider = gtk_css_provider_new();
+      gtk_css_provider_load_from_data(
+          provider,
+          "#floating-widget-window {"
+          "  border: 0;"
+          "  border-radius: 0;"
+          "  box-shadow: none;"
+          "}",
+          -1,
+          nullptr);
+      gtk_style_context_add_provider_for_screen(
+          screen, GTK_STYLE_PROVIDER(provider),
+          GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+      g_object_unref(provider);
+      css_installed = TRUE;
+    }
+  }
+}
+
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
-  gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
+  GtkWidget* toplevel = gtk_widget_get_toplevel(GTK_WIDGET(view));
+  if (GTK_IS_WINDOW(toplevel)) {
+    configure_floating_window(GTK_WINDOW(toplevel));
+  }
+  gtk_widget_show(toplevel);
 }
 
 // Implements GApplication::activate.
@@ -24,33 +70,7 @@ static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
-
-  // Use a header bar when running in GNOME as this is the common style used
-  // by applications and is the setup most users will be using (e.g. Ubuntu
-  // desktop).
-  // If running on X and not using GNOME then just use a traditional title bar
-  // in case the window manager does more exotic layout, e.g. tiling.
-  // If running on Wayland assume the header bar will work (may need changing
-  // if future cases occur).
-  gboolean use_header_bar = TRUE;
-#ifdef GDK_WINDOWING_X11
-  GdkScreen* screen = gtk_window_get_screen(window);
-  if (GDK_IS_X11_SCREEN(screen)) {
-    const gchar* wm_name = gdk_x11_screen_get_window_manager_name(screen);
-    if (g_strcmp0(wm_name, "GNOME Shell") != 0) {
-      use_header_bar = FALSE;
-    }
-  }
-#endif
-  if (use_header_bar) {
-    GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
-    gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "time_widgets");
-    gtk_header_bar_set_show_close_button(header_bar, TRUE);
-    gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
-  } else {
-    gtk_window_set_title(window, "time_widgets");
-  }
+  configure_floating_window(window);
 
   gtk_window_set_default_size(window, 1280, 720);
 
@@ -62,7 +82,7 @@ static void my_application_activate(GApplication* application) {
   GdkRGBA background_color;
   // Background defaults to black, override it here if necessary, e.g. #00000000
   // for transparent.
-  gdk_rgba_parse(&background_color, "#000000");
+  gdk_rgba_parse(&background_color, "#00000000");
   fl_view_set_background_color(view, &background_color);
   gtk_widget_show(GTK_WIDGET(view));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));

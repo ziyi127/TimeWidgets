@@ -189,7 +189,8 @@ class DesktopController extends ChangeNotifier {
 
   Future<void> onWindowClose() async {
     final settings = _settingsService.currentSettings;
-    if (settings.minimizeToTray) {
+    final trayAvailable = MD3TrayMenuService.instance.isInitialized;
+    if (settings.minimizeToTray && trayAvailable) {
       await EnhancedWindowManager.hideWindow();
       _isWindowVisible = false;
       notifyListeners();

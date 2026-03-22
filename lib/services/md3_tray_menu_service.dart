@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:system_tray/system_tray.dart';
+import 'package:flutter/services.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:time_widgets/services/global_animation_service.dart';
 import 'package:time_widgets/utils/logger.dart';
 
@@ -14,7 +15,14 @@ class MD3TrayMenuService {
       _instance ??= MD3TrayMenuService._();
 
   bool _isInitialized = false;
-  SystemTray? _systemTray;
+  bool _linuxTrayListenerRegistered = false;
+
+  static const String _actionToggleWindow = 'toggle_window';
+  static const String _actionEditTimetable = 'edit_timetable';
+  static const String _actionEditLayout = 'edit_layout';
+  static const String _actionTempSchedule = 'temp_schedule';
+  static const String _actionSettings = 'settings';
+  static const String _actionExit = 'exit';
 
   // 回调函数
   VoidCallback? onShowSettings;
@@ -32,26 +40,17 @@ class MD3TrayMenuService {
     if (_isInitialized) return true;
 
     try {
-      _systemTray = SystemTray();
-
-      // Linux 下 system_tray 对无效图标路径更敏感，优先使用可用绝对路径。
       final iconPath = _resolveTrayIconPath();
-
-      await _systemTray!.initSystemTray(
-        title: "智慧课程表",
-        iconPath: iconPath,
-      );
-
-      // 绑定点击事件
-      _systemTray!.registerSystemTrayEventHandler((eventName) async {
-        if (eventName == kSystemTrayEventClick) {
-          // 左键点击显示 MD3 菜单
-          onShowMD3Menu?.call();
-        }
-      });
+      await trayManager.setIcon(iconPath);
+      await _trySetTrayTooltip('智慧课程表');
+      await trayManager.setContextMenu(_buildNativeTrayMenu());
+      if (!_linuxTrayListenerRegistered) {
+        trayManager.addListener(_linuxTrayListener);
+        _linuxTrayListenerRegistered = true;
+      }
 
       _isInitialized = true;
-      Logger.i('系统托盘初始化成功');
+      Logger.i('系统托盘初始化成功（tray_manager）');
       return true;
     } catch (e) {
       Logger.e('系统托盘初始化失败: $e');
@@ -62,30 +61,68 @@ class MD3TrayMenuService {
 
   /// 更新托盘提示
   Future<void> updateTooltip(String tooltip) async {
-    if (_systemTray != null && _isInitialized) {
-      try {
-        // 避免 Linux 上重复 init 触发 native 崩溃，暂不在运行时刷新 tooltip。
-        if (Platform.isLinux) return;
+    if (!_isInitialized) return;
 
-        final iconPath = _resolveTrayIconPath();
-        await _systemTray!.initSystemTray(title: tooltip, iconPath: iconPath);
-      } catch (e) {
-        Logger.e('更新托盘提示失败: $e');
-      }
+    try {
+      await _trySetTrayTooltip(tooltip);
+    } catch (e) {
+      Logger.e('更新托盘提示失败: $e');
     }
+  }
+
+  Future<void> _trySetTrayTooltip(String tooltip) async {
+    try {
+      await trayManager.setToolTip(tooltip);
+    } on MissingPluginException {
+      // 某些 Linux 发行版/插件版本不支持 tooltip，忽略即可。
+    }
+  }
+
+  Menu _buildNativeTrayMenu() {
+    return Menu(
+      items: [
+        MenuItem(
+          key: _actionToggleWindow,
+          label: '显示/隐藏窗口',
+        ),
+        MenuItem.separator(),
+        MenuItem(
+          key: _actionEditTimetable,
+          label: '编辑课表',
+        ),
+        MenuItem(
+          key: _actionEditLayout,
+          label: '编辑布局',
+        ),
+        MenuItem(
+          key: _actionTempSchedule,
+          label: '临时调课',
+        ),
+        MenuItem(
+          key: _actionSettings,
+          label: '设置',
+        ),
+        MenuItem.separator(),
+        MenuItem(
+          key: _actionExit,
+          label: '退出',
+        ),
+      ],
+    );
   }
 
   String _resolveTrayIconPath() {
     final candidates = <String>[
-      if (Platform.isWindows) 'assets/icons/tray_icon.ico',
-      if (!Platform.isWindows) 'assets/icons/tray_icon.png',
-      if (!Platform.isWindows) 'assets/icons/app_icon.png',
-      '${Directory.current.path}/assets/icons/tray_icon.ico',
+      'assets/icons/tray_icon.png',
+      'assets/icons/app_icon.png',
       '${Directory.current.path}/assets/icons/tray_icon.png',
       '${Directory.current.path}/assets/icons/app_icon.png',
-      '${Directory.current.path}/data/flutter_assets/assets/icons/tray_icon.ico',
       '${Directory.current.path}/data/flutter_assets/assets/icons/tray_icon.png',
       '${Directory.current.path}/data/flutter_assets/assets/icons/app_icon.png',
+      // 某些平台也可接受 ico，作为末级回退。
+      'assets/icons/tray_icon.ico',
+      '${Directory.current.path}/assets/icons/tray_icon.ico',
+      '${Directory.current.path}/data/flutter_assets/assets/icons/tray_icon.ico',
     ];
 
     for (final candidate in candidates) {
@@ -94,24 +131,64 @@ class MD3TrayMenuService {
       }
     }
 
-    return Platform.isWindows
-        ? 'assets/icons/tray_icon.ico'
-        : 'assets/icons/app_icon.png';
+    return 'assets/icons/app_icon.png';
   }
 
   /// 销毁托盘
   Future<void> destroy() async {
-    if (_systemTray != null) {
-      try {
-        await _systemTray!.destroy();
-      } catch (e) {
-        Logger.e('销毁托盘失败: $e');
+    try {
+      if (_linuxTrayListenerRegistered) {
+        trayManager.removeListener(_linuxTrayListener);
+        _linuxTrayListenerRegistered = false;
       }
+      await trayManager.destroy();
+    } catch (e) {
+      Logger.e('销毁托盘失败: $e');
     }
     _isInitialized = false;
   }
 
   bool get isInitialized => _isInitialized;
+
+  final _linuxTrayListener = _LinuxTrayListener();
+}
+
+class _LinuxTrayListener with TrayListener {
+  @override
+  void onTrayIconMouseDown() {
+    MD3TrayMenuService.instance.onShowMD3Menu?.call();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    MD3TrayMenuService.instance.onShowMD3Menu?.call();
+  }
+
+  @override
+  void onTrayMenuItemClick(MenuItem menuItem) {
+    switch (menuItem.key) {
+      case MD3TrayMenuService._actionToggleWindow:
+        MD3TrayMenuService.instance.onToggleWindow?.call();
+        return;
+      case MD3TrayMenuService._actionEditTimetable:
+        MD3TrayMenuService.instance.onShowTimetableEdit?.call();
+        return;
+      case MD3TrayMenuService._actionEditLayout:
+        MD3TrayMenuService.instance.onToggleEditMode?.call();
+        return;
+      case MD3TrayMenuService._actionTempSchedule:
+        MD3TrayMenuService.instance.onTempScheduleChange?.call();
+        return;
+      case MD3TrayMenuService._actionSettings:
+        MD3TrayMenuService.instance.onShowSettings?.call();
+        return;
+      case MD3TrayMenuService._actionExit:
+        MD3TrayMenuService.instance.onExit?.call();
+        return;
+      default:
+        return;
+    }
+  }
 }
 
 /// MD3 风格的托盘悬浮菜单

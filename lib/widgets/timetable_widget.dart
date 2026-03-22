@@ -355,13 +355,18 @@ class _TimetableWidgetState extends State<TimetableWidget> {
                     constraints: const BoxConstraints(),
                     style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(
-                      _viewMode == TimetableViewMode.day ? displayDate : displayWeek,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontSize: 14 * fontMultiplier,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(
+                        _viewMode == TimetableViewMode.day ? displayDate : displayWeek,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 14 * fontMultiplier,
+                        ),
                       ),
                     ),
                   ),
