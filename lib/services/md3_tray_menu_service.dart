@@ -34,10 +34,8 @@ class MD3TrayMenuService {
     try {
       _systemTray = SystemTray();
 
-      // 设置托盘图标
-      final iconPath = Platform.isWindows
-          ? 'assets/icons/tray_icon.ico'
-          : 'assets/icons/tray_icon.png';
+      // Linux 下 system_tray 对无效图标路径更敏感，优先使用可用绝对路径。
+      final iconPath = _resolveTrayIconPath();
 
       await _systemTray!.initSystemTray(
         title: "智慧课程表",
@@ -66,20 +64,39 @@ class MD3TrayMenuService {
   Future<void> updateTooltip(String tooltip) async {
     if (_systemTray != null && _isInitialized) {
       try {
-        // system_tray 库可能没有直接的 setTooltip 方法
-        // 我们可以通过重新初始化系统托盘来更新提示
-        final iconPath = Platform.isWindows
-            ? 'assets/icons/tray_icon.ico'
-            : 'assets/icons/tray_icon.png';
+        // 避免 Linux 上重复 init 触发 native 崩溃，暂不在运行时刷新 tooltip。
+        if (Platform.isLinux) return;
 
-        await _systemTray!.initSystemTray(
-          title: tooltip,
-          iconPath: iconPath,
-        );
+        final iconPath = _resolveTrayIconPath();
+        await _systemTray!.initSystemTray(title: tooltip, iconPath: iconPath);
       } catch (e) {
         Logger.e('更新托盘提示失败: $e');
       }
     }
+  }
+
+  String _resolveTrayIconPath() {
+    final candidates = <String>[
+      if (Platform.isWindows) 'assets/icons/tray_icon.ico',
+      if (!Platform.isWindows) 'assets/icons/tray_icon.png',
+      if (!Platform.isWindows) 'assets/icons/app_icon.png',
+      '${Directory.current.path}/assets/icons/tray_icon.ico',
+      '${Directory.current.path}/assets/icons/tray_icon.png',
+      '${Directory.current.path}/assets/icons/app_icon.png',
+      '${Directory.current.path}/data/flutter_assets/assets/icons/tray_icon.ico',
+      '${Directory.current.path}/data/flutter_assets/assets/icons/tray_icon.png',
+      '${Directory.current.path}/data/flutter_assets/assets/icons/app_icon.png',
+    ];
+
+    for (final candidate in candidates) {
+      if (File(candidate).existsSync()) {
+        return File(candidate).absolute.path;
+      }
+    }
+
+    return Platform.isWindows
+        ? 'assets/icons/tray_icon.ico'
+        : 'assets/icons/app_icon.png';
   }
 
   /// 销毁托盘

@@ -17,7 +17,6 @@ import 'package:time_widgets/utils/responsive_utils.dart';
 import 'package:time_widgets/widgets/dialogs/temp_schedule_menu_dialog.dart';
 
 class DesktopController extends ChangeNotifier {
-
   DesktopController({
     required SettingsService settingsService,
     required this.navigatorKey,
@@ -41,13 +40,13 @@ class DesktopController extends ChangeNotifier {
   void dispose() {
     _settingsService.removeListener(_onSettingsChanged);
     MD3TrayMenuService.instance.destroy();
-    
+
     GlobalAnimationService.instance.dispose();
     EnhancedWindowManager.dispose();
     PerformanceOptimizationService.stopMemoryMonitoring();
     PerformanceOptimizationService.stopPerformanceMonitoring();
     CountdownStorageService().dispose();
-    
+
     super.dispose();
   }
 
@@ -82,7 +81,8 @@ class DesktopController extends ChangeNotifier {
       );
 
       if (!success) {
-        Logger.w('Enhanced window initialization failed, falling back to default');
+        Logger.w(
+            'Enhanced window initialization failed, falling back to default');
       }
 
       _isWindowInitialized = true;
@@ -107,8 +107,12 @@ class DesktopController extends ChangeNotifier {
       trayService.onTempScheduleChange = showTempScheduleChangeMenu;
       trayService.onShowMD3Menu = showMD3TrayMenu;
 
-      await trayService.initialize();
-      Logger.i('系统托盘初始化成功');
+      final success = await trayService.initialize();
+      if (success) {
+        Logger.i('系统托盘初始化成功');
+      } else {
+        Logger.w('系统托盘初始化失败，已降级为无托盘模式');
+      }
     } catch (e) {
       Logger.e('系统托盘初始化失败: $e');
     }
@@ -124,7 +128,8 @@ class DesktopController extends ChangeNotifier {
     _showTrayMenu = false;
     notifyListeners();
 
-    if (!_settingsService.currentSettings.enableDesktopWidgets && !_isEditMode) {
+    if (!_settingsService.currentSettings.enableDesktopWidgets &&
+        !_isEditMode) {
       hideMainWindow();
     }
   }
@@ -149,14 +154,17 @@ class DesktopController extends ChangeNotifier {
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEditMode 
-              ? LocalizationService.getString('enter_edit_mode')
-              : LocalizationService.getString('exit_edit_mode'),),
+          content: Text(
+            _isEditMode
+                ? LocalizationService.getString('enter_edit_mode')
+                : LocalizationService.getString('exit_edit_mode'),
+          ),
           duration: const Duration(seconds: 2),
         ),
       );
 
-      if (!_isEditMode && !_settingsService.currentSettings.enableDesktopWidgets) {
+      if (!_isEditMode &&
+          !_settingsService.currentSettings.enableDesktopWidgets) {
         hideMainWindow();
       }
     }
@@ -234,11 +242,4 @@ class DesktopController extends ChangeNotifier {
       ),
     );
   }
-
-
-
-
-
-
-
 }
